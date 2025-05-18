@@ -3,19 +3,16 @@ import { Card } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { ChevronRight } from 'lucide-react'
 
-interface ActivityItem {
+export interface ActivityItem {
   name: string
   jobTitle: string
   time: string
   status: 'Hired' | 'Promoted' | 'Left' | 'On Leave'
 }
 
-const activities: ActivityItem[] = [
-  { name: 'John Doe', jobTitle: 'Manager', time: 'Today, 10:45 AM', status: 'Promoted' },
-  { name: 'Emily Carter', jobTitle: 'Manager', time: 'Yesterday, 2:30 PM', status: 'On Leave' },
-  { name: 'David Kim', jobTitle: 'lvl 1 employee', time: 'May 15, 4:15 PM', status: 'Hired' },
-  { name: 'Sophia Lee', jobTitle: 'HR Specialist', time: 'May 14, 11:20 AM', status: 'Left' },
-]
+interface RecentActivityProps {
+  activities: ActivityItem[]
+}
 
 const getStatusColor = (status: ActivityItem['status']) => {
   switch (status) {
@@ -32,7 +29,7 @@ const getStatusColor = (status: ActivityItem['status']) => {
   }
 }
 
-const RecentActivity: React.FC = () => {
+const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
   return (
     <Card className="p-6 border border-gray-200 bg-white rounded-xl shadow-sm">
       {/* Header */}

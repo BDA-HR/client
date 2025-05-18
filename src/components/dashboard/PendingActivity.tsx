@@ -16,6 +16,11 @@ interface AttendanceApproval {
   totalHours: number
 }
 
+interface PendingActivityProps {
+  timeOffRequests: TimeOffRequest[]
+  attendanceApprovals: AttendanceApproval[]
+}
+
 const getInitials = (name: string): string =>
   name
     .split(' ')
@@ -23,26 +28,19 @@ const getInitials = (name: string): string =>
     .join('')
     .toUpperCase()
 
-const PendingActivity: React.FC = () => {
-  const timeOffRequests: TimeOffRequest[] = [
-    { name: 'John Doe', avatar: 'avatar1.png', days: 3, reason: 'Vacation' },
-    { name: 'Jane Smith', avatar: 'avatar2.png', days: 2, reason: 'Medical Leave' },
-  ]
-
-  const attendanceApprovals: AttendanceApproval[] = [
-    { name: 'Alice Brown', avatar: 'avatar3.png', hoursCompleted: 6, totalHours: 8 },
-    { name: 'Bob Johnson', avatar: 'avatar4.png', hoursCompleted: 4, totalHours: 6 },
-  ]
-
+const PendingActivity: React.FC<PendingActivityProps> = ({
+  timeOffRequests,
+  attendanceApprovals,
+}) => {
   const totalCount = timeOffRequests.length + attendanceApprovals.length
 
   return (
     <Card className="p-6 border border-gray-200 bg-white shadow-sm rounded-xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <h2 className="text-xl font-semibold text-gray-900">Pending Approvals</h2>
-          <span className="bg-gray-200 text-gray-800 text-sm font-medium px-2.5 py-1 rounded-full">
+          <span className="bg-warning-500 text-white text-sm font-medium px-2.5 py-1 rounded-full flex justify-center items-center">
             {totalCount}
           </span>
         </div>
@@ -82,7 +80,7 @@ const PendingActivity: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile-only HR divider */}
+        {/* Mobile HR Divider */}
         <hr className="my-6 md:hidden border-t border-gray-200" />
 
         {/* Time Attendance */}

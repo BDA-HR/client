@@ -3,7 +3,7 @@ import { Card } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { CalendarDays, MapPin, ChevronRight } from 'lucide-react'
 
-interface EventItem {
+export interface EventItem {
   title: string
   date: string
   time: string
@@ -11,29 +11,9 @@ interface EventItem {
   type?: 'Meeting' | 'Holiday' | 'Training'
 }
 
-const events: EventItem[] = [
-  {
-    title: 'Quarterly Team Meeting',
-    date: 'June 5, 2025',
-    time: '10:00 AM – 11:30 AM',
-    location: 'Conference Room A',
-    type: 'Meeting',
-  },
-  {
-    title: 'Annual Company Picnic',
-    date: 'June 12, 2025',
-    time: 'All Day',
-    location: 'Central Park',
-    type: 'Holiday',
-  },
-  {
-    title: 'Leadership Workshop',
-    date: 'June 20, 2025',
-    time: '2:00 PM – 4:00 PM',
-    location: 'Zoom',
-    type: 'Training',
-  },
-]
+interface UpcomingEventsProps {
+  events: EventItem[]
+}
 
 const getBadgeColor = (type?: string) => {
   switch (type) {
@@ -48,10 +28,9 @@ const getBadgeColor = (type?: string) => {
   }
 }
 
-const UpcomingEvents: React.FC = () => {
+const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ events }) => {
   return (
     <Card className="p-6 border border-gray-200 bg-white rounded-xl shadow-sm">
-      {/* Header with animated View All */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-gray-800">Upcoming Events</h2>
         <a
