@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, Bell, HelpCircle, Menu } from 'lucide-react';
-// import Avatar from '../ui/Avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 // import Badge from '../ui/Badge';
 
 interface HeaderProps {
@@ -46,7 +46,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <p className="text-sm font-medium text-gray-700">John Smith</p>
             <p className="text-xs text-gray-500">HR Manager</p>
           </div>
-          {/*<Avatar />*/}
+          <Avatar>
+  <AvatarImage src="https://github.com/shadcn.png" />
+  <AvatarFallback>CN</AvatarFallback>
+</Avatar>
         </div>
       </div>
     </header>
