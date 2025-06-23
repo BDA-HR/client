@@ -1,15 +1,16 @@
 @keyframes honeycomb {
   0%, 20% {
     opacity: 0;
-    transform: scale(0);
+    transform: scale(0) rotate(90deg);
   }
   30%, 100% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
   }
 }
+
 .animate-honeycomb {
-  animation: honeycomb 2.1s forwards;
+  animation: honeycomb 1.8s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
 }
 
 .hexagon {
@@ -21,6 +22,10 @@
     0% 75%,     /* Bottom left */
     0% 25%      /* Top left */
   );
+  transition: all 0.4s ease;
 }
 
-
+.hexagon:hover {
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+  transform: translateY(-5px);
+}
