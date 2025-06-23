@@ -16,7 +16,7 @@ const Layout: React.FC = () => {
         sidebarOpen ? 'block' : 'hidden'
       }`} onClick={() => setSidebarOpen(false)} />
       
-      <div className={`fixed inset-y-0 left-0 z-30 w-64 transition duration-300 transform bg-gray-100 lg:translate-x-0 lg:static lg:inset-0 ${
+      <div className={`fixed inset-y-0 left-0 z-30 w-56 transition duration-300 transform bg-gray-100 lg:translate-x-0 lg:static lg:inset-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <Sidebar />

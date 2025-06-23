@@ -81,12 +81,12 @@ const NavGroup: React.FC<NavGroupProps> = ({ icon, label, children, defaultOpen 
 };
 
 const Sidebar: React.FC = () => {
-  const navigate = useNavigate(); // <-- Initialize the hook
+  const navigate = useNavigate(); 
 
   const handleLogout = () => {    navigate('/login');
   };
   return (
-    <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
+    <div className="w-56 bg-white border-r border-gray-200 h-screen flex flex-col">
  <div className="my-1 p-2 flex items-center gap-2 mx-auto">
   <img 
     src="/logo.png" 
@@ -101,7 +101,7 @@ const Sidebar: React.FC = () => {
 <hr className='mx-2' />
       <div className="flex-1 py-4 overflow-y-auto">
         <div className="px-3 space-y-1">
-          <NavItem to="/" icon={<LayoutDashboard size={18} />} label="Dashboard" end />
+          <NavItem to="/dashboard" icon={<LayoutDashboard size={18} />} label="Dashboard" end />
           <NavGroup icon={<Users size={18} />} label="Employees">
             <NavItem to="/employees" icon={<Users size={18} />} label="Directory" />
             <NavItem to="/employees/skills" icon={<Trophy size={18} />} label="Skills" />
