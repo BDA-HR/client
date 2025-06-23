@@ -1,14 +1,14 @@
-import { Button } from '../components/ui/button'
-import StatsCards from '../components/dashboard/StatsCards'
-import UpcomingEvents from '../components/dashboard/UpcomingEvents'
-import RecentActivity from '../components/dashboard/RecentActivity'
-import PendingActivity from '../components/dashboard/PendingActivity'
-import { dashboardMetrics, departments, employeeStatusData, timeOffRequests, attendanceApprovals, recentActivities, upcomingEvents } from '../data/data'
+import { Button } from '../../components/ui/button'
+import StatsCards from '../../components/dashboard/StatsCards'
+import UpcomingEvents from '../../components/dashboard/UpcomingEvents'
+import RecentActivity from '../../components/dashboard/RecentActivity'
+import PendingActivity from '../../components/dashboard/PendingActivity'
+import { dashboardMetrics, departments, employeeStatusData, timeOffRequests, attendanceApprovals, recentActivities, upcomingEvents } from '../../data/data'
 import { motion } from 'framer-motion';
 import { Plus, RefreshCw, FileDown } from 'lucide-react';
 // import EmployeeStatus from '../components/dashboard/EmployeeStatus'
-import DepartmentChart from '../components/dashboard/DepartmentChart'
-import EmployeeStatusChart from '../components/dashboard/EmployeeChart'
+import DepartmentChart from '../../components/dashboard/DepartmentChart'
+import EmployeeStatusChart from '../../components/dashboard/EmployeeChart'
 
 
 function Dashboard() {

@@ -1,27 +1,45 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SignInPage from './pages/SignInPage';
 import Layout from './layout/layout';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/modules/Dashboard';
+import Modules from './pages/Modules';
+import Files from './pages/modules/Files';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const handleLogin = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
     setIsAuthenticated(true);
   };
+
   return (
     <BrowserRouter>
-    <Routes>
-        {/* Public routes */}
+      <Routes>
+        {/* Public route */}
         <Route path="/login" element={<SignInPage onLogin={handleLogin} />} />
-        {/* Protected routes */}
-        <Route path="/" element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
-          <Route index element={<Dashboard />} />
-          {/* Redirect non-existent routes to Dashboard */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+
+        {/* Protected layout routes */}
+        <Route
+          path="/"
+          element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path='/files' element={<Files />} />
         </Route>
+
+        {/* Standalone protected route without layout (Modules) */}
+        <Route
+          path="/"
+          element={isAuthenticated ? <Modules /> : <Navigate to="/login" />}
+          index
+        />
+
+        {/* Catch-all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
-export default App
+
+export default App;

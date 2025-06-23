@@ -1,0 +1,26 @@
+@keyframes honeycomb {
+  0%, 20% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  30%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-honeycomb {
+  animation: honeycomb 2.1s forwards;
+}
+
+.hexagon {
+  clip-path: polygon(
+    50% 0%,     /* Top point */
+    100% 25%,   /* Top right */
+    100% 75%,   /* Bottom right */
+    50% 100%,   /* Bottom point */
+    0% 75%,     /* Bottom left */
+    0% 25%      /* Top left */
+  );
+}
+
+
