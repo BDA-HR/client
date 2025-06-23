@@ -6,7 +6,12 @@ import { Label } from "../components/ui/label";
 import { Checkbox } from "../components/ui/checkbox";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../components/ui/card";
 
-const SignInPage: React.FC = () => {
+
+type SignInPageProps = {
+  onLogin: () => void;
+};
+
+const SignInPage: React.FC<SignInPageProps> = ({ onLogin }) => {
   const navigate = useNavigate();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -14,6 +19,7 @@ const SignInPage: React.FC = () => {
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
+    onLogin();
     navigate('/');
   };
 
