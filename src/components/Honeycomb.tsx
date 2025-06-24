@@ -4,11 +4,11 @@ import "./Honeycomb.css";
 
 const modules = [
   { label: "HR", color: "bg-white", border: "border-[#FF6B6B]" },
-  { label: "B", color: "bg-white", border: "border-[#FFD93D]" },
-  { label: "C", color: "bg-white", border: "border-[#6BCB77]" },
-  { label: "D", color: "bg-white", border: "border-[#4D96FF]" },
-  { label: "E", color: "bg-white", border: "border-[#C780FA]" },
-  { label: "Files", color: "bg-white", border: "border-[#FFA600]" },
+  { label: "CRM", color: "bg-white", border: "border-[#FFD93D]" },
+  { label: "Core", color: "bg-white", border: "border-[#6BCB77]" },
+  { label: "Inventory", color: "bg-white", border: "border-[#4D96FF]" },
+  { label: "Procurement", color: "bg-white", border: "border-[#C780FA]" },
+  { label: "Finance", color: "bg-white", border: "border-[#FFA600]" },
   { label: "Logo", color: "bg-white", border: "border-[#00C2CB]" },
 ];
 
@@ -67,24 +67,34 @@ export default function Honeycomb() {
                 else if (isFiles) navigate("/files");
               }}
             >
-              <div
-                className={`
-                  hexagon
-                  flex items-center justify-center
-                  w-full h-full
-                  text-2xl font-extrabold
-                  shadow-xl
-                  transition-all duration-300
-                  ${isHR
-                    ? "bg-white group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-green-600 group-hover:text-white"
-                    : isFiles
-                    ? "bg-white group-hover:bg-gradient-to-r group-hover:from-yellow-300 group-hover:to-yellow-500 group-hover:text-white"
-                    : mod.color
-                  }
-                `}
-              >
-                {mod.label}
-              </div>
+<div
+  className={`
+    hexagon
+    flex items-center justify-center
+    w-full h-full
+    text-base font-semibold text-center px-2
+    shadow-xl
+    transition-all duration-300
+    ${isHR
+      ? "bg-white group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-green-600 group-hover:text-white"
+      : isFiles
+      ? "bg-white group-hover:bg-gradient-to-r group-hover:from-yellow-300 group-hover:to-yellow-500 group-hover:text-white"
+      : mod.color
+    }
+  `}
+>
+  {mod.label === "Logo" ? (
+  <a href="https://bda.org.et" target="_blank" rel="noopener noreferrer">    <img
+      src="/bda-logo-1.png"
+      alt="Company Logo"
+      className="w-full h-full object-cover"
+    />
+    </a>
+  ) : (
+    mod.label
+  )}
+</div>
+
             </motion.div>
           );
         })}
