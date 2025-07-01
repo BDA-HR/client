@@ -17,6 +17,7 @@ import {
   LogOut,
   RefreshCw,
   Warehouse,
+  ClipboardList
 } from 'lucide-react';
 import { useModule } from '../ModuleContext';
 
@@ -134,17 +135,20 @@ const Sidebar: React.FC = () => {
         <div className="px-3 space-y-1">
           <NavItem
             to={
-              activeModule === 'Inventory'
-                ? '/inventory'
-                : activeModule === 'Core'
-                ? '/core'
-                : '/dashboard'
+              activeModule === 'Inventory' ? '/inventory' :
+              activeModule === 'Core' ? '/core' :
+              activeModule === 'HR' ? '/dashboard' :
+              activeModule === 'CRM' ? '/crm' :
+              activeModule === 'Finance' ? '/finance' :
+              activeModule === 'Procurement' ? '/procurement' :
+              '/dashboard'
             }
             icon={<LayoutDashboard size={18} />}
             label="Dashboard"
             end
             {...theme}
           />
+
 
           {activeModule === 'HR' && (
             <>
@@ -186,6 +190,18 @@ const Sidebar: React.FC = () => {
               <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
             </>
           )}
+
+          {activeModule === 'CRM' && (
+          <>
+            <NavItem to="/crm/leads" icon={<Trophy size={18} />} label="Lead Management" {...theme} />
+            <NavItem to="/crm/contacts" icon={<Users size={18} />} label="Contact Management" {...theme} />
+            <NavItem to="/crm/sales" icon={<BarChart4 size={18} />} label="Sales Management" {...theme} />
+            <NavItem to="/crm/marketing" icon={<FileSpreadsheet size={18} />} label="Marketing Automation" {...theme} />
+            <NavItem to="/crm/support" icon={<Calendar size={18} />} label="Customer Service" {...theme} />
+            <NavItem to="/crm/activities" icon={<ClipboardList size={18} />} label="Activity Management" {...theme} />
+            <NavItem to="/crm/analytics" icon={<BarChart4 size={18} />} label="Analytics & Reporting" {...theme} />
+          </>
+        )}
         </div>
       </div>
 
