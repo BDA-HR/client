@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -132,13 +132,19 @@ const Sidebar: React.FC = () => {
 
       <div className="flex-1 py-4 overflow-y-auto">
         <div className="px-3 space-y-1">
-            <NavItem
-              to={activeModule === 'Inventory' ? '/inventory' : '/dashboard'}
-              icon={<LayoutDashboard size={18} />}
-              label="Dashboard"
-              end
-              {...theme}
-            />
+          <NavItem
+            to={
+              activeModule === 'Inventory'
+                ? '/inventory'
+                : activeModule === 'Core'
+                ? '/core'
+                : '/dashboard'
+            }
+            icon={<LayoutDashboard size={18} />}
+            label="Dashboard"
+            end
+            {...theme}
+          />
 
           {activeModule === 'HR' && (
             <>
@@ -168,6 +174,16 @@ const Sidebar: React.FC = () => {
               <NavItem to="/inventory/valuation" icon={<BarChart4 size={18} />} label="Inventory Valuation" {...theme} />
               <NavItem to="/inventory/reorder" icon={<RefreshCw size={18} />} label="Reorder Management" {...theme} />
               <NavItem to="/inventory/analytics" icon={<BarChart4 size={18} />} label="Reporting & Analytics" {...theme} />
+            </>
+          )}
+
+          {activeModule === 'Core' && (
+            <>
+              <NavItem to="/core/branch" icon={<Building2 size={18} />} label="Branch" {...theme} />
+              <NavItem to="/core/department" icon={<Users size={18} />} label="Department" {...theme} />
+              <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
+              <NavItem to="/core/hierarchy" icon={<BarChart4 size={18} />} label="Hierarchy" {...theme} />
+              <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
             </>
           )}
         </div>
