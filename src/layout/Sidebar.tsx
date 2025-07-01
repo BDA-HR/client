@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate  } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -15,23 +15,29 @@ import {
   BarChart4,
   FileText,
   LogOut,
+  RefreshCw,
+  Warehouse,
 } from 'lucide-react';
+import { useModule } from '../ModuleContext';
 
 interface NavItemProps {
   to: string;
   icon: React.ReactNode;
   label: string;
   end?: boolean;
+  activeBg: string;
+  textColor: string;
+  hoverBg: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ to, icon, label, end = false }) => {
+const NavItem: React.FC<NavItemProps> = ({ to, icon, label, end = false, activeBg, textColor, hoverBg }) => {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) =>
         `flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-          isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+          isActive ? `${activeBg} ${textColor}` : `text-gray-600 ${hoverBg}`
         }`
       }
     >
@@ -46,16 +52,23 @@ interface NavGroupProps {
   label: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  hoverBg: string;
 }
 
-const NavGroup: React.FC<NavGroupProps> = ({ icon, label, children, defaultOpen = false }) => {
+const NavGroup: React.FC<NavGroupProps> = ({
+  icon,
+  label,
+  children,
+  defaultOpen = false,
+  hoverBg,
+}) => {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   return (
     <div className="mb-2">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+        className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-600 rounded-md transition-colors ${hoverBg}`}
       >
         <div className="flex items-center">
           <span className="mr-3">{icon}</span>
@@ -81,48 +94,91 @@ const NavGroup: React.FC<NavGroupProps> = ({ icon, label, children, defaultOpen 
 };
 
 const Sidebar: React.FC = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const { activeModule } = useModule();
 
-  const handleLogout = () => {    navigate('/login');
+  const handleLogout = () => {
+    navigate('/login');
   };
+
+  const themeMap: Record<string, { textColor: string; activeBg: string; hoverBg: string }> = {
+    Inventory: { textColor: 'text-yellow-700', activeBg: 'bg-yellow-100', hoverBg: 'hover:bg-yellow-50' },
+    HR: { textColor: 'text-green-700', activeBg: 'bg-green-100', hoverBg: 'hover:bg-green-50' },
+    Core: { textColor: 'text-emerald-700', activeBg: 'bg-emerald-100', hoverBg: 'hover:bg-emerald-50' },
+    CRM: { textColor: 'text-orange-700', activeBg: 'bg-orange-100', hoverBg: 'hover:bg-orange-50' },
+    Finance: { textColor: 'text-amber-700', activeBg: 'bg-amber-100', hoverBg: 'hover:bg-amber-50' },
+    Procurement: { textColor: 'text-purple-700', activeBg: 'bg-purple-100', hoverBg: 'hover:bg-purple-50' },
+    Logo: { textColor: 'text-cyan-700', activeBg: 'bg-cyan-100', hoverBg: 'hover:bg-cyan-50' },
+    default: { textColor: 'text-gray-600', activeBg: 'bg-gray-100', hoverBg: 'hover:bg-gray-50' },
+  };
+
+  const theme = themeMap[activeModule] || themeMap.default;
+
   return (
-    <div className="w-56 bg-white border-r border-gray-200 h-screen flex flex-col">
- <div className="my-1 p-2 flex items-center gap-2 mx-auto">
-  <img 
-    src="/logo.png" 
-    alt="Logo" 
-    className="w-12 h-12 rounded-full border object-cover overflow-clip" 
-  />
-  <div className="flex flex-col justify-center text-center">
-    <h1 className="text-xl font-bold text-gray-900 leading-tight">BDA</h1>
-    <p className="text-sm text-gray-500">Investment Group</p>
-  </div>
-</div>
-<hr className='mx-2' />
-      <div className="flex-1 py-4 overflow-y-auto">
-        <div className="px-3 space-y-1">
-          <NavItem to="/dashboard" icon={<LayoutDashboard size={18} />} label="Dashboard" end />
-          <NavGroup icon={<Users size={18} />} label="Employees">
-            <NavItem to="/employees" icon={<Users size={18} />} label="Directory" />
-            <NavItem to="/employees/skills" icon={<Trophy size={18} />} label="Skills" />
-            <NavItem to="/employees/appraisals" icon={<FileText size={18} />} label="Appraisals" />
-          </NavGroup>
-          <NavGroup icon={<Building2 size={18} />} label="Organization">
-            <NavItem to="/organization/structure" icon={<Building2 size={18} />} label="Structure" />
-            <NavItem to="/organization/departments" icon={<Users size={18} />} label="Departments" />
-          </NavGroup>
-          <NavItem to="/leave-management" icon={<Calendar size={18} />} label="Leave Management" />
-          <NavItem to="/training" icon={<GraduationCap size={18} />} label="Training" />
-          <NavItem to="/reports" icon={<FileSpreadsheet size={18} />} label="Reports" />
-          <NavItem to="/analytics" icon={<BarChart4 size={18} />} label="Analytics" />
+    <div className="w-56 bg-white border-r h-screen flex flex-col">
+      <div className="my-1 p-2 flex items-center gap-2 mx-auto">
+        <img
+          src="/bda-logo-1.png"
+          alt="Logo"
+          className="w-12 h-12 rounded-full border object-cover overflow-clip"
+        />
+        <div className="flex flex-col justify-center text-center">
+          <h1 className={`text-xl font-bold ${theme.textColor} leading-tight`}>BDA</h1>
+          <p className="text-sm text-gray-500">Investment Group</p>
         </div>
       </div>
 
-      {/* Footer Section */}
+      <hr className="mx-2" />
+
+      <div className="flex-1 py-4 overflow-y-auto">
+        <div className="px-3 space-y-1">
+            <NavItem
+              to={activeModule === 'Inventory' ? '/inventory' : '/dashboard'}
+              icon={<LayoutDashboard size={18} />}
+              label="Dashboard"
+              end
+              {...theme}
+            />
+
+          {activeModule === 'HR' && (
+            <>
+              <NavGroup icon={<Users size={18} />} label="Employees" hoverBg={theme.hoverBg}>
+                <NavItem to="/employees" icon={<Users size={18} />} label="Directory" {...theme} />
+                <NavItem to="/employees/skills" icon={<Trophy size={18} />} label="Skills" {...theme} />
+                <NavItem to="/employees/appraisals" icon={<FileText size={18} />} label="Appraisals" {...theme} />
+              </NavGroup>
+
+              <NavGroup icon={<Building2 size={18} />} label="Organization" hoverBg={theme.hoverBg}>
+                <NavItem to="/organization/structure" icon={<Building2 size={18} />} label="Structure" {...theme} />
+                <NavItem to="/organization/departments" icon={<Users size={18} />} label="Departments" {...theme} />
+              </NavGroup>
+
+              <NavItem to="/leave-management" icon={<Calendar size={18} />} label="Leave Management" {...theme} />
+              <NavItem to="/training" icon={<GraduationCap size={18} />} label="Training" {...theme} />
+              <NavItem to="/reports" icon={<FileSpreadsheet size={18} />} label="Reports" {...theme} />
+              <NavItem to="/analytics" icon={<BarChart4 size={18} />} label="Analytics" {...theme} />
+            </>
+          )}
+
+          {activeModule === 'Inventory' && (
+            <>
+              <NavItem to="/inventory/tracking" icon={<FileText size={18} />} label="Inventory Tracking" {...theme} />
+              <NavItem to="/inventory/inbound" icon={<FileText size={18} />} label="Stock Management" {...theme} />
+              <NavItem to="/inventory/warehouse" icon={<Warehouse size={18} />} label="Warehouse Management" {...theme} />
+              <NavItem to="/inventory/valuation" icon={<BarChart4 size={18} />} label="Inventory Valuation" {...theme} />
+              <NavItem to="/inventory/reorder" icon={<RefreshCw size={18} />} label="Reorder Management" {...theme} />
+              <NavItem to="/inventory/analytics" icon={<BarChart4 size={18} />} label="Reporting & Analytics" {...theme} />
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="p-4 border-t border-gray-200">
-        <NavItem to="/settings" icon={<Settings size={18} />} label="Settings" />
-        <button className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors w-full hover:cursor-pointer"
-        onClick={handleLogout}>
+        <NavItem to="/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
+        <button
+          className={`flex items-center px-4 py-2.5 text-sm font-medium w-full rounded-md transition-colors ${theme.textColor} ${theme.hoverBg}`}
+          onClick={handleLogout}
+        >
           <span className="mr-3">
             <LogOut size={18} />
           </span>

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import "./Honeycomb.css";
-
+import { useModule } from '../ModuleContext';
 const modules = [
   { label: "HR", color: "bg-white", border: "border-[#FF6B6B]" },
   { label: "CRM", color: "bg-white", border: "border-[#FFD93D]" },
@@ -24,6 +24,7 @@ const positions = [
 
 export default function Honeycomb() {
   const navigate = useNavigate();
+  const { setActiveModule } = useModule();
 
   return (
     <section className="flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 h-screen overflow-hidden">
@@ -34,7 +35,7 @@ export default function Honeycomb() {
         
         {modules.map((mod, i) => {
           const isHR = mod.label === "HR";
-          const isFiles = mod.label === "Files";
+          const isInventory = mod.label === "Inventory";
 
           return (
             <motion.div
@@ -63,8 +64,9 @@ export default function Honeycomb() {
               `}
               style={{ width: 110, height: 110 }}
               onClick={() => {
-                if (isHR) navigate("/dashboard");
-                else if (isFiles) navigate("/files");
+            setActiveModule(mod.label);
+            if (isHR) navigate("/dashboard");
+            else if (isInventory) navigate("/inventory");
               }}
             >
 <div
@@ -77,7 +79,7 @@ export default function Honeycomb() {
     transition-all duration-300
     ${isHR
       ? "bg-white group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-green-600 group-hover:text-white"
-      : isFiles
+      : isInventory
       ? "bg-white group-hover:bg-gradient-to-r group-hover:from-yellow-300 group-hover:to-yellow-500 group-hover:text-white"
       : mod.color
     }

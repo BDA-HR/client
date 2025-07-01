@@ -4,7 +4,8 @@ import SignInPage from './pages/SignInPage';
 import Layout from './layout/layout';
 import Dashboard from './pages/modules/Dashboard';
 import Modules from './pages/Modules';
-import Files from './pages/modules/Files';
+import { ModuleProvider } from './ModuleContext';
+import InventoryDashboard from './pages/modules/Inventory';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,6 +15,7 @@ function App() {
   };
 
   return (
+    <ModuleProvider>
     <BrowserRouter>
       <Routes>
         {/* Public route */}
@@ -25,7 +27,7 @@ function App() {
           element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
         >
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path='/files' element={<Files />} />
+          <Route path='/inventory' element={<InventoryDashboard />} />
         </Route>
 
         {/* Standalone protected route without layout (Modules) */}
@@ -39,6 +41,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </ModuleProvider>
   );
 }
 
