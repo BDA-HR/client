@@ -17,7 +17,14 @@ import {
   LogOut,
   RefreshCw,
   Warehouse,
-  ClipboardList
+  ClipboardList,
+  DollarSign,
+  FileCheck,
+  CheckCircle2,
+  Package,
+  Briefcase,
+  ClipboardCheck,
+  LineChart,
 } from 'lucide-react';
 import { useModule } from '../ModuleContext';
 
@@ -200,6 +207,27 @@ const Sidebar: React.FC = () => {
             <NavItem to="/crm/support" icon={<Calendar size={18} />} label="Customer Service" {...theme} />
             <NavItem to="/crm/activities" icon={<ClipboardList size={18} />} label="Activity Management" {...theme} />
             <NavItem to="/crm/analytics" icon={<BarChart4 size={18} />} label="Analytics & Reporting" {...theme} />
+          </>
+        )}
+        {activeModule === 'Finance' && (
+          <>
+            <NavItem to="/finance/gl" icon={<FileText size={18} />} label="General Ledger" {...theme} />
+            <NavItem to="/finance/ap" icon={<Package size={18} />} label="Accounts Payable" {...theme} />
+            <NavItem to="/finance/ar" icon={<DollarSign size={18} />} label="Accounts Receivable" {...theme} />
+            <NavItem to="/finance/assets" icon={<Briefcase size={18} />} label="Assets" {...theme} />
+            <NavItem to="/finance/budget" icon={<FileSpreadsheet size={18} />} label="Budgeting" {...theme} />
+            <NavItem to="/finance/reports" icon={<LineChart size={18} />} label="Reports" {...theme} />
+          </>
+        )}
+
+        {activeModule === 'Procurement' && (
+          <>
+            <NavItem to="/procurement/requisitions" icon={<FileText size={18} />} label="Requisitions" {...theme} />
+            <NavItem to="/procurement/vendors" icon={<Users size={18} />} label="Vendors" {...theme} />
+            <NavItem to="/procurement/po" icon={<ClipboardCheck size={18} />} label="Purchase Orders" {...theme} />
+            <NavItem to="/procurement/receipt" icon={<CheckCircle2 size={18} />} label="Goods Receipt" {...theme} />
+            <NavItem to="/procurement/invoice" icon={<FileCheck size={18} />} label="Invoices" {...theme} />
+            <NavItem to="/procurement/analytics" icon={<BarChart4 size={18} />} label="Analytics" {...theme} />
           </>
         )}
         </div>
