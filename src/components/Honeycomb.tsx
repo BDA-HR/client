@@ -14,13 +14,13 @@ const modules = [
 ];
 
 const positions = [
-  "-translate-x-[120px] translate-y-0",
-  "-translate-x-[60px] translate-y-[100px]",
-  "translate-x-[60px] translate-y-[100px]",
-  "translate-x-[120px] translate-y-0",
-  "translate-x-[60px] -translate-y-[100px]",
-  "-translate-x-[60px] -translate-y-[100px]",
-  "translate-x-0 translate-y-0",
+  "-translate-x-[160px] translate-y-0",      // top-left
+  "-translate-x-[80px] translate-y-[140px]", // middle-left
+  "translate-x-[80px] translate-y-[140px]",  // middle-right
+  "translate-x-[160px] translate-y-0",       // top-right
+  "translate-x-[80px] -translate-y-[140px]", // upper-right
+  "-translate-x-[80px] -translate-y-[140px]",// upper-left
+  "translate-x-0 translate-y-0",             // center
 ];
 
 export default function Honeycomb() {
@@ -28,8 +28,10 @@ export default function Honeycomb() {
   const { setActiveModule } = useModule();
 
   return (
-    <section className="flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 h-screen overflow-hidden">
-      <div className="relative w-[360px] h-[320px]">
+    <section className="flex items-center justify-center h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 overflow-hidden">
+
+      <div className="relative w-[500px] h-[500px] flex items-center justify-center">
+
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="bg-gradient-to-r from-purple-400 to-pink-600 blur-[100px] opacity-20 rounded-full w-[300px] h-[300px] animate-pulse" />
         </div>
@@ -55,7 +57,7 @@ export default function Honeycomb() {
               transition-all duration-300
               group cursor-pointer
             `}
-            style={{ width: 110, height: 110 }}
+            style={{ width: 140, height: 140 }}
             onClick={() => {
               if (mod.label !== "Logo") {
                 setActiveModule(mod.label);
@@ -85,7 +87,7 @@ export default function Honeycomb() {
                   <img
                     src="/bda-logo-1.png"
                     alt="Company Logo"
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-[80%] h-[80%] object-contain"
                   />
                 </a>
               ) : (
