@@ -135,7 +135,6 @@ const BranchOverview: React.FC<BranchOverviewProps> = ({ branches }) => (
   </div>
 );
 
-// Enhanced DepartmentOverview
 const DepartmentOverview: React.FC<DepartmentOverviewProps> = ({ departments }) => (
   <div className="space-y-4">
     {departments.map(dept => (
@@ -177,7 +176,6 @@ const DepartmentOverview: React.FC<DepartmentOverviewProps> = ({ departments }) 
   </div>
 );
 
-// Enhanced FiscalYearOverview
 const FiscalYearOverview: React.FC<FiscalYearOverviewProps> = ({ fiscalYears }) => (
   <div className="space-y-4">
     {fiscalYears.map(year => (
@@ -185,16 +183,27 @@ const FiscalYearOverview: React.FC<FiscalYearOverviewProps> = ({ fiscalYears }) 
         key={year.id}
         whileHover={{ scale: 1.02 }}
         className={`border rounded-lg p-4 shadow-sm hover:shadow-md transition-all bg-white dark:bg-gray-900 ${
-          year.status === 'Current' ? 'ring-2 ring-purple-500/20' : ''
+          year.status === 'Current' 
+            ? 'ring-2 ring-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-900/20' 
+            : ''
         }`}
       >
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-                <Calendar className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <span className={`p-1.5 rounded-lg ${
+                year.status === 'Current' 
+                  ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400'
+                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+              }`}>
+                <Calendar className="h-5 w-5" />
               </span>
               FY {year.year}
+              {year.status === 'Current' && (
+                <span className="text-xs font-normal bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full dark:bg-emerald-900/30 dark:text-emerald-200">
+                  Current
+                </span>
+              )}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {year.start} - {year.end}
@@ -230,7 +239,6 @@ const FiscalYearOverview: React.FC<FiscalYearOverviewProps> = ({ fiscalYears }) 
   </div>
 );
 
-// Enhanced HierarchyOverview
 const HierarchyOverview: React.FC<HierarchyOverviewProps> = ({ hierarchy }) => (
   <div className="space-y-6">
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -273,7 +281,6 @@ const HierarchyOverview: React.FC<HierarchyOverviewProps> = ({ hierarchy }) => (
   </div>
 );
 
-// Enhanced UserOverview
 const UserOverview: React.FC<UserOverviewProps> = ({ users }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {users.map(user => (
@@ -336,7 +343,6 @@ interface Stats {
   activeUsers: number;
 }
 
-
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -389,9 +395,9 @@ const departmentData: Department[] = [
 ];
 
 const fiscalYearData: FiscalYear[] = [
-  { id: 1, year: '2023', start: 'Jan 1, 2023', end: 'Dec 31, 2023', status: 'Closed' },
-  { id: 2, year: '2024', start: 'Jan 1, 2024', end: 'Dec 31, 2024', status: 'Current' },
-  { id: 3, year: '2025', start: 'Jan 1, 2025', end: 'Dec 31, 2025', status: 'Planning' }
+  { id: 1, year: '2023/2024', start: 'Jan 1, 2023', end: 'Dec 31, 2023', status: 'Closed' },
+  { id: 2, year: '2024/2025', start: 'Jan 1, 2024', end: 'Dec 31, 2024', status: 'Current' },
+  { id: 3, year: '2024/2025', start: 'Jan 1, 2025', end: 'Dec 31, 2025', status: 'Planning' }
 ];
 
 const hierarchyData: HierarchyData = {
@@ -416,7 +422,7 @@ const userData: User[] = [
   { id: 4, name: 'Emily Davis', email: 'emily@company.com', role: 'IT Support', lastLogin: '1 week ago', status: 'inactive' }
 ];
 
-const CoreDashboard=() => {
+const CoreDashboard = () => {
   const { activeModule } = useModule();
   
   const stats: Stats = {
@@ -428,32 +434,33 @@ const CoreDashboard=() => {
   };
 
   const statConfig = {
-  branches: {
-    icon: <Building className="h-4 w-4 text-emerald-600" />,
-    title: 'Branches',
-    description: 'Operational units'
-  },
-  departments: {
-    icon: <Users className="h-4 w-4 text-emerald-500" />,
-    title: 'Departments',
-    description: 'Functional divisions'
-  },
-  fiscalYears: {
-    icon: <Calendar className="h-4 w-4 text-emerald-500" />,
-    title: 'Fiscal Years',
-    description: 'Financial periods'
-  },
-  hierarchyLevels: {
-    icon: <Layers className="h-4 w-4 text-emerald-400" />,
-    title: 'Hierarchy Levels',
-    description: 'Organizational levels'
-  },
-  activeUsers: {
-    icon: <User className="h-4 w-4 text-emerald-600" />,
-    title: 'Active Users',
-    description: 'System users'
-  }
-};
+    branches: {
+      icon: <Building className="h-4 w-4 text-emerald-600" />,
+      title: 'Branches',
+      description: 'Operational units'
+    },
+    departments: {
+      icon: <Users className="h-4 w-4 text-emerald-500" />,
+      title: 'Departments',
+      description: 'Functional divisions'
+    },
+    fiscalYears: {
+      icon: <Calendar className="h-4 w-4 text-emerald-500" />,
+      title: 'Current Year',
+      description: 'Active fiscal period'
+    },
+    hierarchyLevels: {
+      icon: <Layers className="h-4 w-4 text-emerald-400" />,
+      title: 'Hierarchy Levels',
+      description: 'Organizational levels'
+    },
+    activeUsers: {
+      icon: <User className="h-4 w-4 text-emerald-600" />,
+      title: 'Active Users',
+      description: 'System users'
+    }
+  };
+
   return (
     <motion.div 
       variants={containerVariants} 
@@ -469,22 +476,22 @@ const CoreDashboard=() => {
               {activeModule === 'Core' ? 'Core Module' : 'Dashboard'}
             </h1>
             <Badge variant="outline" className="bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900 dark:text-emerald-100">
-  Active
-</Badge>
+              Active
+            </Badge>
           </div>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Central hub for managing organizational structure, financial periods, and user access.
           </p>
         </div>
         <div className="flex gap-3">
-<Button variant="outline" size="sm" className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-100">
-  <RefreshCw size={16} />
-  <span>Refresh</span>
-</Button>
-<Button size="sm" className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
-  <Plus size={16} />
-  <span>New</span>
-</Button>
+          <Button variant="outline" size="sm" className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-100">
+            <RefreshCw size={16} />
+            <span>Refresh</span>
+          </Button>
+          <Button size="sm" className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+            <Plus size={16} />
+            <span>New</span>
+          </Button>
         </div>
       </section>
 
@@ -495,15 +502,28 @@ const CoreDashboard=() => {
       >
         {(Object.keys(statConfig) as StatKey[]).map((key) => (
           <motion.div key={key} variants={statCardVariants}>
-<Card className="hover:shadow-lg hover:ring-1 hover:ring-emerald-400 transition-all">              <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <Card className="hover:shadow-lg hover:ring-1 hover:ring-emerald-400 transition-all">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-500">
                   {statConfig[key].title}
                 </CardTitle>
                 {statConfig[key].icon}
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats[key]}</div>
-                <p className="text-xs text-gray-500 mt-1">{statConfig[key].description}</p>
+                <div className="text-2xl font-bold">
+                  {key === 'fiscalYears' 
+                    ? fiscalYearData.find(y => y.status === 'Current')?.year || 'N/A'
+                    : stats[key]
+                  }
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {key === 'fiscalYears'
+                    ? fiscalYearData.find(y => y.status === 'Current') 
+                        ? `${fiscalYearData.find(y => y.status === 'Current')?.start} - ${fiscalYearData.find(y => y.status === 'Current')?.end}`
+                        : 'No active fiscal year'
+                    : statConfig[key].description
+                  }
+                </p>
               </CardContent>
             </Card>
           </motion.div>
@@ -593,6 +613,7 @@ const CoreDashboard=() => {
         </Card>
       </motion.div>
     </motion.div>
+
   );
 };
 

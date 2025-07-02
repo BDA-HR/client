@@ -1,4 +1,3 @@
-// src/components/finance/AccountsReceivable.tsx
 export default function AccountsReceivable() {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 border-2 border-purple-100 hover:border-indigo-800 transition-colors">

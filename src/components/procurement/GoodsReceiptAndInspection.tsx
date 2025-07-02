@@ -1,4 +1,3 @@
-// src/components/procurement/GoodsReceiptAndInspection.tsx
 export default function GoodsReceiptAndInspection() {
   const receipts = [
     { po: "PO-1001", items: 15, status: "Inspected" },

@@ -23,8 +23,29 @@
     0% 27%
   );
   transition: all 0.4s ease;
+  background-color: white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .hexagon:hover {
-  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+}
+
+/* ---------- Responsive Adjustments ---------- */
+@media (max-width: 639px) {
+  .absolute {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  .absolute {
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+}
+
+@media (max-width: 639px) {
+  .hexagon {
+    font-size: 10px;
+  }
 }

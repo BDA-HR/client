@@ -1,4 +1,3 @@
-// src/components/finance/AuditAndComplianceManagement.tsx
 export default function AuditAndComplianceManagement() {
   const complianceItems = [
     { name: 'SOX Compliance', status: 'Complete', date: '2023-12-15' },

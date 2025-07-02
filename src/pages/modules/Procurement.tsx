@@ -1,4 +1,3 @@
-// src/modules/procurement.tsx
 import PurchaseRequisitionManagement from '../../components/procurement/PurchaseRequisitionManagement';
 import VendorManagement from '../../components/procurement/VendorManagement';
 import PurchaseOrderManagement from '../../components/procurement/PurchaseOrderManagement';

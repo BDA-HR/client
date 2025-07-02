@@ -1,15 +1,18 @@
 import React, { createContext, useContext, useState } from 'react';
 
-interface ModuleContextType {
+type ModuleContextType = {
   activeModule: string;
   setActiveModule: (module: string) => void;
-}
+};
 
-const ModuleContext = createContext<ModuleContextType | undefined>(undefined);
+const ModuleContext = createContext<ModuleContextType>({
+  activeModule: 'Core',
+  setActiveModule: () => {},
+});
 
-export const ModuleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeModule, setActiveModule] = useState("HR");
-
+export const ModuleProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const [activeModule, setActiveModule] = useState('Core');
+  
   return (
     <ModuleContext.Provider value={{ activeModule, setActiveModule }}>
       {children}
@@ -17,8 +20,4 @@ export const ModuleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 };
 
-export const useModule = () => {
-  const context = useContext(ModuleContext);
-  if (!context) throw new Error("useModule must be used within a ModuleProvider");
-  return context;
-};
+export const useModule = () => useContext(ModuleContext);

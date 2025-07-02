@@ -1,4 +1,3 @@
-// src/components/procurement/ContractManagement.tsx
 export default function ContractManagement() {
   const contracts = [
     { vendor: "Tech Supplies", endDate: "2024-06-30", status: "Active" },

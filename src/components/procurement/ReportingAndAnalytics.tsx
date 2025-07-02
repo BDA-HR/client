@@ -1,4 +1,3 @@
-// src/components/procurement/ReportingAndAnalytics.tsx
 export default function ReportingAndAnalytics() {
   const reports = [
     { name: "Spend Analysis", lastRun: "2023-12-01" },

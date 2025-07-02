@@ -1,7 +1,6 @@
 import React from 'react';
 import { Bell, HelpCircle, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-// import Badge from '../ui/Badge';
 
 interface HeaderProps {
   toggleSidebar: () => void;

@@ -1,4 +1,3 @@
-// src/components/procurement/PurchaseRequisitionManagement.tsx
 export default function PurchaseRequisitionManagement() {
   const requisitions = [
     { id: "REQ-001", department: "Marketing", amount: "$8,500", status: "Approved" },

@@ -1,4 +1,3 @@
-// src/components/procurement/QuotationAndTenderManagement.tsx
 export default function QuotationAndTenderManagement() {
   const tenders = [
     { id: "TDR-2023-15", name: "Office Equipment", status: "Evaluation" },

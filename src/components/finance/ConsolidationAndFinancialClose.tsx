@@ -1,4 +1,3 @@
-// src/components/finance/ConsolidationAndFinancialClose.tsx
 export default function ConsolidationAndFinancialClose() {
   const entities = [
     { name: 'Parent Company', status: 'Complete' },

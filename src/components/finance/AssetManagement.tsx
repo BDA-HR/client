@@ -1,4 +1,3 @@
-// src/components/finance/AssetManagement.tsx
 export default function AssetManagement() {
   const assets = [
     { name: 'Equipment', value: '$420,000', change: '+3.2%' },

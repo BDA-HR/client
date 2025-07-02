@@ -1,4 +1,3 @@
-// src/components/procurement/InvoiceProcessingAndPayment.tsx
 export default function InvoiceProcessingAndPayment() {
   const invoices = [
     { vendor: "Tech Supplies", amount: "$8,500", due: "2023-12-15" },

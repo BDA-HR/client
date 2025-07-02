@@ -1,4 +1,3 @@
-// src/components/finance/FinancialReportingAndAnalytics.tsx
 export default function FinancialReportingAndAnalytics() {
   const reports = [
     { name: 'Income Statement', lastRun: '2023-12-15' },

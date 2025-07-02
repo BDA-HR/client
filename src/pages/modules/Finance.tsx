@@ -1,4 +1,3 @@
-// src/modules/finance.tsx
 import AccountsPayable from '../../components/finance/AccountsPayable';
 import AccountsReceivable from '../../components/finance/AccountsReceivable';
 import AssetManagement from '../../components/finance/AssetManagement';

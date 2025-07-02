@@ -1,4 +1,3 @@
-// src/components/finance/GeneralLedger.tsx
 export default function GeneralLedger() {
   const accounts = [
     { name: 'Assets', balance: '$1.2M' },

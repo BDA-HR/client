@@ -1,4 +1,3 @@
-// src/components/procurement/VendorManagement.tsx
 export default function VendorManagement() {
   const vendors = [
     { name: "Tech Supplies Inc", rating: "4.8", status: "Active" },

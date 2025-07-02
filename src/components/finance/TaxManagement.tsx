@@ -1,4 +1,3 @@
-// src/components/finance/TaxManagement.tsx
 export default function TaxManagement() {
   const taxes = [
     { name: 'Income Tax', due: '2024-04-15', amount: '$85,000' },

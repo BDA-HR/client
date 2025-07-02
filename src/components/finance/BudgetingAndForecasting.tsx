@@ -1,4 +1,3 @@
-// src/components/finance/BudgetingAndForecasting.tsx
 export default function BudgetingAndForecasting() {
   const budgets = [
     { department: 'Marketing', used: 75, budget: 100 },

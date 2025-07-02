@@ -1,4 +1,3 @@
-// src/components/finance/VoucherManagement.tsx
 export default function VoucherManagement() {
   const vouchers = [
     { type: 'Payment', count: 42, pending: 8 },

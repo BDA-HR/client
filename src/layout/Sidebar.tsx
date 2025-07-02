@@ -30,7 +30,7 @@ import { useModule } from '../ModuleContext';
 
 interface NavItemProps {
   to: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode; // Made optional with ?
   label: string;
   end?: boolean;
   activeBg: string;
@@ -38,18 +38,28 @@ interface NavItemProps {
   hoverBg: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ to, icon, label, end = false, activeBg, textColor, hoverBg }) => {
+const NavItem: React.FC<NavItemProps> = ({ 
+  to, 
+  icon, 
+  label, 
+  end = false, 
+  activeBg, 
+  textColor, 
+  hoverBg 
+}) => {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) =>
         `flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-          isActive ? `${activeBg} ${textColor}` : `text-gray-600 ${hoverBg}`
+          isActive 
+            ? `${activeBg} ${textColor}` 
+            : `text-gray-600 ${hoverBg}`
         }`
       }
     >
-      <span className="mr-3">{icon}</span>
+      {icon && <span className="mr-3">{icon}</span>}
       {label}
     </NavLink>
   );
@@ -114,7 +124,7 @@ const Sidebar: React.FC = () => {
     HR: { textColor: 'text-green-700', activeBg: 'bg-green-100', hoverBg: 'hover:bg-green-50' },
     Core: { textColor: 'text-emerald-700', activeBg: 'bg-emerald-100', hoverBg: 'hover:bg-emerald-50' },
     CRM: { textColor: 'text-orange-700', activeBg: 'bg-orange-100', hoverBg: 'hover:bg-orange-50' },
-    Finance: { textColor: 'text-Indigo-800', activeBg: 'bg-indigo-100', hoverBg: 'hover:bg-indigo-50' },
+    Finance: { textColor: 'text-amber-700', activeBg: 'bg-amber-100', hoverBg: 'hover:bg-amber-50' },
     Procurement: { textColor: 'text-purple-700', activeBg: 'bg-purple-100', hoverBg: 'hover:bg-purple-50' },
     Logo: { textColor: 'text-cyan-700', activeBg: 'bg-cyan-100', hoverBg: 'hover:bg-cyan-50' },
     default: { textColor: 'text-gray-600', activeBg: 'bg-gray-100', hoverBg: 'hover:bg-gray-50' },
@@ -123,8 +133,8 @@ const Sidebar: React.FC = () => {
   const theme = themeMap[activeModule] || themeMap.default;
 
   return (
-    <div className="w-56 bg-white  h-screen flex flex-col">
-      <div className="h-16 px-4 flex items-center gap-2">
+    <div className="w-56 bg-white h-screen flex flex-col">
+      <div className="mb-1/2 p-2 flex items-center gap-2 mx-auto">
         <img
           src="/bda-logo-1.png"
           alt="Logo"
@@ -136,8 +146,7 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      <hr className="mx-4 border-gray-200" />
-
+      <hr className="mx-2" />
 
       <div className="flex-1 py-4 overflow-y-auto">
         <div className="px-3 space-y-1">
@@ -196,6 +205,10 @@ const Sidebar: React.FC = () => {
               <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
               <NavItem to="/core/hierarchy" icon={<BarChart4 size={18} />} label="Hierarchy" {...theme} />
               <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
+              <NavGroup icon={<Users size={18} />} label="Users" hoverBg={theme.hoverBg}>
+                <NavItem to="/core/users"  label="user-list" {...theme} />
+                <NavItem to="/core/users"  label="User-profile" {...theme} />
+              </NavGroup>
             </>
           )}
 

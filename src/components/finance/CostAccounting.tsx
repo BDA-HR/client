@@ -1,4 +1,3 @@
-// src/components/finance/CostAccounting.tsx
 export default function CostAccounting() {
   const costCenters = [
     { name: 'Production', actual: 85, budget: 80 },

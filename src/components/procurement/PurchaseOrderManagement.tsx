@@ -1,4 +1,3 @@
-// src/components/procurement/PurchaseOrderManagement.tsx
 export default function PurchaseOrderManagement() {
   const orders = [
     { id: "PO-1001", vendor: "Tech Supplies", amount: "$8,500", status: "Shipped" },

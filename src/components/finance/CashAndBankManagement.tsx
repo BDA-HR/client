@@ -1,4 +1,3 @@
-// src/components/finance/CashAndBankManagement.tsx
 export default function CashAndBankManagement() {
   const accounts = [
     { name: 'Main Operating', balance: '$185,420' },
