@@ -1,7 +1,7 @@
 // src/components/finance/AccountsReceivable.tsx
 export default function AccountsReceivable() {
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+    <div className="bg-white rounded-lg shadow-md p-4 border-2 border-purple-100 hover:border-indigo-800 transition-colors">
       <h3 className="text-lg font-semibold text-gray-800 mb-3">Accounts Receivable</h3>
       <div className="space-y-2">
         <div className="flex justify-between">

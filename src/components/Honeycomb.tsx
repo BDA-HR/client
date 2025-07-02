@@ -9,7 +9,7 @@ const modules = [
   { label: "Core", color: "group-hover:from-emerald-300 group-hover:to-emerald-500", path: "/core" },
   { label: "Inventory", color: "group-hover:from-yellow-300 group-hover:to-yellow-500", path: "/inventory" },
   { label: "Procurement", color: "group-hover:from-purple-300 group-hover:to-purple-500", path: "/procurement" },
-  { label: "Finance", color: "group-hover:from-amber-300 group-hover:to-amber-500", path: "/finance" },
+  { label: "Finance", color: "group-hover:from-indigo-800 group-hover:to-indigo-500", path: "/finance" },
   { label: "Logo", color: "", path: "" },
 ];
 

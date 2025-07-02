@@ -114,7 +114,7 @@ const Sidebar: React.FC = () => {
     HR: { textColor: 'text-green-700', activeBg: 'bg-green-100', hoverBg: 'hover:bg-green-50' },
     Core: { textColor: 'text-emerald-700', activeBg: 'bg-emerald-100', hoverBg: 'hover:bg-emerald-50' },
     CRM: { textColor: 'text-orange-700', activeBg: 'bg-orange-100', hoverBg: 'hover:bg-orange-50' },
-    Finance: { textColor: 'text-amber-700', activeBg: 'bg-amber-100', hoverBg: 'hover:bg-amber-50' },
+    Finance: { textColor: 'text-Indigo-800', activeBg: 'bg-indigo-100', hoverBg: 'hover:bg-indigo-50' },
     Procurement: { textColor: 'text-purple-700', activeBg: 'bg-purple-100', hoverBg: 'hover:bg-purple-50' },
     Logo: { textColor: 'text-cyan-700', activeBg: 'bg-cyan-100', hoverBg: 'hover:bg-cyan-50' },
     default: { textColor: 'text-gray-600', activeBg: 'bg-gray-100', hoverBg: 'hover:bg-gray-50' },
@@ -123,8 +123,8 @@ const Sidebar: React.FC = () => {
   const theme = themeMap[activeModule] || themeMap.default;
 
   return (
-    <div className="w-56 bg-white border-r h-screen flex flex-col">
-      <div className="my-1 p-2 flex items-center gap-2 mx-auto">
+    <div className="w-56 bg-white  h-screen flex flex-col">
+      <div className="h-16 px-4 flex items-center gap-2">
         <img
           src="/bda-logo-1.png"
           alt="Logo"
@@ -136,7 +136,8 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      <hr className="mx-2" />
+      <hr className="mx-4 border-gray-200" />
+
 
       <div className="flex-1 py-4 overflow-y-auto">
         <div className="px-3 space-y-1">
