@@ -1,14 +1,30 @@
 import React from 'react';
 import { Bell, HelpCircle, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { useModule } from '../ModuleContext';
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
+  const { activeModule } = useModule();
+  
+  // Module-based color themes
+  const themeMap: Record<string, { bg: string; border: string; text: string }> = {
+    Inventory: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700' },
+    HR: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
+    Core: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' },
+    CRM: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700' },
+    Finance: { bg: 'bg-indigo-50', border: 'border-indigo-200', text: 'text-indigo-700' },
+    Procurement: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
+    default: { bg: 'bg-white', border: 'border-gray-200', text: 'text-gray-600' },
+  };
+
+  const theme = themeMap[activeModule] || themeMap.default;
+
   return (
-    <header className="bg-white border-b border-gray-200 shadow-nav h-16 flex items-center justify-between px-4 lg:px-6">
+    <header className={`${theme.bg} border-b ${theme.border} shadow-nav h-16 flex items-center justify-between px-4 lg:px-6`}>
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
@@ -32,13 +48,13 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         
         <div className="flex items-center border-l border-gray-200 pl-4 ml-2">
           <div className="mr-3 text-right hidden sm:block">
-            <p className="text-sm font-medium text-gray-700">John Smith</p>
-            <p className="text-xs text-gray-500">HR Manager</p>
+            <p className={`text-sm font-medium ${theme.text}`}>John Smith</p>
+            <p className="text-xs text-gray-500">{activeModule || 'HR'} Manager</p>
           </div>
           <Avatar>
-  <AvatarImage src="https://github.com/shadcn.png" />
-  <AvatarFallback>CN</AvatarFallback>
-</Avatar>
+            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
         </div>
       </div>
     </header>

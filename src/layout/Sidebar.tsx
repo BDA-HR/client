@@ -124,7 +124,7 @@ const Sidebar: React.FC = () => {
     HR: { textColor: 'text-green-700', activeBg: 'bg-green-100', hoverBg: 'hover:bg-green-50' },
     Core: { textColor: 'text-emerald-700', activeBg: 'bg-emerald-100', hoverBg: 'hover:bg-emerald-50' },
     CRM: { textColor: 'text-orange-700', activeBg: 'bg-orange-100', hoverBg: 'hover:bg-orange-50' },
-    Finance: { textColor: 'text-amber-700', activeBg: 'bg-amber-100', hoverBg: 'hover:bg-amber-50' },
+    Finance: { textColor: 'text-indigo-700', activeBg: 'bg-indigo-100', hoverBg: 'hover:bg-indigo-50' },
     Procurement: { textColor: 'text-purple-700', activeBg: 'bg-purple-100', hoverBg: 'hover:bg-purple-50' },
     Logo: { textColor: 'text-cyan-700', activeBg: 'bg-cyan-100', hoverBg: 'hover:bg-cyan-50' },
     default: { textColor: 'text-gray-600', activeBg: 'bg-gray-100', hoverBg: 'hover:bg-gray-50' },
@@ -205,10 +205,7 @@ const Sidebar: React.FC = () => {
               <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
               <NavItem to="/core/hierarchy" icon={<BarChart4 size={18} />} label="Hierarchy" {...theme} />
               <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
-              <NavGroup icon={<Users size={18} />} label="Users" hoverBg={theme.hoverBg}>
-                <NavItem to="/core/users"  label="user-list" {...theme} />
-                <NavItem to="/core/users"  label="User-profile" {...theme} />
-              </NavGroup>
+              
             </>
           )}
 
