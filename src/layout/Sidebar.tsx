@@ -170,14 +170,15 @@ const Sidebar: React.FC = () => {
           {activeModule === 'HR' && (
             <>
               <NavGroup icon={<Users size={18} />} label="Employees" hoverBg={theme.hoverBg}>
-                <NavItem to="/employees" icon={<Users size={18} />} label="Directory" {...theme} />
-                <NavItem to="/employees/skills" icon={<Trophy size={18} />} label="Skills" {...theme} />
-                <NavItem to="/employees/appraisals" icon={<FileText size={18} />} label="Appraisals" {...theme} />
+                <NavItem to="/employees/record" icon={<Users size={18} />} label="Employee Record" {...theme} />
+                <NavItem to="/employees/jobgrade" icon={<Trophy size={18} />} label="Job Grade" {...theme} />
+                <NavItem to="/employees/termination" icon={<FileText size={18} />} label="Termination" {...theme} />
               </NavGroup>
 
-              <NavGroup icon={<Building2 size={18} />} label="Organization" hoverBg={theme.hoverBg}>
-                <NavItem to="/organization/structure" icon={<Building2 size={18} />} label="Structure" {...theme} />
-                <NavItem to="/organization/departments" icon={<Users size={18} />} label="Departments" {...theme} />
+              <NavGroup icon={<Building2 size={18} />} label="Recruitment" hoverBg={theme.hoverBg}>
+                <NavItem to="/recruitment/plan" icon={<Building2 size={18} />} label="Recruitment Plan" {...theme} />
+                <NavItem to="/recruitment/pipeline" icon={<Building2 size={18} />} label="Candidate Pipeline" {...theme} />
+                <NavItem to="/recruitment/onboarding" icon={<Users size={18} />} label="On Boarding" {...theme} />
               </NavGroup>
 
               <NavItem to="/leave-management" icon={<Calendar size={18} />} label="Leave Management" {...theme} />
