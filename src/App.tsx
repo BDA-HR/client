@@ -7,7 +7,6 @@ import Modules from './pages/Modules';
 import { ModuleProvider } from './ModuleContext';
 import InventoryDashboard from './pages/modules/Inventory';
 import CoreDashboard from './pages/modules/Core';
-import CRM from './pages/modules/CRM';
 import Finance from './pages/modules/Finance';
 import Procurement from './pages/modules/Procurement';
 import EmployeeRecord from './pages/hr/employeepage/EmployeeRecord';
@@ -16,6 +15,7 @@ import Termination from './pages/hr/employeepage/Termination';
 import CandidatePipeline from './pages/hr/recruitmentpage/CandidatePipeline';
 import OnBoarding from './pages/hr/recruitmentpage/OnBoarding';
 import RecruitmentPlan from './pages/hr/recruitmentpage/RecruitmentPlan';
+import CRMDashboard from './pages/modules/CRM';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,7 +39,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path='/inventory' element={<InventoryDashboard />} />
           <Route path='/core' element={<CoreDashboard />} />
-          <Route path='/crm' element={<CRM />} />          
+          <Route path='/crm' element={<CRMDashboard />} />          
           <Route path='/finance' element={<Finance />} />
           <Route path='/procurement' element={<Procurement />} />
           <Route path='/employees/record' element={<EmployeeRecord />} />
