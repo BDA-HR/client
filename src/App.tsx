@@ -14,7 +14,7 @@ import JobGrade from './pages/hr/employeepage/JobGrade';
 import Termination from './pages/hr/employeepage/Termination';
 import CandidatePipeline from './pages/hr/recruitmentpage/CandidatePipeline';
 import OnBoarding from './pages/hr/recruitmentpage/OnBoarding';
-import RecruitmentPlan from './pages/hr/recruitmentpage/RecruitmentPlan';
+import RecruitmentList from './pages/hr/recruitmentpage/RecruitmentList';
 import CRMDashboard from './pages/modules/CRM';
 
 function App() {
@@ -47,7 +47,7 @@ function App() {
           <Route path='/employees/termination' element={<Termination />} />
           <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />
           <Route path='/recruitment/onboarding' element={<OnBoarding />} />
-          <Route path='/recruitment/plan' element={<RecruitmentPlan />} />
+          <Route path='/recruitment/list' element={<RecruitmentList />} />
         </Route>
 
         {/* Standalone protected route without layout (Modules) */}
