@@ -9,13 +9,13 @@ import InventoryDashboard from './pages/modules/Inventory';
 import CoreDashboard from './pages/modules/Core';
 import Finance from './pages/modules/Finance';
 import Procurement from './pages/modules/Procurement';
-import EmployeeRecord from './pages/hr/employeepage/EmployeeRecord';
 import JobGrade from './pages/hr/employeepage/JobGrade';
 import Termination from './pages/hr/employeepage/Termination';
 import CandidatePipeline from './pages/hr/recruitmentpage/CandidatePipeline';
 import OnBoarding from './pages/hr/recruitmentpage/OnBoarding';
 import RecruitmentList from './pages/hr/recruitmentpage/RecruitmentList';
 import CRMDashboard from './pages/modules/CRM';
+import EmployeeManagementPage from './pages/hr/employeepage/EmployeeRecord';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,7 +42,7 @@ function App() {
           <Route path='/crm' element={<CRMDashboard />} />          
           <Route path='/finance' element={<Finance />} />
           <Route path='/procurement' element={<Procurement />} />
-          <Route path='/employees/record' element={<EmployeeRecord />} />
+          <Route path='/employees/record' element={<EmployeeManagementPage />} />
           <Route path='/employees/jobgrade' element={<JobGrade />} />
           <Route path='/employees/termination' element={<Termination />} />
           <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />
