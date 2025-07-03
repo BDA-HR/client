@@ -172,7 +172,6 @@ const Sidebar: React.FC = () => {
               <NavGroup icon={<Users size={18} />} label="Employees" hoverBg={theme.hoverBg}>
                 <NavItem to="/employees/record" icon={<Users size={18} />} label="Employee Record" {...theme} />
                 <NavItem to="/employees/jobgrade" icon={<Trophy size={18} />} label="Job Grade" {...theme} />
-                <NavItem to="/employees/termination" icon={<FileText size={18} />} label="Termination" {...theme} />
               </NavGroup>
 
               <NavGroup icon={<Building2 size={18} />} label="Recruitment" hoverBg={theme.hoverBg}>
