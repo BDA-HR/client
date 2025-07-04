@@ -179,8 +179,13 @@ const Sidebar: React.FC = () => {
                 <NavItem to="/recruitment/pipeline" icon={<Building2 size={18} />} label="Candidate Pipeline" {...theme} />
                 <NavItem to="/recruitment/onboarding" icon={<Users size={18} />} label="On Boarding" {...theme} />
               </NavGroup>
+              <NavGroup icon={<Building2 size={18} />} label="Leave" hoverBg={theme.hoverBg}>
+                <NavItem to="/leave/list" icon={<Building2 size={18} />} label="Leave List" {...theme} />
+                <NavItem to="/leave/form" icon={<Building2 size={18} />} label="Leave Request" {...theme} />
+                <NavItem to="/leave/Entitlement" icon={<Users size={18} />} label="Leave Entitlement" {...theme} />
+              </NavGroup>
 
-              <NavItem to="/leave-management" icon={<Calendar size={18} />} label="Leave Management" {...theme} />
+              {/* <NavItem to="/leave" icon={<Calendar size={18} />} label="Leave Management" {...theme} /> */}
               <NavItem to="/training" icon={<GraduationCap size={18} />} label="Training" {...theme} />
               <NavItem to="/reports" icon={<FileSpreadsheet size={18} />} label="Reports" {...theme} />
               <NavItem to="/analytics" icon={<BarChart4 size={18} />} label="Analytics" {...theme} />

@@ -16,6 +16,10 @@ import OnBoarding from './pages/hr/recruitmentpage/OnBoarding';
 import RecruitmentList from './pages/hr/recruitmentpage/RecruitmentList';
 import CRMDashboard from './pages/modules/CRM';
 import EmployeeManagementPage from './pages/hr/employeepage/EmployeeRecord';
+import LeaveEntitlementPage from './pages/hr/leavepage/LeaveEntitlementPage';
+import LeaveList from './pages/hr/leavepage/LeaveList';
+import LeaveRequestForm from './pages/hr/leavepage/LeaveRequestForm';
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -48,6 +52,12 @@ function App() {
           <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />
           <Route path='/recruitment/onboarding' element={<OnBoarding />} />
           <Route path='/recruitment/list' element={<RecruitmentList />} />
+          <Route path='/leave/list' element={<LeaveList />} />
+          <Route path='/leave/form' element={<LeaveRequestForm />} />
+          <Route path='/leave/entitlement' element={<LeaveEntitlementPage />} />
+                  
+
+
         </Route>
 
         {/* Standalone protected route without layout (Modules) */}
