@@ -1,0 +1,430 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '../ui/button';
+
+interface AddEmployeeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddEmployee: (employee: Omit<Employee, 'id'>) => void;
+}
+
+const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, onAddEmployee }) => {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    email: '',
+    payroll: '',
+    department: '',
+    role: '',
+    jobGrade: '',
+    joiningDate: new Date().toISOString().split('T')[0],
+    contractType: 'Full-time',
+    status: 'active'
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const departments = ['Finance', 'Engineer', 'Product', 'Marketing', 'HR', 'Operations'];
+  const jobGrades = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'];
+  const contractTypes: Array<Employee['contractType']> = ['Full-time', 'Part-time', 'Freelance', 'Internship'];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateStep = (stepNumber: number): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (stepNumber === 1) {
+      if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+      if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email';
+      }
+      if (!formData.payroll.trim()) newErrors.payroll = 'Payroll ID is required';
+    } else if (stepNumber === 2) {
+      if (!formData.department) newErrors.department = 'Department is required';
+      if (!formData.role.trim()) newErrors.role = 'Role is required';
+      if (!formData.jobGrade) newErrors.jobGrade = 'Job grade is required';
+      if (!formData.joiningDate) newErrors.joiningDate = 'Joining date is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const nextStep = () => {
+    if (!validateStep(step)) return;
+    setStep(prev => prev + 1);
+  };
+
+  const prevStep = () => setStep(prev => prev - 1);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateStep(3)) return;
+    
+    onAddEmployee(formData);
+    alert('Employee added successfully!');
+    setFormData({
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      email: '',
+      payroll: '',
+      department: '',
+      role: '',
+      jobGrade: '',
+      joiningDate: new Date().toISOString().split('T')[0],
+      contractType: 'Full-time',
+      status: 'active'
+    });
+    setErrors({});
+    setStep(1);
+    onClose();
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-gray-500 bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+        >
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Add New Employee</h2>
+                <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <div className="flex mb-4">
+                  {[1, 2, 3].map((i) => (
+                    <React.Fragment key={i}>
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= i ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                        {i}
+                      </div>
+                      {i < 3 && (
+                        <div className={`flex-1 h-1 mx-2 my-auto ${step > i ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit}>
+                {step === 1 && (
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="space-y-4"
+                  >
+                    <h3 className="text-lg font-medium text-gray-800 mb-4">Personal Information</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          First Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        />
+                        {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+                        <input
+                          type="text"
+                          name="middleName"
+                          value={formData.middleName}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Last Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        />
+                        {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        />
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Payroll ID <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="payroll"
+                          value={formData.payroll}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.payroll ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        />
+                        {errors.payroll && <p className="text-red-500 text-xs mt-1">{errors.payroll}</p>}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {step === 2 && (
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="space-y-4"
+                  >
+                    <h3 className="text-lg font-medium text-gray-800 mb-4">Employment Details</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Department <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="department"
+                          value={formData.department}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.department ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        >
+                          <option value="">Select Department</option>
+                          {departments.map(dept => (
+                            <option key={dept} value={dept}>{dept}</option>
+                          ))}
+                        </select>
+                        {errors.department && <p className="text-red-500 text-xs mt-1">{errors.department}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Role <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="role"
+                          value={formData.role}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        />
+                        {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Job Grade <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="jobGrade"
+                          value={formData.jobGrade}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.jobGrade ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        >
+                          <option value="">Select Grade</option>
+                          {jobGrades.map(grade => (
+                            <option key={grade} value={grade}>{grade}</option>
+                          ))}
+                        </select>
+                        {errors.jobGrade && <p className="text-red-500 text-xs mt-1">{errors.jobGrade}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Contract Type <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="contractType"
+                          value={formData.contractType}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.contractType ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        >
+                          {contractTypes.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
+                        {errors.contractType && <p className="text-red-500 text-xs mt-1">{errors.contractType}</p>}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Joining Date <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="joiningDate"
+                          value={formData.joiningDate}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.joiningDate ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        />
+                        {errors.joiningDate && <p className="text-red-500 text-xs mt-1">{errors.joiningDate}</p>}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {step === 3 && (
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="space-y-4"
+                  >
+                    <h3 className="text-lg font-medium text-gray-800 mb-4">Review Information</h3>
+                    
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-500">Full Name</p>
+                          <p className="font-medium">
+                            {formData.firstName} {formData.middleName && `${formData.middleName} `}{formData.lastName}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Email</p>
+                          <p className="font-medium">{formData.email}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-500">Payroll ID</p>
+                          <p className="font-medium">{formData.payroll}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Department</p>
+                          <p className="font-medium">{formData.department}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-500">Role</p>
+                          <p className="font-medium">{formData.role}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Job Grade</p>
+                          <p className="font-medium">{formData.jobGrade}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-500">Contract Type</p>
+                          <p className="font-medium">{formData.contractType}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Joining Date</p>
+                          <p className="font-medium">
+                            {new Date(formData.joiningDate).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="flex justify-between mt-8">
+                  <div>
+                    {step > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={prevStep}
+                        className="flex items-center"
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                    )}
+                  </div>
+                  <div>
+                    {step < 3 ? (
+                      <Button
+                        type="button"
+                        onClick={nextStep}
+                        className="flex items-center bg-green-600 hover:bg-green-700"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        Add Employee
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+type Employee = {
+  id: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+  payroll: string;
+  department: string;
+  role: string;
+  jobGrade: string;
+  joiningDate: string;
+  contractType: "Full-time" | "Part-time" | "Freelance" | "Internship";
+  status: "active" | "on-leave";
+};
+
+export default AddEmployeeModal;

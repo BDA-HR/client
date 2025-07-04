@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Briefcase, Calendar, MoreVertical } from 'lucide-react';
 import { User } from 'lucide-react';
@@ -18,11 +18,46 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   totalItems,
   onPageChange
 }) => {
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const sortedEmployees = [...employees].sort((a, b) => {
+    return new Date(b.joiningDate).getTime() - new Date(a.joiningDate).getTime();
+  });
 
-  const toggleMenu = (id: string) => {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+const menuRefs = useRef<Record<string, HTMLDivElement | null>>({});  const [menuPosition, setMenuPosition] = useState<Record<string, 'above' | 'below'>>({});
+
+  const toggleMenu = (id: string, event: React.MouseEvent) => {
+    event.stopPropagation();
     setOpenMenuId(openMenuId === id ? null : id);
   };
+  
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openMenuId && !menuRefs.current[openMenuId]?.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenuId]);
+
+  useEffect(() => {
+    if (openMenuId && menuRefs.current[openMenuId]) {
+      const menuElement = menuRefs.current[openMenuId];
+      if (menuElement) {
+        const rect = menuElement.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        
+        if (spaceBelow < 200 && spaceAbove > 200) {
+          setMenuPosition(prev => ({ ...prev, [openMenuId]: 'above' }));
+        } else {
+          setMenuPosition(prev => ({ ...prev, [openMenuId]: 'below' }));
+        }
+      }
+    }
+  }, [openMenuId]);
 
   const getContractTypeColor = (type: Employee["contractType"]): string => {
     switch (type) {
@@ -84,8 +119,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
               </th>
             </motion.tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {employees.map((employee, index) => (
+                    <tbody className="bg-white divide-y divide-gray-200">
+            {sortedEmployees.map((employee, index) => (  // Changed to sortedEmployees
               <motion.tr 
                 key={employee.id}
                 custom={index}
@@ -103,10 +138,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       <User className="text-green-600 h-5 w-5" />
                     </motion.div>
                     <div className="ml-3">
-                      <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
-                        {employee.name}
+                      <div className="text-sm font-medium text-gray-900">
+                          {employee.firstName} {employee.lastName}
                       </div>
-                      <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
+                      <div className="text-xs text-gray-500">
                         {employee.email}
                       </div>
                     </div>
@@ -144,7 +179,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <motion.button 
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => toggleMenu(employee.id)}
+                    onClick={(e) => toggleMenu(employee.id, e)}
                     className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
                   >
                     <MoreVertical className="h-5 w-5" />
@@ -153,12 +188,22 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <AnimatePresence>
                     {openMenuId === employee.id && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
-                      >
+  ref={(el: HTMLDivElement | null) => {
+    if (el) {
+      menuRefs.current[employee.id] = el;
+    } else {
+      delete menuRefs.current[employee.id];
+    }
+  }}
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: -10 }}
+  transition={{ duration: 0.2 }}
+  className={`absolute right-0 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200 ${
+    menuPosition[employee.id] === 'above' ? 'bottom-full mb-2' : 'mt-2'
+  }`}
+
+>
                         <div className="py-1">
                           <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             View Details
@@ -282,7 +327,9 @@ const itemVariants = {
 
 type Employee = {
   id: string;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   email: string;
   payroll: string;
   department: string;
