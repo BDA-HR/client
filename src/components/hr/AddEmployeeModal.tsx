@@ -2,12 +2,32 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/button';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 interface AddEmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddEmployee: (employee: Omit<Employee, 'id'>) => void;
 }
+
+type Employee = {
+  id: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  payroll: string;
+  bankAccountNumber: string;
+  department: string;
+  role: string;
+  jobGrade: string;
+  joiningDate: string;
+  contractType: "Full-time" | "Part-time" | "Freelance" | "Internship";
+  status: "active" | "on-leave";
+};
 
 const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, onAddEmployee }) => {
   const [step, setStep] = useState(1);
@@ -16,7 +36,10 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
     middleName: '',
     lastName: '',
     email: '',
+    phone: '',
+    address: '',
     payroll: '',
+    bankAccountNumber: '',
     department: '',
     role: '',
     jobGrade: '',
@@ -26,22 +49,23 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const departments = ['Finance', 'Engineer', 'Product', 'Marketing', 'HR', 'Operations'];
+  const departments = ['Finance', 'Engineering', 'Product', 'Marketing', 'HR', 'Operations'];
   const jobGrades = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'];
   const contractTypes: Array<Employee['contractType']> = ['Full-time', 'Part-time', 'Freelance', 'Internship'];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setFormData(prev => ({ ...prev, phone: value }));
+    if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
   };
 
   const validateStep = (stepNumber: number): boolean => {
     const newErrors: Record<string, string> = {};
-
     if (stepNumber === 1) {
       if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
       if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
@@ -50,8 +74,11 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
         newErrors.email = 'Please enter a valid email';
       }
-      if (!formData.payroll.trim()) newErrors.payroll = 'Payroll ID is required';
+      if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+      if (!formData.address.trim()) newErrors.address = 'Address is required';
     } else if (stepNumber === 2) {
+      if (!formData.payroll.trim()) newErrors.payroll = 'Payroll ID is required';
+      if (!formData.bankAccountNumber.trim()) newErrors.bankAccountNumber = 'Bank account number is required';
       if (!formData.department) newErrors.department = 'Department is required';
       if (!formData.role.trim()) newErrors.role = 'Role is required';
       if (!formData.jobGrade) newErrors.jobGrade = 'Job grade is required';
@@ -72,7 +99,6 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep(3)) return;
-    
     onAddEmployee(formData);
     alert('Employee added successfully!');
     setFormData({
@@ -80,7 +106,10 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
       middleName: '',
       lastName: '',
       email: '',
+      phone: '',
+      address: '',
       payroll: '',
+      bankAccountNumber: '',
       department: '',
       role: '',
       jobGrade: '',
@@ -116,64 +145,47 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                 </button>
               </div>
 
-              <div className="mb-6">
-                <div className="flex mb-4">
-                  {[1, 2, 3].map((i) => (
-                    <React.Fragment key={i}>
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= i ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                        {i}
-                      </div>
-                      {i < 3 && (
-                        <div className={`flex-1 h-1 mx-2 my-auto ${step > i ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
+              {/* Step indicators */}
+              <div className="flex mb-6">
+                {[1, 2, 3].map(i => (
+                  <React.Fragment key={i}>
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= i ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}>{i}</div>
+                    {i < 3 && <div className={`flex-1 h-1 mx-2 my-auto ${step > i ? 'bg-green-500' : 'bg-gray-200'}`} />}
+                  </React.Fragment>
+                ))}
               </div>
 
               <form onSubmit={handleSubmit}>
                 {step === 1 && (
-                  <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="space-y-4"
-                  >
+                  <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
                     <h3 className="text-lg font-medium text-gray-800 mb-4">Personal Information</h3>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          First Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={formData.firstName}
+                        <label className="block text-sm font-medium mb-1">First Name *</label>
+                        <input 
+                          name="firstName" 
+                          value={formData.firstName} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          className={`w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                        <input
-                          type="text"
-                          name="middleName"
-                          value={formData.middleName}
+                        <label className="block text-sm font-medium mb-1">Middle Name</label>
+                        <input 
+                          name="middleName" 
+                          value={formData.middleName} 
                           onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Last Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={formData.lastName}
+                        <label className="block text-sm font-medium mb-1">Last Name *</label>
+                        <input 
+                          name="lastName" 
+                          value={formData.lastName} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          className={`w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                       </div>
@@ -181,48 +193,71 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Email <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
+                        <label className="block text-sm font-medium mb-1">Email *</label>
+                        <input 
+                          type="email" 
+                          name="email" 
+                          value={formData.email} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Payroll ID <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="payroll"
-                          value={formData.payroll}
-                          onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.payroll ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                        <label className="block text-sm font-medium mb-1">Phone Number *</label>
+                        <PhoneInput
+                          country={'us'}
+                          value={formData.phone}
+                          onChange={handlePhoneChange}
+                          inputClass={`w-full px-3 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          containerClass={`${errors.phone ? 'border-red-500' : ''}`}
                         />
-                        {errors.payroll && <p className="text-red-500 text-xs mt-1">{errors.payroll}</p>}
+                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Address *</label>
+                      <input 
+                        name="address" 
+                        value={formData.address} 
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                      />
+                      {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                     </div>
                   </motion.div>
                 )}
 
                 {step === 2 && (
-                  <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="space-y-4"
-                  >
+                  <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
                     <h3 className="text-lg font-medium text-gray-800 mb-4">Employment Details</h3>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Department <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium mb-1">Payroll ID *</label>
+                        <input 
+                          name="payroll" 
+                          value={formData.payroll} 
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.payroll ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                        />
+                        {errors.payroll && <p className="text-red-500 text-xs mt-1">{errors.payroll}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Bank Account Number *</label>
+                        <input 
+                          name="bankAccountNumber" 
+                          value={formData.bankAccountNumber} 
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.bankAccountNumber ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                        />
+                        {errors.bankAccountNumber && <p className="text-red-500 text-xs mt-1">{errors.bankAccountNumber}</p>}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Department *</label>
                         <select
                           name="department"
                           value={formData.department}
@@ -237,67 +272,41 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                         {errors.department && <p className="text-red-500 text-xs mt-1">{errors.department}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Role <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="role"
-                          value={formData.role}
-                          onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-                        />
-                        {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Job Grade <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium mb-1">Job Grade *</label>
                         <select
                           name="jobGrade"
                           value={formData.jobGrade}
                           onChange={handleChange}
                           className={`w-full px-3 py-2 border ${errors.jobGrade ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                         >
-                          <option value="">Select Grade</option>
+                          <option value="">Select Job Grade</option>
                           {jobGrades.map(grade => (
                             <option key={grade} value={grade}>{grade}</option>
                           ))}
                         </select>
                         {errors.jobGrade && <p className="text-red-500 text-xs mt-1">{errors.jobGrade}</p>}
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Contract Type <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          name="contractType"
-                          value={formData.contractType}
-                          onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.contractType ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-                        >
-                          {contractTypes.map(type => (
-                            <option key={type} value={type}>{type}</option>
-                          ))}
-                        </select>
-                        {errors.contractType && <p className="text-red-500 text-xs mt-1">{errors.contractType}</p>}
-                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Joining Date <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="date"
-                          name="joiningDate"
-                          value={formData.joiningDate}
+                        <label className="block text-sm font-medium mb-1">Role *</label>
+                        <input 
+                          name="role" 
+                          value={formData.role} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.joiningDate ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          className={`w-full px-3 py-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                        />
+                        {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Joining Date *</label>
+                        <input 
+                          type="date" 
+                          name="joiningDate" 
+                          value={formData.joiningDate} 
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border ${errors.joiningDate ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.joiningDate && <p className="text-red-500 text-xs mt-1">{errors.joiningDate}</p>}
                       </div>
@@ -306,79 +315,48 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                 )}
 
                 {step === 3 && (
-                  <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="space-y-4"
-                  >
-                    <h3 className="text-lg font-medium text-gray-800 mb-4">Review Information</h3>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <p className="text-sm text-gray-500">Full Name</p>
-                          <p className="font-medium">
-                            {formData.firstName} {formData.middleName && `${formData.middleName} `}{formData.lastName}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Email</p>
-                          <p className="font-medium">{formData.email}</p>
-                        </div>
+                  <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
+                    <h3 className="text-lg font-medium text-gray-800 mb-4">Contract Details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Contract Type</label>
+                        <select
+                          name="contractType"
+                          value={formData.contractType}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          {contractTypes.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
                       </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <p className="text-sm text-gray-500">Payroll ID</p>
-                          <p className="font-medium">{formData.payroll}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Department</p>
-                          <p className="font-medium">{formData.department}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <p className="text-sm text-gray-500">Role</p>
-                          <p className="font-medium">{formData.role}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Job Grade</p>
-                          <p className="font-medium">{formData.jobGrade}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500">Contract Type</p>
-                          <p className="font-medium">{formData.contractType}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Joining Date</p>
-                          <p className="font-medium">
-                            {new Date(formData.joiningDate).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Status</label>
+                        <select
+                          name="status"
+                          value={formData.status}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value="active">Active</option>
+                          <option value="on-leave">On Leave</option>
+                        </select>
                       </div>
                     </div>
                   </motion.div>
                 )}
 
-                <div className="flex justify-between mt-8">
+                <div className="flex justify-between pt-6">
                   <div>
                     {step > 1 && (
                       <Button
                         type="button"
                         variant="outline"
                         onClick={prevStep}
-                        className="flex items-center"
+                        className="flex items-center gap-1"
                       >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        <ChevronLeft className="h-4 w-4" />
                         Previous
                       </Button>
                     )}
@@ -388,17 +366,17 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                       <Button
                         type="button"
                         onClick={nextStep}
-                        className="flex items-center bg-green-600 hover:bg-green-700"
+                        className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
                       >
                         Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
+                        <ChevronRight className="h-4 w-4" />
                       </Button>
                     ) : (
                       <Button
                         type="submit"
                         className="bg-green-600 hover:bg-green-700"
                       >
-                        Add Employee
+                        Submit
                       </Button>
                     )}
                   </div>
@@ -410,21 +388,6 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
       )}
     </AnimatePresence>
   );
-};
-
-type Employee = {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  email: string;
-  payroll: string;
-  department: string;
-  role: string;
-  jobGrade: string;
-  joiningDate: string;
-  contractType: "Full-time" | "Part-time" | "Freelance" | "Internship";
-  status: "active" | "on-leave";
 };
 
 export default AddEmployeeModal;

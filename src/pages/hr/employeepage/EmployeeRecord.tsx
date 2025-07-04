@@ -30,7 +30,104 @@ const initialEmployees: Employee[] = [
     contractType: 'Freelance',
     status: 'on-leave'
   },
+  {
+    id: 'emp-3',
+    firstName: 'Leslie',
+    lastName: 'Alexander',
+    email: 'alexanderis@gmail.com',
+    payroll: '182194DANJ',
+    department: 'Product',
+    role: 'Jr. Technical Product',
+    joiningDate: 'Dec 25, 2024',
+    contractType: 'Internship',
+    status: 'active'
+  },
+  {
+    id: 'emp-4',
+    firstName: 'Esther',
+    lastName: 'Howard',
+    email: 'esthinhovard@gmail.com',
+    payroll: 'MMZKAOB11',
+    department: 'Finance',
+    role: 'Lead Accountant',
+    joiningDate: 'Jan 10, 2025',
+    contractType: 'Part-time',
+    status: 'on-leave'
+  },
+  {
+    id: 'emp-5',
+    firstName: 'Cameron',
+    lastName: 'Williamson',
+    email: 'williamcn@gmail.com',
+    payroll: 'HSASH8188',
+    department: 'Engineer',
+    role: 'Sr. DevOps',
+    joiningDate: 'Mar 30, 2025',
+    contractType: 'Freelance',
+    status: 'active'
+  },
+  {
+    id: 'emp-6',
+    firstName: 'Albert',
+    lastName: 'Flores',
+    email: 'albertfirs@gmail.com',
+    payroll: 'NXAHCH100',
+    department: 'Marketing',
+    role: 'Jr. Digital Marketing',
+    joiningDate: 'Oct 4, 2024',
+    contractType: 'Part-time',
+    status: 'active'
+  },
+  {
+    id: 'emp-7',
+    firstName: 'Annette',
+    lastName: 'Black',
+    email: 'annetblack@gmail.com',
+    payroll: 'SJABV81742',
+    department: 'Engineer',
+    role: 'Jr. Front End Dev',
+    joiningDate: 'Dec 19, 2024',
+    contractType: 'Internship',
+    status: 'on-leave'
+  },
+  {
+    id: 'emp-8',
+    firstName: 'Dafene',
+    lastName: 'Robertson',
+    email: 'dafenerobert@gmail.com',
+    payroll: '71738KAON',
+    department: 'Marketing',
+    role: 'Sr. Content Writer',
+    joiningDate: 'Jan 28, 2025',
+    contractType: 'Full-time',
+    status: 'active'
+  },
+  {
+    id: 'emp-9',
+    firstName: 'Grande',
+    lastName: 'Ariana',
+    email: 'grandeari@gmail.com',
+    payroll: 'JJHDC6661',
+    department: 'Product',
+    role: 'Lead Product Manager',
+    joiningDate: 'Feb 12, 2025',
+    contractType: 'Full-time',
+    status: 'active'
+  },
+  {
+    id: 'emp-10',
+    firstName: 'Aliene',
+    lastName: 'McCoy',
+    email: 'mccoyariene@gmail.com',
+    payroll: 'LAKD89137',
+    department: 'Product',
+    role: 'Sr. UI/UX Designer',
+    joiningDate: 'Nov 10, 2024',
+    contractType: 'Part-time',
+    status: 'on-leave'
+  }
 ];
+
 
 const EmployeeManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('');

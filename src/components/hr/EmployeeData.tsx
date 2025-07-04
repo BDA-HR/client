@@ -11,9 +11,9 @@ export const generateEmployees = (count: number): Employee[] => {
   ];
   const statuses: ("active" | "on-leave")[] = ['active', 'on-leave'];
   
-  return Array.from({ length: count }, (_, i) => {
-    const firstName = ['Jane', 'Brooklyn', 'Leslie', 'Esther', 'Cameron', 'Albert', 'Annette', 'Dafene', 'Grande', 'Taylor'][i % 10];
-    const lastName = ['Cooper', 'Simmons', 'Alexander', 'Howard', 'Williamson', 'Flores', 'Black', 'Robertson', 'Ariana', 'Swift'][i % 10];
+return Array.from({ length: count }, (_, i) => {
+  const firstName = ['Jane', 'Brooklyn', 'Leslie', 'Esther', 'Cameron', 'Albert', 'Annette', 'Dafene', 'Grande', 'Aliene'][i % 10];
+  const lastName = ['Cooper', 'Simmons', 'Alexander', 'Howard', 'Williamson', 'Flores', 'Black', 'Robertson', 'Ariana', 'McCoy'][i % 10];
     
     return {
       id: `emp-${i}`,
