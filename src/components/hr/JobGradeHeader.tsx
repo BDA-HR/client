@@ -7,9 +7,15 @@ interface JobGradeHeaderProps {
   jobGrades: JobGrade[];
   viewMode: 'grid' | 'list';
   setViewMode: (mode: 'grid' | 'list') => void;
+  onAddClick: () => void;
 }
 
-const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({ jobGrades, viewMode, setViewMode }) => {
+const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({ 
+  jobGrades, 
+  viewMode, 
+  setViewMode,
+  onAddClick 
+}) => {
   return (
     <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
       <div>
@@ -64,9 +70,10 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({ jobGrades, viewMode, se
         >
           Export Data
         </Button>
-        <Button
+         <Button
           size="sm"
           className="bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm"
+          onClick={onAddClick}
         >
           Add New Grade
         </Button>

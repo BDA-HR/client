@@ -10,6 +10,7 @@ interface JobGradeCardProps extends JobGrade {
 }
 
 const JobGradeCard: React.FC<JobGradeCardProps> = ({
+  id,
   grade,
   title,
   experience,
@@ -25,6 +26,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
   viewMode
 }) => (
   <motion.div
+    layout
     variants={cardVariants}
     initial="hidden"
     animate="visible"
@@ -84,6 +86,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
         <AnimatePresence>
           {expanded && (
             <motion.div
+              layout
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -94,7 +97,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
                 <h4 className="text-sm font-medium text-green-700 mb-2">Key Responsibilities:</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
                   {descriptions.map((desc) => (
-                    <li key={desc.id} className="flex">
+                    <li key={`${id}-desc-${desc.id}`} className="flex">
                       <span className="text-green-500 mr-2">•</span>
                       {desc.text}
                     </li>
@@ -161,6 +164,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
           <AnimatePresence>
             {expanded && (
               <motion.div
+                layout
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -171,7 +175,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
                   <h4 className="text-sm font-medium text-green-700 mb-2">Key Responsibilities:</h4>
                   <ul className="space-y-2 text-sm text-gray-600">
                     {descriptions.map((desc) => (
-                      <li key={desc.id} className="flex">
+                      <li key={`${id}-desc-${desc.id}`} className="flex">
                         <span className="text-green-500 mr-2">•</span>
                         {desc.text}
                       </li>

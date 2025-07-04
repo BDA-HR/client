@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, BookOpen } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import JobGradeHeader from '../../../components/hr/JobGradeHeader';
-import JobGradeSearchFilters from '../../../components/hr/JobGradeSearchFilters';
 import JobGradeCard from '../../../components/hr/JobGradeCard';
 import JobGradeAnalytics from '../../../components/hr/JobGradeAnalytics';
 import { generateJobGrades } from '../../../components/hr/JobGradeData';
+import AddJobGradeModal from '../../../components/hr/AddJobGrade';
+import JobGradeSearchFilters from '../../../components/hr/JobGradeSearchFilters';
+import { Briefcase, Layers, TrendingUp, Award, ShieldCheck } from 'lucide-react';
 
 const JobGradePage = () => {
   const [jobGrades, setJobGrades] = useState<JobGrade[]>([]);
@@ -20,6 +22,12 @@ const JobGradePage = () => {
     skillLevel: ''
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const icons = [Briefcase, Layers, TrendingUp, Award, ShieldCheck];
+  const departments = [...new Set(jobGrades.map(grade => grade.department).filter(Boolean))] as string[];
+  const categories = [...new Set(jobGrades.map(grade => grade.category).filter(Boolean))] as string[];
+  const skillLevels = [...new Set(jobGrades.map(grade => grade.skill).filter(Boolean))] as string[];
 
   useEffect(() => {
     setLoading(true);
@@ -57,6 +65,17 @@ const JobGradePage = () => {
     setExpandedCard(expandedCard === id ? null : id);
   };
 
+  const handleAddGrade = (newGrade: Omit<JobGrade, 'id'>) => {
+    const gradeWithId = {
+      ...newGrade,
+      id: `grade-${Date.now()}`,
+      icon: newGrade.icon || Briefcase
+    };
+    setJobGrades(prev => [gradeWithId, ...prev]);
+    setFilteredGrades(prev => [gradeWithId, ...prev]);
+    setExpandedCard(gradeWithId.id);
+  };
+
   return (
     <motion.div
       variants={containerVariants}
@@ -67,7 +86,8 @@ const JobGradePage = () => {
       <JobGradeHeader 
         jobGrades={jobGrades} 
         viewMode={viewMode} 
-        setViewMode={setViewMode} 
+        setViewMode={setViewMode}
+        onAddClick={() => setIsAddModalOpen(true)}
       />
       
       <JobGradeSearchFilters 
@@ -76,6 +96,16 @@ const JobGradePage = () => {
         filters={filters}
         setFilters={setFilters}
         jobGrades={jobGrades}
+      />
+
+      <AddJobGradeModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAddGrade={handleAddGrade}
+        departments={departments}
+        categories={categories}
+        skillLevels={skillLevels}
+        icons={icons}
       />
 
       <motion.div variants={itemVariants} className="mb-4 flex justify-between items-center">
@@ -150,7 +180,6 @@ const JobGradePage = () => {
   );
 };
 
-// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -168,7 +197,6 @@ const itemVariants = {
   }
 };
 
-// Types
 type SalaryRange = {
   min: string;
   mid: string;

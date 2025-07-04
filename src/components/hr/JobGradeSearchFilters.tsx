@@ -23,9 +23,9 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
   setFilters,
   jobGrades
 }) => {
-  const departments = [...new Set(jobGrades.map(grade => grade.department))];
-  const categories = [...new Set(jobGrades.map(grade => grade.category))];
-  const skillLevels = [...new Set(jobGrades.map(grade => grade.skill))];
+  const departments = [...new Set(jobGrades.map(grade => grade.department).filter(Boolean))];
+  const categories = [...new Set(jobGrades.map(grade => grade.category).filter(Boolean))];
+  const skillLevels = [...new Set(jobGrades.map(grade => grade.skill).filter(Boolean))];
 
   return (
     <motion.div variants={itemVariants} className="mb-6 space-y-4">
