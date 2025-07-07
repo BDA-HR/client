@@ -187,8 +187,8 @@ const Sidebar: React.FC = () => {
 
               {/* <NavItem to="/leave" icon={<Calendar size={18} />} label="Leave Management" {...theme} /> */}
               <NavItem to="/training" icon={<GraduationCap size={18} />} label="Training" {...theme} />
+              <NavItem to="/attendance" icon={<BarChart4 size={18} />} label="Attendance" {...theme} />
               <NavItem to="/reports" icon={<FileSpreadsheet size={18} />} label="Reports" {...theme} />
-              <NavItem to="/analytics" icon={<BarChart4 size={18} />} label="Analytics" {...theme} />
             </>
           )}
 

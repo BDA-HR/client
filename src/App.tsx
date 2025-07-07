@@ -19,6 +19,8 @@ import EmployeeManagementPage from './pages/hr/employeepage/EmployeeRecord';
 import LeaveEntitlementPage from './pages/hr/leavepage/LeaveEntitlementPage';
 import LeaveList from './pages/hr/leavepage/LeaveList';
 import LeaveRequestForm from './pages/hr/leavepage/LeaveRequestForm';
+import Attendance from './pages/hr/attendancepage/Attendance';
+import Training from './pages/hr/trainingpage/Training';
 
 
 function App() {
@@ -55,7 +57,8 @@ function App() {
           <Route path='/leave/list' element={<LeaveList />} />
           <Route path='/leave/form' element={<LeaveRequestForm />} />
           <Route path='/leave/entitlement' element={<LeaveEntitlementPage />} />
-                  
+          <Route path='/attendance' element={<Attendance />} />
+          <Route path='/training' element={<Training />} />
 
 
         </Route>
