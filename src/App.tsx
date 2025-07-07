@@ -23,7 +23,8 @@ import Training from './pages/hr/trainingpage/Training';
 import AttendanceList from './pages/hr/attendancepage/AttendanceList';
 import ShiftScheduler from './pages/hr/attendancepage/ShiftScheduler';
 import TimeClock from './pages/hr/attendancepage/TimeClock';
-import Timesheet from './pages/hr/attendancepage/Timesheet';
+import TimeClockFormContainer from './pages/hr/attendancepage/TimeClockFormContainer';
+// import TimeClockDisplay from './components/hr/TimeClockDisplay';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
+  
 
   return (
     <ModuleProvider>
@@ -63,7 +65,9 @@ function App() {
           <Route path='/attendance/list' element={<AttendanceList />} />
           <Route path='/shift-scheduler' element={<ShiftScheduler />} />
           <Route path='/time-clock' element={<TimeClock />} />
-          <Route path='/time-sheet' element={<Timesheet />} />
+          {/* <Route path="/time-display" element={<TimeClockDisplay schedule={schedule} />} /> */}
+          <Route path="/attendance/form" element={<TimeClockFormContainer />} />
+          
           <Route path='/training' element={<Training />} />
 
 
