@@ -19,8 +19,11 @@ import EmployeeManagementPage from './pages/hr/employeepage/EmployeeRecord';
 import LeaveEntitlementPage from './pages/hr/leavepage/LeaveEntitlementPage';
 import LeaveList from './pages/hr/leavepage/LeaveList';
 import LeaveRequestForm from './pages/hr/leavepage/LeaveRequestForm';
-import Attendance from './pages/hr/attendancepage/Attendance';
 import Training from './pages/hr/trainingpage/Training';
+import AttendanceList from './pages/hr/attendancepage/AttendanceList';
+import ShiftScheduler from './pages/hr/attendancepage/ShiftScheduler';
+import TimeClock from './pages/hr/attendancepage/TimeClock';
+import Timesheet from './pages/hr/attendancepage/Timesheet';
 
 
 function App() {
@@ -57,8 +60,12 @@ function App() {
           <Route path='/leave/list' element={<LeaveList />} />
           <Route path='/leave/form' element={<LeaveRequestForm />} />
           <Route path='/leave/entitlement' element={<LeaveEntitlementPage />} />
-          <Route path='/attendance' element={<Attendance />} />
+          <Route path='/attendance/list' element={<AttendanceList />} />
+          <Route path='/shift-scheduler' element={<ShiftScheduler />} />
+          <Route path='/time-clock' element={<TimeClock />} />
+          <Route path='/time-sheet' element={<Timesheet />} />
           <Route path='/training' element={<Training />} />
+
 
 
         </Route>
