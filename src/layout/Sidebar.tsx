@@ -135,11 +135,17 @@ const Sidebar: React.FC = () => {
   return (
     <div className="w-56 bg-white h-screen flex flex-col">
       <div className="mb-1/2 p-2 flex items-center gap-2 mx-auto">
-        <img
-          src="/bda-logo-1.png"
-          alt="Logo"
-          className="w-12 h-12 rounded-full border object-cover overflow-clip"
-        />
+        <button
+  onClick={() => navigate('/menu')}
+  className="focus:outline-none cursor-pointer"
+>
+  <img
+    src="/bda-logo-1.png"
+    alt="Logo"
+    className="w-12 h-12 rounded-full border object-cover overflow-clip"
+  />
+</button>
+
         <div className="flex flex-col justify-center text-center">
           <h1 className={`text-xl font-bold ${theme.textColor} leading-tight`}>BDA</h1>
           <p className="text-sm text-gray-500">Investment Group</p>
