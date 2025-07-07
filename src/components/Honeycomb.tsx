@@ -23,13 +23,34 @@ const positions = [
   "translate-x-0 translate-y-0",
 ];
 
-
 export default function Honeycomb() {
   const navigate = useNavigate();
   const { setActiveModule } = useModule();
 
+  const handleLogout = () => {
+    navigate('/login');
+  };
+
   return (
     <section className="flex items-center justify-center h-screen w-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 overflow-hidden">
+      <motion.button
+        onClick={handleLogout}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="absolute top-6 right-6 z-50 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span className="font-medium">Logout</span>
+      </motion.button>
+
+      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 drop-shadow">
+          Welcome to the <span className="text-purple-600">BDA Platform</span>
+        </h1>
+      </div>
+
       <div className="relative w-full max-w-[90vmin] h-[90vmin] flex items-center justify-center">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="bg-gradient-to-r from-purple-400 to-pink-600 blur-[10vmin] opacity-20 rounded-full w-[60%] h-[60%] animate-pulse" />
