@@ -116,8 +116,8 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-bold text-green-800">{title}</h3>
-              <p className="text-sm text-gray-500">{grade} • {department} • {category}</p>
+              <h3 className="font-bold text-black">{title}</h3>
+              <p className="text-sm text-gray-500">{grade} • {category}</p>
             </div>
             <Button 
               variant="ghost" 
@@ -152,8 +152,8 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
               <p>{roles.join(', ')}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Skill Level</p>
-              <p>{skill}</p>
+              <p className="text-xs text-gray-500">Catagoty</p>
+              <p>{category}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">Salary Band</p>

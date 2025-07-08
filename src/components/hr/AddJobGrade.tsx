@@ -6,20 +6,14 @@ interface AddJobGradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddGrade: (grade: Omit<JobGrade, 'id'>) => void;
-  departments: string[];
   categories: string[];
-  skillLevels: string[];
-  icons: React.ElementType[];
 }
 
 const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
   isOpen,
   onClose,
   onAddGrade,
-  departments,
   categories,
-  skillLevels,
-  icons
 }) => {
   const [formData, setFormData] = useState<Omit<JobGrade, 'id'>>({
     grade: '',
@@ -27,11 +21,8 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
     experience: '',
     roles: [],
     salary: { min: '', mid: '', max: '' },
-    skill: '',
-    icon: icons[0],
     descriptions: [{ id: 1, text: '' }],
-    department: '',
-    category: ''
+    category: '',
   });
 
   const [currentRole, setCurrentRole] = useState('');
@@ -39,15 +30,15 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     if (name.startsWith('salary.')) {
       const salaryField = name.split('.')[1] as keyof SalaryRange;
       setFormData(prev => ({
         ...prev,
         salary: {
           ...prev.salary,
-          [salaryField]: value
-        }
+          [salaryField]: value,
+        },
       }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -58,7 +49,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
     if (currentRole.trim() && !formData.roles.includes(currentRole.trim())) {
       setFormData(prev => ({
         ...prev,
-        roles: [...prev.roles, currentRole.trim()]
+        roles: [...prev.roles, currentRole.trim()],
       }));
       setCurrentRole('');
     }
@@ -67,36 +58,8 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
   const handleRemoveRole = (roleToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      roles: prev.roles.filter(role => role !== roleToRemove)
+      roles: prev.roles.filter(role => role !== roleToRemove),
     }));
-  };
-
-  const handleAddDescription = () => {
-    setFormData(prev => ({
-      ...prev,
-      descriptions: [
-        ...prev.descriptions,
-        { id: prev.descriptions.length + 1, text: '' }
-      ]
-    }));
-  };
-
-  const handleDescriptionChange = (id: number, text: string) => {
-    setFormData(prev => ({
-      ...prev,
-      descriptions: prev.descriptions.map(desc => 
-        desc.id === id ? { ...desc, text } : desc
-      )
-    }));
-  };
-
-  const handleRemoveDescription = (id: number) => {
-    if (formData.descriptions.length > 1) {
-      setFormData(prev => ({
-        ...prev,
-        descriptions: prev.descriptions.filter(desc => desc.id !== id)
-      }));
-    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -109,9 +72,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
       formData.salary.min &&
       formData.salary.mid &&
       formData.salary.max &&
-      formData.skill &&
-      formData.descriptions.every(d => d.text.trim()) &&
-      formData.department &&
+      formData.descriptions[0].text.trim() &&
       formData.category
     ) {
       onAddGrade(formData);
@@ -121,11 +82,8 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
         experience: '',
         roles: [],
         salary: { min: '', mid: '', max: '' },
-        skill: '',
-        icon: icons[0],
         descriptions: [{ id: 1, text: '' }],
-        department: '',
-        category: ''
+        category: '',
       });
       onClose();
     }
@@ -182,22 +140,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Department *</label>
-                    <select
-                      name="department"
-                      value={formData.department}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map(dept => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                     <select
@@ -214,33 +157,17 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Skill Level *</label>
-                    <select
-                      name="skill"
-                      value={formData.skill}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Experience *</label>
+                    <input
+                      type="text"
+                      name="experience"
+                      value={formData.experience}
                       onChange={handleChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      placeholder="e.g. 2-4 years"
                       required
-                    >
-                      <option value="">Select Skill Level</option>
-                      {skillLevels.map(skill => (
-                        <option key={skill} value={skill}>{skill}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Experience *</label>
-                  <input
-                    type="text"
-                    name="experience"
-                    value={formData.experience}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="e.g. 2-4 years"
-                    required
-                  />
                 </div>
 
                 <div>
@@ -287,91 +214,38 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Min Salary *</label>
-                    <input
-                      type="text"
-                      name="salary.min"
-                      value={formData.salary.min}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="e.g. $50K"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Mid Salary *</label>
-                    <input
-                      type="text"
-                      name="salary.mid"
-                      value={formData.salary.mid}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="e.g. $60K"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Max Salary *</label>
-                    <input
-                      type="text"
-                      name="salary.max"
-                      value={formData.salary.max}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="e.g. $70K"
-                      required
-                    />
-                  </div>
+                  {['min', 'mid', 'max'].map((key) => (
+                    <div key={key}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {`${key[0].toUpperCase() + key.slice(1)} Salary *`}
+                      </label>
+                      <input
+                        type="text"
+                        name={`salary.${key}`}
+                        value={formData.salary[key as keyof SalaryRange]}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        placeholder={`e.g. $${key === 'min' ? '50K' : key === 'mid' ? '60K' : '70K'}`}
+                        required
+                      />
+                    </div>
+                  ))}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
-                  <div className="grid grid-cols-5 gap-2">
-                    {icons.map((IconComponent, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, icon: IconComponent }))}
-                        className={`p-2 rounded-md flex items-center justify-center ${formData.icon === IconComponent ? 'bg-green-100 border border-green-300' : 'bg-gray-100'}`}
-                      >
-                        <IconComponent className="h-5 w-5 text-gray-700" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Key Responsibilities *</label>
-                  <div className="space-y-3">
-                    {formData.descriptions.map(desc => (
-                      <div key={desc.id} className="flex items-start">
-                        <textarea
-                          value={desc.text}
-                          onChange={(e) => handleDescriptionChange(desc.id, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-                          placeholder="Describe a key responsibility"
-                          required
-                        />
-                        {formData.descriptions.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveDescription(desc.id)}
-                            className="ml-2 text-red-500 hover:text-red-700 p-2"
-                          >
-                            &times;
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={handleAddDescription}
-                      className="mt-2 text-sm text-green-600 hover:text-green-800 flex items-center"
-                    >
-                      <span className="mr-1">+</span> Add Another Responsibility
-                    </button>
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                  <textarea
+                    value={formData.descriptions[0].text}
+                    onChange={(e) =>
+                      setFormData(prev => ({
+                        ...prev,
+                        descriptions: [{ id: 1, text: e.target.value }]
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    placeholder="Enter job description..."
+                    required
+                  />
                 </div>
 
                 <div className="flex justify-end space-x-4 pt-4">
@@ -418,9 +292,6 @@ type JobGrade = {
   experience: string;
   roles: string[];
   salary: SalaryRange;
-  skill: string;
-  icon: React.ElementType;
   descriptions: JobDescription[];
-  department?: string;
   category?: string;
 };

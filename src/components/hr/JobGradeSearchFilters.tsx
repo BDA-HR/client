@@ -23,69 +23,50 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
   setFilters,
   jobGrades
 }) => {
-  const departments = [...new Set(jobGrades.map(grade => grade.department).filter(Boolean))];
   const categories = [...new Set(jobGrades.map(grade => grade.category).filter(Boolean))];
-  const skillLevels = [...new Set(jobGrades.map(grade => grade.skill).filter(Boolean))];
 
   return (
-    <motion.div variants={itemVariants} className="mb-6 space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search job grades, titles, or roles..."
-          className="pl-10 bg-white"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      
-      <div className="flex flex-wrap gap-3">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-500" />
-          <select
-            className="text-sm border rounded-md px-3 py-1 bg-white"
-            value={filters.department}
-            onChange={(e) => setFilters({...filters, department: e.target.value})}
-          >
-            <option value="">All Departments</option>
-            {departments.map((dept) => (
-              <option key={dept} value={dept}>{dept}</option>
-            ))}
-          </select>
-        </div>
-        
-        <select
-          className="text-sm border rounded-md px-3 py-1 bg-white"
-          value={filters.category}
-          onChange={(e) => setFilters({...filters, category: e.target.value})}
-        >
-          <option value="">All Categories</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-        
-        <select
-          className="text-sm border rounded-md px-3 py-1 bg-white"
-          value={filters.skillLevel}
-          onChange={(e) => setFilters({...filters, skillLevel: e.target.value})}
-        >
-          <option value="">All Skill Levels</option>
-          {skillLevels.map((skill) => (
-            <option key={skill} value={skill}>{skill}</option>
-          ))}
-        </select>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="text-green-600 hover:bg-green-50"
-          onClick={() => setFilters({ department: '', category: '', skillLevel: '' })}
-        >
-          Clear Filters
-        </Button>
-      </div>
-    </motion.div>
+<motion.div variants={itemVariants} className="mb-6">
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    
+    {/* Search Input */}
+    <div className="relative flex-1">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <Input
+        placeholder="Search job grades, titles, or roles..."
+        className="pl-10 bg-white w-full"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+
+    {/* Filters */}
+    <div className="flex items-center flex-wrap gap-3">
+      <Filter className="h-4 w-4 text-gray-500" />
+
+      <select
+        className="text-sm border rounded-md px-3 py-1 bg-white"
+        value={filters.category}
+        onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+      >
+        <option value="">All Categories</option>
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>{cat}</option>
+        ))}
+      </select>
+
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        className="text-green-600 hover:bg-green-50"
+        onClick={() => setFilters({ department: '', category: '', skillLevel: '' })}
+      >
+        Clear Filter
+      </Button>
+    </div>
+  </div>
+</motion.div>
+
   );
 };
 
