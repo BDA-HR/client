@@ -1,61 +1,21 @@
 import React, { useState } from 'react';
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardContent,
-  CardDescription,
-  CardFooter
-} from "../../../components/ui/card";
-import { 
-  Table, 
-  TableHeader, 
-  TableRow, 
-  TableHead, 
-  TableBody, 
-  TableCell 
-} from "../../../components/ui/table";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell 
-} from 'recharts';
-import { 
-  Users, 
-  Clock, 
-  CheckCircle, 
-  XCircle,
-  ArrowLeft,
-  Mail,
-  Phone,
-  FileText,
-  CalendarDays,
-  Briefcase,
-  History
-} from 'lucide-react';
-import { Separator } from "../../../components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import CandidateMetrics from "../../../components/hr/CandidateMetrics";
+import CandidateDetail from "../../../components/hr/CandidateDetail";
+import CandidateStageChart from "../../../components/hr/CandidateStageChart";
+import DepartmentApplicationChart from "../../../components/hr/DepartmentApplicationChart";
+import CandidateTable from "../../../components/hr/CandidateTable";
+import { Users, CheckCircle, Clock, XCircle } from 'lucide-react';
+
+
+
+import type { Candidate } from '../../../types/candidate';
 
 const CandidatePipeline = () => {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
   const [showFullHistory, setShowFullHistory] = useState(false);
-  const [candidates, setCandidates] = useState([
+  
+  const [candidates, setCandidates] = useState<Candidate[]>([
     {
       id: 'CAN-1001',
       name: 'John Smith',
@@ -323,462 +283,46 @@ const CandidatePipeline = () => {
   // Candidate Detail View
   if (selectedCandidateId) {
     const selectedCandidate = candidates.find(c => c.id === selectedCandidateId);
-    
-    if (!selectedCandidate) {
-      return (
-        <div className="p-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Candidate not found</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={handleBackToList}>Back to list</Button>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
-
     return (
       <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={handleBackToList}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div>
-                <CardTitle>Candidate Details</CardTitle>
-                <CardDescription>
-                  Detailed information for {selectedCandidate.name}
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Personal Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Personal Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-                    <div>
-                      <h3 className="text-xl font-bold">{selectedCandidate.name}</h3>
-                      <p className="text-gray-600">{selectedCandidate.position}</p>
-                      <p className="text-sm text-gray-500">{selectedCandidate.department} Department</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center">
-                      <Mail className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{selectedCandidate.email}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{selectedCandidate.phone}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Briefcase className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>Experience: {selectedCandidate.experience}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CalendarDays className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>Applied on {selectedCandidate.appliedDate}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FileText className="w-4 h-4 mr-2 text-gray-500" />
-                      <span className="text-blue-600 cursor-pointer">
-                        {selectedCandidate.resume}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <h4 className="font-medium mb-2">Education</h4>
-                    <p>{selectedCandidate.education}</p>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <h4 className="font-medium mb-2">Location</h4>
-                    <p>{selectedCandidate.location}</p>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <h4 className="font-medium mb-2">Salary Expectation</h4>
-                    <p>{selectedCandidate.salaryExpectation}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Status & Timeline */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="text-lg">Application Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-medium mb-2">Current Status</h4>
-                      <Select
-                        value={selectedCandidate.status}
-                        onValueChange={(value) => handleStatusChange(selectedCandidate.id, value)}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {statusOptions.map(option => (
-                            <SelectItem key={option} value={option}>
-                              <div className="flex items-center">
-                                <Badge 
-                                  variant={
-                                    option === 'New' ? 'secondary' :
-                                    option === 'Scheduled' ? 'default' :
-                                    option === 'In Review' ? 'outline' : 
-                                    option === 'Rejected' || option === 'Declined' ? 'destructive' : 'default'
-                                  }
-                                  className="mr-2"
-                                >
-                                  {option}
-                                </Badge>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">Interview Date</h4>
-                      <p>{selectedCandidate.interviewDate || 'Not scheduled yet'}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">Source</h4>
-                      <p>{selectedCandidate.source}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">Department</h4>
-                      <p>{selectedCandidate.department}</p>
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div>
-                    <h4 className="font-medium mb-3">Recruitment Pipeline</h4>
-                    <div className="flex items-center justify-between">
-                      {stageOptions.map((stage, index) => (
-                        <div key={stage} className="flex flex-col items-center">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            selectedCandidate.stage === stage 
-                              ? 'bg-blue-500 text-white' 
-                              : index <= stageOptions.indexOf(selectedCandidate.stage) 
-                                ? 'bg-gray-200 text-gray-600' 
-                                : 'bg-gray-100 text-gray-400'
-                          }`}>
-                            {index + 1}
-                          </div>
-                          <span className={`mt-2 text-xs ${
-                            selectedCandidate.stage === stage 
-                              ? 'font-bold text-blue-600' 
-                              : 'text-gray-500'
-                          }`}>
-                            {stage}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Stage</h4>
-                    <Select
-                      value={selectedCandidate.stage}
-                      onValueChange={(value) => handleStageChange(selectedCandidate.id, value)}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select stage" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {stageOptions.map(option => (
-                          <SelectItem key={option} value={option}>
-                            <div className="flex items-center">
-                              <Badge 
-                                variant={
-                                  option === 'Application' ? 'secondary' :
-                                  option === 'Screening' ? 'outline' :
-                                  option === 'Interview' ? 'default' :
-                                  option === 'Offer' ? 'destructive' : 
-                                  option === 'Hired' ? 'default' : 'destructive'
-                                }
-                                className="mr-2"
-                              >
-                                {option}
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Skills</h4>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {selectedCandidate.skills.map((skill: string, index: number) => (
-                        <Badge key={index} variant="outline">{skill}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Notes</h4>
-                    <p className="text-gray-600">{selectedCandidate.notes}</p>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div>
-                    <h4 className="font-medium mb-3">Candidate History</h4>
-                    <div className="space-y-4">
-                      {selectedCandidate.history.map((entry, index) => (
-                        <div key={index} className="flex items-start">
-                          <div className="flex flex-col items-center mr-4">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                            {index < selectedCandidate.history.length - 1 && (
-                              <div className="w-px h-full bg-gray-300"></div>
-                            )}
-                          </div>
-                          <div className="pb-4">
-                            <p className="font-medium">{entry.stage} - <Badge variant={
-                              entry.status === 'New' ? 'secondary' :
-                              entry.status === 'Scheduled' ? 'default' :
-                              entry.status === 'In Review' ? 'outline' : 
-                              entry.status === 'Rejected' || entry.status === 'Declined' ? 'destructive' : 'default'
-                            }>{entry.status}</Badge></p>
-                            <p className="text-sm text-gray-500">{entry.date}</p>
-                            <p className="text-sm mt-1">{entry.note}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-end space-x-3">
-                  <Button variant="outline">Schedule Interview</Button>
-                  <Button onClick={() => handleMoveToNextStage(selectedCandidate.id)}>
-                    Move to Next Stage
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          </CardContent>
-        </Card>
+        {selectedCandidate && (
+          <CandidateDetail 
+            candidate={selectedCandidate}
+            onBack={handleBackToList}
+            onStageChange={(newStage) => handleStageChange(selectedCandidate.id, newStage)}
+            onStatusChange={(newStatus) => handleStatusChange(selectedCandidate.id, newStatus)}
+            onMoveToNextStage={() => handleMoveToNextStage(selectedCandidate.id)}
+            stageOptions={stageOptions}
+            statusOptions={statusOptions}
+          />
+        )}
       </div>
     );
   }
 
-  // Main List View
   return (
     <Card>
       <CardHeader>
         <CardTitle>Candidate Pipeline</CardTitle>
       </CardHeader>
       <CardContent className="space-y-8">
-        {/* Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {metrics.map((metric) => (
-            <Card key={metric.id} className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">{metric.title}</h3>
-                    <p className="text-2xl font-bold mt-1">{metric.value}</p>
-                    <p className="text-sm text-green-600 mt-2 font-medium">
-                      {metric.change} from last month
-                    </p>
-                  </div>
-                  <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-                    {metric.icon}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Charts */}
+        <CandidateMetrics metrics={metrics} />
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Candidates by Stage</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={stageData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="candidates" fill="#3b82f6" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Applications by Department</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={departmentData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="applicants"
-                      nameKey="name"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {departmentData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <CandidateStageChart data={stageData} />
+          <DepartmentApplicationChart data={departmentData} colors={COLORS} />
         </div>
 
-        {/* Candidates Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Candidate Tracking</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Candidate ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Stage</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Days in Stage</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {candidates.filter(c => !showFullHistory ? c.stage !== 'Hired' && c.stage !== 'Rejected' : true)
-                  .map((candidate) => (
-                  <TableRow key={candidate.id}>
-                    <TableCell className="font-medium">{candidate.id}</TableCell>
-                    <TableCell className="font-medium">{candidate.name}</TableCell>
-                    <TableCell>{candidate.position}</TableCell>
-                    <TableCell>{candidate.department}</TableCell>
-                    <TableCell>
-                      <Select
-                        value={candidate.stage}
-                        onValueChange={(value) => handleStageChange(candidate.id, value)}
-                      >
-                        <SelectTrigger className="w-[150px]">
-                          <SelectValue placeholder="Select stage" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {stageOptions.map(option => (
-                            <SelectItem key={option} value={option}>
-                              <Badge 
-                                variant={
-                                  option === 'Application' ? 'secondary' :
-                                  option === 'Screening' ? 'outline' :
-                                  option === 'Interview' ? 'default' :
-                                  option === 'Offer' ? 'destructive' : 
-                                  option === 'Hired' ? 'default' : 'destructive'
-                                }
-                              >
-                                {option}
-                              </Badge>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={candidate.status}
-                        onValueChange={(value) => handleStatusChange(candidate.id, value)}
-                      >
-                        <SelectTrigger className="w-[150px]">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {statusOptions.map(option => (
-                            <SelectItem key={option} value={option}>
-                              <Badge 
-                                variant={
-                                  option === 'New' ? 'secondary' :
-                                  option === 'Scheduled' ? 'default' :
-                                  option === 'In Review' ? 'outline' : 
-                                  option === 'Rejected' || option === 'Declined' ? 'destructive' : 'default'
-                                }
-                              >
-                                {option}
-                              </Badge>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>{candidate.daysInStage}</TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleViewDetails(candidate.id)}
-                      >
-                        View Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            
-            <div className="mt-6 flex justify-center">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowFullHistory(!showFullHistory)}
-                className="flex items-center"
-              >
-                <History className="w-4 h-4 mr-2" />
-                {showFullHistory ? 'Hide Full History' : 'View Full History'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <CandidateTable 
+          candidates={candidates}
+          showFullHistory={showFullHistory}
+          onViewDetails={handleViewDetails}
+          onStageChange={handleStageChange}
+          onStatusChange={handleStatusChange}
+          onToggleHistory={() => setShowFullHistory(!showFullHistory)}
+          stageOptions={stageOptions}
+          statusOptions={statusOptions}
+        />
       </CardContent>
     </Card>
   );

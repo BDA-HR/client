@@ -132,7 +132,6 @@ const RecruitmentList = () => {
     }
   ]);
 
-
   // Approval workflow handlers
   const handleApprove = (id: string) => {
     setRequisitions(requisitions.map(req => 
@@ -167,16 +166,6 @@ const RecruitmentList = () => {
       case 'Rejected': return <AlertCircle className="w-5 h-5 text-red-500" />;
       default: return null;
     }
-  };
-
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
   };
 
   return (
@@ -243,10 +232,8 @@ const RecruitmentList = () => {
                     <TableHead>Department</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Positions</TableHead>
-                    <TableHead>Budget</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Progress</TableHead>
-                    
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -257,7 +244,6 @@ const RecruitmentList = () => {
                       <TableCell>{plan.department}</TableCell>
                       <TableCell>{plan.employmentType}</TableCell>
                       <TableCell>{plan.positions}</TableCell>
-                      <TableCell>{formatCurrency(plan.budget)}</TableCell>
                       <TableCell>
                         <Badge 
                           variant="outline"
@@ -277,7 +263,6 @@ const RecruitmentList = () => {
                           <span>{plan.applicants} applied</span>
                         </div>
                       </TableCell>
-
                     </TableRow>
                   ))}
                 </TableBody>
@@ -301,7 +286,6 @@ const RecruitmentList = () => {
                     <TableHead>Job Title</TableHead>
                     <TableHead>Department</TableHead>
                     <TableHead>Positions</TableHead>
-                    <TableHead>Budget</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Submitted By</TableHead>
                     <TableHead>Actions</TableHead>
@@ -314,7 +298,6 @@ const RecruitmentList = () => {
                       <TableCell className="font-medium">{req.title}</TableCell>
                       <TableCell>{req.department}</TableCell>
                       <TableCell>{req.positions}</TableCell>
-                      <TableCell>{formatCurrency(req.budget)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {getStatusIcon(req.status)}
