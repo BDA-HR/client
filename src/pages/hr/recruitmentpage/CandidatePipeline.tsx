@@ -303,7 +303,7 @@ const CandidatePipeline = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Candidate Pipeline</CardTitle>
+        <CardTitle className="text-green-700 text-2xl md:text-3xl font-bold">Candidate Pipeline</CardTitle>
       </CardHeader>
       <CardContent className="space-y-8">
         <CandidateMetrics metrics={metrics} />

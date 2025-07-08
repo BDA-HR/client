@@ -12,7 +12,6 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Progress } from "../../../components/ui/progress";
 import { 
-   
   Clock, 
   FileText,  
   Settings, 
@@ -83,18 +82,21 @@ const Onboarding = () => {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Employee Onboarding</h1>
+              <h1 className="text-green-700 text-2xl md:text-3xl font-bold">Employee Onboarding</h1>
               <p className="text-sm text-gray-500 mt-1">
                 Streamlining the onboarding process for {employee.name}
               </p>
             </div>
-            <Badge variant="secondary" className="px-3 py-1">
+            <Badge variant="secondary" className="px-3 py-1 bg-green-100 text-green-800">
               {progress}% Complete
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Progress value={progress} className="h-2 mb-6" />
+          <Progress 
+            value={progress} 
+            className="h-2 mb-6 bg-gray-200 [&>div]:bg-green-600" 
+          />
           
           {/* Employee Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -153,7 +155,7 @@ const Onboarding = () => {
                       <YAxis allowDecimals={false} />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="value" fill="#8884d8" />
+                      <Bar dataKey="value" fill="#10b981" /> {/* Changed to green */}
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -191,11 +193,13 @@ const Onboarding = () => {
                     </div>
                     <div>
                       <Badge 
-                        variant={
-                          task.status === 'completed' ? 'default' : 
-                          task.status === 'in-progress' ? 'secondary' : 'outline'
-                        }
-                        className="capitalize"
+                        className={`capitalize ${
+                          task.status === 'completed' 
+                            ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                            : task.status === 'in-progress' 
+                              ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                              : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                        }`}
                       >
                         {task.status}
                       </Badge>
@@ -244,7 +248,9 @@ const Onboarding = () => {
                       placeholder="Assign trainer"
                     />
                   </div>
-                  <Button className="mt-4">Schedule Training</Button>
+                  <Button className="mt-4 bg-green-600 hover:bg-green-700 text-white">
+                    Schedule Training
+                  </Button>
                 </div>
                 
                 <div className="border border-dashed rounded-lg bg-gray-50 flex items-center justify-center p-6">

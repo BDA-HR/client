@@ -173,7 +173,8 @@ const RecruitmentList = () => {
       <Card>
         <CardHeader>
           <div>
-            <CardTitle>Recruitment Dashboard</CardTitle>
+            <CardTitle className="text-green-700 text-2xl md:text-3xl font-bold">Recruitment List</CardTitle>
+
             <CardDescription>
               Manage hiring plans and approval workflows
             </CardDescription>
