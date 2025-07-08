@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import './Honeycomb.css';
 import { useModule } from '../ModuleContext';
 
@@ -33,17 +32,15 @@ export default function Honeycomb() {
 
   return (
     <section className="flex items-center justify-center h-screen w-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 overflow-hidden">
-      <motion.button
+      <button
         onClick={handleLogout}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
         className="absolute top-6 right-6 z-50 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
         <span className="font-medium">Logout</span>
-      </motion.button>
+      </button>
 
       <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 drop-shadow">
@@ -57,34 +54,15 @@ export default function Honeycomb() {
         </div>
 
         {modules.map((mod, i) => (
-          <motion.div
+          <div
             key={mod.label}
-            initial={{ scale: 0, opacity: 0, rotate: 45 }}
-            animate={{ 
-              scale: 1, 
-              opacity: 1, 
-              rotate: 0,
-            }}
-            transition={{
-              delay: i * 0.15,
-              duration: 0.7,
-              ease: [0.17, 0.67, 0.83, 0.67],
-              rotate: { type: 'spring', stiffness: 100 },
-            }}
-            whileHover={{
-              scale: 1.15,
-              zIndex: 50,
-              transition: { duration: 0.3 },
-            }}
-            className={`absolute
-              transform -translate-x-1/2 -translate-y-1/2
-              ${positions[i]}
-              transition-all duration-300
-              group cursor-pointer
-            `}
-            style={{ 
+            className={`absolute transform -translate-x-1/2 -translate-y-1/2 ${positions[i]} group cursor-pointer transition-all duration-300`}
+            style={{
               width: 'clamp(68px, 15.5vmin, 125px)',
-              height: 'clamp(68px, 15.5vmin, 125px)' 
+              height: 'clamp(68px, 15.5vmin, 125px)',
+              animation: `honeycomb 2.1s ease forwards`,
+              animationDelay: `${i * 0.1}s`,
+              opacity: 0, 
             }}
             onClick={() => {
               if (mod.path) {
@@ -106,16 +84,16 @@ export default function Honeycomb() {
               `}
             >
               {mod.label === "Logo" ? (
-                  <img
-                    src="/bda-logo-1.png"
-                    alt="Company Logo"
-                    className="w-[80%] h-[80%] object-contain"
-                  />
+                <img
+                  src="/bda-logo-1.png"
+                  alt="Company Logo"
+                  className="w-[80%] h-[80%] object-contain"
+                />
               ) : (
                 mod.label
               )}
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>

@@ -10,7 +10,7 @@
 }
 
 .animate-honeycomb {
-  animation: honeycomb 1s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+  animation: honeycomb 2.1s ease forwards;
 }
 
 .hexagon {
@@ -31,21 +31,15 @@
   filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
 }
 
-/* ---------- Responsive Adjustments ---------- */
 @media (max-width: 639px) {
   .absolute {
     transform: translate(-50%, -50%) scale(0.95);
+    font-size: 10px;
   }
 }
 
 @media (min-width: 640px) and (max-width: 767px) {
   .absolute {
     transform: translate(-50%, -50%) scale(0.97);
-  }
-}
-
-@media (max-width: 639px) {
-  .hexagon {
-    font-size: 10px;
   }
 }
