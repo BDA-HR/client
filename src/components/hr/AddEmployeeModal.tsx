@@ -4,6 +4,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import type { Employee } from '../../types/employee';
 
 interface AddEmployeeModalProps {
   isOpen: boolean;
@@ -11,47 +12,73 @@ interface AddEmployeeModalProps {
   onAddEmployee: (employee: Omit<Employee, 'id'>) => void;
 }
 
-type Employee = {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  payroll: string;
-  bankAccountNumber: string;
-  department: string;
-  role: string;
-  jobGrade: string;
-  joiningDate: string;
-  contractType: "Full-time" | "Part-time" | "Freelance" | "Internship";
-  status: "active" | "on-leave";
-};
-
 const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, onAddEmployee }) => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    payroll: '',
-    bankAccountNumber: '',
-    department: '',
-    role: '',
-    jobGrade: '',
-    joiningDate: new Date().toISOString().split('T')[0],
-    contractType: 'Full-time',
-    status: 'active'
-  });
+const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
+  employeeId: '',
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  address: '',
+  city: '',
+  state: '',
+  postalCode: '',
+  country: '',
+  dateOfBirth: '',
+  gender: '',
+  maritalStatus: '',
+  emergencyContact: {
+    name: '',
+    relationship: '',
+    phone: ''
+  },
+  department: '',
+  jobTitle: '',
+  role: '', // Added missing required field
+  jobGrade: '',
+  employeeCategory: '',
+  reportingTo: '',
+  manager: '',
+  team: '',
+  joiningDate: new Date().toISOString().split('T')[0],
+  contractType: 'Full-time',
+  employmentStatus: 'Active',
+  status: 'active',
+  workLocation: '',
+  workSchedule: '',
+  salary: 0,
+  currency: '',
+  paymentMethod: '',
+  bankDetails: {
+    bankName: '',
+    accountNumber: '',
+    branchCode: ''
+  },
+  taxInformation: '',
+  totalLeavesTaken: 0,
+  leaveBalance: 0,
+  attendancePercentage: 0,
+  performanceRating: 0,
+  lastAppraisalDate: '',
+  nextAppraisalDate: '',
+  keyPerformanceIndicators: [],
+  skills: [],
+  competencies: [],
+  trainings: [],
+  previousRoles: [],
+  documents: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  updatedBy: ''
+});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const departments = ['Finance', 'Engineering', 'Product', 'Marketing', 'HR', 'Operations'];
   const jobGrades = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'];
   const contractTypes: Array<Employee['contractType']> = ['Full-time', 'Part-time', 'Freelance', 'Internship'];
+  const employmentStatuses: Array<Employee['employmentStatus']> = ['Active', 'On Leave', 'Terminated', 'Probation'];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -75,13 +102,9 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
         newErrors.email = 'Please enter a valid email';
       }
       if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-      if (!formData.address.trim()) newErrors.address = 'Address is required';
     } else if (stepNumber === 2) {
-      if (!formData.payroll.trim()) newErrors.payroll = 'Payroll ID is required';
-      if (!formData.bankAccountNumber.trim()) newErrors.bankAccountNumber = 'Bank account number is required';
       if (!formData.department) newErrors.department = 'Department is required';
-      if (!formData.role.trim()) newErrors.role = 'Role is required';
-      if (!formData.jobGrade) newErrors.jobGrade = 'Job grade is required';
+      if (!formData.jobTitle.trim()) newErrors.jobTitle = 'Job title is required';
       if (!formData.joiningDate) newErrors.joiningDate = 'Joining date is required';
     }
 
@@ -101,24 +124,6 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
     if (!validateStep(3)) return;
     onAddEmployee(formData);
     alert('Employee added successfully!');
-    setFormData({
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      address: '',
-      payroll: '',
-      bankAccountNumber: '',
-      department: '',
-      role: '',
-      jobGrade: '',
-      joiningDate: new Date().toISOString().split('T')[0],
-      contractType: 'Full-time',
-      status: 'active'
-    });
-    setErrors({});
-    setStep(1);
     onClose();
   };
 
@@ -217,14 +222,14 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">Address *</label>
+                      <label className="block text-sm font-medium mb-1">Date of Birth</label>
                       <input 
-                        name="address" 
-                        value={formData.address} 
+                        type="date" 
+                        name="dateOfBirth" 
+                        value={formData.dateOfBirth} 
                         onChange={handleChange}
-                        className={`w-full px-3 py-2 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md" 
                       />
-                      {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                     </div>
                   </motion.div>
                 )}
@@ -234,24 +239,23 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                     <h3 className="text-lg font-medium text-gray-800 mb-4">Employment Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1">Payroll ID *</label>
+                        <label className="block text-sm font-medium mb-1">Employee ID *</label>
                         <input 
-                          name="payroll" 
-                          value={formData.payroll} 
+                          name="employeeId" 
+                          value={formData.employeeId} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.payroll ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
                         />
-                        {errors.payroll && <p className="text-red-500 text-xs mt-1">{errors.payroll}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">Bank Account Number *</label>
+                        <label className="block text-sm font-medium mb-1">Job Title *</label>
                         <input 
-                          name="bankAccountNumber" 
-                          value={formData.bankAccountNumber} 
+                          name="jobTitle" 
+                          value={formData.jobTitle} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.bankAccountNumber ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                          className={`w-full px-3 py-2 border ${errors.jobTitle ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
-                        {errors.bankAccountNumber && <p className="text-red-500 text-xs mt-1">{errors.bankAccountNumber}</p>}
+                        {errors.jobTitle && <p className="text-red-500 text-xs mt-1">{errors.jobTitle}</p>}
                       </div>
                     </div>
 
@@ -272,33 +276,22 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                         {errors.department && <p className="text-red-500 text-xs mt-1">{errors.department}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">Job Grade *</label>
+                        <label className="block text-sm font-medium mb-1">Job Grade</label>
                         <select
                           name="jobGrade"
                           value={formData.jobGrade}
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.jobGrade ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
                         >
                           <option value="">Select Job Grade</option>
                           {jobGrades.map(grade => (
                             <option key={grade} value={grade}>{grade}</option>
                           ))}
                         </select>
-                        {errors.jobGrade && <p className="text-red-500 text-xs mt-1">{errors.jobGrade}</p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Role *</label>
-                        <input 
-                          name="role" 
-                          value={formData.role} 
-                          onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
-                        />
-                        {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
-                      </div>
                       <div>
                         <label className="block text-sm font-medium mb-1">Joining Date *</label>
                         <input 
@@ -309,6 +302,19 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                           className={`w-full px-3 py-2 border ${errors.joiningDate ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.joiningDate && <p className="text-red-500 text-xs mt-1">{errors.joiningDate}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Employment Status</label>
+                        <select
+                          name="employmentStatus"
+                          value={formData.employmentStatus}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          {employmentStatuses.map(status => (
+                            <option key={status} value={status}>{status}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </motion.div>
@@ -342,6 +348,28 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ isOpen, onClose, on
                           <option value="active">Active</option>
                           <option value="on-leave">On Leave</option>
                         </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Salary</label>
+                        <input 
+                          type="number" 
+                          name="salary" 
+                          value={formData.salary} 
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Currency</label>
+                        <input 
+                          name="currency" 
+                          value={formData.currency} 
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                        />
                       </div>
                     </div>
                   </motion.div>

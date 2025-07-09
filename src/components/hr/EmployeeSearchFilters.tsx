@@ -4,6 +4,7 @@ import { Search, Filter } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import AddEmployeeModal from './AddEmployeeModal';
+import type { Employee } from '../../types/employee';
 
 interface EmployeeSearchFiltersProps {
   searchTerm: string;
@@ -27,6 +28,8 @@ const EmployeeSearchFilters: React.FC<EmployeeSearchFiltersProps> = ({
   onAddEmployee
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Extract unique values for filter dropdowns
   const departments = [...new Set(employees.map(emp => emp.department))];
   const statuses = ['active', 'on-leave'];
   const contractTypes = ['Full-time', 'Part-time', 'Freelance', 'Internship'];
@@ -107,7 +110,12 @@ const EmployeeSearchFilters: React.FC<EmployeeSearchFiltersProps> = ({
               variant="ghost" 
               size="sm" 
               className="text-green-600 hover:bg-green-50"
-              onClick={() => setFilters({ department: '', status: '', contractType: '' })}
+              onClick={() => setFilters({ 
+                department: '', 
+                status: '', 
+                contractType: '',
+                employmentStatus: '' 
+              })}
             >
               Clear
             </Button>
@@ -136,20 +144,6 @@ const itemVariants = {
       duration: 0.5
     }
   }
-};
-
-type Employee = {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  email: string;
-  payroll: string;
-  department: string;
-  role: string;
-  joiningDate: string;
-  contractType: "Full-time" | "Part-time" | "Freelance" | "Internship";
-  status: "active" | "on-leave";
 };
 
 export default EmployeeSearchFilters;
