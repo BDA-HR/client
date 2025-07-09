@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import CandidateMetrics from "../../../components/hr/CandidateMetrics";
 import CandidateDetail from "../../../components/hr/CandidateDetail";
@@ -6,16 +7,27 @@ import CandidateStageChart from "../../../components/hr/CandidateStageChart";
 import DepartmentApplicationChart from "../../../components/hr/DepartmentApplicationChart";
 import CandidateTable from "../../../components/hr/CandidateTable";
 import { Users, CheckCircle, Clock, XCircle } from 'lucide-react';
-
-
-
+import { useModule } from "../../../ModuleContext";
 import type { Candidate } from '../../../types/candidate';
 
 const CandidatePipeline = () => {
-  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+    // All hooks at the top
+  const { setActiveModule } = useModule();
+  const storedModule = sessionStorage.getItem('currentModule');
+  
+  useEffect(() => {
+    if (storedModule) {
+      setActiveModule(storedModule);
+    }
+  }, [setActiveModule, storedModule]);
+
+  const { candidateId } = useParams();
   const [showFullHistory, setShowFullHistory] = useState(false);
   
-  const [candidates, setCandidates] = useState<Candidate[]>([
+  // Initialize candidates from sessionStorage or default data
+  const [candidates, setCandidates] = useState<Candidate[]>(() => {
+    const savedCandidates = sessionStorage.getItem('candidates');
+    return savedCandidates ? JSON.parse(savedCandidates) : [
     {
       id: 'CAN-1001',
       name: 'John Smith',
@@ -169,7 +181,16 @@ const CandidatePipeline = () => {
         { date: '2023-07-12', stage: 'Rejected', status: 'Declined', note: 'Not selected after interview' }
       ]
     }
-  ]);
+    ];
+  });
+
+  // Stage and status options
+  
+
+    // Save candidates to sessionStorage whenever they change
+  useEffect(() => {
+    sessionStorage.setItem('candidates', JSON.stringify(candidates));
+  }, [candidates]);
 
   // Stage and status options
   const stageOptions = ['Application', 'Screening', 'Interview', 'Offer', 'Hired', 'Rejected'];
@@ -201,12 +222,11 @@ const CandidatePipeline = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-  const handleViewDetails = (candidateId: string) => {
-    setSelectedCandidateId(candidateId);
-  };
-
-  const handleBackToList = () => {
-    setSelectedCandidateId(null);
+  const handleViewDetails = (candidate: Candidate) => {
+    // Store candidate data and module context before opening new tab
+    sessionStorage.setItem('selectedCandidate', JSON.stringify(candidate));
+    sessionStorage.setItem('currentModule', 'HR');
+    window.open(`/recruitment/candidates/${candidate.id}`, '_blank');
   };
 
   const handleStageChange = (candidateId: string, newStage: string) => {
@@ -280,24 +300,29 @@ const CandidatePipeline = () => {
     );
   };
 
-  // Candidate Detail View
-  if (selectedCandidateId) {
-    const selectedCandidate = candidates.find(c => c.id === selectedCandidateId);
-    return (
-      <div className="space-y-6">
-        {selectedCandidate && (
+  // If we're in a candidate detail tab
+  if (candidateId) {
+    const storedCandidate = sessionStorage.getItem('selectedCandidate');
+    const storedModule = sessionStorage.getItem('currentModule');
+    
+    if (storedCandidate && storedModule === 'HR') {
+      const selectedCandidate = JSON.parse(storedCandidate);
+      
+      return (
+        <div className="space-y-6">
           <CandidateDetail 
             candidate={selectedCandidate}
-            onBack={handleBackToList}
+            onBack={() => window.close()}
             onStageChange={(newStage) => handleStageChange(selectedCandidate.id, newStage)}
             onStatusChange={(newStatus) => handleStatusChange(selectedCandidate.id, newStatus)}
             onMoveToNextStage={() => handleMoveToNextStage(selectedCandidate.id)}
             stageOptions={stageOptions}
             statusOptions={statusOptions}
           />
-        )}
-      </div>
-    );
+        </div>
+      );
+    }
+    return <div className="p-8 text-center">Candidate data not found. Please reopen from the candidate list.</div>;
   }
 
   return (

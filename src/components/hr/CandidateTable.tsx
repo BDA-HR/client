@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// CandidateTable.tsx
+import React from 'react';
 import { 
   Table, 
   TableHeader, 
@@ -32,20 +33,19 @@ const CandidateTable = ({
 }: { 
   candidates: Candidate[]; 
   showFullHistory: boolean; 
-  onViewDetails: (id: string) => void; 
+  onViewDetails: (candidate: Candidate) => void; 
   onStageChange: (id: string, stage: string) => void;
   onStatusChange: (id: string, status: string) => void;
   onToggleHistory: () => void;
   stageOptions: string[];
   statusOptions: string[];
 }) => {
-  const [filters, setFilters] = useState({
-    position: '',
-    department: '',
-    stage: '',
-    status: ''
+  const [filters, setFilters] = React.useState({
+    position: 'all',
+    department: 'all',
+    stage: 'all',
+    status: 'all'
   });
-
 
   // Get unique values for filter dropdowns
   const positions = Array.from(new Set(candidates.map(c => c.position)));
@@ -58,12 +58,11 @@ const CandidateTable = ({
   const filteredCandidates = candidates
     .filter(c => !showFullHistory ? c.stage !== 'Hired' && c.stage !== 'Rejected' : true)
     .filter(c => 
-      (filters.position ? c.position === filters.position : true) &&
-      (filters.department ? c.department === filters.department : true) &&
-      (filters.stage ? c.stage === filters.stage : true) &&
-      (filters.status ? c.status === filters.status : true)
+      (filters.position === 'all' || c.position === filters.position) &&
+      (filters.department === 'all' || c.department === filters.department) &&
+      (filters.stage === 'all' || c.stage === filters.stage) &&
+      (filters.status === 'all' || c.status === filters.status)
     );
-
 
   return (
     <Card>
@@ -146,7 +145,6 @@ const CandidateTable = ({
           </div>
         </div>
 
-
         <Table>
           <TableHeader>
             <TableRow>
@@ -225,7 +223,7 @@ const CandidateTable = ({
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => onViewDetails(candidate.id)}
+                    onClick={() => onViewDetails(candidate)}
                   >
                     View Details
                   </Button>

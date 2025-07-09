@@ -62,6 +62,7 @@ const [isAuthenticated, setIsAuthenticated] = useState(() => {
           <Route path='/employees/jobgrade' element={<JobGrade />} />
           <Route path='/employees/termination' element={<Termination />} />
           <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />
+          <Route path='/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />
           <Route path='/recruitment/onboarding' element={<OnBoarding />} />
           <Route path='/recruitment/list' element={<RecruitmentList />} />
           <Route path='/leave/list' element={<LeaveList />} />
