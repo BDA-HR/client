@@ -3,12 +3,12 @@ import StatsCards from '../../components/hr/StatsCards'
 import UpcomingEvents from '../../components/hr/UpcomingEvents'
 import RecentActivity from '../../components/hr/RecentActivity'
 import PendingActivity from '../../components/hr/PendingActivity'
-import { dashboardMetrics, departments, employeeStatusData, timeOffRequests, attendanceApprovals, recentActivities, upcomingEvents } from '../../data/data'
+import { dashboardMetrics, timeOffRequests, attendanceApprovals, recentActivities, upcomingEvents } from '../../data/data'
 import { motion } from 'framer-motion';
 import { Plus, RefreshCw, FileDown } from 'lucide-react';
 // import EmployeeStatus from '../components/dashboard/EmployeeStatus'
-import DepartmentChart from '../../components/hr/DepartmentChart'
-import EmployeeStatusChart from '../../components/hr/EmployeeChart'
+// import DepartmentChart from '../../components/hr/DepartmentChart'
+// import EmployeeStatusChart from '../../components/hr/EmployeeChart'
 
 
 function Dashboard() {
@@ -83,8 +83,8 @@ function Dashboard() {
         variants={itemVariants}
         className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6"
       >
-        <EmployeeStatusChart data={employeeStatusData} />
-        <DepartmentChart departments={departments} />
+        {/* <EmployeeStatusChart data={employeeStatusData} />
+        <DepartmentChart departments={departments} /> */}
       </motion.div>
 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         <motion.div

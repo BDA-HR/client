@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SignInPage from './pages/SignInPage';
 import Layout from './layout/layout';
-import Dashboard from './pages/modules/Dashboard';
+import Dashboard from './pages/modules/HR';
 import Modules from './pages/Modules';
 import { ModuleProvider } from './ModuleContext';
 import InventoryDashboard from './pages/modules/Inventory';
