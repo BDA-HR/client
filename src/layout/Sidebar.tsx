@@ -18,7 +18,6 @@ import {
   RefreshCw,
   Warehouse,
   ClipboardList,
-  DollarSign,
   FileCheck,
   CheckCircle2,
   Package,
@@ -272,10 +271,12 @@ const Sidebar: React.FC = () => {
           {activeModule === 'Finance' && (
             <>
               <NavItem to="/finance/gl" icon={<FileText size={18} />} label="General Ledger" {...theme} />
-              <NavItem to="/finance/ap" icon={<Package size={18} />} label="Accounts Payable" {...theme} />
-              <NavItem to="/finance/ar" icon={<DollarSign size={18} />} label="Accounts Receivable" {...theme} />
+              <NavItem to="/finance/accounts" icon={<Package size={18} />} label="Accounts " {...theme} />
+              {/* <NavItem to="/finance/ar" icon={<DollarSign size={18} />} label="Accounts Receivable" {...theme} /> */}
               <NavItem to="/finance/assets" icon={<Briefcase size={18} />} label="Assets" {...theme} />
               <NavItem to="/finance/budget" icon={<FileSpreadsheet size={18} />} label="Budgeting" {...theme} />
+              <NavItem to="/finance/payroll" icon={<FileSpreadsheet size={18} />} label="Payroll" {...theme} />
+              <NavItem to="/finance/transactions" icon={<FileSpreadsheet size={18} />} label="Transaction" {...theme} />
               <NavItem to="/finance/reports" icon={<LineChart size={18} />} label="Reports" {...theme} />
             </>
           )}
