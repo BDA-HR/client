@@ -1,0 +1,85 @@
+export type Employee = {
+  id: string;
+  employeeId: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+  role: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  dateOfBirth: string;
+  gender: string;
+  maritalStatus: string;
+  emergencyContact: {
+    name: string;
+    relationship: string;
+    phone: string;
+  };
+  department: string;
+  jobTitle: string;
+  jobGrade: string;
+  employeeCategory: string;
+  reportingTo: string;
+  manager: string;
+  team: string;
+  joiningDate: string;
+  contractType: "Full-time" | "Part-time" | "Freelance" | "Internship";
+  employmentStatus: "Active" | "On Leave" | "Terminated" | "Probation";
+  status: "active" | "on-leave";
+  workLocation: string;
+  workSchedule: string;
+  salary: number;
+  currency: string;
+  paymentMethod: string;
+  bankDetails: {
+    bankName: string;
+    accountNumber: string;
+    branchCode: string;
+  };
+  taxInformation: string;
+  lastCheckIn?: string;
+  lastCheckOut?: string;
+  totalLeavesTaken: number;
+  leaveBalance: number;
+  attendancePercentage: number;
+  performanceRating: number;
+  lastAppraisalDate: string;
+  nextAppraisalDate: string;
+  keyPerformanceIndicators: {
+    name: string;
+    target: string;
+    actual: string;
+    weight: number;
+  }[];
+  skills: string[];
+  competencies: string[];
+  trainings: {
+    name: string;
+    date: string;
+    duration: string;
+    status: "Completed" | "In Progress" | "Pending";
+    certification?: string;
+  }[];
+  previousRoles: {
+    jobTitle: string;
+    department: string;
+    startDate: string;
+    endDate: string;
+    responsibilities: string;
+  }[];
+  documents: {
+    type: string;
+    name: string;
+    issueDate: string;
+    expiryDate?: string;
+    status: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+  updatedBy: string;
+};

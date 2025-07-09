@@ -24,13 +24,17 @@ import AttendanceList from './pages/hr/attendancepage/AttendanceList';
 import ShiftScheduler from './pages/hr/attendancepage/ShiftScheduler';
 import TimeClock from './pages/hr/attendancepage/TimeClock';
 import TimeClockFormContainer from './pages/hr/attendancepage/TimeClockFormContainer';
+import EmployeeDetailsPage from './components/hr/EmployeeDetailsPage';
 // import TimeClockDisplay from './components/hr/TimeClockDisplay';
 
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
 
   const handleLogin = () => {
+    localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
   };
   
@@ -54,6 +58,7 @@ function App() {
           <Route path='/finance' element={<Finance />} />
           <Route path='/procurement' element={<Procurement />} />
           <Route path='/employees/record' element={<EmployeeManagementPage />} />
+          <Route path="/employees/:id" element={<EmployeeDetailsPage />} />
           <Route path='/employees/jobgrade' element={<JobGrade />} />
           <Route path='/employees/termination' element={<Termination />} />
           <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />

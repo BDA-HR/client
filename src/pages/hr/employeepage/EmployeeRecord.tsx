@@ -125,6 +125,18 @@ const initialEmployees: Employee[] = [
     joiningDate: 'Nov 10, 2024',
     contractType: 'Part-time',
     status: 'on-leave'
+  },
+  {
+    id: 'emp-11',
+    firstName: 'Tom',
+    lastName: 'McCoy',
+    email: 'tom@gmail.com',
+    payroll: 'LAKD89137',
+    department: 'Product',
+    role: 'Sr. UI/UX Designer',
+    joiningDate: 'Nov 10, 2024',
+    contractType: 'Part-time',
+    status: 'active'
   }
 ];
 
@@ -143,10 +155,10 @@ const EmployeeManagementPage = () => {
   const handleAddEmployee = (newEmployee: Omit<Employee, 'id'>) => {
     const employeeWithId = {
       ...newEmployee,
-      id: `emp-${Date.now()}` // Generate a unique ID
+      id: `emp-${Date.now()}`
     };
     setEmployees(prev => [...prev, employeeWithId]);
-    setCurrentPage(1); // Reset to first page to show the new employee
+    setCurrentPage(1);
   };
 
   // Filter employees based on search and filters

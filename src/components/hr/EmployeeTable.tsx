@@ -135,11 +135,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     return new Date(b.joiningDate).getTime() - new Date(a.joiningDate).getTime();
   });
 
-  const handleViewDetails = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setModalType('view');
-    setPopoverOpen(null);
-  };
+const handleViewDetails = (employee: Employee) => {
+  // Store the employee data in sessionStorage before opening the new tab
+  sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
+  sessionStorage.setItem('currentModule', 'HR'); // Or get this from your module context
+  window.open(`/employees/${employee.id}`, '_blank');
+};
+
 
   const handleEdit = (employee: Employee) => {
     setSelectedEmployee(employee);
