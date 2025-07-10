@@ -25,6 +25,9 @@ import ShiftScheduler from './pages/hr/attendancepage/ShiftScheduler';
 import TimeClock from './pages/hr/attendancepage/TimeClock';
 import TimeClockFormContainer from './pages/hr/attendancepage/TimeClockFormContainer';
 import EmployeeDetailsPage from './components/hr/EmployeeDetailsPage';
+// import GeneralLedger from './components/finance/GeneralLedger';
+import Planning from './pages/finance/budgetpage/Planning';
+import GlPage from './pages/finance/generalledgerpage/GlPage';
 // import TimeClockDisplay from './components/hr/TimeClockDisplay';
 
 
@@ -75,6 +78,8 @@ const [isAuthenticated, setIsAuthenticated] = useState(() => {
           <Route path="/attendance/form" element={<TimeClockFormContainer />} />
           
           <Route path='/training' element={<Training />} />
+          <Route path='/finance/gl' element={<GlPage />} />
+          <Route path='/finance/budget' element ={<Planning />} />
 
 
 
