@@ -1,10 +1,10 @@
 import { 
   Briefcase, Layers, TrendingUp, Award, ShieldCheck 
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export const generateJobGrades = (count: number): JobGrade[] => {
-  const icons = [Briefcase, Layers, TrendingUp, Award, ShieldCheck];
-  const categories = ['Engineering', 'Marketing', 'Finance', 'HR', 'Operations', 'IT', 'Sales'];
+  const icons: LucideIcon[] = [Briefcase, Layers, TrendingUp, Award, ShieldCheck];  const categories = ['Engineering', 'Marketing', 'Finance', 'HR', 'Operations', 'IT', 'Sales'];
   const departments = ['Product', 'Growth', 'Corporate', 'Support', 'R&D'];
   const skills = ['Basic', 'Foundational', 'Intermediate', 'Advanced', 'Expert'];
   

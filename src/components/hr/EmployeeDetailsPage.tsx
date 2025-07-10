@@ -1,95 +1,83 @@
 import { Briefcase, Calendar, User, Mail, Phone, MapPin, Clock, Award, BarChart2, DollarSign, Users, Star, TrendingUp } from 'lucide-react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useModule } from '../../ModuleContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import type { Employee } from '../../types/employee';
+import { motion } from 'framer-motion';
 
 const EmployeeDetailsPage = () => {
-  // All hooks at the top
   const { setActiveModule } = useModule();
-  const storedModule = sessionStorage.getItem('currentModule');
+  const { id } = useParams();
+  const [employee, setEmployee] = useState<Employee | null>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
+    // Check authentication first
+    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuth) {
+      setLoading(false);
+      return;
+    }
+
+    // Set the active module from session storage if available
+    const storedModule = sessionStorage.getItem('currentModule');
     if (storedModule) {
       setActiveModule(storedModule);
     }
-  }, [setActiveModule, storedModule]);
 
-  // Then your conditional checks
+    // Try to get employee data from sessionStorage first
+    const storedEmployee = sessionStorage.getItem('selectedEmployee');
+    if (storedEmployee) {
+      const parsedEmployee = JSON.parse(storedEmployee);
+      if (parsedEmployee.id === id) {
+        setEmployee(parsedEmployee);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // If no employee in sessionStorage or ID doesn't match, try to fetch from API
+    // You would implement this API call based on your backend
+    const fetchEmployee = async () => {
+      try {
+        // Replace this with your actual API call
+        // const response = await fetch(`/api/employees/${id}`);
+        // const data = await response.json();
+        // setEmployee(data);
+        
+        // For now, we'll use a timeout to simulate loading
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      } catch (error) {
+        console.error('Failed to fetch employee:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchEmployee();
+  }, [id, setActiveModule]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading employee details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check authentication after loading
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Get employee data from sessionStorage
-const employee = {
-    id: 'emp-1',
-    employeeId: '1219484SH3',
-    firstName: 'Jane',
-    lastName: 'Cooper',
-    email: 'janecoop@gmail.com',
-    phone: '+1 555-123-4567',
-    address: '123 Main Street, San Francisco, USA',
-    dateOfBirth: 'June 15, 1990',
-    department: 'Finance',
-    jobTitle: 'Sr. Accountant',
-    jobGrade: 'G6',
-    employeeCategory: 'Technical',
-    reportingTo: 'Emily Wong',
-    manager: 'Jacob Lee',
-    team: 'Platform Engineering',
-    joiningDate: 'Feb 23, 2025',
-    contractType: "Full-time",
-    employmentStatus: "Active",
-    status: "active",
-    workLocation: 'San Francisco HQ',
-    salary: 120000,
-    currency: 'USD',
-    paymentMethod: 'Bank Transfer',
-    bankDetails: {
-      bankName: 'Bank of America',
-      accountNumber: '••••5678',
-      branchCode: '12345'
-    },
-    lastCheckIn: 'Jul 6, 2025 • 9:05 AM',
-    lastCheckOut: 'Jul 6, 2025 • 6:01 PM',
-    totalLeavesTaken: 8,
-    leaveBalance: 12,
-    attendancePercentage: 94,
-    performanceRating: 4.5,
-    lastAppraisalDate: 'Feb 2025',
-    nextAppraisalDate: 'Aug 2025',
-    emergencyContact: {
-      name: 'Jane Chen',
-      relationship: 'Sister',
-      phone: '+1 555-987-6543'
-    },
-    trainings: [
-      {
-        name: 'Advanced React',
-        date: 'Jan 2025',
-        status: "Completed"
-      },
-      {
-        name: 'Leadership Skills',
-        date: 'May 2025',
-        status: "In Progress"
-      }
-    ],
-    previousRoles: [
-      {
-        jobTitle: 'Software Developer',
-        department: 'R&D',
-        startDate: '2021',
-        endDate: '2023',
-        responsibilities: 'Led React migration, improved performance by 25%'
-      }
-    ]
-  };
-
   if (!employee) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Employee Not Found</h1>
           <p>The employee data could not be loaded.</p>
@@ -109,7 +97,12 @@ const employee = {
   };
   
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-4 md:p-8">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="min-h-screen bg-gray-50 p-4 md:p-8"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
@@ -153,7 +146,6 @@ const employee = {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="space-y-6">
-            {/* Personal Information */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center">
                 <User className="mr-2 text-green-500" size={20} />
@@ -178,7 +170,7 @@ const employee = {
                   <MapPin className="text-gray-500 mr-3 mt-1" size={16} />
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
-                    <p>{employee.address}</p>
+                    <p>{employee.address}, {employee.city}, {employee.country}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -259,11 +251,11 @@ const employee = {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Last Check-In</p>
-                  <p>{employee.lastCheckIn}</p>
+                  <p>{employee.lastCheckIn || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Last Check-Out</p>
-                  <p>{employee.lastCheckOut}</p>
+                  <p>{employee.lastCheckOut || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Leaves Taken</p>
@@ -357,7 +349,7 @@ const employee = {
                 Training & Development
               </h2>
               <div className="space-y-3">
-                {employee.trainings.map((training, index) => (
+                {employee.trainings.slice(0, 3).map((training, index) => (
                   <div key={index} className="text-sm">
                     <p className="font-medium">{training.name}</p>
                     <div className="flex justify-between text-gray-500">
@@ -397,7 +389,9 @@ const employee = {
                   <tr key={index}>
                     <td className="px-4 py-2 text-sm">{role.jobTitle}</td>
                     <td className="px-4 py-2 text-sm">{role.department}</td>
-                    <td className="px-4 py-2 text-sm">{role.startDate} - {role.endDate}</td>
+                    <td className="px-4 py-2 text-sm">
+                      {role.startDate} - {role.endDate || 'Present'}
+                    </td>
                     <td className="px-4 py-2 text-sm text-gray-500">{role.responsibilities}</td>
                   </tr>
                 ))}
@@ -406,7 +400,7 @@ const employee = {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

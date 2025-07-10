@@ -134,7 +134,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-gray-500 bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 h-screen"
         >
           <motion.div
             initial={{ y: 50, opacity: 0 }}

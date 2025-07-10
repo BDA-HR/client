@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import type { JobGrade, SalaryRange } from '../../types/jobgrade';
+import type { LucideIcon } from 'lucide-react';
 
 interface AddJobGradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddGrade: (grade: Omit<JobGrade, 'id'>) => void;
+  onAddGrade: (grade: Omit<JobGrade, "id">) => void;
+  departments: string[];
   categories: string[];
+  skillLevels: string[];
+  icons: LucideIcon[];
 }
 
 const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
   isOpen,
   onClose,
   onAddGrade,
+  departments,
   categories,
+  skillLevels,
+  icons,
 }) => {
   const [formData, setFormData] = useState<Omit<JobGrade, 'id'>>({
     grade: '',
@@ -21,12 +29,16 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
     experience: '',
     roles: [],
     salary: { min: '', mid: '', max: '' },
+    skill: skillLevels[0] || '',
+    icon: icons[0],
     descriptions: [{ id: 1, text: '' }],
-    category: '',
+    department: departments[0] || '',
+    category: categories[0] || '',
   });
 
   const [currentRole, setCurrentRole] = useState('');
   const [isRoleInputFocused, setIsRoleInputFocused] = useState(false);
+  const [selectedIconIndex, setSelectedIconIndex] = useState(0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -39,6 +51,13 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
           ...prev.salary,
           [salaryField]: value,
         },
+      }));
+    } else if (name === 'icon') {
+      const index = Number(value);
+      setSelectedIconIndex(index);
+      setFormData(prev => ({ 
+        ...prev, 
+        icon: icons[index] 
       }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -73,7 +92,9 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
       formData.salary.mid &&
       formData.salary.max &&
       formData.descriptions[0].text.trim() &&
-      formData.category
+      formData.category &&
+      formData.department &&
+      formData.skill
     ) {
       onAddGrade(formData);
       setFormData({
@@ -82,8 +103,11 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
         experience: '',
         roles: [],
         salary: { min: '', mid: '', max: '' },
+        skill: skillLevels[0] || '',
+        icon: icons[0],
         descriptions: [{ id: 1, text: '' }],
-        category: '',
+        department: departments[0] || '',
+        category: categories[0] || '',
       });
       onClose();
     }
@@ -142,6 +166,21 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                    <select
+                      name="department"
+                      value={formData.department}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      required
+                    >
+                      <option value="">Select Department</option>
+                      {departments.map(dept => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                     <select
                       name="category"
@@ -156,17 +195,39 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                       ))}
                     </select>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Experience *</label>
-                    <input
-                      type="text"
-                      name="experience"
-                      value={formData.experience}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Skill Level *</label>
+                    <select
+                      name="skill"
+                      value={formData.skill}
                       onChange={handleChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="e.g. 2-4 years"
                       required
-                    />
+                    >
+                      <option value="">Select Skill Level</option>
+                      {skillLevels.map(skill => (
+                        <option key={skill} value={skill}>{skill}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Icon *</label>
+                    <select
+                      name="icon"
+                      value={selectedIconIndex}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      required
+                    >
+                      {icons.map((Icon, index) => (
+                        <option key={index} value={index}>
+                          {Icon.displayName || `Icon ${index + 1}`}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -273,25 +334,3 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
 };
 
 export default AddJobGradeModal;
-
-type SalaryRange = {
-  min: string;
-  mid: string;
-  max: string;
-};
-
-type JobDescription = {
-  id: number;
-  text: string;
-};
-
-type JobGrade = {
-  id: string;
-  grade: string;
-  title: string;
-  experience: string;
-  roles: string[];
-  salary: SalaryRange;
-  descriptions: JobDescription[];
-  category?: string;
-};

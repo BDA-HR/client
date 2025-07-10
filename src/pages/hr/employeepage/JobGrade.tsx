@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, BookOpen } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
@@ -9,6 +9,8 @@ import { generateJobGrades } from '../../../components/hr/JobGradeData';
 import AddJobGradeModal from '../../../components/hr/AddJobGrade';
 import JobGradeSearchFilters from '../../../components/hr/JobGradeSearchFilters';
 import { Briefcase, Layers, TrendingUp, Award, ShieldCheck } from 'lucide-react';
+import type { JobGrade } from '../../../types/jobgrade';
+import type { LucideIcon } from 'lucide-react';
 
 const JobGradePage = () => {
   const [jobGrades, setJobGrades] = useState<JobGrade[]>([]);
@@ -24,8 +26,7 @@ const JobGradePage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const icons = [Briefcase, Layers, TrendingUp, Award, ShieldCheck];
-  const departments = [...new Set(jobGrades.map(grade => grade.department).filter(Boolean))] as string[];
+const icons: LucideIcon[] = [Briefcase, Layers, TrendingUp, Award, ShieldCheck];  const departments = [...new Set(jobGrades.map(grade => grade.department).filter(Boolean))] as string[];
   const categories = [...new Set(jobGrades.map(grade => grade.category).filter(Boolean))] as string[];
   const skillLevels = [...new Set(jobGrades.map(grade => grade.skill).filter(Boolean))] as string[];
 
@@ -66,7 +67,7 @@ const JobGradePage = () => {
   };
 
   const handleAddGrade = (newGrade: Omit<JobGrade, 'id'>) => {
-    const gradeWithId = {
+    const gradeWithId: JobGrade = {
       ...newGrade,
       id: `grade-${Date.now()}`,
       icon: newGrade.icon || Briefcase
@@ -195,31 +196,6 @@ const itemVariants = {
     opacity: 1,
     transition: { type: 'spring', stiffness: 100, damping: 15 }
   }
-};
-
-type SalaryRange = {
-  min: string;
-  mid: string;
-  max: string;
-};
-
-type JobDescription = {
-  id: number;
-  text: string;
-};
-
-type JobGrade = {
-  id: string;
-  grade: string;
-  title: string;
-  experience: string;
-  roles: string[];
-  salary: SalaryRange;
-  skill: string;
-  icon: React.ElementType;
-  descriptions: JobDescription[];
-  department?: string;
-  category?: string;
 };
 
 export default JobGradePage;

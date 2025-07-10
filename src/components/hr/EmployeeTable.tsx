@@ -153,11 +153,16 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     return new Date(b.joiningDate).getTime() - new Date(a.joiningDate).getTime();
   });
 
-  const handleViewDetails = (employee: Employee) => {
-    sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
-    sessionStorage.setItem('currentModule', 'HR');
-    window.open(`/employees/${employee.id}`, '_blank');
-  };
+const handleViewDetails = (employee: Employee) => {
+  sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
+  sessionStorage.setItem('currentModule', 'HR');
+  
+  // Use window.open with the same origin to maintain session
+  const newWindow = window.open(`/employees/${employee.id}`, '_blank');
+  if (newWindow) {
+    newWindow.focus();
+  }
+};
 
   const handleEdit = (employee: Employee) => {
     setSelectedEmployee(employee);
