@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
-import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { MoreHorizontal} from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Progress } from "../../../components/ui/progress";
@@ -23,7 +22,7 @@ interface Budget {
 }
 
 export default function BudgetList() {
-  const navigate = useNavigate(); // ADDED  
+  
   const [showFullHistory, setShowFullHistory] = useState(false);
   
   // Base budgets always shown
@@ -126,9 +125,7 @@ export default function BudgetList() {
     console.log(`Changing status for ${id} to ${newStatus}`);
   };
 
-  const handleCreateBudget = () => {
-    navigate('/finance/budget-create'); // UPDATED
-  };
+
 
   const toggleFullHistory = () => {
     setShowFullHistory(!showFullHistory);
@@ -164,13 +161,7 @@ export default function BudgetList() {
             Manage budgets, forecasts, and approval workflows
           </p>
         </div>
-        <Button 
-          onClick={handleCreateBudget}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create Budget
-        </Button>
+
       </div>
 
       {/* Financial Summary Cards */}
