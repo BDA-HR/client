@@ -2,87 +2,65 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { JobGrade, SalaryRange } from '../../types/jobgrade';
-import type { LucideIcon } from 'lucide-react';
 
 interface AddJobGradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddGrade: (grade: Omit<JobGrade, "id">) => void;
-  departments: string[];
-  categories: string[];
+  onAddGrade: (grade: Omit<JobGrade, "id" | "icon" | "category">) => void;
   skillLevels: string[];
-  icons: LucideIcon[];
 }
 
 const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
   isOpen,
   onClose,
   onAddGrade,
-  departments,
-  categories,
   skillLevels,
-  icons,
 }) => {
-  const [formData, setFormData] = useState<Omit<JobGrade, 'id'>>({
+  const [formData, setFormData] = useState<Omit<JobGrade, 'id' | 'icon' | 'category'>>({
     grade: '',
     title: '',
     experience: '',
     roles: [],
     salary: { min: '', mid: '', max: '' },
     skill: skillLevels[0] || '',
-    icon: icons[0],
     descriptions: [{ id: 1, text: '' }],
-    department: departments[0] || '',
-    category: categories[0] || '',
   });
-
   const [currentRole, setCurrentRole] = useState('');
   const [isRoleInputFocused, setIsRoleInputFocused] = useState(false);
-  const [selectedIconIndex, setSelectedIconIndex] = useState(0);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-
     if (name.startsWith('salary.')) {
-      const salaryField = name.split('.')[1] as keyof SalaryRange;
-      setFormData(prev => ({
-        ...prev,
-        salary: {
-          ...prev.salary,
-          [salaryField]: value,
-        },
-      }));
-    } else if (name === 'icon') {
-      const index = Number(value);
-      setSelectedIconIndex(index);
-      setFormData(prev => ({ 
-        ...prev, 
-        icon: icons[index] 
+      const key = name.split('.')[1] as keyof SalaryRange;
+      setFormData((p) => ({
+        ...p,
+        salary: { ...p.salary, [key]: value },
       }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((p) => ({ ...p, [name]: value }));
     }
   };
 
   const handleAddRole = () => {
-    if (currentRole.trim() && !formData.roles.includes(currentRole.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        roles: [...prev.roles, currentRole.trim()],
-      }));
+    const v = currentRole.trim();
+    if (v && !formData.roles.includes(v)) {
+      setFormData((p) => ({ ...p, roles: [...p.roles, v] }));
       setCurrentRole('');
     }
   };
 
-  const handleRemoveRole = (roleToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      roles: prev.roles.filter(role => role !== roleToRemove),
+  const handleRemoveRole = (role: string) => {
+    setFormData((p) => ({
+      ...p,
+      roles: p.roles.filter((r) => r !== role),
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const d = formData.descriptions[0]?.text.trim();
     if (
       formData.grade &&
       formData.title &&
@@ -91,12 +69,11 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
       formData.salary.min &&
       formData.salary.mid &&
       formData.salary.max &&
-      formData.descriptions[0].text.trim() &&
-      formData.category &&
-      formData.department &&
+      d &&
       formData.skill
     ) {
       onAddGrade(formData);
+      // reset
       setFormData({
         grade: '',
         title: '',
@@ -104,10 +81,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
         roles: [],
         salary: { min: '', mid: '', max: '' },
         skill: skillLevels[0] || '',
-        icon: icons[0],
         descriptions: [{ id: 1, text: '' }],
-        department: departments[0] || '',
-        category: categories[0] || '',
       });
       onClose();
     }
@@ -137,190 +111,138 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Grade / Title */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Grade *</label>
+                    <label className="block text-sm font-medium mb-1">Grade *</label>
                     <input
-                      type="text"
                       name="grade"
                       value={formData.grade}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="e.g. G1-L1"
+                      className="w-full px-3 py-2 border rounded"
+                      placeholder="G1-L1"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                    <label className="block text-sm font-medium mb-1">Title *</label>
                     <input
-                      type="text"
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="e.g. Junior Software Engineer"
+                      className="w-full px-3 py-2 border rounded"
+                      placeholder="Junior Engineer"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Department *</label>
-                    <select
-                      name="department"
-                      value={formData.department}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map(dept => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Skill Level *</label>
-                    <select
-                      name="skill"
-                      value={formData.skill}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      <option value="">Select Skill Level</option>
-                      {skillLevels.map(skill => (
-                        <option key={skill} value={skill}>{skill}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Icon *</label>
-                    <select
-                      name="icon"
-                      value={selectedIconIndex}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    >
-                      {icons.map((Icon, index) => (
-                        <option key={index} value={index}>
-                          {Icon.displayName || `Icon ${index + 1}`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
+                {/* Skill Level */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Roles *</label>
+                  <label className="block text-sm font-medium mb-1">Skill Level *</label>
+                  <select
+                    name="skill"
+                    value={formData.skill}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded"
+                    required
+                  >
+                    <option value="">Select Skill</option>
+                    {skillLevels.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Roles */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Roles *</label>
                   <div className="relative">
                     <input
-                      type="text"
                       value={currentRole}
-                      onChange={(e) => setCurrentRole(e.target.value)}
                       onFocus={() => setIsRoleInputFocused(true)}
                       onBlur={() => setTimeout(() => setIsRoleInputFocused(false), 200)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      onChange={(e) => setCurrentRole(e.target.value)}
+                      className="w-full px-3 py-2 border rounded"
                       placeholder="Add a role"
                     />
                     {isRoleInputFocused && currentRole && (
                       <button
                         type="button"
                         onClick={handleAddRole}
-                        className="absolute right-2 top-2 bg-green-500 text-white p-1 rounded-md"
+                        className="absolute right-2 top-2 bg-green-500 text-white px-2 rounded"
                       >
                         Add
                       </button>
                     )}
                   </div>
-                  {formData.roles.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {formData.roles.map(role => (
-                        <span
-                          key={role}
-                          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {formData.roles.map((r) => (
+                      <span
+                        key={r}
+                        className="inline-flex items-center px-2 py-1 bg-green-100 rounded text-xs"
+                      >
+                        {r}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRole(r)}
+                          className="ml-1 text-green-600 hover:text-green-800"
                         >
-                          {role}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveRole(role)}
-                            className="ml-1 text-green-600 hover:text-green-800"
-                          >
-                            &times;
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
+                {/* Salary */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {['min', 'mid', 'max'].map((key) => (
-                    <div key={key}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {`${key[0].toUpperCase() + key.slice(1)} Salary *`}
+                  {(['min', 'mid', 'max'] as const).map((k) => (
+                    <div key={k}>
+                      <label className="block text-sm font-medium mb-1">
+                        {k.charAt(0).toUpperCase() + k.slice(1)} Salary *
                       </label>
                       <input
-                        type="text"
-                        name={`salary.${key}`}
-                        value={formData.salary[key as keyof SalaryRange]}
+                        name={`salary.${k}`}
+                        value={formData.salary[k]}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                        placeholder={`e.g. $${key === 'min' ? '50K' : key === 'mid' ? '60K' : '70K'}`}
+                        className="w-full px-3 py-2 border rounded"
+                        placeholder={`e.g. ${k === 'min' ? '50K' : k === 'mid' ? '60K' : '70K'}`}
                         required
                       />
                     </div>
                   ))}
                 </div>
 
+                {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                  <label className="block text-sm font-medium mb-1">Description *</label>
                   <textarea
                     value={formData.descriptions[0].text}
                     onChange={(e) =>
-                      setFormData(prev => ({
-                        ...prev,
-                        descriptions: [{ id: 1, text: e.target.value }]
+                      setFormData((p) => ({
+                        ...p,
+                        descriptions: [{ id: 1, text: e.target.value }],
                       }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="Enter job description..."
+                    className="w-full px-3 py-2 border rounded"
+                    placeholder="Job description..."
                     required
                   />
                 </div>
 
-                <div className="flex justify-end space-x-4 pt-4">
+                {/* Footer Buttons */}
+                <div className="flex justify-end gap-4 pt-4">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
                   </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-green-600 rounded-md text-sm font-medium text-white hover:bg-green-700"
-                  >
+                  <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                     Add Job Grade
                   </button>
                 </div>
