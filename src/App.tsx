@@ -26,7 +26,8 @@ import TimeClock from './pages/hr/attendancepage/TimeClock';
 import TimeClockFormContainer from './pages/hr/attendancepage/TimeClockFormContainer';
 import EmployeeDetailsPage from './components/hr/EmployeeDetailsPage';
 // import GeneralLedger from './components/finance/GeneralLedger';
-import Planning from './pages/finance/budgetpage/Planning';
+import BudgetList from './pages/finance/budgetpage/BudgetList';
+import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
 import GlPage from './pages/finance/generalledgerpage/GlPage';
 // import TimeClockDisplay from './components/hr/TimeClockDisplay';
 
@@ -79,8 +80,8 @@ const [isAuthenticated, setIsAuthenticated] = useState(() => {
           
           <Route path='/training' element={<Training />} />
           <Route path='/finance/gl' element={<GlPage />} />
-          <Route path='/finance/budget' element ={<Planning />} />
-
+          <Route path='/finance/budget-list' element ={<BudgetList />} />
+          <Route path='/finance/budget-create' element ={<BudgetCreate />} />
 
 
         </Route>

@@ -274,7 +274,8 @@ const Sidebar: React.FC = () => {
               <NavItem to="/finance/accounts" icon={<Package size={18} />} label="Accounts " {...theme} />
               {/* <NavItem to="/finance/ar" icon={<DollarSign size={18} />} label="Accounts Receivable" {...theme} /> */}
               <NavItem to="/finance/assets" icon={<Briefcase size={18} />} label="Assets" {...theme} />
-              <NavItem to="/finance/budget" icon={<FileSpreadsheet size={18} />} label="Budgeting" {...theme} />
+        
+              <NavItem to="/finance/budget-list" icon={<FileSpreadsheet size={18} />} label="Budgeting" {...theme} />
               <NavItem to="/finance/payroll" icon={<FileSpreadsheet size={18} />} label="Payroll" {...theme} />
               <NavItem to="/finance/transactions" icon={<FileSpreadsheet size={18} />} label="Transaction" {...theme} />
               <NavItem to="/finance/reports" icon={<LineChart size={18} />} label="Reports" {...theme} />
