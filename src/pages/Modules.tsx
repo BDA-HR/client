@@ -2,8 +2,10 @@ import Honeycomb from "../components/Honeycomb";
 import { AnimatedList } from "../components/magicui/animated-list";
 import { useNavigate } from "react-router";
 import { useState, useEffect, useCallback } from "react";
-import { Bell, LogOut } from "lucide-react";
+import { Bell } from "lucide-react";
 import Calendar from "../components/Calender";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 
 interface Notification {
   id: number;
@@ -148,13 +150,16 @@ function Modules() {
             </div>
 
             {/* Logout Button */}
-            <button
-              onClick={() => navigate("/login")}
-              className="flex items-center gap-2 px-6 py-3 h-14 text-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="font-medium">Logout</span>
-            </button>
+            <DropdownMenu>
+            <DropdownMenuTrigger><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>CN</AvatarFallback> </Avatar></DropdownMenuTrigger>
+            <DropdownMenuContent>
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => navigate("/login")}>logout</DropdownMenuItem>
+  </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
