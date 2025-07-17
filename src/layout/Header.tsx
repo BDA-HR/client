@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <p className="text-xs text-gray-500">{activeModule || 'HR'} Manager</p>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
+            <DropdownMenuTrigger className='rounded-full'><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
                         <AvatarFallback>CN</AvatarFallback> </Avatar></DropdownMenuTrigger>
             <DropdownMenuContent>
     <DropdownMenuLabel>My Account</DropdownMenuLabel>
