@@ -5,7 +5,7 @@ import RecentActivity from '../../components/hr/RecentActivity'
 import PendingActivity from '../../components/hr/PendingActivity'
 import { dashboardMetrics, timeOffRequests, attendanceApprovals, recentActivities, upcomingEvents } from '../../data/data'
 import { motion } from 'framer-motion';
-import { Plus, RefreshCw, FileDown } from 'lucide-react';
+import { RefreshCw, FileDown } from 'lucide-react';
 // import EmployeeStatus from '../components/dashboard/EmployeeStatus'
 // import DepartmentChart from '../../components/hr/DepartmentChart'
 // import EmployeeStatusChart from '../../components/hr/EmployeeChart'
@@ -42,7 +42,7 @@ function Dashboard() {
     >
       <section className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back, <span className='text-primary-600'>John</span></h1>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome back, <span className="bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">John</span></h1>
           <p className="mt-1 text-sm text-gray-500">Here is the overview of the key metrics and activities.</p>
         </div>
           <div className="flex space-x-3 mt-4 sm:mt-0">
@@ -60,13 +60,13 @@ function Dashboard() {
               <FileDown size={16} />
               Export
             </Button>
-            <Button
+            {/* <Button
               size="sm"
               className='bg-primary-700'
             >
               <Plus size={16} />
               New Employee
-            </Button>
+            </Button> */}
           </div>
       </section>
       <motion.div variants={itemVariants}>
