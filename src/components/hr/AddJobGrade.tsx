@@ -198,8 +198,8 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                 </div>
 
                 {/* Salary */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {(['min', 'mid', 'max'] as const).map((k) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {(['min', 'max'] as const).map((k) => (
                     <div key={k}>
                       <label className="block text-sm font-medium mb-1">
                         {k.charAt(0).toUpperCase() + k.slice(1)} Salary *
@@ -209,7 +209,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                         value={formData.salary[k]}
                         onChange={handleChange}
                         className="w-full px-3 py-2 border rounded"
-                        placeholder={`e.g. ${k === 'min' ? '50K' : k === 'mid' ? '60K' : '70K'}`}
+                        placeholder={`e.g. ${k === 'min' ? '50K' : k === 'max' ? '60K' : '70K'}`}
                         required
                       />
                     </div>
