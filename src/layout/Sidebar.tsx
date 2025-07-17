@@ -14,7 +14,7 @@ import {
   Settings,
   BarChart4,
   FileText,
-  LogOut,
+
   RefreshCw,
   Warehouse,
   ClipboardList,
@@ -123,9 +123,7 @@ const Sidebar: React.FC = () => {
     setOpenGroup(prev => prev === groupLabel ? null : groupLabel);
   };
 
-  const handleLogout = () => {
-    navigate('/login');
-  };
+ 
 
   const themeMap: Record<string, { textColor: string; activeBg: string; hoverBg: string }> = {
     Inventory: { textColor: 'text-yellow-700', activeBg: 'bg-yellow-100', hoverBg: 'hover:bg-yellow-50' },
@@ -297,15 +295,7 @@ const Sidebar: React.FC = () => {
 
       <div className="p-4 border-t border-gray-200">
         <NavItem to="/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
-        <button
-          className={`flex items-center px-4 py-2.5 text-sm font-medium w-full rounded-md transition-colors ${theme.textColor} ${theme.hoverBg}`}
-          onClick={handleLogout}
-        >
-          <span className="mr-3">
-            <LogOut size={18} />
-          </span>
-          Logout
-        </button>
+
       </div>
     </div>
   );
