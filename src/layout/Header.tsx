@@ -2,6 +2,9 @@ import React from 'react';
 import { Bell, HelpCircle, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { useModule } from '../ModuleContext';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from '../components/ui/dropdown-menu';
+import { useNavigate } from "react-router";
+
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -9,6 +12,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { activeModule } = useModule();
+  const navigate = useNavigate();
+
   
   // Module-based color themes
   const themeMap: Record<string, { bg: string; border: string; text: string }> = {
@@ -51,10 +56,16 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <p className={`text-sm font-medium ${theme.text}`}>John Smith</p>
             <p className="text-xs text-gray-500">{activeModule || 'HR'} Manager</p>
           </div>
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>CN</AvatarFallback> </Avatar></DropdownMenuTrigger>
+            <DropdownMenuContent>
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => navigate("/login")}>logout</DropdownMenuItem>
+  </DropdownMenuContent>
+            </DropdownMenu>
         </div>
       </div>
     </header>
