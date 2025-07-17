@@ -64,6 +64,38 @@ const CandidateTable = ({
       (filters.status === 'all' || c.status === filters.status)
     );
 
+  // Define color classes
+  const getStageColorClass = (stage: string) => {
+    switch(stage) {
+      case 'Interview':
+      case 'Hired':
+        return 'bg-green-500 text-white hover:bg-green-600';
+      case 'Rejected':
+        return 'bg-red-500 text-white hover:bg-red-600';
+      case 'Offer':
+        return 'bg-yellow-500 text-white hover:bg-yellow-600';
+      case 'Application':
+        return 'bg-blue-500 text-white hover:bg-blue-600';
+      case 'Screening':
+        return 'bg-purple-500 text-white hover:bg-purple-600';
+      default:
+        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+    }
+  };
+
+  const getStatusColorClass = (status: string) => {
+    if (['Scheduled', 'Interviewed', 'Negotiating', 'Hired'].includes(status)) {
+      return 'bg-green-500 text-white hover:bg-green-600';
+    }
+    if (['Rejected', 'Declined'].includes(status)) {
+      return 'bg-red-500 text-white hover:bg-red-600';
+    }
+    if (['New', 'In Review', 'Offer Sent'].includes(status)) {
+      return 'bg-blue-500 text-white hover:bg-blue-600';
+    }
+    return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -147,8 +179,7 @@ const CandidateTable = ({
 
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Candidate ID</TableHead>
+            <TableRow className="bg-gray-100">
               <TableHead>Name</TableHead>
               <TableHead>Position</TableHead>
               <TableHead>Department</TableHead>
@@ -161,7 +192,6 @@ const CandidateTable = ({
           <TableBody>
             {filteredCandidates.map((candidate) => (
               <TableRow key={candidate.id}>
-                <TableCell className="font-medium">{candidate.id}</TableCell>
                 <TableCell className="font-medium">{candidate.name}</TableCell>
                 <TableCell>{candidate.position}</TableCell>
                 <TableCell>{candidate.department}</TableCell>
@@ -176,15 +206,7 @@ const CandidateTable = ({
                     <SelectContent>
                       {stageOptions.map(option => (
                         <SelectItem key={option} value={option}>
-                          <Badge 
-                            variant={
-                              option === 'Application' ? 'secondary' :
-                              option === 'Screening' ? 'outline' :
-                              option === 'Interview' ? 'default' :
-                              option === 'Offer' ? 'destructive' : 
-                              option === 'Hired' ? 'default' : 'destructive'
-                            }
-                          >
+                          <Badge className={getStageColorClass(option)}>
                             {option}
                           </Badge>
                         </SelectItem>
@@ -203,14 +225,7 @@ const CandidateTable = ({
                     <SelectContent>
                       {statusOptions.map(option => (
                         <SelectItem key={option} value={option}>
-                          <Badge 
-                            variant={
-                              option === 'New' ? 'secondary' :
-                              option === 'Scheduled' ? 'default' :
-                              option === 'In Review' ? 'outline' : 
-                              option === 'Rejected' || option === 'Declined' ? 'destructive' : 'default'
-                            }
-                          >
+                          <Badge className={getStatusColorClass(option)}>
                             {option}
                           </Badge>
                         </SelectItem>

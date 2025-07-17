@@ -19,7 +19,6 @@ import {
   CheckCircle, 
   Clock, 
   AlertCircle,
-  
 } from 'lucide-react';
 import { Badge } from "../../../components/ui/badge";
 
@@ -174,7 +173,6 @@ const RecruitmentList = () => {
         <CardHeader>
           <div>
             <CardTitle className="text-green-700 text-2xl md:text-3xl font-bold">Recruitment List</CardTitle>
-
             <CardDescription>
               Manage hiring plans and approval workflows
             </CardDescription>
@@ -228,19 +226,17 @@ const RecruitmentList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Plan ID</TableHead>
-                    <TableHead>Job Title</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Positions</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Progress</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Job Title</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Department</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Type</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Positions</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Status</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Progress</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {plans.map((plan) => (
                     <TableRow key={plan.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">{plan.id}</TableCell>
                       <TableCell className="font-medium">{plan.title}</TableCell>
                       <TableCell>{plan.department}</TableCell>
                       <TableCell>{plan.employmentType}</TableCell>
@@ -283,19 +279,17 @@ const RecruitmentList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Req ID</TableHead>
-                    <TableHead>Job Title</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Positions</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Submitted By</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Job Title</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Department</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Positions</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Status</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Submitted By</TableHead>
+                    <TableHead className="bg-blue-50 font-bold text-gray-800">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {requisitions.map((req) => (
                     <TableRow key={req.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">{req.id}</TableCell>
                       <TableCell className="font-medium">{req.title}</TableCell>
                       <TableCell>{req.department}</TableCell>
                       <TableCell>{req.positions}</TableCell>

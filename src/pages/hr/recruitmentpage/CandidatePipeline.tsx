@@ -273,32 +273,7 @@ const CandidatePipeline = () => {
     );
   };
 
-  const handleMoveToNextStage = (candidateId: string) => {
-    setCandidates(prev => 
-      prev.map(candidate => {
-        if (candidate.id === candidateId) {
-          const currentIndex = stageOptions.indexOf(candidate.stage);
-          if (currentIndex < stageOptions.length - 1) {
-            const newStage = stageOptions[currentIndex + 1];
-            return { 
-              ...candidate, 
-              stage: newStage,
-              history: [
-                ...candidate.history,
-                { 
-                  date: new Date().toISOString().split('T')[0], 
-                  stage: newStage, 
-                  status: candidate.status,
-                  note: `Moved to next stage: ${newStage}`
-                }
-              ]
-            };
-          }
-        }
-        return candidate;
-      })
-    );
-  };
+
 
   // If we're in a candidate detail tab
   if (candidateId) {
@@ -315,7 +290,7 @@ const CandidatePipeline = () => {
             onBack={() => window.close()}
             onStageChange={(newStage) => handleStageChange(selectedCandidate.id, newStage)}
             onStatusChange={(newStatus) => handleStatusChange(selectedCandidate.id, newStatus)}
-            onMoveToNextStage={() => handleMoveToNextStage(selectedCandidate.id)}
+            
             stageOptions={stageOptions}
             statusOptions={statusOptions}
           />
