@@ -29,6 +29,11 @@ import EmployeeDetailsPage from './components/hr/EmployeeDetailsPage';
 import BudgetList from './pages/finance/budgetpage/BudgetList';
 import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
 import GlPage from './pages/finance/generalledgerpage/GlPage';
+import BranchOverview from './pages/core/branchpage/BranchOverview';
+import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
+import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
+import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
+import UserOverview from './pages/core/usermanagementpage/UserOverview';
 // import TimeClockDisplay from './components/hr/TimeClockDisplay';
 
 
@@ -82,6 +87,15 @@ const [isAuthenticated, setIsAuthenticated] = useState(() => {
           <Route path='/finance/gl' element={<GlPage />} />
           <Route path='/finance/budget-list' element ={<BudgetList />} />
           <Route path='/finance/budget-create' element ={<BudgetCreate />} />
+          
+          {/* Core routes */}
+          <Route path='/core/branch' element={<BranchOverview />} />
+          <Route path='/core/department' element={<DepartmentOverview />} />
+          <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
+          <Route path='/core/hierarchy' element={<HierarchyOverview />} />
+          <Route path='/core/users' element={<UserOverview />} />
+          
+
 
 
         </Route>
