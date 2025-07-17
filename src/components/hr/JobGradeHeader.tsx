@@ -34,7 +34,7 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="mt-2 text-sm text-green-700"
+          className="mt-2 text-sm text-gray-600"
         >
           Comprehensive job classification with {jobGrades.length} grades and detailed role descriptions
         </motion.p>

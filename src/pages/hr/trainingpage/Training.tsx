@@ -177,7 +177,7 @@ const EmployeeTrainingOverview: React.FC<{ records: EmployeeTraining[] }> = ({ r
           </div>
         </div>
         
-        <div className="mt-4 flex justify-between items-center">
+        <div className="mt-4 flex justify-between items-center flex-wrap">
           <div className="flex items-center gap-2">
             {record.certification && (
               <Badge variant="default" className="px-2 py-0.5 text-xs flex items-center gap-1">
@@ -190,7 +190,7 @@ const EmployeeTrainingOverview: React.FC<{ records: EmployeeTraining[] }> = ({ r
               </Badge>
             )}
           </div>
-          <Button variant="outline" size="sm" className="h-8 gap-1 text-xs">
+          <Button variant="outline" size="sm" className="h-8 gap-1 text-xs md:mt-1">
             View Record <ArrowRight className="h-3 w-3" />
           </Button>
         </div>
