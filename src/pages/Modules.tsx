@@ -88,6 +88,15 @@ function Modules() {
   const [allNotifications, setAllNotifications] = useState<Notification[]>(initialNotifications);
   const [shownNotificationCount, setShownNotificationCount] = useState<number>(0); // NEW
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  useEffect(() => {
+    document.title = selectedModule ? `BDA | ${selectedModule}` : 'BDA';
+  }, [selectedModule]);
+
+  const handleModuleSelect = useCallback((moduleName: string) => {
+    setSelectedModule(moduleName);
+  }, []);
+
 
   const toggleTaskCompletion = useCallback((taskId: number) => {
     setTasks(prevTasks => 
@@ -165,7 +174,7 @@ function Modules() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto h-full flex items-center pt-32 pb-8"> {/* Added top/bottom padding */}
+      <div className="container mx-auto h-full flex items-center pt-24"> {/* Added top/bottom padding */}
         {/* Left Panel - Calendar with Scroll */}
         <div className="w-1/4 h-full pr-8">
           <div className="h-full overflow-y-auto"> {/* Scroll container */}
@@ -179,7 +188,7 @@ function Modules() {
         {/* Center Panel - Honeycomb */}
         <div className="flex-1 flex items-center justify-center">
           <div className="relative w-full max-w-[75vmin] h-[75vmin]">
-            <Honeycomb />
+            <Honeycomb onModuleSelect={handleModuleSelect} />
           </div>
         </div>
 

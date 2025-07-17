@@ -22,9 +22,25 @@ const positions = [
   "translate-x-0 translate-y-0",
 ];
 
-export default function Honeycomb() {
+interface HoneycombProps {
+  onModuleSelect?: (moduleName: string) => void;
+}
+
+export default function Honeycomb({ onModuleSelect }: HoneycombProps) {
   const navigate = useNavigate();
   const { setActiveModule } = useModule();
+
+  const handleModuleClick = (module: typeof modules[0]) => {
+    const moduleName = module.label === "Logo" ? "Core" : module.label;
+        setActiveModule(moduleName);
+        document.title = `BDA | ${moduleName}`;
+        if (onModuleSelect) {
+      onModuleSelect(moduleName);
+    }
+        if (module.path) {
+      navigate(module.path);
+    }
+  };
 
   return (
     <section className="flex items-center justify-center h-full w-full">
@@ -44,12 +60,7 @@ export default function Honeycomb() {
               animationDelay: `${i * 0.1}s`,
               opacity: 0, 
             }}
-            onClick={() => {
-              if (mod.path) {
-                setActiveModule(mod.label === "Logo" ? "Core" : mod.label);
-                navigate(mod.path);
-              }
-            }}
+            onClick={() => handleModuleClick(mod)}
           >
             <div
               className={`
