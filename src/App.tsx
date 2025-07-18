@@ -30,12 +30,10 @@ import BudgetList from './pages/finance/budgetpage/BudgetList';
 import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
 import GlPage from './pages/finance/generalledgerpage/GlPage';
 import BranchOverview from './pages/core/branchpage/BranchOverview';
-import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
 import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
 import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
 import UserOverview from './pages/core/usermanagementpage/UserOverview';
-// import TimeClockDisplay from './components/hr/TimeClockDisplay';
-
+import DepartmentList from './pages/core/departmentpage/DepartmentList';
 
 function App() {
 const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -90,13 +88,10 @@ const [isAuthenticated, setIsAuthenticated] = useState(() => {
           
           {/* Core routes */}
           <Route path='/core/branch' element={<BranchOverview />} />
-          <Route path='/core/department' element={<DepartmentOverview />} />
           <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
           <Route path='/core/hierarchy' element={<HierarchyOverview />} />
           <Route path='/core/users' element={<UserOverview />} />
-          
-
-
+          <Route path="/core/department-list" element={<DepartmentList />} />
 
         </Route>
 
