@@ -33,7 +33,7 @@ import BranchOverview from './pages/core/branchpage/BranchOverview';
 import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
 import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
 import UserOverview from './pages/core/usermanagementpage/UserOverview';
-import DepartmentList from './pages/core/departmentpage/DepartmentList';
+import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
 
 function App() {
 const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -91,7 +91,7 @@ const [isAuthenticated, setIsAuthenticated] = useState(() => {
           <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
           <Route path='/core/hierarchy' element={<HierarchyOverview />} />
           <Route path='/core/users' element={<UserOverview />} />
-          <Route path="/core/department-list" element={<DepartmentList />} />
+          <Route path="/core/department" element={<DepartmentOverview />} />
 
         </Route>
 
