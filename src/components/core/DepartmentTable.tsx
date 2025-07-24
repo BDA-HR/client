@@ -1,7 +1,7 @@
 // src/components/core/DepartmentTable.tsx
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
-import { Edit, Trash } from 'lucide-react';
+import { Edit, Trash, Plus } from 'lucide-react';
 import type { Department } from "../../types/coreTypes";
 
 interface DepartmentTableProps {
@@ -20,41 +20,47 @@ const DepartmentTable = ({
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <Button onClick={onCreate} className="mb-4">
+        <Button 
+          onClick={onCreate} 
+          className="mb-4 bg-green-500 hover:bg-green-600 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
           Create New Department
         </Button>
       </div>
       
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-lg overflow-hidden shadow-sm">
         <Table>
-          <TableHeader className="bg-muted/50">
+          <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead className="w-[30%]">Name</TableHead>
-              <TableHead className="w-[40%]">Description</TableHead>
-              <TableHead>Parent</TableHead>
-              <TableHead className="text-right w-[120px]">Actions</TableHead>
+              <TableHead className="w-[30%] font-semibold text-gray-700">Name</TableHead>
+              <TableHead className="w-[40%] font-semibold text-gray-700">Description</TableHead>
+              <TableHead className="font-semibold text-gray-700">Parent</TableHead>
+              <TableHead className="text-right w-[120px] font-semibold text-gray-700">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {departments.map((dept) => {
               const parent = departments.find(d => d.id === dept.parentId);
               return (
-                <TableRow key={dept.id} className="hover:bg-muted/10">
+                <TableRow key={dept.id} className="hover:bg-gray-50">
                   <TableCell className="font-medium">{dept.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{dept.description}</TableCell>
-                  <TableCell>{parent ? parent.name : 'None'}</TableCell>
+                  <TableCell className="text-gray-600">{dept.description}</TableCell>
+                  <TableCell className="text-gray-600">{parent ? parent.name : 'None'}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button 
                         variant="outline" 
                         size="icon"
+                        className="text-gray-600 border-gray-300 hover:bg-gray-100"
                         onClick={() => onEdit(dept)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
-                        variant="destructive" 
+                        variant="outline" 
                         size="icon"
+                        className="text-red-600 border-red-200 hover:bg-red-50"
                         onClick={() => onDelete(dept.id)}
                       >
                         <Trash className="h-4 w-4" />
