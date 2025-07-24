@@ -11,13 +11,11 @@ import type { Department } from "../../types/coreTypes";
 export const DepartmentListTab = ({ 
   departments, 
   onEdit, 
-  onDelete, 
-  onCreate 
+  onDelete,
 }: { 
   departments: Department[];
   onEdit: (department: Department) => void;
   onDelete: (id: string) => void;
-  onCreate: () => void;
 }) => (
   <Card className="border-none shadow-none">
     <CardContent className="p-0">
@@ -25,50 +23,6 @@ export const DepartmentListTab = ({
         departments={departments}
         onEdit={onEdit}
         onDelete={onDelete}
-        onCreate={onCreate}
-      />
-    </CardContent>
-  </Card>
-);
-
-export const DepartmentFormTab = ({ 
-  initialData, 
-  departments, 
-  isEdit, 
-  onChange, 
-  onSubmit, 
-  onCancel,
-  formError
-}: { 
-  initialData: Omit<Department, 'id'> & { id?: string };
-  departments: Department[];
-  isEdit: boolean;
-  onChange: (field: keyof Department, value: string | null) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onCancel: () => void;
-  formError: string | null;
-}) => (
-  <Card className="border-none shadow-none">
-    <CardHeader className="px-0 pt-0 pb-4">
-      <CardTitle className="text-xl">
-        {isEdit ? "Edit Department" : "Create New Department"}
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="px-0">
-      {formError && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{formError}</AlertDescription>
-        </Alert>
-      )}
-      <DepartmentForm 
-        initialData={initialData}
-        departments={departments}
-        isEdit={isEdit}
-        onChange={onChange}
-        onSubmit={onSubmit}
-        onCancel={onCancel}
       />
     </CardContent>
   </Card>
@@ -85,7 +39,7 @@ export const DepartmentHierarchyTab = ({
 }) => (
   <Card className="border-none shadow-none">
     <CardHeader className="px-0 pt-0 pb-4">
-      <CardTitle className="text-xl">Organizational Hierarchy</CardTitle>
+      <CardTitle className="text-xl">Department Hierarchy</CardTitle>
     </CardHeader>
     <CardContent className="px-0">
       <DepartmentHierarchy 
@@ -117,6 +71,8 @@ const DepartmentList = ({ departments, onCreateDepartment, onUpdateDepartment, o
     const rootNodeIds = departments.filter(dept => dept.parentId === null).map(dept => dept.id);
     return new Set(rootNodeIds);
   });
+  const [filteredDepartments, setFilteredDepartments] = useState<Department[]>(departments);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Reset form when switching to form tab without a selected department
   useEffect(() => {
@@ -126,15 +82,29 @@ const DepartmentList = ({ departments, onCreateDepartment, onUpdateDepartment, o
     }
   }, [tabValue, selectedDepartment]);
 
+  useEffect(() => {
+    setFilteredDepartments(departments);
+  }, [departments]);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredDepartments(departments);
+      return;
+    }
+    
+    const lowerTerm = searchTerm.toLowerCase();
+    const filtered = departments.filter(
+      dept => 
+        dept.name.toLowerCase().includes(lowerTerm) || 
+        (dept.description && dept.description.toLowerCase().includes(lowerTerm))
+    );
+    
+    setFilteredDepartments(filtered);
+  }, [searchTerm, departments]);
+
   const handleSelectDepartment = (department: Department) => {
     setSelectedDepartment(department);
     setFormData(department);
-    setTabValue('form');
-  };
-
-  const handleCreateNew = () => {
-    setSelectedDepartment(null);
-    setFormData({ name: '', description: '', parentId: null });
     setTabValue('form');
   };
 
@@ -203,48 +173,59 @@ const DepartmentList = ({ departments, onCreateDepartment, onUpdateDepartment, o
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <Tabs value={tabValue} onValueChange={setTabValue}>
+          <TabsList className="bg-gray-100 p-1.5 rounded-lg">
+            <TabsTrigger 
+              value="list" 
+              className="px-6 py-2 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-green-600 font-medium transition-colors hover:bg-gray-200"
+            >
+              Department List
+            </TabsTrigger>
+            <TabsTrigger 
+              value="hierarchy" 
+              className="px-6 py-2 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-green-600 font-medium transition-colors hover:bg-gray-200"
+            >
+              Department Hierarchy
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search departments..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-64 rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+            />
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+              />
+            </svg>
+          </div>
+          
 
-      
-      <Tabs value={tabValue} onValueChange={setTabValue}>
-        <TabsList className="grid grid-cols-3 w-[500px] mb-8 bg-green-100 p-1.5">
-          <TabsTrigger 
-            value="list" 
-            className="py-2.5 data-[state=active]:bg-green-500 data-[state=active]:text-white"
-          >
-            Department List
-          </TabsTrigger>
-          <TabsTrigger 
-            value="form" 
-            className="py-2.5 data-[state=active]:bg-green-500 data-[state=active]:text-white"
-          >
-            {selectedDepartment ? "Edit Department" : "Create Department"}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="hierarchy" 
-            className="py-2.5 data-[state=active]:bg-green-500 data-[state=active]:text-white"
-          >
-            Organizational Hierarchy
-          </TabsTrigger>
-        </TabsList>
+        </div>
+      </div>
 
+      <Tabs value={tabValue} className="w-full">
         <TabsContent value="list" className="mt-0">
           <DepartmentListTab 
-            departments={departments}
+            departments={filteredDepartments}
             onEdit={handleSelectDepartment}
             onDelete={handleDeleteDepartment}
-            onCreate={handleCreateNew}
-          />
-        </TabsContent>
-
-        <TabsContent value="form" className="mt-0">
-          <DepartmentFormTab 
-            initialData={formData}
-            departments={departments}
-            isEdit={!!selectedDepartment}
-            onChange={handleFormChange}
-            onSubmit={handleFormSubmit}
-            onCancel={() => setTabValue('list')}
-            formError={formError}
           />
         </TabsContent>
 
@@ -256,6 +237,38 @@ const DepartmentList = ({ departments, onCreateDepartment, onUpdateDepartment, o
           />
         </TabsContent>
       </Tabs>
+
+      {/* Form Modal */}
+      {tabValue === 'form' && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+            <Card className="border-none">
+              <CardHeader className="px-6 pt-6 pb-4">
+                <CardTitle className="text-xl">
+                  {selectedDepartment ? "Edit Department" : "Create New Department"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-6 pb-6">
+                {formError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{formError}</AlertDescription>
+                  </Alert>
+                )}
+                <DepartmentForm 
+                  initialData={formData}
+                  departments={departments}
+                  isEdit={!!selectedDepartment}
+                  onChange={handleFormChange}
+                  onSubmit={handleFormSubmit}
+                  onCancel={() => setTabValue('list')}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

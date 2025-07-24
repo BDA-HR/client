@@ -16,9 +16,10 @@ interface DepartmentFormProps {
   departments: Department[];
   isEdit: boolean;
   onChange: (field: keyof Department, value: string | null) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (dept: Omit<Department, 'id'>) => void;
   onCancel: () => void;
 }
+
 
 const DepartmentForm = ({ 
   initialData, 
