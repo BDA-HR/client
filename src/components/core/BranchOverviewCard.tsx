@@ -1,76 +1,36 @@
-import { motion } from 'framer-motion';
+import { Building, MapPin, Users, Settings, Calendar, Edit, ChevronDown, User, Layers } from 'lucide-react';
 import { Card, CardHeader, CardDescription, CardContent, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
-import { Building, MapPin, Users, Settings, Edit, Calendar, ChevronDown } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../ui/dropdown-menu';
+import { motion } from 'framer-motion';
+import type { Branch } from '../../data/company';
 
-interface Branch {
-  id: number;
-  name: string;
-  code: string;
-  location: string;
-  status: 'active' | 'inactive' | 'setup';
-  manager: string;
-  users: number;
-  established: string;
-  lastActivity: string;
+interface BranchOverviewCardProps {
+  currentBranchId: number;
+  setCurrentBranchId: (id: number) => void;
+  branches: Branch[];
 }
 
-const branches: Branch[] = [
-  {
-    id: 1,
-    name: 'Headquarters',
-    code: 'BR-HQ-001',
-    location: 'New York, USA',
-    status: 'active',
-    manager: 'Sarah Johnson',
-    users: 45,
-    established: 'Jan 15, 2015',
-    lastActivity: 'Today, 10:45 AM'
-  },
-  {
-    id: 2,
-    name: 'West Coast Branch',
-    code: 'BR-WC-002',
-    location: 'San Francisco, USA',
-    status: 'active',
-    manager: 'Michael Chen',
-    users: 32,
-    established: 'Mar 22, 2018',
-    lastActivity: 'Today, 9:30 AM'
-  },
-  {
-    id: 3,
-    name: 'Europe Branch',
-    code: 'BR-EU-003',
-    location: 'Berlin, Germany',
-    status: 'active',
-    manager: 'Emma Schmidt',
-    users: 28,
-    established: 'Aug 5, 2020',
-    lastActivity: 'Yesterday, 3:15 PM'
-  },
-  {
-    id: 4,
-    name: 'Asia Branch',
-    code: 'BR-AS-004',
-    location: 'Singapore',
-    status: 'setup',
-    manager: 'Raj Patel',
-    users: 12,
-    established: 'May 10, 2023',
-    lastActivity: '2 days ago'
-  }
-];
-
-const BranchOverviewCard = ({ currentBranchId, setCurrentBranchId }: { currentBranchId: number, setCurrentBranchId: (id: number) => void }) => {
+const BranchOverviewCard = ({ 
+  currentBranchId, 
+  setCurrentBranchId,
+  branches
+}: BranchOverviewCardProps) => {
   const branchDetails = branches.find(b => b.id === currentBranchId) || branches[0];
+  
+  // Calculate total employees across all departments
+  const totalEmployees = branchDetails.departments.reduce(
+    (sum, department) => sum + department.employees, 
+    0
+  );
+
+  // Ensure active users don't exceed total employees
+  const activeUsers = Math.min(branchDetails.users, totalEmployees);
 
   return (
     <motion.div variants={itemVariants}>
       <Card className="relative overflow-hidden">
-        {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/20 to-emerald-100/10 dark:from-emerald-900/10 dark:to-emerald-950/20 pointer-events-none" />
         
         <CardHeader>
@@ -130,18 +90,20 @@ const BranchOverviewCard = ({ currentBranchId, setCurrentBranchId }: { currentBr
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Users Card - Now showing active users (capped at total employees) */}
             <div className="border rounded-lg p-4 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-gray-900">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-emerald-100 dark:bg-emerald-900/50">
                   <Users className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Users</p>
-                  <p className="text-xl font-semibold">{branchDetails.users}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Active Users</p>
+                  <p className="text-xl font-semibold">{activeUsers}</p>
                 </div>
               </div>
             </div>
             
+            {/* Location Card */}
             <div className="border rounded-lg p-4 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-900">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50">
@@ -154,35 +116,45 @@ const BranchOverviewCard = ({ currentBranchId, setCurrentBranchId }: { currentBr
               </div>
             </div>
             
+            {/* General Manager Card */}
             <div className="border rounded-lg p-4 bg-gradient-to-br from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-900">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/50">
-                  <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Manager</p>
-                  <p className="text-sm font-medium">{branchDetails.manager}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">General Manager</p>
+                  <p className="text-sm font-medium">{branchDetails.GeneralManager}</p>
                 </div>
               </div>
             </div>
             
+            {/* Departments Card */}
             <div className="border rounded-lg p-4 bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-gray-900">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
-                  <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  <Layers className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Established</p>
-                  <p className="text-sm font-medium">{branchDetails.established}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Departments</p>
+                  <div className="flex items-baseline gap-1">
+                    <p className="text-xl font-semibold">{branchDetails.departments.length}</p>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      ({totalEmployees} employees)
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </CardContent>
         <CardFooter className="border-t px-6 py-3 bg-gradient-to-r from-emerald-50/50 to-white/50 dark:from-emerald-900/10 dark:to-gray-800/50">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Last activity: {branchDetails.lastActivity}
-          </p>
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <Calendar className="h-3 w-3" />
+            <span>Established: {branchDetails.established}</span>
+            <span className="mx-1">•</span>
+            <span>Last activity: {branchDetails.lastActivity}</span>
+          </div>
         </CardFooter>
       </Card>
     </motion.div>

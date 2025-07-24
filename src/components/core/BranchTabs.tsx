@@ -4,13 +4,23 @@ import UsersTab from './UsersTab';
 import InventoryTab from './InventoryTab';
 import FinancialsTab from './FinancialsTab';
 import SettingsTab from './SettingsTab';
-import { DollarSign, Package, Settings, Users } from 'lucide-react';
+import DepartmentsTab from './DepartmentsTab';
+import { DollarSign, Package, Settings, Users, Layers } from 'lucide-react';
+import type { Branch } from '../../data/company';
 
-const BranchTabs = () => {
+interface BranchTabsProps {
+  branch: Branch;
+}
+
+const BranchTabs = ({ branch }: BranchTabsProps) => {
   return (
     <motion.div variants={itemVariants}>
-      <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="departments" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="departments">
+            <Layers className="h-4 w-4 mr-2" />
+            Departments
+          </TabsTrigger>
           <TabsTrigger value="users">
             <Users className="h-4 w-4 mr-2" />
             Users
@@ -28,6 +38,10 @@ const BranchTabs = () => {
             Settings
           </TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="departments">
+          <DepartmentsTab departments={branch.departments} />
+        </TabsContent>
         
         <TabsContent value="users">
           <UsersTab />

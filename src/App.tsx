@@ -33,6 +33,7 @@ import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
 import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
 import UserOverview from './pages/core/usermanagementpage/UserOverview';
 import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
+import CompanyBranchesPage from './pages/core/branchpage/CompanyBranchPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -87,6 +88,7 @@ function App() {
             <Route path='/finance/budget-create' element ={<BudgetCreate />} />
             
             {/* Core routes */}
+            <Route path='/core/company/:companyId/branches' element={<CompanyBranchesPage />} />
             <Route path='/core/branch' element={<BranchOverview />} />
             <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
             <Route path='/core/hierarchy' element={<HierarchyOverview />} />

@@ -245,8 +245,32 @@ const Sidebar: React.FC = () => {
 
           {activeModule === 'Core' && (
             <>
-              <NavItem to="/core/branch" icon={<Building2 size={18} />} label="Branch" {...theme} />
-                            
+    <NavGroup 
+      icon={<Building2 size={18} />} 
+      label="Companies" 
+      isOpen={openGroup === 'Companies'} 
+      onToggle={() => toggleGroup('Companies')} 
+      hoverBg={theme.hoverBg}
+    >
+      <NavItem 
+        to="/core/company/1/branches" 
+        icon={<Building2 size={18} />} 
+        label="BDA Investment Group" 
+        {...theme} 
+      />
+      <NavItem 
+        to="/core/company/2/branches" 
+        icon={<Building2 size={18} />} 
+        label="BDA Technologies" 
+        {...theme} 
+      />
+      <NavItem 
+        to="/core/company/3/branches" 
+        icon={<Building2 size={18} />} 
+        label="BDA Holdings" 
+        {...theme} 
+      />
+    </NavGroup>
               <NavItem to="/core/department" icon={<Users size={18} />} label="Department" {...theme} />
               <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
               <NavItem to="/core/hierarchy" icon={<BarChart4 size={18} />} label="Hierarchy" {...theme} />
