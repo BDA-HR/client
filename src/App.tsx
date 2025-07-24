@@ -25,7 +25,6 @@ import ShiftScheduler from './pages/hr/attendancepage/ShiftScheduler';
 import TimeClock from './pages/hr/attendancepage/TimeClock';
 import TimeClockFormContainer from './pages/hr/attendancepage/TimeClockFormContainer';
 import EmployeeDetailsPage from './components/hr/EmployeeDetailsPage';
-// import GeneralLedger from './components/finance/GeneralLedger';
 import BudgetList from './pages/finance/budgetpage/BudgetList';
 import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
 import GlPage from './pages/finance/generalledgerpage/GlPage';
@@ -36,7 +35,7 @@ import UserOverview from './pages/core/usermanagementpage/UserOverview';
 import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
 
 function App() {
-const [isAuthenticated, setIsAuthenticated] = useState(() => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
 
@@ -44,68 +43,67 @@ const [isAuthenticated, setIsAuthenticated] = useState(() => {
     localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
   };
-  
 
   return (
     <ModuleProvider>
-    <BrowserRouter>
-      <Routes>
-        {/* Public route */}
-        <Route path="/login" element={<SignInPage onLogin={handleLogin} />} />
-
-        {/* Protected layout routes */}
-        <Route
-          path="/"
-          element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
-        >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path='/inventory' element={<InventoryDashboard />} />
-          <Route path='/core' element={<CoreDashboard />} />
-          <Route path='/crm' element={<CRMDashboard />} />          
-          <Route path='/finance' element={<Finance />} />
-          <Route path='/procurement' element={<Procurement />} />
-          <Route path='/employees/record' element={<EmployeeManagementPage />} />
-          <Route path="/employees/:id" element={<EmployeeDetailsPage />} />
-          <Route path='/employees/jobgrade' element={<JobGrade />} />
-          <Route path='/employees/termination' element={<Termination />} />
-          <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />
-          <Route path='/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />
-          <Route path='/recruitment/onboarding' element={<OnBoarding />} />
-          <Route path='/recruitment/list' element={<RecruitmentList />} />
-          <Route path='/leave/list' element={<LeaveList />} />
-          <Route path='/leave/form' element={<LeaveRequestForm />} />
-          <Route path='/leave/entitlement' element={<LeaveEntitlementPage />} />
-          <Route path='/attendance/list' element={<AttendanceList />} />
-          <Route path='/shift-scheduler' element={<ShiftScheduler />} />
-          <Route path='/time-clock' element={<TimeClock />} />
-          {/* <Route path="/time-display" element={<TimeClockDisplay schedule={schedule} />} /> */}
-          <Route path="/attendance/form" element={<TimeClockFormContainer />} />
+      <BrowserRouter>
+        <Routes>
+          {/* Root path redirects to login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           
-          <Route path='/training' element={<Training />} />
-          <Route path='/finance/gl' element={<GlPage />} />
-          <Route path='/finance/budget-list' element ={<BudgetList />} />
-          <Route path='/finance/budget-create' element ={<BudgetCreate />} />
-          
-          {/* Core routes */}
-          <Route path='/core/branch' element={<BranchOverview />} />
-          <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
-          <Route path='/core/hierarchy' element={<HierarchyOverview />} />
-          <Route path='/core/users' element={<UserOverview />} />
-          <Route path="/core/department" element={<DepartmentOverview />} />
+          {/* Public route */}
+          <Route path="/login" element={<SignInPage onLogin={handleLogin} />} />
 
-        </Route>
+          {/* Protected layout routes */}
+          <Route
+            path="/"
+            element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path='/inventory' element={<InventoryDashboard />} />
+            <Route path='/core' element={<CoreDashboard />} />
+            <Route path='/crm' element={<CRMDashboard />} />          
+            <Route path='/finance' element={<Finance />} />
+            <Route path='/procurement' element={<Procurement />} />
+            <Route path='/employees/record' element={<EmployeeManagementPage />} />
+            <Route path="/employees/:id" element={<EmployeeDetailsPage />} />
+            <Route path='/employees/jobgrade' element={<JobGrade />} />
+            <Route path='/employees/termination' element={<Termination />} />
+            <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />
+            <Route path='/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />
+            <Route path='/recruitment/onboarding' element={<OnBoarding />} />
+            <Route path='/recruitment/list' element={<RecruitmentList />} />
+            <Route path='/leave/list' element={<LeaveList />} />
+            <Route path='/leave/form' element={<LeaveRequestForm />} />
+            <Route path='/leave/entitlement' element={<LeaveEntitlementPage />} />
+            <Route path='/attendance/list' element={<AttendanceList />} />
+            <Route path='/shift-scheduler' element={<ShiftScheduler />} />
+            <Route path='/time-clock' element={<TimeClock />} />
+            <Route path="/attendance/form" element={<TimeClockFormContainer />} />
+            
+            <Route path='/training' element={<Training />} />
+            <Route path='/finance/gl' element={<GlPage />} />
+            <Route path='/finance/budget-list' element ={<BudgetList />} />
+            <Route path='/finance/budget-create' element ={<BudgetCreate />} />
+            
+            {/* Core routes */}
+            <Route path='/core/branch' element={<BranchOverview />} />
+            <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
+            <Route path='/core/hierarchy' element={<HierarchyOverview />} />
+            <Route path='/core/users' element={<UserOverview />} />
+            <Route path="/core/department" element={<DepartmentOverview />} />
+          </Route>
 
-        {/* Standalone protected route without layout (Modules) */}
-        <Route
-          path="/"
-          element={isAuthenticated ? <Modules /> : <Navigate to="/login" />}
-          index
-        />
+          {/* Modules route at /menu */}
+          <Route
+            path="/menu"
+            element={isAuthenticated ? <Modules /> : <Navigate to="/login" />}
+          />
 
-        {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to={isAuthenticated ? "/404" : "/login"} replace />} />
+        </Routes>
+      </BrowserRouter>
     </ModuleProvider>
   );
 }

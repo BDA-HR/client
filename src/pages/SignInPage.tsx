@@ -20,7 +20,7 @@ const SignInPage: React.FC<SignInPageProps> = ({ onLogin }) => {
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     onLogin();
-    navigate('/');
+    navigate('/menu');
   };
 
   return (

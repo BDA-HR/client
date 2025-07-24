@@ -139,7 +139,7 @@ function Modules() {
           {/* Split header text */}
           <div className="text-center ml-96">
             <h1 className="text-4xl font-bold text-gray-800 drop-shadow">
-              Welcome to the <span className="text-purple-600">BDA Platform</span>
+              Welcome to the <span className="text-purple-600">BDA ERP</span>
             </h1>
 
           </div>
