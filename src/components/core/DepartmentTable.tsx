@@ -1,4 +1,3 @@
-// src/components/core/DepartmentTable.tsx
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
 import { Edit, Trash, Plus } from 'lucide-react';

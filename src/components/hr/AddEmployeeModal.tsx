@@ -90,10 +90,10 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
     if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
   };
 
-const validateStep = (stepNumber: number): boolean => {
-  const newErrors: Record<string, string> = {};
+  const validateStep = (stepNumber: number): boolean => {
+    const newErrors: Record<string, string> = {};
 
-  if (stepNumber === 1 || stepNumber === 2) {
+    if (stepNumber === 1 || stepNumber === 2) {
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.middleName.trim()) newErrors.middleName = 'Middle name is required'; // ✅
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
@@ -109,19 +109,22 @@ const validateStep = (stepNumber: number): boolean => {
     if (!formData.joiningDate) newErrors.joiningDate = 'Joining date is required';
   }
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const nextStep = () => {
-    if (!validateStep(step)) return;
-    setStep(prev => prev + 1);
+    if (validateStep(step)) {
+      if (step < 4) {
+        setStep(prev => prev + 1);
+      }
+    }
   };
 
   const prevStep = () => setStep(prev => prev - 1);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // FIX: Removed handleSubmit from form and moved logic to button
+  const handleSubmit = () => {
     onAddEmployee(formData);
     onClose();
   };
@@ -410,36 +413,41 @@ const validateStep = (stepNumber: number): boolean => {
   </motion.div>
 )}
 
-                <div className="flex justify-between pt-6">
-  <div>
-    {step > 1 && (
-      <Button
-        type="button"
-        variant="outline"
-        onClick={prevStep}
-        className="flex items-center gap-1"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        Previous
-      </Button>
-    )}
-  </div>
-  <div>
-    {step < 4 ? (
-      <Button
-        type="button"
-        onClick={nextStep}
-        className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
-      >
-        Next
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    ) : (
-      <Button type="submit" className="bg-green-600 hover:bg-green-700">
-        Submit
-      </Button>
-    )}
-  </div>
+                              {/* FIX: Unified navigation buttons */}
+              <div className="flex justify-between pt-6">
+                <div>
+                  {step > 1 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={prevStep}
+                      className="flex items-center gap-1"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                  )}
+                </div>
+                <div>
+                  {step < 4 ? (
+                    <Button
+                      type="button"
+                      onClick={nextStep}
+                      className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button 
+                      type="button" 
+                      onClick={handleSubmit}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Add Employee
+                    </Button>
+                  )}
+                </div>
 </div>
 
               </form>
