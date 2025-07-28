@@ -2,7 +2,7 @@ export type Employee = {
   id: string;
   employeeId: string;
   firstName: string;
-  middleName?: string;
+  middleName: string;
   lastName: string;
   email: string;
   role: string;
