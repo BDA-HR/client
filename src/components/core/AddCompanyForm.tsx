@@ -47,8 +47,10 @@ const mockCompanies: Company[] = [
   },
 ];
 
-const AddCompanyForm = () => {
-  const [companies, setCompanies] = useState<Company[]>(mockCompanies);
+interface AddCompanyFormProps {
+  onClick: () => void;
+}
+const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const [companies, setCompanies] = useState<Company[]>(mockCompanies);
   const [openDialog, setOpenDialog] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
   const [editCompany, setEditCompany] = useState<Company | null>(null);
@@ -153,7 +155,7 @@ const AddCompanyForm = () => {
           >
             <Card className="relative rounded-xl border border-gray-200 shadow-sm p-4 space-y-3 transition hover:shadow-md">
               <div>
-                <h4 className="text-md font-semibold text-emerald-600">{company.nameAm}</h4>
+                <h4 className="text-md font-semibold text-black">{company.nameAm}</h4>
                 <p className="text-sm text-gray-600">{company.name}</p>
               </div>
            
@@ -162,14 +164,7 @@ const AddCompanyForm = () => {
                 <Button
                   className="text-green-600 bg-green-50 hover:bg-green-100"
                   size="sm"
-                  onClick={() => {
-                    sessionStorage.setItem('selectedCompany', JSON.stringify(company));
-                    const win = window.open(`/core/company/${company.id}`, '_blank');
-                    if (win) win.focus();
-                  }}
-                >
-                  View Details
-                </Button>
+                  onClick={onClick}>View Details</Button>
               </div>
 
               <div className="absolute top-2 right-2 z-10">
