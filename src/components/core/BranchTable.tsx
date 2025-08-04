@@ -94,15 +94,15 @@ const BranchTable: React.FC<BranchTableProps> = ({
     setModalType(null);
   };
 
-  const getBranchTypeColor = (type: Branch["type"]): string => {
-    switch (type) {
-      case "Head Office": return "bg-emerald-100 text-emerald-800";
-      case "Regional": return "bg-blue-100 text-blue-800";
-      case "Local": return "bg-purple-100 text-purple-800";
-      case "Virtual": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
+//   const getBranchTypeColor = (type: Branch["type"]): string => {
+//     switch (type) {
+//       case "Head Office": return "bg-emerald-100 text-emerald-800";
+//       case "Regional": return "bg-blue-100 text-blue-800";
+//       case "Local": return "bg-purple-100 text-purple-800";
+//       case "Virtual": return "bg-yellow-100 text-yellow-800";
+//       default: return "bg-gray-100 text-gray-800";
+//     }
+//   };
 
   const getStatusColor = (status: Branch["status"]): string => {
     switch (status) {
@@ -161,15 +161,15 @@ const BranchTable: React.FC<BranchTableProps> = ({
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Location
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                {/* <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Manager
-                </th>
+                </th> */}
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Opened
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Type
-                </th>
+                </th> */}
                 <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -215,26 +215,26 @@ const BranchTable: React.FC<BranchTableProps> = ({
                       <span className="truncate max-w-[120px]">{branch.city}, {branch.country}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                  {/* <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
                       <User className="text-gray-400 mr-2 h-4 w-4" />
                       <span className="truncate max-w-[120px]">{branch.manager}</span>
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <div className="flex items-center">
                       <Calendar className="text-gray-400 mr-2 h-4 w-4" />
                       <span>{branch.openingDate}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  {/* <td className="px-4 py-4 whitespace-nowrap">
                     <motion.span 
                       whileHover={{ scale: 1.05 }}
                       className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(branch.type)}`}
                     >
                       {branch.type}
                     </motion.span>
-                  </td>
+                  </td> */}
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Popover open={popoverOpen === branch.id} onOpenChange={(open) => setPopoverOpen(open ? branch.id : null)}>
                       <PopoverTrigger asChild>

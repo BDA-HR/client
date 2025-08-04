@@ -60,53 +60,55 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div>
-                <label htmlFor="branchName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Branch Name (English)
-                </label>
-                <Input
-                  id="branchName"
-                  type="text"
-                  placeholder="Enter branch name"
-                  value={branchName}
-                  onChange={(e) => setBranchName(e.target.value)}
-                  required
-                  className="w-full"
-                />
-              </div>
+<form onSubmit={handleSubmit} className="p-6 space-y-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label htmlFor="branchNameAm" className="block text-sm font-medium text-gray-700 mb-1">
+        Branch Name (Amharic)
+      </label>
+      <Input
+        id="branchNameAm"
+        type="text"
+        placeholder="የምዝግብ ስም አስገባ"
+        value={branchNameAm}
+        onChange={handleAmharicChange}
+        className="w-full"
+      />
+    </div>
 
-              <div>
-                <label htmlFor="branchNameAm" className="block text-sm font-medium text-gray-700 mb-1">
-                  Branch Name (Amharic)
-                </label>
-                <Input
-                  id="branchNameAm"
-                  type="text"
-                  placeholder="የምዝግብ ስም አስገባ"
-                  value={branchNameAm}
-                  onChange={handleAmharicChange}
-                  className="w-full"
-                />
-              </div>
+    <div>
+      <label htmlFor="branchName" className="block text-sm font-medium text-gray-700 mb-1">
+        Branch Name (English)
+      </label>
+      <Input
+        id="branchName"
+        type="text"
+        placeholder="Enter branch name"
+        value={branchName}
+        onChange={(e) => setBranchName(e.target.value)}
+        required
+        className="w-full"
+      />
+    </div>
+  </div>
 
-              <div className="flex justify-end space-x-3 border-t pt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                  disabled={!branchName.trim()}
-                >
-                  Add Branch
-                </Button>
-              </div>
-            </form>
+  <div className="flex justify-end space-x-3 border-t pt-6">
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onClose}
+    >
+      Cancel
+    </Button>
+    <Button
+      type="submit"
+      className="bg-emerald-600 hover:bg-emerald-700"
+      disabled={!branchName.trim()}
+    >
+      Add Branch
+    </Button>
+  </div>
+</form>
           </motion.div>
         </motion.div>
       )}
