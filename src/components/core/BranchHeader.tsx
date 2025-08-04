@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
 
-const BranchHeader = () => {
+interface BranchHeaderProps {
+  companyName: string;
+}
+
+const BranchHeader = ({ companyName }: BranchHeaderProps) => {
   return (
     <motion.div 
       variants={itemVariants}
@@ -11,7 +15,9 @@ const BranchHeader = () => {
         animate={{ opacity: 1, x: 0 }}
         className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
       >
-        Branch <span className="bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent">Management</span>
+        <span className="bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent">
+          {companyName}
+        </span> Branches
       </motion.h1>
       <motion.p 
         initial={{ opacity: 0 }}
@@ -19,7 +25,7 @@ const BranchHeader = () => {
         transition={{ delay: 0.2 }}
         className="text-gray-600 dark:text-gray-400"
       >
-        Manage branch operations, users, inventory, and financial accounts
+        Manage {companyName}'s branch operations, users, and financial accounts
       </motion.p>
     </motion.div>
   );
