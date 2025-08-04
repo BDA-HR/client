@@ -23,10 +23,7 @@ interface Company {
   id: number;
   name: string;
   nameAm: string;
-  manager: string;
-  budget: string;
-  employees: number;
-  branches: number;
+ 
 }
 
 const mockCompanies: Company[] = [
@@ -34,38 +31,27 @@ const mockCompanies: Company[] = [
     id: 1,
     name: 'Rohobot Tech',
     nameAm: 'ሮሆቦት ቴክ',
-    manager: 'John doe',
-    budget: '1.2M ETB',
-    employees: 50,
-    branches: 3,
+  
   },
   {
     id: 2,
     name: 'Rohobot Group',
     nameAm: 'ሮሆቦት ግሩፕ',
-    manager: 'anonymous',
-    budget: '850K ETB',
-    employees: 35,
-    branches: 2,
+  
   },
   {
     id: 3,
     name: 'EthioDev',
     nameAm: 'ኢትዮዴቭ',
-    manager: 'ethioo',
-    budget: '950K ETB',
-    employees: 42,
-    branches: 4,
+
   },
 ];
-interface AddCompanyFormProps {
-  onClick: () => void;
-}
-const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
+
+const AddCompanyForm = () => {
   const [companies, setCompanies] = useState<Company[]>(mockCompanies);
-  const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
   const [openDialog, setOpenDialog] = useState(false);
-  const [viewCompany, setViewCompany] = useState<Company | null>(null);
+  const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
+  const [editCompany, setEditCompany] = useState<Company | null>(null);
 
   const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s]*$/;
 
@@ -77,24 +63,30 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
   };
 
   const handleSubmit = () => {
+    if (!newCompany.name || !newCompany.nameAm) return;
     const id = companies.length + 1;
-    const newEntry: Company = {
+    const entry: Company = {
       id,
       name: newCompany.name,
       nameAm: newCompany.nameAm,
-      manager: 'To be assigned',
-      budget: '0 ETB',
-      employees: 0,
-      branches: 0,
+    
     };
-    setCompanies((prev) => [...prev, newEntry]);
+    setCompanies((prev) => [...prev, entry]);
     setNewCompany({ name: '', nameAm: '' });
     setOpenDialog(false);
   };
-// const [editCompany, setEditCompany] = useState<Company | null>(null);
+
+  const handleEditSave = () => {
+    if (!editCompany) return;
+    setCompanies((prev) =>
+      prev.map((comp) => (comp.id === editCompany.id ? editCompany : comp))
+    );
+    setEditCompany(null);
+  };
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Companies</h2>
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -103,45 +95,42 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
               Add Company
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Add New Company</DialogTitle>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Company Name
-                </Label>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div>
+                <Label htmlFor="nameAm">የኩባንያው ስም</Label>
+                <Input
+                  id="nameAm"
+                  value={newCompany.nameAm}
+                  onChange={handleAmharicChange}
+                  placeholder="ሮሆቦት ቴክ"
+                />
+              </div>
+              <div>
+                <Label htmlFor="name">Company Name</Label>
                 <Input
                   id="name"
                   value={newCompany.name}
                   onChange={(e) =>
                     setNewCompany((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  className="col-span-3"
-                  placeholder="e.g. Rohobot Tech"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="nameAm" className="text-right">
-                  የኩባንያው ስም
-                </Label>
-                <Input
-                  id="nameAm"
-                  value={newCompany.nameAm}
-                  onChange={handleAmharicChange}
-                  className="col-span-3"
-                  placeholder="ሮሆቦት ቴክ"
+                  placeholder="Rohobot Tech"
                 />
               </div>
             </div>
             <div className="flex justify-end">
-              <Button onClick={handleSubmit}>Save</Button>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSubmit}>
+                Save
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Cards */}
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         initial="hidden"
@@ -150,9 +139,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
           hidden: { opacity: 0 },
           visible: {
             opacity: 1,
-            transition: {
-              staggerChildren: 0.05,
-            },
+            transition: { staggerChildren: 0.05 },
           },
         }}
       >
@@ -165,35 +152,26 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
             }}
           >
             <Card className="relative rounded-xl border border-gray-200 shadow-sm p-4 space-y-3 transition hover:shadow-md">
-              <div className="flex justify-between items-start">
-                <div className="flex gap-3 items-center">
-                  <div className="p-2 rounded-full bg-blue-100">
-                    <span className="text-blue-600 font-bold text-lg">🏢</span>
-                  </div>
-                  <div>
-                    <h4 className="text-md font-semibold leading-none">
-                      {company.name}
-                    </h4>
-                    <p className="text-sm text-gray-500">{company.nameAm}</p>
-                  </div>
-                </div>
-                <div className="text-sm px-2 py-1 bg-gray-100 rounded-full text-gray-700 font-medium mr-8">
-                  {company.budget} Budget
-                </div>
+              <div>
+                <h4 className="text-md font-semibold text-emerald-600">{company.nameAm}</h4>
+                <p className="text-sm text-gray-600">{company.name}</p>
               </div>
-              <div className="rounded-md border bg-gradient-to-b from-white to-gray-50 p-3 text-sm grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-500">Manager</p>
-                  <p className="font-medium">{company.manager}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Employees</p>
-                  <p className="font-medium">{company.employees}</p>
-                </div>
+           
+
+              <div className="flex justify-between items-center">
+                <Button
+                  className="text-green-600 bg-green-50 hover:bg-green-100"
+                  size="sm"
+                  onClick={() => {
+                    sessionStorage.setItem('selectedCompany', JSON.stringify(company));
+                    const win = window.open(`/core/company/${company.id}`, '_blank');
+                    if (win) win.focus();
+                  }}
+                >
+                  View Details
+                </Button>
               </div>
-              <div className="text-xs text-gray-500 flex flex-wrap justify-between items-center">Last activity: Today, 9:30 AM
-                <Button onClick={onClick}>View Details</Button>
-              </div>
+
               <div className="absolute top-2 right-2 z-10">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -201,29 +179,23 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
                       <MoreVertical className="w-4 h-4 text-gray-500" />
                     </Button>
                   </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                        onClick={() => {
-                            sessionStorage.setItem('selectedCompany', JSON.stringify(company));
-                            const newTab = window.open(`/core/company/${company.id}`, '_blank');
-                            if (newTab) newTab.focus();
-                        }}
-                        >
-                        View Details
-                        </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setEditCompany(company)}>
-                        Edit
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setEditCompany(company);
+                      }}
+                    >
+                      Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                        onClick={() =>
+                      onClick={() =>
                         setCompanies((prev) => prev.filter((c) => c.id !== company.id))
-                        }
-                        className="text-red-500"
+                      }
+                      className="text-red-500"
                     >
-                        Delete
+                      Delete
                     </DropdownMenuItem>
-                    </DropdownMenuContent>
-
+                  </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </Card>
@@ -231,39 +203,46 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
         ))}
       </motion.div>
 
-        {viewCompany && (
-        <Dialog open={true} onOpenChange={() => setViewCompany(null)}>
-            <DialogContent className="max-w-md">
+      {/* Edit Dialog */}
+      {editCompany && (
+        <Dialog open={true} onOpenChange={() => setEditCompany(null)}>
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-emerald-600">
-                {viewCompany.name} <span className="text-gray-500">({viewCompany.nameAm})</span>
-                </DialogTitle>
+              <DialogTitle>Edit Company</DialogTitle>
             </DialogHeader>
-            <div className="bg-gray-50 rounded-md p-4 space-y-4 border mt-2">
-                <div className="flex items-center justify-between">
-                <span className="text-gray-500">👤 Manager:</span>
-                <span className="font-medium text-gray-700">{viewCompany.manager}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                <span className="text-gray-500">💰 Budget:</span>
-                <span className="font-medium text-gray-700">{viewCompany.budget}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                <span className="text-gray-500">👥 Employees:</span>
-                <span className="font-medium text-gray-700">{viewCompany.employees}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                <span className="text-gray-500">🏢 Branches:</span>
-                <span className="font-medium text-gray-700">{viewCompany.branches}</span>
-                </div>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div>
+                <Label htmlFor="editNameAm">የኩባንያው ስም</Label>
+                <Input
+                  id="editNameAm"
+                  value={editCompany.nameAm}
+                  onChange={(e) =>
+                    setEditCompany((prev) => ({ ...prev!, nameAm: e.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="editName">Company Name</Label>
+                <Input
+                  id="editName"
+                  value={editCompany.name}
+                  onChange={(e) =>
+                    setEditCompany((prev) => ({ ...prev!, name: e.target.value }))
+                  }
+                />
+              </div>
             </div>
-            <div className="pt-2 text-xs text-right text-gray-400">
-                Last viewed: {new Date().toLocaleString()}
+            <div className="flex justify-end">
+              <Button
+                onClick={handleEditSave}
+                className="bg-green-600 text-white hover:bg-green-700"
+              >
+                Save Changes
+              </Button>
             </div>
-            </DialogContent>
+          </DialogContent>
         </Dialog>
-        )}
-
+      )}
     </div>
   );
 };
