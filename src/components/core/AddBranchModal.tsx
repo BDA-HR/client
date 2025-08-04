@@ -7,7 +7,7 @@ import { Input } from '../ui/input';
 interface AddBranchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddBranch: (branchName: string) => void;
+  onAddBranch: (branchName: string, branchNameAm: string) => void;
 }
 
 export const AddBranchModal: React.FC<AddBranchModalProps> = ({ 
@@ -16,12 +16,22 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
   onAddBranch 
 }) => {
   const [branchName, setBranchName] = useState('');
+  const [branchNameAm, setBranchNameAm] = useState('');
+  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s]*$/;
+
+  const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (amharicRegex.test(value) || value === '') {
+      setBranchNameAm(value);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (branchName.trim()) {
-      onAddBranch(branchName);
+      onAddBranch(branchName, branchNameAm);
       setBranchName('');
+      setBranchNameAm('');
     }
   };
 
@@ -53,7 +63,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div>
                 <label htmlFor="branchName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Branch Name
+                  Branch Name (English)
                 </label>
                 <Input
                   id="branchName"
@@ -62,6 +72,20 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
                   value={branchName}
                   onChange={(e) => setBranchName(e.target.value)}
                   required
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="branchNameAm" className="block text-sm font-medium text-gray-700 mb-1">
+                  Branch Name (Amharic)
+                </label>
+                <Input
+                  id="branchNameAm"
+                  type="text"
+                  placeholder="የምዝግብ ስም አስገባ"
+                  value={branchNameAm}
+                  onChange={handleAmharicChange}
                   className="w-full"
                 />
               </div>

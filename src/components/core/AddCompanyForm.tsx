@@ -58,8 +58,10 @@ const mockCompanies: Company[] = [
     branches: 4,
   },
 ];
-
-const AddCompanyForm = () => {
+interface AddCompanyFormProps {
+  onClick: () => void;
+}
+const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
   const [companies, setCompanies] = useState<Company[]>(mockCompanies);
   const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
   const [openDialog, setOpenDialog] = useState(false);
@@ -189,7 +191,9 @@ const AddCompanyForm = () => {
                   <p className="font-medium">{company.employees}</p>
                 </div>
               </div>
-              <div className="text-xs text-gray-500">Last activity: Today, 9:30 AM</div>
+              <div className="text-xs text-gray-500 flex flex-wrap justify-between items-center">Last activity: Today, 9:30 AM
+                <Button onClick={onClick}>View Details</Button>
+              </div>
               <div className="absolute top-2 right-2 z-10">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
