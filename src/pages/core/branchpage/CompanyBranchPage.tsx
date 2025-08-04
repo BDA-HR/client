@@ -6,7 +6,7 @@ import BranchTabs from '../../../components/core/BranchTabs';
 import { Button } from '../../../components/ui/button';
 import { Plus } from 'lucide-react';
 import { companies } from '../../../data/company';
-
+import AddCompanyForm from '../../../components/core/AddCompanyForm';
 const CompanyBranchesPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const [currentBranchId, setCurrentBranchId] = useState<number>(1);
@@ -44,6 +44,7 @@ const CompanyBranchesPage = () => {
         setCurrentBranchId={setCurrentBranchId} 
         branches={company.branches}
       />
+      <AddCompanyForm />
 
       <BranchTabs branch={branchDetails} />
     </div>

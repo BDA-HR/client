@@ -34,6 +34,7 @@ import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
 import UserOverview from './pages/core/usermanagementpage/UserOverview';
 import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
 import CompanyBranchesPage from './pages/core/branchpage/CompanyBranchPage';
+import CompanyDetailsPage from './components/core/CompanyDetailsPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -95,6 +96,7 @@ function App() {
             {/* <Route path='/core/hierarchy' element={<HierarchyOverview />} /> */}
             <Route path='/core/users' element={<UserOverview />} />
             <Route path="/core/department" element={<DepartmentOverview />} />
+            <Route path="/core/company/:id" element={<CompanyDetailsPage />} />
           </Route>
 
           {/* Modules route at /menu */}
