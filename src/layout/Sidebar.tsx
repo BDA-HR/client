@@ -245,7 +245,8 @@ const Sidebar: React.FC = () => {
 
           {activeModule === 'Core' && (
             <>
-    <NavGroup 
+    <NavItem to="/core/company" icon={<Users size={18} />} label="Companies" {...theme} />
+    {/* <NavGroup 
       icon={<Building2 size={18} />} 
       label="Companies" 
       isOpen={openGroup === 'Companies'} 
@@ -270,10 +271,9 @@ const Sidebar: React.FC = () => {
         label="BDA Holdings" 
         {...theme} 
       />
-    </NavGroup>
-              <NavItem to="/core/department" icon={<Users size={18} />} label="Department" {...theme} />
+    </NavGroup>*/}
+              <NavItem to="/core/department" icon={<Users size={18} />} label="Department" {...theme} /> 
               <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
-              <NavItem to="/core/hierarchy" icon={<BarChart4 size={18} />} label="Hierarchy" {...theme} />
               <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
 
             </>
