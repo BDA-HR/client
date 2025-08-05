@@ -145,14 +145,15 @@ const AddHierarchy = () => {
       </div>
 
       {/* Level 1 */}
+      <Card className='w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4'>
+        <h2 className='text-lg font-semibold text-gray-700'>Level 1</h2>
       <div className="flex justify-center">
         <Card className="max-w-lg w-full p-6 shadow-md border border-gray-200 bg-white text-center">
-          <span className="text-sm text-gray-500 mb-2 block">Level 1</span>
           <h3 className="text-2xl font-bold text-gray-800">ቢዲኤ</h3>
           <p className="text-lg text-gray-600">BDA</p>
         </Card>
       </div>
-
+</Card>
       {/* Render each level */}
       {renderLevelSection('Level 2', level2Companies)}
       {renderLevelSection('Level 3', level3Companies)}
