@@ -18,6 +18,7 @@ import {
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { motion } from 'framer-motion';
+import DialogOverlay from '../ui/dialog-overlay';
 
 interface Company {
   id: number;
@@ -108,7 +109,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
                   id="nameAm"
                   value={newCompany.nameAm}
                   onChange={handleAmharicChange}
-                  placeholder="ሮሆቦት ቴክ"
+                  placeholder="ምሳሌ፡ አክሜ ኢንት"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -119,7 +120,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
                   onChange={(e) =>
                     setNewCompany((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  placeholder="Rohobot Tech"
+                  placeholder="Eg. Acme int"
                 />
               </div>
             </div>
@@ -201,12 +202,13 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
       {/* Edit Dialog */}
       {editCompany && (
         <Dialog open={true} onOpenChange={() => setEditCompany(null)}>
+          <DialogOverlay>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Edit Company</DialogTitle>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4 py-4">
-              <div>
+              <div className='flex gap-4 flex-col'>
                 <Label htmlFor="editNameAm">የኩባንያው ስም</Label>
                 <Input
                   id="editNameAm"
@@ -216,7 +218,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
                   }
                 />
               </div>
-              <div>
+              <div className='flex gap-4 flex-col'>
                 <Label htmlFor="editName">Company Name</Label>
                 <Input
                   id="editName"
@@ -236,6 +238,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
               </Button>
             </div>
           </DialogContent>
+          </DialogOverlay>
         </Dialog>
       )}
     </div>
