@@ -10,7 +10,7 @@ import type { Branch } from '../../../types/branches';
 import { dummyBranches } from '../../../types/branches';
 import BranchHeader from '../../../components/core/BranchHeader';
 import { AddBranchModal } from '../../../components/core/AddBranchModal';
-
+import AddHierarchy from '../../../components/core/AddHierarchy';
 const CompanyBranchesPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const [showCompanyForm, setShowCompanyForm] = useState<boolean>(true);
@@ -82,7 +82,12 @@ const CompanyBranchesPage = () => {
       ></motion.div>
 
       {showCompanyForm ? (
-        <AddCompanyForm onClick={handleCompanyFormClick} />
+        <>
+          <AddCompanyForm onClick={handleCompanyFormClick} />
+          <div className="pt-6">
+            <AddHierarchy />
+          </div>
+        </>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
