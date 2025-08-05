@@ -102,7 +102,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
               <DialogTitle>Add New Company</DialogTitle>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4 py-4">
-              <div>
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="nameAm">የኩባንያው ስም</Label>
                 <Input
                   id="nameAm"
@@ -111,7 +111,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
                   placeholder="ሮሆቦት ቴክ"
                 />
               </div>
-              <div>
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="name">Company Name</Label>
                 <Input
                   id="name"
@@ -155,8 +155,8 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {  const 
           >
             <Card className="relative rounded-xl border border-gray-200 shadow-sm p-4 space-y-3 transition hover:shadow-md">
               <div>
-                <h4 className="text-md font-semibold text-black">{company.nameAm}</h4>
-                <p className="text-sm text-gray-600">{company.name}</p>
+                <h4 className="text-md font-semibold text-black ">{company.nameAm}</h4>
+                <p className="text-sm text-gray-600 ">{company.name}</p>
               </div>
            
 
