@@ -51,7 +51,6 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
 
-  // Function to get company name by ID
   const getCompanyName = (companyId: number): string => {
     const company = companies.find(c => c.id === companyId);
     if (!company) {
@@ -61,7 +60,6 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
     return company.name;
   };
 
-  // Function to get company branches by company ID
   const getCompanyBranches = (companyId: number) => {
     const company = companies.find(c => c.id === companyId);
     return company ? company.branches : [];
