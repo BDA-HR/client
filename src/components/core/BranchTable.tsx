@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
 import type { Branch, BranchTableProps } from '../../types/branches';
+import { companies } from '../../data/company-branches';
 
 const BranchTable: React.FC<BranchTableProps> = ({
   branches,
@@ -29,24 +30,26 @@ const BranchTable: React.FC<BranchTableProps> = ({
   onPageChange,
   onBranchUpdate,
   onBranchStatusChange,
-  onBranchDelete
+  onBranchDelete,
+  companyId
 }) => {
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
-  const sortedBranches = [...branches].sort((a, b) => {
+  // Get branches for the specific company if companyId is provided
+  const companyBranches = companyId 
+    ? companies.find(c => c.id === companyId)?.branches || []
+    : branches;
+
+  const sortedBranches = [...companyBranches].sort((a, b) => {
     return new Date(b.openingDate).getTime() - new Date(a.openingDate).getTime();
   });
 
   const handleViewDetails = (branch: Branch) => {
-    sessionStorage.setItem('selectedBranch', JSON.stringify(branch));
-    sessionStorage.setItem('currentModule', 'Branches');
-    
-    const newWindow = window.open(`/branches/${branch.id}`, '_blank');
-    if (newWindow) {
-      newWindow.focus();
-    }
+    setSelectedBranch(branch);
+    setModalType('view');
+    setPopoverOpen(null);
   };
 
   const handleEdit = (branch: Branch) => {
@@ -93,16 +96,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
     onBranchUpdate(updatedBranch);
     setModalType(null);
   };
-
-//   const getBranchTypeColor = (type: Branch["type"]): string => {
-//     switch (type) {
-//       case "Head Office": return "bg-emerald-100 text-emerald-800";
-//       case "Regional": return "bg-blue-100 text-blue-800";
-//       case "Local": return "bg-purple-100 text-purple-800";
-//       case "Virtual": return "bg-yellow-100 text-yellow-800";
-//       default: return "bg-gray-100 text-gray-800";
-//     }
-//   };
 
   const getStatusColor = (status: Branch["status"]): string => {
     switch (status) {
@@ -161,15 +154,9 @@ const BranchTable: React.FC<BranchTableProps> = ({
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Location
                 </th>
-                {/* <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                  Manager
-                </th> */}
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Opened
                 </th>
-                {/* <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th> */}
                 <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -215,26 +202,12 @@ const BranchTable: React.FC<BranchTableProps> = ({
                       <span className="truncate max-w-[120px]">{branch.city}, {branch.country}</span>
                     </div>
                   </td>
-                  {/* <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                    <div className="flex items-center">
-                      <User className="text-gray-400 mr-2 h-4 w-4" />
-                      <span className="truncate max-w-[120px]">{branch.manager}</span>
-                    </div>
-                  </td> */}
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <div className="flex items-center">
                       <Calendar className="text-gray-400 mr-2 h-4 w-4" />
                       <span>{branch.openingDate}</span>
                     </div>
                   </td>
-                  {/* <td className="px-4 py-4 whitespace-nowrap">
-                    <motion.span 
-                      whileHover={{ scale: 1.05 }}
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(branch.type)}`}
-                    >
-                      {branch.type}
-                    </motion.span>
-                  </td> */}
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Popover open={popoverOpen === branch.id} onOpenChange={(open) => setPopoverOpen(open ? branch.id : null)}>
                       <PopoverTrigger asChild>
