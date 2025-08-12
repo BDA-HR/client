@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import {
@@ -17,29 +17,75 @@ import {
   SelectValue,
 } from '../../components/ui/select';
 
+interface Company {
+  id: number;
+  name: string;
+  nameAm: string;
+}
+
+interface Connector {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
 const AddHierarchy = () => {
-  const allCompanies = [
+  const allCompanies: Company[] = [
     { id: 1, name: 'Rohobot Tech', nameAm: 'ሮሆቦት ቴክ' },
     { id: 2, name: 'EthioDev', nameAm: 'ኢትዮዴቭ' },
     { id: 3, name: 'Rohobot Group', nameAm: 'ሮሆቦት ግሩፕ' },
   ];
 
-  const [level2Companies, setLevel2Companies] = useState(allCompanies);
-  const [level3Companies, setLevel3Companies] = useState<
-    { name: string; nameAm: string }[]
-  >([]);
-  const [level4Companies, setLevel4Companies] = useState<
-    { name: string; nameAm: string }[]
-  >([]);
+  const [level2Companies, setLevel2Companies] = useState<Company[]>(allCompanies);
+  const [level3Companies, setLevel3Companies] = useState<Company[]>([]);
+  const [level4Companies, setLevel4Companies] = useState<Company[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const [selectedLevel, setSelectedLevel] = useState<string>('Level 2');
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [connectors, setConnectors] = useState<Connector[]>([]);
 
-  const [selectedCompanyId, setSelectedCompanyId] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState('Level 2');
-  const [openDialog, setOpenDialog] = useState(false);
+  const level1Ref = useRef<HTMLDivElement>(null);
+  const level2ContainerRef = useRef<HTMLDivElement>(null);
+  const connectorsRef = useRef<SVGSVGElement>(null);
+
+  useEffect(() => {
+    const updateConnectors = () => {
+      if (!level1Ref.current || !level2ContainerRef.current || !connectorsRef.current) return;
+
+      const level1Rect = level1Ref.current.getBoundingClientRect();
+      const containerRect = level2ContainerRef.current.getBoundingClientRect();
+      const svgRect = connectorsRef.current.getBoundingClientRect();
+
+      const level1CenterX = level1Rect.left + level1Rect.width / 2 - svgRect.left;
+      const level1BottomY = level1Rect.bottom - svgRect.top;
+
+      const newConnectors: Connector[] = [];
+      const level2Cards = level2ContainerRef.current.querySelectorAll('.level2-card');
+
+      level2Cards.forEach((card) => {
+        const cardRect = card.getBoundingClientRect();
+        const cardCenterX = cardRect.left + cardRect.width / 2 - svgRect.left;
+        const cardTopY = cardRect.top - svgRect.top;
+
+        newConnectors.push({
+          x1: level1CenterX,
+          y1: level1BottomY,
+          x2: cardCenterX,
+          y2: cardTopY,
+        });
+      });
+
+      setConnectors(newConnectors);
+    };
+
+    updateConnectors();
+    window.addEventListener('resize', updateConnectors);
+    return () => window.removeEventListener('resize', updateConnectors);
+  }, [level2Companies]);
 
   const handleAddHierarchy = () => {
-    const company = allCompanies.find(
-      (c) => c.id.toString() === selectedCompanyId
-    );
+    const company = allCompanies.find((c) => c.id.toString() === selectedCompanyId);
     if (!company) return;
 
     if (selectedLevel === 'Level 2') {
@@ -57,38 +103,55 @@ const AddHierarchy = () => {
 
   const renderLevelSection = (
     title: string,
-    companies: { name: string; nameAm: string }[]
+    companies: Company[],
+    level: number
   ) => {
     if (companies.length === 0) return null;
 
     return (
-      <Card className="w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {companies.map((company, index) => (
-            <Card
-              key={index}
-              className="p-6 border border-gray-200 bg-white shadow hover:shadow-lg transition-all"
-            >
-              <h4 className="text-base font-semibold text-gray-800">
-                {company.nameAm}
-              </h4>
-              <p className="text-sm text-gray-500">{company.name}</p>
-            </Card>
-          ))}
-        </div>
-      </Card>
+      <div className="relative">
+        <Card className="w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4 relative z-10">
+          <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
+          <div
+            ref={level === 2 ? level2ContainerRef : null}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {companies.map((company, index) => (
+              <Card
+                key={`${level}-${index}`}
+                className={`p-6 border border-gray-200 bg-white shadow hover:shadow-lg transition-all ${
+                  level === 2 ? 'level2-card' : ''
+                }`}
+              >
+                <h4 className="text-base font-semibold text-gray-800">
+                  {company.nameAm}
+                </h4>
+                <p className="text-sm text-gray-500">{company.name}</p>
+              </Card>
+            ))}
+          </div>
+        </Card>
+      </div>
     );
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      <style>{`
+        @keyframes draw {
+          to { stroke-dashoffset: 0; }
+        }
+        .connector-path {
+          animation: draw 1s ease-in-out forwards;
+        }
+      `}</style>
+
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Organization Level</h2>
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
+            <Button className="bg-green-100 text-green-700 hover:bg-green-200">
               Add Hierarchy
             </Button>
           </DialogTrigger>
@@ -145,19 +208,43 @@ const AddHierarchy = () => {
       </div>
 
       {/* Level 1 */}
-      <Card className='w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4'>
-        <h2 className='text-lg font-semibold text-gray-700'>Level 1</h2>
-      <div className="flex justify-center">
-        <Card className="max-w-lg w-full p-6 shadow-md border border-gray-200 bg-white text-center">
-          <h3 className="text-2xl font-bold text-gray-800">ቢዲኤ</h3>
-          <p className="text-lg text-gray-600">BDA</p>
+      <div ref={level1Ref}>
+        <Card className="w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-700">Level 1</h2>
+          <div className="flex justify-center">
+            <Card className="max-w-lg w-full p-6 shadow-md border border-gray-200 bg-white text-center">
+              <h3 className="text-2xl font-bold text-gray-800">ቢዲኤ</h3>
+              <p className="text-lg text-gray-600">BDA</p>
+            </Card>
+          </div>
         </Card>
       </div>
-</Card>
-      {/* Render each level */}
-      {renderLevelSection('Level 2', level2Companies)}
-      {renderLevelSection('Level 3', level3Companies)}
-      {renderLevelSection('Level 4', level4Companies)}
+
+      {/* Connector SVG - Placed right after Level 1 */}
+      <svg
+        ref={connectorsRef}
+        className="absolute w-full h-[200px] top-[calc(100%-20px)] left-0 pointer-events-none z-0"
+        style={{ height: '200px' }}
+      >
+        {connectors.map((conn, index) => (
+          <path
+            key={index}
+            d={`M${conn.x1},${conn.y1} C${conn.x1},${conn.y1 + 50} ${conn.x2},${conn.y2 - 50} ${conn.x2},${conn.y2}`}
+            stroke="#6b7280"
+            strokeWidth="2"
+            fill="none"
+            strokeDasharray="1000"
+            strokeDashoffset="1000"
+            className="connector-path"
+            style={{ animationDelay: `${index * 0.2}s` }}
+          />
+        ))}
+      </svg>
+
+      {/* Level 2 and below */}
+      {renderLevelSection('Level 2', level2Companies, 2)}
+      {renderLevelSection('Level 3', level3Companies, 3)}
+      {renderLevelSection('Level 4', level4Companies, 4)}
     </div>
   );
 };
