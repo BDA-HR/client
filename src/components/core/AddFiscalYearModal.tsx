@@ -41,12 +41,7 @@ export const AddFiscalYearModal = ({
                 Fill in the details below to create a new fiscal year period.
               </DialogDescription>
             </div>
-            <button
-              onClick={() => onOpenChange(false)}
-              className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
-            >
-              <X size={24} />
-            </button>
+
           </div>
         </DialogHeader>
 
