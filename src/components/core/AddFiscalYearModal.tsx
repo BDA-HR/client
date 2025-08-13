@@ -1,6 +1,7 @@
 import { Plus, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import type { NewFiscalYear } from '../../types/fiscalYear';
+import React from 'react';
 
 export const AddFiscalYearModal = ({
   open,
@@ -15,6 +16,15 @@ export const AddFiscalYearModal = ({
   setNewYear: (year: NewFiscalYear) => void;
   onAddFiscalYear: () => void;
 }) => {
+  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s]*$/;
+
+  const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (amharicRegex.test(value)) {
+      setNewYear({ ...newYear, nameAm: value });
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAddFiscalYear();
@@ -39,12 +49,29 @@ export const AddFiscalYearModal = ({
             </button>
           </div>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="grid md:grid-cols-2 gap-6 mt-4">
+            {/* Amharic Name */}
+            <div>
+              <label htmlFor="yearNameAm" className="block text-sm font-medium text-gray-700 mb-1">
+                የበጀት አመት  <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="yearNameAm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="ምሳሌ፡ 2017 ዓ.ም"
+                value={newYear.nameAm || ''}
+                onChange={handleAmharicChange}
+                required
+              />
+            </div>
+
+            {/* English Name */}
             <div>
               <label htmlFor="yearName" className="block text-sm font-medium text-gray-700 mb-1">
-                Fiscal Year Name <span className="text-red-500">*</span>
+                Fiscal Year  <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -57,6 +84,7 @@ export const AddFiscalYearModal = ({
               />
             </div>
 
+            {/* Status */}
             <div>
               <label htmlFor="isActive" className="block text-sm font-medium text-gray-700 mb-1">
                 Status
@@ -65,13 +93,16 @@ export const AddFiscalYearModal = ({
                 id="isActive"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                 value={newYear.isActive}
-                onChange={(e) => setNewYear({ ...newYear, isActive: e.target.value as 'Yes' | 'No' })}
+                onChange={(e) =>
+                  setNewYear({ ...newYear, isActive: e.target.value as 'Yes' | 'No' })
+                }
               >
                 <option value="Yes">Active</option>
                 <option value="No">Inactive</option>
               </select>
             </div>
 
+            {/* Start Date */}
             <div>
               <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
                 Start Date <span className="text-red-500">*</span>
@@ -86,6 +117,7 @@ export const AddFiscalYearModal = ({
               />
             </div>
 
+            {/* End Date */}
             <div>
               <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
                 End Date <span className="text-red-500">*</span>
@@ -100,7 +132,8 @@ export const AddFiscalYearModal = ({
               />
             </div>
           </div>
-          
+
+          {/* Buttons */}
           <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
