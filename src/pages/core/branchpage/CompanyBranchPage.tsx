@@ -94,14 +94,14 @@ const CompanyBranchesPage = () => {
             <Button 
               variant="outline" 
               onClick={handleCompanyBackClick}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 cursor-pointer"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Companies
             </Button>
             <Button 
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700"
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Branch

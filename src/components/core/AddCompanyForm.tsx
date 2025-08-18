@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
-import { MapPin, MoreVertical } from 'lucide-react';
+import { MapPin, MoreVertical, Plus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -79,6 +79,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
     setViewingBranches(null);
   };
 
+
   if (viewingBranches) {
     const company = companies.find(c => c.id === viewingBranches.companyId);
     
@@ -133,7 +134,10 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
       </motion.h1>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
+            <Button  type="submit"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
+            >
+              <Plus size={18} />
               Add Company
             </Button>
           </DialogTrigger>
@@ -164,13 +168,15 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
               </div>
             </div>
             <div className="flex justify-end">
-              <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSubmit}>
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer" onClick={handleSubmit}
+              >
                 Save
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
+
 
       {/* Cards */}
       <motion.div
@@ -204,7 +210,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
 
               <div className="flex justify-between items-center">
                 <Button
-                  className="text-green-600 bg-green-50 hover:bg-green-100"
+                  className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 cursor-pointer"
                   size="sm"
                   onClick={() => handleViewBranches(company.id)}
                   disabled={!company.branches || company.branches.length === 0}
@@ -244,6 +250,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
         ))}
       </motion.div>
 
+
       {/* Edit Dialog */}
       {editCompany && (
         <Dialog open={true} onOpenChange={() => setEditCompany(null)}>
@@ -277,7 +284,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
               <div className="flex justify-end">
                 <Button
                   onClick={handleEditSave}
-                  className="bg-green-600 text-white hover:bg-green-700"
+                  className="bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
                 >
                   Save Changes
                 </Button>

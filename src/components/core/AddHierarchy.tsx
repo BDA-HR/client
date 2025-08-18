@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
+import { Plus } from 'lucide-react';
 
 interface Company {
   id: number;
@@ -151,9 +152,13 @@ const AddHierarchy = () => {
         <h2 className="text-xl font-semibold">Organization Level</h2>
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-green-100 text-green-700 hover:bg-green-200">
+            <Button  type="submit"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
+            >
+              <Plus size={18} />
               Add Hierarchy
             </Button>
+            
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -197,7 +202,7 @@ const AddHierarchy = () => {
               <div className="flex justify-end">
                 <Button
                   onClick={handleAddHierarchy}
-                  className="bg-green-600 text-white hover:bg-green-700"
+                  className="bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
                 >
                   Add
                 </Button>

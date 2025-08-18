@@ -133,13 +133,13 @@ export const AddFiscalYearModal = ({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
             >
               <Plus size={18} />
               Add Fiscal Year
