@@ -147,39 +147,39 @@ const AttendanceList = () => {
         </button>
       </div>
 
-      <div className="filters flex gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Date</label>
-          <input 
-            type="date" 
-            value={filters.date}
-            onChange={e => setFilters({ ...filters, date: e.target.value })}
-            className="w-full border p-2 rounded-md"
-          />
-        </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
-          <select
-            value={filters.status}
-            onChange={e => setFilters({ ...filters, status: e.target.value })}
-            className="w-full border p-2 rounded-md"
-          >
-            <option value="">All Statuses</option>
-            <option value="Present">Present</option>
-            <option value="Late">Late Arrivals</option>
-            <option value="Absent">Absences</option>
-            <option value="Early Departure">Early Departures</option>
-          </select>
-        </div>
-        <div className="flex items-end">
-          <button
-            onClick={() => setFilters({ date: '', status: '' })}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-          >
-            Clear Filters
-          </button>
-        </div>
-      </div>
+      <div className="filters flex flex-col md:flex-row justify-between gap-4 mb-6 p-4 bg-gray-50 rounded-lg shadow-sm">
+  <div className="flex-1 min-w-[200px]">
+    <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Date</label>
+    <input 
+      type="date" 
+      value={filters.date}
+      onChange={e => setFilters({ ...filters, date: e.target.value })}
+      className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+    />
+  </div>
+    <div className="flex-1 min-w-[200px]">
+    <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+    <select
+      value={filters.status}
+      onChange={e => setFilters({ ...filters, status: e.target.value })}
+      className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition cursor-pointer"
+    >
+      <option value="">All Statuses</option>
+      <option value="Present">Present</option>
+      <option value="Late">Late Arrivals</option>
+      <option value="Absent">Absences</option>
+      <option value="Early Departure">Early Departures</option>
+    </select>
+  </div>
+  <div className="flex items-end">
+    <button
+      onClick={() => setFilters({ date: '', status: '' })}
+      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+    >
+      Clear Filters
+    </button>
+  </div>
+</div>
 
       <div className="overflow-x-auto">
         <table className="w-full table-auto border-collapse">
@@ -226,7 +226,7 @@ const AttendanceList = () => {
         <div className="mt-4 text-center text-sm text-gray-500">
           Showing 5 of {filteredRecords.length} records. 
           <button 
-            className="ml-2 text-blue-600 hover:underline"
+            className="ml-2 text-green-600 hover:underline"
             onClick={() => setShowFullHistory(true)}
           >
             Show all

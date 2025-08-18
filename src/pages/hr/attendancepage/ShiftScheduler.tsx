@@ -145,7 +145,7 @@ const ShiftScheduler = () => {
                 placeholder="John Doe"
                 value={newShift.employeeName}
                 onChange={e => setNewShift({ ...newShift, employeeName: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
             
@@ -158,7 +158,7 @@ const ShiftScheduler = () => {
                   type="datetime-local"
                   value={newShift.start}
                   onChange={e => setNewShift({ ...newShift, start: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
               
@@ -170,7 +170,7 @@ const ShiftScheduler = () => {
                   type="datetime-local"
                   value={newShift.end}
                   onChange={e => setNewShift({ ...newShift, end: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -195,14 +195,14 @@ const ShiftScheduler = () => {
             <div className="flex gap-3 pt-2">
               <button
                 onClick={handleAddShift}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 cursor-pointer"
               >
                 Add Shift
               </button>
               
               <button
                 onClick={resetForm}
-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-200"
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-200 cursor-pointer"
               >
                 Clear
               </button>

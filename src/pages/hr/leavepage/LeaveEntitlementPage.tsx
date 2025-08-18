@@ -114,7 +114,7 @@ const LeaveEntitlementPage = () => {
                 <TableRow key={entitlement.id} className="hover:bg-gray-50">
                   <TableCell className="py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center h-9 w-9 rounded-full bg-blue-100 text-blue-800 font-medium">
+                      <div className="flex items-center justify-center h-9 w-9 rounded-full bg-green-100 text-green-800 font-medium">
                         {getInitials(entitlement.employee.name)}
                       </div>
                       <div>
@@ -131,14 +131,14 @@ const LeaveEntitlementPage = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="py-3 px-4">
-                    <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm inline-block">
+                    <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm inline-block">
                       {entitlement.leaveType}
                     </div>
                   </TableCell>
                   <TableCell className="py-3 px-4">{entitlement.totalDays}</TableCell>
                   <TableCell className="py-3 px-4">{entitlement.usedDays}</TableCell>
                   <TableCell className="py-3 px-4">
-                    <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm inline-block">
+                    <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm inline-block">
                       {entitlement.remainingDays} days
                     </div>
                   </TableCell>

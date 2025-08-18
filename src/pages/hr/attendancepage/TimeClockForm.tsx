@@ -65,9 +65,9 @@ const TimeClockForm: React.FC<TimeClockFormProps> = ({
               key={day}
               type="button"
               onClick={() => setSelectedDay(day)}
-              className={`px-4 py-2 rounded-md text-sm font-medium ${
+              className={`px-4 py-2 rounded-md text-sm cursor-pointer font-medium ${
                 selectedDay === day
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-green-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -141,14 +141,14 @@ const TimeClockForm: React.FC<TimeClockFormProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="px-5 py-2.5 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+          className="px-5 py-2.5 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors cursor-pointer"
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={handleSave}
-          className="px-5 py-2.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          className="px-5 py-2.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors cursor-pointer"
         >
           Save Schedule
         </button>

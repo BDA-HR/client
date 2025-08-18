@@ -319,13 +319,14 @@ const RecruitmentList = () => {
                             <Button 
                               size="sm" 
                               onClick={() => handleApprove(req.id)}
-                              className="bg-green-600 hover:bg-green-700"
+                              className="bg-green-600 hover:bg-green-700 cursor-pointer"
                             >
                               Approve
                             </Button>
                             <Button 
                               variant="destructive" 
                               size="sm" 
+                              className='cursor-pointer'
                               onClick={() => handleReject(req.id)}
                             >
                               Reject

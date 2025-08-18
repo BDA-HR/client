@@ -110,13 +110,13 @@ const CandidateTable = ({
               value={filters.position}
               onValueChange={value => handleFilterChange('position', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className='cursor-pointer'>
                 <SelectValue placeholder="All Positions" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Positions</SelectItem>
                 {positions.map(pos => (
-                  <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                  <SelectItem className='cursor-pointer' key={pos} value={pos}>{pos}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -128,13 +128,13 @@ const CandidateTable = ({
               value={filters.department}
               onValueChange={value => handleFilterChange('department', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className='cursor-pointer'>
                 <SelectValue placeholder="All Departments" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Departments</SelectItem>
                 {departments.map(dept => (
-                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                  <SelectItem  className='cursor-pointer' key={dept} value={dept}>{dept}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -146,13 +146,13 @@ const CandidateTable = ({
               value={filters.stage}
               onValueChange={value => handleFilterChange('stage', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className='cursor-pointer'>
                 <SelectValue placeholder="All Stages" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Stages</SelectItem>
                 {stageOptions.map(stage => (
-                  <SelectItem key={stage} value={stage}>{stage}</SelectItem>
+                  <SelectItem className='cursor-pointer' key={stage} value={stage}>{stage}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -164,13 +164,13 @@ const CandidateTable = ({
               value={filters.status}
               onValueChange={value => handleFilterChange('status', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className='cursor-pointer'>
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 {statusOptions.map(status => (
-                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                  <SelectItem className='cursor-pointer' key={status} value={status}>{status}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -200,12 +200,12 @@ const CandidateTable = ({
                     value={candidate.stage}
                     onValueChange={(value) => onStageChange(candidate.id, value)}
                   >
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[150px] cursor-pointer">
                       <SelectValue placeholder="Select stage" />
                     </SelectTrigger>
                     <SelectContent>
                       {stageOptions.map(option => (
-                        <SelectItem key={option} value={option}>
+                        <SelectItem  className='cursor-pointer' key={option} value={option}>
                           <Badge className={getStageColorClass(option)}>
                             {option}
                           </Badge>
@@ -219,12 +219,12 @@ const CandidateTable = ({
                     value={candidate.status}
                     onValueChange={(value) => onStatusChange(candidate.id, value)}
                   >
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[150px] cursor-pointer">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
                       {statusOptions.map(option => (
-                        <SelectItem key={option} value={option}>
+                        <SelectItem key={option} value={option}  className='cursor-pointer'>
                           <Badge className={getStatusColorClass(option)}>
                             {option}
                           </Badge>
@@ -239,6 +239,7 @@ const CandidateTable = ({
                     variant="outline" 
                     size="sm"
                     onClick={() => onViewDetails(candidate)}
+                     className='cursor-pointer'
                   >
                     View Details
                   </Button>
@@ -252,7 +253,7 @@ const CandidateTable = ({
           <Button 
             variant="outline" 
             onClick={onToggleHistory}
-            className="flex items-center"
+            className="flex items-center cursor-pointer"
           >
             <History className="w-4 h-4 mr-2" />
             {showFullHistory ? 'Hide Full History' : 'View Full History'}

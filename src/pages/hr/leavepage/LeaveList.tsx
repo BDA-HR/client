@@ -128,7 +128,7 @@ const LeaveList = () => {
                 {request.status === 'pending' && (
                   <div className="flex justify-end space-x-2">
                     <Button 
-                      className="bg-green-500 hover:bg-green-600 text-white"
+                      className="bg-green-500 hover:bg-green-600 text-white cursor-pointer"
                       size="sm"
                       onClick={() => handleApprove(request.id)}
                     >
@@ -137,7 +137,7 @@ const LeaveList = () => {
                     
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button className="bg-red-500 hover:bg-red-600 text-white" size="sm">Reject</Button>
+                        <Button className="bg-red-500 hover:bg-red-600 text-white cursor-pointer" size="sm">Reject</Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>

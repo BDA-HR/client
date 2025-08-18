@@ -51,15 +51,15 @@ const LeaveRequestForm = ({ onSuccess }: LeaveRequestFormProps) => {
         <div>
           <label className="block text-sm font-medium mb-2">Leave Type</label>
           <Select onValueChange={handleSelectChange} value={formData.leaveType}>
-            <SelectTrigger>
+            <SelectTrigger className='cursor-pointer'>
               <SelectValue placeholder="Select leave type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="annual">Annual Leave</SelectItem>
-              <SelectItem value="sick">Sick Leave</SelectItem>
-              <SelectItem value="maternity">Maternity Leave</SelectItem>
-              <SelectItem value="paternity">Paternity Leave</SelectItem>
-              <SelectItem value="unpaid">Unpaid Leave</SelectItem>
+              <SelectItem className='cursor-pointer' value="annual">Annual Leave</SelectItem>
+              <SelectItem className='cursor-pointer' value="sick">Sick Leave</SelectItem>
+              <SelectItem className='cursor-pointer' value="maternity">Maternity Leave</SelectItem>
+              <SelectItem className='cursor-pointer' value="paternity">Paternity Leave</SelectItem>
+              <SelectItem className='cursor-pointer' value="unpaid">Unpaid Leave</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -76,6 +76,7 @@ const LeaveRequestForm = ({ onSuccess }: LeaveRequestFormProps) => {
                 onChange={handleChange}
                 min={new Date().toISOString().split('T')[0]}
                 required
+                className='focus:outline-none focus:border-green-500 focus:outline-2 border'
               />
             </div>
             <div className="flex-1">
@@ -87,6 +88,7 @@ const LeaveRequestForm = ({ onSuccess }: LeaveRequestFormProps) => {
                 onChange={handleChange}
                 min={formData.startDate || new Date().toISOString().split('T')[0]}
                 required
+                className="focus:outline-none focus:border-green-500 focus:outline-2 border"
               />
             </div>
           </div>
@@ -99,14 +101,14 @@ const LeaveRequestForm = ({ onSuccess }: LeaveRequestFormProps) => {
             value={formData.reason}
             onChange={handleChange}
             placeholder="Explain the reason for your leave"
-            className="resize-none min-h-[100px]"
+            className="resize-none min-h-[100px] focus:outline-none focus:border-green-500 focus:outline-2 border"
             required
           />
         </div>
 
         <Button 
           type="submit" 
-          className="w-full"
+          className="w-full bg-green-600 hover:bg-green-700 cursor-pointer"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Submitting..." : "Submit Request"}

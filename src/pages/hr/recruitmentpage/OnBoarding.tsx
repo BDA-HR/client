@@ -221,7 +221,7 @@ const Onboarding = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div>
+                  <div className='space-y-1'>
                     <Label htmlFor="trainingProgram">Training Program</Label>
                     <Input
                       id="trainingProgram"
@@ -230,7 +230,7 @@ const Onboarding = () => {
                       placeholder="Enter training program"
                     />
                   </div>
-                  <div>
+                  <div className='space-y-1'>
                     <Label htmlFor="startDate">Start Date</Label>
                     <Input
                       id="startDate"
@@ -239,7 +239,7 @@ const Onboarding = () => {
                       onChange={(e) => setStartDate(e.target.value)}
                     />
                   </div>
-                  <div>
+                  <div className='space-y-1'>
                     <Label htmlFor="trainer">Trainer</Label>
                     <Input
                       id="trainer"
@@ -248,7 +248,7 @@ const Onboarding = () => {
                       placeholder="Assign trainer"
                     />
                   </div>
-                  <Button className="mt-4 bg-green-600 hover:bg-green-700 text-white">
+                  <Button className="mt-4 bg-green-600 hover:bg-green-700 text-white cursor-pointer">
                     Schedule Training
                   </Button>
                 </div>
