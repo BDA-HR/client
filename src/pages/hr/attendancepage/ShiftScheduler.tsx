@@ -115,7 +115,7 @@ const ShiftScheduler = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Shift Scheduler</h1>
+      <h1 className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent text-2xl md:text-3xl font-bold text-center mb-6">Shift <span className='text-gray-900'>Scheduler</span></h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form Section */}
@@ -195,7 +195,7 @@ const ShiftScheduler = () => {
             <div className="flex gap-3 pt-2">
               <button
                 onClick={handleAddShift}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
               >
                 Add Shift
               </button>

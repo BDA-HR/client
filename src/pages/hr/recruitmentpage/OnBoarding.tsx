@@ -78,11 +78,11 @@ const Onboarding = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
+
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div>
-              <h1 className="text-green-700 text-2xl md:text-3xl font-bold">Employee Onboarding</h1>
+              <h1 className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent text-2xl md:text-3xl font-bold mt-6">Employee <span className='text-gray-900 ml-1.5'>Onboarding</span></h1>
               <p className="text-sm text-gray-500 mt-1">
                 Streamlining the onboarding process for {employee.name}
               </p>
@@ -100,7 +100,7 @@ const Onboarding = () => {
           
           {/* Employee Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card className="bg-gray-50">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <User className="w-5 h-5" />
@@ -266,7 +266,6 @@ const Onboarding = () => {
             </CardContent>
           </Card>
         </CardContent>
-      </Card>
     </div>
   );
 };

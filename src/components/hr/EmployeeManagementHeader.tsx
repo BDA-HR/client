@@ -11,7 +11,7 @@ const EmployeeManagementHeader = () => {
         animate={{ opacity: 1, x: 0 }}
         className="text-2xl md:text-3xl font-bold text-gray-900"
       >
-        Employee <span className="text-green-600">Management</span>
+         <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Employee</span> Management
       </motion.h1>
       <motion.p 
         initial={{ opacity: 0 }}

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import CandidateMetrics from "../../../components/hr/CandidateMetrics";
 import CandidateDetail from "../../../components/hr/CandidateDetail";
 import CandidateStageChart from "../../../components/hr/CandidateStageChart";
@@ -301,9 +301,9 @@ const CandidatePipeline = () => {
   }
 
   return (
-    <Card>
+    <div className='space-y-6'>
       <CardHeader>
-        <CardTitle className="text-green-700 text-2xl md:text-3xl font-bold">Candidate Pipeline</CardTitle>
+        <CardTitle className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent text-2xl md:text-3xl font-bold mt-6">Candidate <span className='text-gray-900'>Pipeline</span> </CardTitle>
       </CardHeader>
       <CardContent className="space-y-8">
         <CandidateMetrics metrics={metrics} />
@@ -324,7 +324,7 @@ const CandidatePipeline = () => {
           statusOptions={statusOptions}
         />
       </CardContent>
-    </Card>
+    </div>
   );
 };
 

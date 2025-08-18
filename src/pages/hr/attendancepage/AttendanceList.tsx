@@ -136,12 +136,12 @@ const AttendanceList = () => {
   };
 
   return (
-    <div className="attendance-list p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md">
+    <div className='p-4 md:p-6 bg-gray-50 min-h-screen'>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Attendance Records</h2>
+        <h2 className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent text-2xl md:text-3xl font-bold">Attendance <span className='text-gray-900'>list</span></h2>
         <button
           onClick={() => setShowFullHistory(!showFullHistory)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
         >
           {showFullHistory ? 'Show Recent Only' : 'View Full History'}
         </button>
