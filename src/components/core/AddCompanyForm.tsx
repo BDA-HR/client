@@ -49,7 +49,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
       id,
       name: newCompany.name,
       nameAm: newCompany.nameAm,
-      branches: [] // Initialize with empty branches
+      branches: []
     };
     setCompanies((prev) => [...prev, entry]);
     setNewCompany({ name: '', nameAm: '' });
@@ -125,8 +125,13 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Companies</h2>
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      <motion.h1 
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
+      >Companies
+      </motion.h1>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogTrigger asChild>
             <Button className="bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
               Add Company

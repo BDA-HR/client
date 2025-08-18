@@ -25,8 +25,6 @@ const AddDepartmentForm = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-800">Add New Department</h2>
-
       <div className="grid grid-cols-2 gap-4 py-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="nameAm">የዲፓርትመንት ስም</Label>
