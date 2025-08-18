@@ -45,7 +45,7 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
       <Filter className="h-4 w-4 text-gray-500" />
 
       <select
-        className="text-sm border rounded-md px-3 py-1 bg-white"
+        className="text-sm border rounded-md px-3 py-1 bg-white cursor-pointer"
         value={filters.category}
         onChange={(e) => setFilters({ ...filters, category: e.target.value })}
       >
@@ -58,7 +58,7 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
       <Button 
         variant="ghost" 
         size="sm" 
-        className="text-green-600 hover:bg-green-50"
+        className="text-green-600 hover:bg-green-50 cursor-pointer"
         onClick={() => setFilters({ department: '', category: '', skillLevel: '' })}
       >
         Clear Filter

@@ -173,7 +173,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="firstName" 
                           value={formData.firstName} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                          className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                       </div>
@@ -183,7 +183,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="middleName" 
                           value={formData.middleName} 
                           onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                          className="w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 border-gray-300 rounded-md" 
                         />
                       </div>
                       <div>
@@ -192,7 +192,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="lastName" 
                           value={formData.lastName} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                       </div>
@@ -206,7 +206,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="email" 
                           value={formData.email} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                       </div>
@@ -216,7 +216,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           country={'us'}
                           value={formData.phone}
                           onChange={handlePhoneChange}
-                          inputClass={`w-full px-3 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          inputClass={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                           containerClass={`${errors.phone ? 'border-red-500' : ''}`}
                         />
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -230,7 +230,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                         name="dateOfBirth" 
                         value={formData.dateOfBirth} 
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                        className="w-full px-3 focus:outline-none focus:border-green-500 focus:outline-2 py-2 border border-gray-300 rounded-md" 
                       />
                     </div>
                   </motion.div>
@@ -247,7 +247,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
           value={formData.firstName} 
           onChange={handleChange}
           lang="am"
-          className={`w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
+          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
         />
         {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
       </div>
@@ -259,7 +259,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
           onChange={handleChange}
           lang="am"
           required
-          className={`w-full px-3 py-2 border ${errors.middleName ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
+          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.middleName ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
         />
         {errors.middleName && <p className="text-red-500 text-xs mt-1">{errors.middleName}</p>}
       </div>
@@ -270,7 +270,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
           value={formData.lastName} 
           onChange={handleChange}
           lang="am"
-          className={`w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
+          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
         />
         {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
       </div>
@@ -285,7 +285,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
           value={formData.email} 
           onChange={handleChange}
           lang="am"
-          className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
+          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md font-ethiopic`} 
         />
         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
       </div>
@@ -298,7 +298,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
           inputProps={{
             lang: 'am',
           }}
-          inputClass={`w-full px-3 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md font-['Noto_Sans_Ethiopic','sans-serif']`}
+          inputClass={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md font-['Noto_Sans_Ethiopic','sans-serif']`}
           containerClass={`${errors.phone ? 'border-red-500' : ''}`}
         />
         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -318,7 +318,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="employeeId" 
                           value={formData.employeeId} 
                           onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                          className="w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border border-gray-300 rounded-md" 
                         />
                       </div>
                       <div>
@@ -327,7 +327,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="jobTitle" 
                           value={formData.jobTitle} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.jobTitle ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.jobTitle ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.jobTitle && <p className="text-red-500 text-xs mt-1">{errors.jobTitle}</p>}
                       </div>
@@ -340,7 +340,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="department"
                           value={formData.department}
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.department ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                          className={`w-full px-3 py-2 cursor-pointer focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.department ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                         >
                           <option value="">Select Department</option>
                           {departments.map(dept => (
@@ -355,7 +355,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="jobGrade"
                           value={formData.jobGrade}
                           onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          className="w-full px-3 py-2 cursor-pointer focus:outline-none focus:border-green-500 focus:outline-2 border border-gray-300 rounded-md"
                         >
                           <option value="">Select Job Grade</option>
                           {jobGrades.map(grade => (
@@ -373,7 +373,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="joiningDate" 
                           value={formData.joiningDate} 
                           onChange={handleChange}
-                          className={`w-full px-3 py-2 border ${errors.joiningDate ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
+                          className={`w-full px-3 py-2 focus:outline-none focus:border-green-500 focus:outline-2 border ${errors.joiningDate ? 'border-red-500' : 'border-gray-300'} rounded-md`} 
                         />
                         {errors.joiningDate && <p className="text-red-500 text-xs mt-1">{errors.joiningDate}</p>}
                       </div>
@@ -383,7 +383,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                           name="employmentStatus"
                           value={formData.employmentStatus}
                           onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          className="w-full px-3 py-2 cursor-pointer focus:outline-none focus:border-green-500 focus:outline-2 border border-gray-300 rounded-md"
                         >
                           {employmentStatuses.map(status => (
                             <option key={status} value={status}>{status}</option>
@@ -421,7 +421,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                       type="button"
                       variant="outline"
                       onClick={prevStep}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 cursor-pointer"
                     >
                       <ChevronLeft className="h-4 w-4" />
                       Previous
@@ -433,7 +433,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                     <Button
                       type="button"
                       onClick={nextStep}
-                      className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+                      className="flex items-center gap-1 bg-green-600 hover:bg-green-700 cursor-pointer"
                     >
                       Next
                       <ChevronRight className="h-4 w-4" />
@@ -442,7 +442,7 @@ const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
                     <Button 
                       type="button" 
                       onClick={handleSubmit}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-green-600 hover:bg-green-700 cursor-pointer"
                     >
                       Add Employee
                     </Button>

@@ -343,7 +343,7 @@ const handleViewDetails = (employee: Employee) => {
                           whileTap={{ scale: 0.9 }}
                           className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
                         >
-                          <MoreVertical className="h-5 w-5" />
+                          <MoreVertical className="h-5 w-5 cursor-pointer" />
                         </motion.button>
                       </PopoverTrigger>
                       <PopoverContent className="w-48 p-0" align="end">
@@ -395,7 +395,7 @@ const handleViewDetails = (employee: Employee) => {
             <button
               onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
             >
               Next
             </button>
@@ -413,7 +413,7 @@ const handleViewDetails = (employee: Employee) => {
                 <button
                   onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer"
                 >
                   <span className="sr-only">Previous</span>
                   <ChevronLeft size={16} />
@@ -434,7 +434,7 @@ const handleViewDetails = (employee: Employee) => {
                 <button
                   onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer"
                 >
                   <span className="sr-only">Next</span>
                   <ChevronRight size={16} />

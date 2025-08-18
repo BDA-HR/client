@@ -119,7 +119,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                       name="grade"
                       value={formData.grade}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded"
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:border-green-500 focus:outline-2"
                       placeholder="G1-L1"
                       required
                     />
@@ -130,7 +130,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded"
+                      className="w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded"
                       placeholder="Junior Engineer"
                       required
                     />
@@ -144,7 +144,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                     name="skill"
                     value={formData.skill}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded"
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:border-green-500 focus:outline-2"
                     required
                   >
                     <option value="">Select Skill</option>
@@ -165,7 +165,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                       onFocus={() => setIsRoleInputFocused(true)}
                       onBlur={() => setTimeout(() => setIsRoleInputFocused(false), 200)}
                       onChange={(e) => setCurrentRole(e.target.value)}
-                      className="w-full px-3 py-2 border rounded"
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:border-green-500 focus:outline-2"
                       placeholder="Add a role"
                     />
                     {isRoleInputFocused && currentRole && (
@@ -208,7 +208,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                         name={`salary.${k}`}
                         value={formData.salary[k]}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border rounded"
+                        className="w-full px-3 py-2 border rounded focus:outline-none focus:border-green-500 focus:outline-2"
                         placeholder={`e.g. ${k === 'min' ? '50K' : k === 'max' ? '60K' : '70K'}`}
                         required
                       />
@@ -227,7 +227,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                         descriptions: [{ id: 1, text: e.target.value }],
                       }))
                     }
-                    className="w-full px-3 py-2 border rounded"
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:border-green-500 focus:outline-2"
                     placeholder="Job description..."
                     required
                   />
@@ -238,11 +238,11 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50"
+                    className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50 cursor-pointer"
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                  <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer">
                     Add Job Grade
                   </button>
                 </div>

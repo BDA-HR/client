@@ -48,7 +48,7 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
+          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
           onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
         >
           {viewMode === 'grid' ? (
@@ -66,13 +66,13 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
+          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
         >
           Export Data
         </Button>
          <Button
           size="sm"
-          className="bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm"
+          className="bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm cursor-pointer"
           onClick={onAddClick}
         >
           Add New Grade

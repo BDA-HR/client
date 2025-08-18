@@ -44,7 +44,7 @@ const EmployeeSearchFilters: React.FC<EmployeeSearchFiltersProps> = ({
           <div className="flex items-center gap-3">
             <Button
               size="sm"
-              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm"
+              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white cursor-pointer hover:from-green-600 hover:to-emerald-600 shadow-sm"
               onClick={() => setIsModalOpen(true)}
             >
               Add New Employee
@@ -71,7 +71,7 @@ const EmployeeSearchFilters: React.FC<EmployeeSearchFiltersProps> = ({
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-gray-500" />
               <select
-                className="text-sm border rounded-md px-3 py-2 bg-white"
+                className="text-sm border rounded-md px-3 py-2 bg-white cursor-pointer"
                 value={filters.department}
                 onChange={(e) => setFilters({...filters, department: e.target.value})}
               >
@@ -83,7 +83,7 @@ const EmployeeSearchFilters: React.FC<EmployeeSearchFiltersProps> = ({
             </div>
             
             <select
-              className="text-sm border rounded-md px-3 py-2 bg-white"
+              className="text-sm border rounded-md px-3 py-2 bg-white cursor-pointer"
               value={filters.status}
               onChange={(e) => setFilters({...filters, status: e.target.value})}
             >
@@ -96,7 +96,7 @@ const EmployeeSearchFilters: React.FC<EmployeeSearchFiltersProps> = ({
             </select>
             
             <select
-              className="text-sm border rounded-md px-3 py-2 bg-white"
+              className="text-sm border rounded-md px-3 py-2 bg-white cursor-pointer"
               value={filters.contractType}
               onChange={(e) => setFilters({...filters, contractType: e.target.value})}
             >
@@ -109,7 +109,7 @@ const EmployeeSearchFilters: React.FC<EmployeeSearchFiltersProps> = ({
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-green-600 hover:bg-green-50"
+              className="text-green-600 hover:bg-green-50 cursor-pointer"
               onClick={() => setFilters({ 
                 department: '', 
                 status: '', 

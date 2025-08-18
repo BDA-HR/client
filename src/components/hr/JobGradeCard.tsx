@@ -51,7 +51,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-green-600 hover:bg-green-50"
+                className="text-green-600 hover:bg-green-50 cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleExpand();
@@ -122,7 +122,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-green-600 hover:bg-green-50"
+              className="text-green-600 hover:bg-green-50 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleExpand();
