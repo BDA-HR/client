@@ -145,24 +145,26 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({ onClick }) => {
             <DialogHeader>
               <DialogTitle>Add New Company</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="grid grid-row-2 gap-4 py-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="nameAm">የኩባንያው ስም</Label>
-                <Input
+                <input
                   id="nameAm"
                   value={newCompany.nameAm}
                   onChange={handleAmharicChange}
                   placeholder="ምሳሌ፡ አክሜ ኢንት"
+                  className={`w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md`} 
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="name">Company Name</Label>
-                <Input
+                <input
                   id="name"
                   value={newCompany.name}
                   onChange={(e) =>
                     setNewCompany((prev) => ({ ...prev, name: e.target.value }))
                   }
+                  className={`w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md`} 
                   placeholder="Eg. Acme int"
                 />
               </div>

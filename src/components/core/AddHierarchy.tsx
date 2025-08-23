@@ -171,7 +171,7 @@ const AddHierarchy = () => {
                   value={selectedCompanyId}
                   onValueChange={setSelectedCompanyId}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="h-12 text-base px-4 w-full">
                     <SelectValue placeholder="Choose company..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -189,7 +189,7 @@ const AddHierarchy = () => {
                   value={selectedLevel}
                   onValueChange={setSelectedLevel}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="h-12 text-base px-4 w-full">
                     <SelectValue placeholder="Choose level..." />
                   </SelectTrigger>
                   <SelectContent>

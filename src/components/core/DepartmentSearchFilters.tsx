@@ -120,7 +120,7 @@ const DepartmentSearchFilters = ({
                 Add Department
               </motion.button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[625px]">
+            <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Add New Department</DialogTitle>
               </DialogHeader>
