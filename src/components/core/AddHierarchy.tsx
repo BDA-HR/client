@@ -16,12 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface Company {
   id: number;
   name: string;
   nameAm: string;
+  parentId?: number;
 }
 
 interface Connector {
@@ -33,47 +34,45 @@ interface Connector {
 
 const AddHierarchy = () => {
   const allCompanies: Company[] = [
-    { id: 1, name: 'Rohobot Tech', nameAm: 'ሮሆቦት ቴክ' },
-    { id: 2, name: 'EthioDev', nameAm: 'ኢትዮዴቭ' },
-    { id: 3, name: 'Rohobot Group', nameAm: 'ሮሆቦት ግሩፕ' },
+    { id: 1, name: 'Rohobot Tech', nameAm: 'ሮሆቦት ቴክ', parentId: 0 },
+    { id: 2, name: 'EthioDev', nameAm: 'ኢትዮዴቭ', parentId: 0 },
+    { id: 3, name: 'Rohobot Group', nameAm: 'ሮሆቦት ግሩፕ', parentId: 1},
   ];
 
-  const [level2Companies, setLevel2Companies] = useState<Company[]>(allCompanies);
-  const [level3Companies, setLevel3Companies] = useState<Company[]>([]);
-  const [level4Companies, setLevel4Companies] = useState<Company[]>([]);
+  const [parentCompanies, setParentCompanies] = useState<Company[]>(allCompanies);
+  const [childCompanies, setChildCompanies] = useState<Company[]>(allCompanies.filter(c => c.parentId === 0));
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
-  const [selectedLevel, setSelectedLevel] = useState<string>('Level 2');
+  const [selectedParentId, setSelectedParentId] = useState<string>('');
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [connectors, setConnectors] = useState<Connector[]>([]);
 
-  const level1Ref = useRef<HTMLDivElement>(null);
-  const level2ContainerRef = useRef<HTMLDivElement>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const childContainerRef = useRef<HTMLDivElement>(null);
   const connectorsRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     const updateConnectors = () => {
-      if (!level1Ref.current || !level2ContainerRef.current || !connectorsRef.current) return;
+      if (!parentRef.current || !childContainerRef.current || !connectorsRef.current) return;
 
-      const level1Rect = level1Ref.current.getBoundingClientRect();
-      const containerRect = level2ContainerRef.current.getBoundingClientRect();
+      const parentRect = parentRef.current.getBoundingClientRect();
       const svgRect = connectorsRef.current.getBoundingClientRect();
 
-      const level1CenterX = level1Rect.left + level1Rect.width / 2 - svgRect.left;
-      const level1BottomY = level1Rect.bottom - svgRect.top;
+      const parentCenterX = parentRect.left + parentRect.width / 2 - svgRect.left;
+      const parentBottomY = parentRect.bottom - svgRect.top;
 
       const newConnectors: Connector[] = [];
-      const level2Cards = level2ContainerRef.current.querySelectorAll('.level2-card');
+      const childRows = childContainerRef.current.querySelectorAll('.child-row');
 
-      level2Cards.forEach((card) => {
-        const cardRect = card.getBoundingClientRect();
-        const cardCenterX = cardRect.left + cardRect.width / 2 - svgRect.left;
-        const cardTopY = cardRect.top - svgRect.top;
+      childRows.forEach((row) => {
+        const rowRect = row.getBoundingClientRect();
+        const rowCenterX = rowRect.left + rowRect.width / 2 - svgRect.left;
+        const rowTopY = rowRect.top - svgRect.top;
 
         newConnectors.push({
-          x1: level1CenterX,
-          y1: level1BottomY,
-          x2: cardCenterX,
-          y2: cardTopY,
+          x1: parentCenterX,
+          y1: parentBottomY,
+          x2: rowCenterX,
+          y2: rowTopY,
         });
       });
 
@@ -83,57 +82,34 @@ const AddHierarchy = () => {
     updateConnectors();
     window.addEventListener('resize', updateConnectors);
     return () => window.removeEventListener('resize', updateConnectors);
-  }, [level2Companies]);
+  }, [childCompanies]);
 
   const handleAddHierarchy = () => {
     const company = allCompanies.find((c) => c.id.toString() === selectedCompanyId);
-    if (!company) return;
-
-    if (selectedLevel === 'Level 2') {
-      setLevel2Companies((prev) => [...prev, company]);
-    } else if (selectedLevel === 'Level 3') {
-      setLevel3Companies((prev) => [...prev, company]);
-    } else if (selectedLevel === 'Level 4') {
-      setLevel4Companies((prev) => [...prev, company]);
-    }
-
+    const parentCompany = allCompanies.find((c) => c.id.toString() === selectedParentId);
+    
+    if (!company || !parentCompany) return;
+    const updatedCompany = { ...company, parentId: parentCompany.id };    
+    setChildCompanies((prev) => [...prev, updatedCompany]);
     setSelectedCompanyId('');
-    setSelectedLevel('Level 2');
+    setSelectedParentId('');
     setOpenDialog(false);
   };
 
-  const renderLevelSection = (
-    title: string,
-    companies: Company[],
-    level: number
-  ) => {
-    if (companies.length === 0) return null;
+  const handleRemoveCompany = (id: number) => {
+    setChildCompanies(prev => prev.filter(company => company.id !== id));
+  };
 
-    return (
-      <div className="relative">
-        <Card className="w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4 relative z-10">
-          <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
-          <div
-            ref={level === 2 ? level2ContainerRef : null}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {companies.map((company, index) => (
-              <Card
-                key={`${level}-${index}`}
-                className={`p-6 border border-gray-200 bg-white shadow hover:shadow-lg transition-all ${
-                  level === 2 ? 'level2-card' : ''
-                }`}
-              >
-                <h4 className="text-base font-semibold text-gray-800">
-                  {company.nameAm}
-                </h4>
-                <p className="text-sm text-gray-500">{company.name}</p>
-              </Card>
-            ))}
-          </div>
-        </Card>
-      </div>
-    );
+  const getParentName = (parentId: number) => {
+    if (parentId === 0) return 'BDA';
+    const parent = allCompanies.find(c => c.id === parentId);
+    return parent ? parent.name : 'Unknown';
+  };
+
+  const getParentNameAm = (parentId: number) => {
+    if (parentId === 0) return 'ቢዲኤ';
+    const parent = allCompanies.find(c => c.id === parentId);
+    return parent ? parent.nameAm : 'Unknown';
   };
 
   return (
@@ -149,16 +125,15 @@ const AddHierarchy = () => {
 
       {/* Top Bar */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Organization Level</h2>
+        <h2 className="text-xl font-semibold">Organization Hierarchy</h2>
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogTrigger asChild>
-            <Button  type="submit"
+            <Button
               className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
             >
               <Plus size={18} />
               Add Hierarchy
             </Button>
-            
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -184,18 +159,21 @@ const AddHierarchy = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Select Level</Label>
+                <Label>Select Parent Company</Label>
                 <Select
-                  value={selectedLevel}
-                  onValueChange={setSelectedLevel}
+                  value={selectedParentId}
+                  onValueChange={setSelectedParentId}
                 >
                   <SelectTrigger className="h-12 text-base px-4 w-full">
-                    <SelectValue placeholder="Choose level..." />
+                    <SelectValue placeholder="Choose parent company..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Level 2">Level 2</SelectItem>
-                    <SelectItem value="Level 3">Level 3</SelectItem>
-                    <SelectItem value="Level 4">Level 4</SelectItem>
+                    <SelectItem value="0">BDA (ቢዲኤ)</SelectItem>
+                    {allCompanies.map((c) => (
+                      <SelectItem key={c.id} value={c.id.toString()}>
+                        {c.nameAm} ({c.name})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -212,10 +190,10 @@ const AddHierarchy = () => {
         </Dialog>
       </div>
 
-      {/* Level 1 */}
-      <div ref={level1Ref}>
+      {/* Parent Company */}
+      <div ref={parentRef}>
         <Card className="w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4">
-          <h2 className="text-lg font-semibold text-gray-700">Level 1</h2>
+          <h2 className="text-lg font-semibold text-gray-700">Parent Company</h2>
           <div className="flex justify-center">
             <Card className="max-w-lg w-full p-6 shadow-md border border-gray-200 bg-white text-center">
               <h3 className="text-2xl font-bold text-gray-800">ቢዲኤ</h3>
@@ -224,8 +202,6 @@ const AddHierarchy = () => {
           </div>
         </Card>
       </div>
-
-      {/* Connector SVG - Placed right after Level 1 */}
       <svg
         ref={connectorsRef}
         className="absolute w-full h-[200px] top-[calc(100%-20px)] left-0 pointer-events-none z-0"
@@ -246,10 +222,57 @@ const AddHierarchy = () => {
         ))}
       </svg>
 
-      {/* Level 2 and below */}
-      {renderLevelSection('Level 2', level2Companies, 2)}
-      {renderLevelSection('Level 3', level3Companies, 3)}
-      {renderLevelSection('Level 4', level4Companies, 4)}
+      {/* Child Companies */}
+      <div ref={childContainerRef} className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Company Name (Amharic)
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Company Name (English)
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Parent Company
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {childCompanies.map((company, index) => (
+              <tr key={index} className="child-row hover:bg-gray-50 transition-colors">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {company.nameAm}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {company.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {getParentNameAm(company.parentId || 0)} ({getParentName(company.parentId || 0)})
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleRemoveCompany(company.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {childCompanies.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No companies added yet. Click "Add Hierarchy" to get started.
+          </div>
+        )}
+      </div>
     </div>
   );
 };
