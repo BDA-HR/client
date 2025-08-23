@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import {
   Dialog,
@@ -16,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Eye } from 'lucide-react';
+import * as d3 from 'd3';
 
 interface Company {
   id: number;
@@ -30,6 +30,14 @@ interface Connector {
   y1: number;
   x2: number;
   y2: number;
+}
+
+interface TreeNode {
+  id: number;
+  name: string;
+  nameAm: string;
+  children?: TreeNode[];
+  parentId?: number;
 }
 
 const AddHierarchy = () => {
@@ -46,10 +54,13 @@ const AddHierarchy = () => {
   const [selectedParentId, setSelectedParentId] = useState<string>('');
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [connectors, setConnectors] = useState<Connector[]>([]);
+  const [showVisualization, setShowVisualization] = useState<boolean>(false);
+  const [hierarchyData, setHierarchyData] = useState<TreeNode | null>(null);
 
   const parentRef = useRef<HTMLDivElement>(null);
   const childContainerRef = useRef<HTMLDivElement>(null);
   const connectorsRef = useRef<SVGSVGElement>(null);
+  const visualizationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateConnectors = () => {
@@ -85,24 +96,118 @@ const AddHierarchy = () => {
     return () => window.removeEventListener('resize', updateConnectors);
   }, [childCompanies]);
 
+  useEffect(() => {
+    if (showVisualization) {
+      buildHierarchy();
+    }
+  }, [showVisualization, childCompanies]);
+
+  useEffect(() => {
+    if (showVisualization && hierarchyData && visualizationRef.current) {
+      drawVisualization();
+    }
+  }, [hierarchyData, showVisualization]);
+
+  const buildHierarchy = () => {
+    const companyMap = new Map<number, TreeNode>();
+    
+    const root: TreeNode = { id: 0, name: 'BDA', nameAm: 'ቢዲኤ' };
+    companyMap.set(0, root);
+    
+    childCompanies.forEach(company => {
+      companyMap.set(company.id, { 
+        id: company.id, 
+        name: company.name, 
+        nameAm: company.nameAm,
+        parentId: company.parentId
+      });
+    });
+    
+    companyMap.forEach(company => {
+      if (company.id === 0) return;
+      
+      const parentId = company.parentId !== undefined ? company.parentId : 0;
+      const parent = companyMap.get(parentId);
+      
+      if (parent) {
+        if (!parent.children) {
+          parent.children = [];
+        }
+        parent.children.push(company);
+      }
+    });
+    companyMap.forEach(company => {
+      if (company.children && company.children.length === 0) {
+        delete company.children;
+      }
+    });
+    
+    setHierarchyData(root);
+  };
+
+  const drawVisualization = () => {
+    if (!hierarchyData || !visualizationRef.current) return;
+    d3.select(visualizationRef.current).selectAll('*').remove();
+    
+    const width = visualizationRef.current.clientWidth;
+    const height = 500;
+    
+    const svg = d3.select(visualizationRef.current)
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .append('g')
+      .attr('transform', 'translate(40, 20)');
+    const treeLayout = d3.tree<TreeNode>()
+      .size([width - 100, height - 100]);
+    const root = d3.hierarchy(hierarchyData, d => d.children);
+      treeLayout(root);
+
+      svg.selectAll('.link')
+      .data(root.links())
+      .enter()
+      .append('path')
+      .attr('class', 'link')
+      .attr('d', d3.linkVertical()
+        .x((d: any) => d.x)
+        .y((d: any) => d.y))
+      .attr('fill', 'none')
+      .attr('stroke', '#6b7280')
+      .attr('stroke-width', 2);
+    
+    const nodes = svg.selectAll('.node')
+      .data(root.descendants())
+      .enter()
+      .append('g')
+      .attr('class', 'node')
+      .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
+    
+    nodes.append('circle')
+      .attr('r', 10)
+      .attr('fill', '#10b981');
+    
+    nodes.append('text')
+      .attr('dy', '0.31em')
+      .attr('x', (d: any) => d.children ? -12 : 12)
+      .attr('text-anchor', (d: any) => d.children ? 'end' : 'start')
+      .text((d: any) => d.data.name)
+      .clone(true).lower()
+      .attr('stroke', 'white')
+      .attr('stroke-width', 3);
+  };
+
   const handleAddHierarchy = () => {
     const company = allCompanies.find((c) => c.id.toString() === selectedCompanyId);
     
     if (!company) return;
-    
-    // Handle BDA case (parentId = 0) separately
     const parentId = selectedParentId === "0" ? 0 : parseInt(selectedParentId);
-    
-    // Check if this company already exists in the hierarchy
     const companyExists = childCompanies.some(c => c.id === company.id);
     
     if (companyExists) {
-      // Update existing company's parent
       setChildCompanies(prev => 
         prev.map(c => c.id === company.id ? {...c, parentId} : c)
       );
     } else {
-      // Add new company with parentId
       const updatedCompany = { ...company, parentId };
       setChildCompanies((prev) => [...prev, updatedCompany]);
     }
@@ -128,6 +233,10 @@ const AddHierarchy = () => {
     return parent ? parent.nameAm : 'Unknown';
   };
 
+  const toggleVisualization = () => {
+    setShowVisualization(!showVisualization);
+  };
+
   return (
     <div className="space-y-6 relative">
       <style>{`
@@ -137,106 +246,113 @@ const AddHierarchy = () => {
         .connector-path {
           animation: draw 1s ease-in-out forwards;
         }
+        .org-chart {
+          margin: 20px 0;
+          padding: 20px;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          background-color: white;
+        }
+        .node circle {
+          fill: #10b981;
+          stroke: #047857;
+          stroke-width: 2px;
+        }
+        .node text {
+          font: 12px sans-serif;
+          fill: #333;
+        }
+        .link {
+          fill: none;
+          stroke: #6b7280;
+          stroke-width: 2px;
+        }
       `}</style>
 
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Organization Hierarchy</h2>
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <DialogTrigger asChild>
-            <Button
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
-            >
-              <Plus size={18} />
-              Add Hierarchy
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Add New Hierarchy</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label>Select Company</Label>
-                <Select
-                  value={selectedCompanyId}
-                  onValueChange={setSelectedCompanyId}
-                >
-                  <SelectTrigger className="h-12 text-base px-4 w-full">
-                    <SelectValue placeholder="Choose company..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allCompanies.map((c) => (
-                      <SelectItem key={c.id} value={c.id.toString()}>
-                        {c.nameAm} ({c.name})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        <div className="flex gap-2">
+          <Button
+            onClick={toggleVisualization}
+            variant="outline"
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <Eye size={18} />
+            {showVisualization ? 'Hide Visualization' : 'Visualize'}
+          </Button>
+          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+            <DialogTrigger asChild>
+              <Button
+                className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
+              >
+                <Plus size={18} />
+                Add Hierarchy
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Add New Hierarchy</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Select Company</Label>
+                  <Select
+                    value={selectedCompanyId}
+                    onValueChange={setSelectedCompanyId}
+                  >
+                    <SelectTrigger className="h-12 text-base px-4 w-full">
+                      <SelectValue placeholder="Choose company..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allCompanies.map((c) => (
+                        <SelectItem key={c.id} value={c.id.toString()}>
+                          {c.nameAm} ({c.name})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Select Parent Company</Label>
+                  <Select
+                    value={selectedParentId}
+                    onValueChange={setSelectedParentId}
+                  >
+                    <SelectTrigger className="h-12 text-base px-4 w-full">
+                      <SelectValue placeholder="Choose parent company..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">BDA (ቢዲኤ)</SelectItem>
+                      {allCompanies.map((c) => (
+                        <SelectItem key={c.id} value={c.id.toString()}>
+                          {c.nameAm} ({c.name})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleAddHierarchy}
+                    className="bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
+                  >
+                    Add
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>Select Parent Company</Label>
-                <Select
-                  value={selectedParentId}
-                  onValueChange={setSelectedParentId}
-                >
-                  <SelectTrigger className="h-12 text-base px-4 w-full">
-                    <SelectValue placeholder="Choose parent company..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">BDA (ቢዲኤ)</SelectItem>
-                    {allCompanies.map((c) => (
-                      <SelectItem key={c.id} value={c.id.toString()}>
-                        {c.nameAm} ({c.name})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex justify-end">
-                <Button
-                  onClick={handleAddHierarchy}
-                  className="bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
-                >
-                  Add
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      {/* Parent Company */}
-      <div ref={parentRef}>
-        <Card className="w-full p-6 shadow-md border border-gray-200 bg-gray-50 space-y-4">
-          <h2 className="text-lg font-semibold text-gray-700">Parent Company</h2>
-          <div className="flex justify-center">
-            <Card className="max-w-lg w-full p-6 shadow-md border border-gray-200 bg-white text-center">
-              <h3 className="text-2xl font-bold text-gray-800">ቢዲኤ</h3>
-              <p className="text-lg text-gray-600">BDA</p>
-            </Card>
-          </div>
-        </Card>
-      </div>
-      <svg
-        ref={connectorsRef}
-        className="absolute w-full h-[200px] top-[calc(100%-20px)] left-0 pointer-events-none z-0"
-        style={{ height: '200px' }}
-      >
-        {connectors.map((conn, index) => (
-          <path
-            key={index}
-            d={`M${conn.x1},${conn.y1} C${conn.x1},${conn.y1 + 50} ${conn.x2},${conn.y2 - 50} ${conn.x2},${conn.y2}`}
-            stroke="#6b7280"
-            strokeWidth="2"
-            fill="none"
-            strokeDasharray="1000"
-            strokeDashoffset="1000"
-            className="connector-path"
-            style={{ animationDelay: `${index * 0.2}s` }}
-          />
-        ))}
-      </svg>
+      {/* Visualization */}
+      {showVisualization && (
+        <div className="org-chart">
+          <h3 className="text-lg font-semibold mb-4">Organization Chart</h3>
+          <div ref={visualizationRef} style={{ width: '100%', height: '500px' }} />
+        </div>
+      )}
 
       {/* Child Companies */}
       <div ref={childContainerRef} className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
