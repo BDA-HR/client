@@ -36,10 +36,11 @@ const AddHierarchy = () => {
   const allCompanies: Company[] = [
     { id: 1, name: 'Rohobot Tech', nameAm: 'ሮሆቦት ቴክ', parentId: 0 },
     { id: 2, name: 'EthioDev', nameAm: 'ኢትዮዴቭ', parentId: 0 },
-    { id: 3, name: 'Rohobot Group', nameAm: 'ሮሆቦት ግሩፕ', parentId: 1},
+    { id: 3, name: 'Rohobot Group', nameAm: 'ሮሆቦት ግሩፕ', parentId: 1 },
+    { id: 4, name: 'Tech Solutions', nameAm: 'ቴክ ሶልዩሽንስ', parentId: 1 },
+    { id: 5, name: 'Innovate Ethiopia', nameAm: 'ኢንኖቬት ኢትዮጵያ', parentId: 2 },
   ];
 
-  const [parentCompanies, setParentCompanies] = useState<Company[]>(allCompanies);
   const [childCompanies, setChildCompanies] = useState<Company[]>(allCompanies.filter(c => c.parentId === 0));
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const [selectedParentId, setSelectedParentId] = useState<string>('');
@@ -86,11 +87,26 @@ const AddHierarchy = () => {
 
   const handleAddHierarchy = () => {
     const company = allCompanies.find((c) => c.id.toString() === selectedCompanyId);
-    const parentCompany = allCompanies.find((c) => c.id.toString() === selectedParentId);
     
-    if (!company || !parentCompany) return;
-    const updatedCompany = { ...company, parentId: parentCompany.id };    
-    setChildCompanies((prev) => [...prev, updatedCompany]);
+    if (!company) return;
+    
+    // Handle BDA case (parentId = 0) separately
+    const parentId = selectedParentId === "0" ? 0 : parseInt(selectedParentId);
+    
+    // Check if this company already exists in the hierarchy
+    const companyExists = childCompanies.some(c => c.id === company.id);
+    
+    if (companyExists) {
+      // Update existing company's parent
+      setChildCompanies(prev => 
+        prev.map(c => c.id === company.id ? {...c, parentId} : c)
+      );
+    } else {
+      // Add new company with parentId
+      const updatedCompany = { ...company, parentId };
+      setChildCompanies((prev) => [...prev, updatedCompany]);
+    }
+    
     setSelectedCompanyId('');
     setSelectedParentId('');
     setOpenDialog(false);
