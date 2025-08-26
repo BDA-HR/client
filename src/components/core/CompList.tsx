@@ -8,13 +8,13 @@ import {
   DropdownMenuItem,
 } from '../../components/ui/dropdown-menu';
 import { motion } from 'framer-motion';
-import type { Company } from '../../data/company-branches';
+import type { Company } from '../../services/core/compservice';
 
 interface CompListProps {
   companies: Company[];
   onEditCompany: (company: Company) => void;
-  onDeleteCompany: (companyId: number) => void;
-  onViewBranches: (companyId: number) => void;
+  onDeleteCompany: (companyId: string) => void;
+  onViewBranches: (companyId: string) => void;
 }
 
 const CompList: React.FC<CompListProps> = ({

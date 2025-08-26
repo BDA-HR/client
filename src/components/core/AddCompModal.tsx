@@ -9,14 +9,13 @@ import {
 import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
 import { Plus } from 'lucide-react';
-import type { Company } from '../../data/company-branches';
+import type { Company } from '../../services/core/compservice';
 
 interface AddCompModalProps {
-  onAddCompany: (company: Company) => void;
-  nextId: number;
+  onAddCompany: (company: Omit<Company, 'id' | 'branches'>) => void;
 }
 
-const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany, nextId }) => {
+const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
 
@@ -32,14 +31,11 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany, nextId }) => 
   const handleSubmit = () => {
     if (!newCompany.name || !newCompany.nameAm) return;
     
-    const company: Company = {
-      id: nextId,
+    onAddCompany({
       name: newCompany.name,
       nameAm: newCompany.nameAm,
-      branches: []
-    };
+    });
     
-    onAddCompany(company);
     setNewCompany({ name: '', nameAm: '' });
     setOpenDialog(false);
   };
