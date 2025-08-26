@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
 import { companies } from '../../../data/company';
-import AddCompanyForm from '../../../components/core/AddCompanyForm';
+import CompSection from '../../../components/core/CompSection';
 import { ArrowLeft, Plus } from 'lucide-react';
 import BranchTable from '../../../components/core/BranchTable';
 import type { Branch } from '../../../types/branches';
@@ -11,6 +11,7 @@ import { dummyBranches } from '../../../types/branches';
 import BranchHeader from '../../../components/core/BranchHeader';
 import { AddBranchModal } from '../../../components/core/AddBranchModal';
 import AddHierarchy from '../../../components/core/AddHierarchy';
+
 const CompanyBranchesPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const [showCompanyForm, setShowCompanyForm] = useState<boolean>(true);
@@ -83,7 +84,7 @@ const CompanyBranchesPage = () => {
 
       {showCompanyForm ? (
         <>
-          <AddCompanyForm onClick={handleCompanyFormClick} />
+          <CompSection onClick={handleCompanyFormClick} />
           <div className="pt-6">
             <AddHierarchy />
           </div>

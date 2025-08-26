@@ -28,7 +28,7 @@ import EmployeeDetailsPage from './components/hr/EmployeeDetailsPage';
 import BudgetList from './pages/finance/budgetpage/BudgetList';
 import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
 import GlPage from './pages/finance/generalledgerpage/GlPage';
-import BranchOverview from './pages/core/branchpage/BranchOverview';
+// import BranchOverview from './pages/core/branchpage/BranchOverview';
 import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
 // import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
 import UserOverview from './pages/core/usermanagementpage/UserOverview';
@@ -91,7 +91,7 @@ function App() {
             {/* Core routes */}
             {/* <Route path='/core/company/:companyId/branches' element={<CompanyBranchesPage />} /> */}
             <Route path='/core/company' element={<CompanyBranchesPage />} />
-            <Route path='/core/branch' element={<BranchOverview />} />
+            {/* <Route path='/core/branch' element={<BranchOverview />} /> */}
             <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
             {/* <Route path='/core/hierarchy' element={<HierarchyOverview />} /> */}
             <Route path='/core/users' element={<UserOverview />} />
