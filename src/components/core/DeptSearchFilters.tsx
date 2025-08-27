@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
-import AddDepartmentForm from './AddDepartmentForm';
+import AddDepartmentForm from './AddDeptForm';
 import type { DepartmentFormValues } from '../../types/department';
 import { companies } from '../../data/company-branches';
 

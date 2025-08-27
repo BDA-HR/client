@@ -21,7 +21,7 @@ import {
   TrashIcon
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
-import EditDepartmentForm from './EditDepartmentForm';
+import EditDepartmentForm from './EditDeptForm';
 import type { Department } from '../../types/department';
 import { companies } from '../../data/company-branches';
 

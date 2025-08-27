@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AlertCircle } from 'lucide-react';
-import DepartmentTable from "./DepartmentTable";
+import DepartmentTable from "./DeptTable";
 import DepartmentForm from "./DepartmentForm";
-import DepartmentHierarchy from "./DepartmentHierarchy";
+import DepartmentHierarchy from "./DeptHier";
 import type { Department } from "../../types/coreTypes";
 
 export const DepartmentListTab = ({ 

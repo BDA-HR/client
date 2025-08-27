@@ -1,20 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { Button } from '../../components/ui/button';
+import { Button } from '../ui/button';
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '../../components/ui/dialog';
-import { Label } from '../../components/ui/label';
+} from '../ui/dialog';
+import { Label } from '../ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
+} from '../ui/select';
 import { Plus, Trash2, Eye } from 'lucide-react';
 import * as d3 from 'd3';
 

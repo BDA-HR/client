@@ -4,7 +4,7 @@ import UsersTab from './UsersTab';
 import InventoryTab from './InventoryTab';
 import FinancialsTab from './FinancialsTab';
 import SettingsTab from './SettingsTab';
-import DepartmentsTab from './DepartmentsTab';
+import DepartmentsTab from './DeptTab';
 import { DollarSign, Package, Settings, Users, Layers } from 'lucide-react';
 import type { Branch } from '../../data/company';
 

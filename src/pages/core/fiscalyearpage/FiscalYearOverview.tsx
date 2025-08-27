@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Dialog } from '../../../components/ui/dialog';
-import { FiscalYearManagementHeader } from '../../../components/core/FiscalYearManagementHeader';
-import { FiscalYearTable } from '../../../components/core/FiscalYearTable';
-import { FiscalYearModal } from '../../../components/core/FiscalYearModal';
-import { AddFiscalYearModal } from '../../../components/core/AddFiscalYearModal';
+import { FiscalYearManagementHeader } from '../../../components/core/FiscYearHeader';
+import { FiscalYearTable } from '../../../components/core/FiscYearTable';
+import { FiscalYearModal } from '../../../components/core/FiscYearModal';
+import { AddFiscalYearModal } from '../../../components/core/AddFiscYearModal';
 import { initialFiscalYears, convertToEthiopianDate } from '../../../data/fiscalYear';
 import type { FiscYearListDto, NewFiscalYear } from '../../../types/fiscalYear';
 

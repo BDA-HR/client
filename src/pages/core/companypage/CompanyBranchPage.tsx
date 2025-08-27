@@ -10,7 +10,7 @@ import type { Branch } from '../../../types/branches';
 import { dummyBranches } from '../../../types/branches';
 import BranchHeader from '../../../components/core/BranchHeader';
 import { AddBranchModal } from '../../../components/core/AddBranchModal';
-import AddHierarchy from '../../../components/core/AddHierarchy';
+import AddHierarchy from '../../../components/core/HierSection';
 
 const CompanyBranchesPage = () => {
   const { companyId } = useParams<{ companyId: string }>();

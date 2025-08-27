@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
-import DepartmentCard from './DepartmentCard';
+import DepartmentCard from './DeptCard';
 import type { Department } from '../../data/company';
 
 interface DepartmentsTabProps {
