@@ -33,7 +33,7 @@ import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
 // import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
 import UserOverview from './pages/core/usermanagementpage/UserOverview';
 import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
-import CompanyBranchesPage from './pages/core/branchpage/CompanyBranchPage';
+import CompanyBranchesPage from './pages/core/companypage/CompanyBranchPage';
 import CompanyDetailsPage from './components/core/CompanyDetailsPage';
 
 function App() {
