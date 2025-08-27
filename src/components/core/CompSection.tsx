@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { companyService } from '../../services/core/compservice';
-import type { Company } from '../../services/core/compservice';
-import type { Branch } from '../../types/branches';
+import type { Company, UUID } from '../../types/core/comp';
+import type { Branch } from '../../types/core/branch';
 import AddCompModal from './AddCompModal';
 import EditCompModal from './EditCompModal';
 import CompList from './CompList';
 import BranchView from './BranchView';
 
 interface CompSectionProps {
-  onClick: (companyId: string) => void;
+  onClick: (companyId: UUID) => void;
 }
 
 const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
@@ -17,7 +17,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editCompany, setEditCompany] = useState<Company | null>(null);
-  const [viewingBranches, setViewingBranches] = useState<{companyId: string, branches: Branch[]} | null>(null);
+  const [viewingBranches, setViewingBranches] = useState<{companyId: UUID, branches: Branch[]} | null>(null);
 
   // Fetch companies on component mount
   useEffect(() => {
@@ -66,7 +66,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     }
   };
 
-  const handleDeleteCompany = async (companyId: string) => {
+  const handleDeleteCompany = async (companyId: UUID) => {
     try {
       await companyService.deleteCompany(companyId);
       setCompanies((prev) => prev.filter((c) => c.id !== companyId));
@@ -77,7 +77,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     }
   };
 
-  const handleViewBranches = async (companyId: string) => {
+  const handleViewBranches = async (companyId: UUID) => {
     try {
       const branches = await companyService.getCompanyBranches(companyId);
       const company = companies.find(c => c.id === companyId);

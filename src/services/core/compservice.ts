@@ -1,21 +1,6 @@
 import { api } from '../api';
-
-export interface Company {
-  id: string;
-  name: string;
-  nameAm: string;
-  branches: Branch[];
-}
-
-export interface Branch {
-  id: string;
-  branchId: string;
-  name: string;
-  status: 'active' | 'inactive' | 'pending';
-  city: string;
-  country: string;
-  // ... other branch properties
-}
+import type { Company, UUID } from '../../types/core/comp';
+import type { Branch } from '../../types/core/branch';
 
 class CompanyService {
   private baseUrl = `${import.meta.env.VITE_CORE_URL || 'http://localhost:1212/api/core/v1'}/companies`;
@@ -30,7 +15,7 @@ class CompanyService {
     }
   }
 
-  async getCompanyById(id: string): Promise<Company> {
+  async getCompanyById(id: UUID): Promise<Company> {
     try {
       const response = await api.get(`${this.baseUrl}/${id}`);
       return response.data;
@@ -50,7 +35,7 @@ class CompanyService {
     }
   }
 
-  async updateCompany(id: string, company: Partial<Company>): Promise<Company> {
+  async updateCompany(id: UUID, company: Partial<Company>): Promise<Company> {
     try {
       const response = await api.put(`${this.baseUrl}/${id}`, company);
       return response.data;
@@ -60,7 +45,7 @@ class CompanyService {
     }
   }
 
-  async deleteCompany(id: string): Promise<void> {
+  async deleteCompany(id: UUID): Promise<void> {
     try {
       await api.delete(`${this.baseUrl}/${id}`);
     } catch (error) {
@@ -69,7 +54,7 @@ class CompanyService {
     }
   }
 
-  async getCompanyBranches(companyId: string): Promise<Branch[]> {
+  async getCompanyBranches(companyId: UUID): Promise<Branch[]> {
     try {
       const response = await api.get(`${this.baseUrl}/${companyId}/branches`);
       return response.data;
@@ -79,7 +64,7 @@ class CompanyService {
     }
   }
 
-  async createBranch(companyId: string, branch: Omit<Branch, 'id'>): Promise<Branch> {
+  async createBranch(companyId: UUID, branch: Omit<Branch, 'id'>): Promise<Branch> {
     try {
       const response = await api.post(`${this.baseUrl}/${companyId}/branches`, branch);
       return response.data;
@@ -89,7 +74,7 @@ class CompanyService {
     }
   }
 
-  async updateBranch(companyId: string, branchId: string, branch: Partial<Branch>): Promise<Branch> {
+  async updateBranch(companyId: UUID, branchId: UUID, branch: Partial<Branch>): Promise<Branch> {
     try {
       const response = await api.put(`${this.baseUrl}/${companyId}/branches/${branchId}`, branch);
       return response.data;
@@ -99,7 +84,7 @@ class CompanyService {
     }
   }
 
-  async deleteBranch(companyId: string, branchId: string): Promise<void> {
+  async deleteBranch(companyId: UUID, branchId: UUID): Promise<void> {
     try {
       await api.delete(`${this.baseUrl}/${companyId}/branches/${branchId}`);
     } catch (error) {

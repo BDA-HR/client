@@ -1,8 +1,8 @@
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { MapPin } from 'lucide-react';
-import type { Company } from '../../data/company-branches';
-import type { Branch } from '../../types/branches';
+import type { Company } from '../../types/core/comp';
+import type { Branch } from '../../types/core/branch';
 
 interface BranchViewProps {
   company: Company | undefined;
