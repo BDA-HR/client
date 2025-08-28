@@ -1,6 +1,6 @@
 import { Plus, X } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import type { NewFiscalYear } from '../../types/fiscalYear';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
+import type { NewFiscalYear } from '../../../types/fiscalYear';
 import React from 'react';
 
 export const AddFiscalYearModal = ({

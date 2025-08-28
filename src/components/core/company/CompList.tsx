@@ -1,14 +1,14 @@
-import { Card } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { Card } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
 import { MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '../../components/ui/dropdown-menu';
+} from '../../../components/ui/dropdown-menu';
 import { motion } from 'framer-motion';
-import type { Company } from '../../services/core/compservice';
+import type { Company } from '../../../services/core/compservice';
 
 interface CompListProps {
   companies: Company[];

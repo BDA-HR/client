@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import DepartmentManagementHeader from '../../../components/core/DeptHeader';
-import DepartmentStatsCards from '../../../components/core/DeptStatusCards';
-import DepartmentSearchFilters from '../../../components/core/DeptSearchFilters';
-import DepartmentTable from '../../../components/core/DeptTable';
+import DepartmentManagementHeader from '../../../components/core/department/DeptHeader';
+import DepartmentStatsCards from '../../../components/core/department/DeptStatusCards';
+import DepartmentSearchFilters from '../../../components/core/department/DeptSearchFilters';
+import DepartmentTable from '../../../components/core/department/DeptTable';
 import type { Department } from '../../../types/department';
 import { initialDepartments } from '../../../data/department';
 

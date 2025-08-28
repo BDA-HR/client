@@ -1,5 +1,5 @@
-import { Card } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { Card } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
 import { MapPin } from 'lucide-react';
 import type { Company } from '../../types/core/comp';
 import type { Branch } from '../../types/core/branch';

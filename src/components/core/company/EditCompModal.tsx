@@ -3,12 +3,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '../../components/ui/dialog';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import DialogOverlay from '../ui/dialog-overlay';
-import type { Company } from '../../types/core/comp';
+} from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import DialogOverlay from '../../ui/dialog-overlay';
+import type { Company } from '../../../types/core/comp';
 
 interface EditCompModalProps {
   company: Company | null;

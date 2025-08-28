@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import { DialogTrigger } from '../ui/dialog';
+import { DialogTrigger } from '../../ui/dialog';
 
 export const FiscalYearManagementHeader = ({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) => {
   return (

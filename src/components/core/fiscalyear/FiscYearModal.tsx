@@ -1,7 +1,7 @@
 import { X, Check, Calendar } from 'lucide-react';
-import { DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import type { FiscYearListDto, NewFiscalYear } from '../../types/fiscalYear';
-import { formatDate } from '../../data/fiscalYear';
+import { DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
+import type { FiscYearListDto, NewFiscalYear } from '../../../types/fiscalYear';
+import { formatDate } from '../../../data/fiscalYear';
 
 interface FiscalYearModalProps {
   modalType: 'view' | 'edit' | 'status' | 'delete' | 'add' | null;

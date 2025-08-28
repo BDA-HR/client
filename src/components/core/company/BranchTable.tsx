@@ -18,9 +18,9 @@ import {
   BarChart2,
   Calendar
 } from 'lucide-react';
-import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
-import type { Branch, BranchTableProps } from '../../types/branches';
-import { companies } from '../../data/company-branches';
+import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
+import type { Branch, BranchTableProps } from '../../../types/branches';
+import { companies } from '../../../data/company-branches';
 
 const BranchTable: React.FC<BranchTableProps> = ({
   branches,

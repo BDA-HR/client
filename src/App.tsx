@@ -34,7 +34,7 @@ import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
 import UserOverview from './pages/core/usermanagementpage/UserOverview';
 import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
 import CompanyBranchesPage from './pages/core/companypage/CompanyBranchPage';
-import CompanyDetailsPage from './components/core/CompDetails';
+import CompanyDetailsPage from './components/core/company/CompDetails';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { companyService } from '../../services/core/compservice';
+import { companyService } from '../../../services/core/compservice';
 import type { Company, UUID } from '../../types/core/comp';
 import type { Branch } from '../../types/core/branch';
 import AddCompModal from './AddCompModal';

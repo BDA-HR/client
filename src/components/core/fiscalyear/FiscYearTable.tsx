@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock } from 'lucide-react';
-import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
-import type { FiscYearListDto } from '../../types/fiscalYear';
-import { formatDate } from '../../data/fiscalYear';
+import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
+import type { FiscYearListDto } from '../../../types/fiscalYear';
+import { formatDate } from '../../../data/fiscalYear';
 
 interface FiscalYearTableProps {
   years: FiscYearListDto[];

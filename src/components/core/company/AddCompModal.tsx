@@ -5,11 +5,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '../../components/ui/dialog';
-import { Button } from '../../components/ui/button';
-import { Label } from '../../components/ui/label';
+} from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Label } from '../../../components/ui/label';
 import { Plus } from 'lucide-react';
-import type { Company } from '../../services/core/compservice';
+import type { Company } from '../../../services/core/compservice';
 
 interface AddCompModalProps {
   onAddCompany: (company: Omit<Company, 'id' | 'branches'>) => void;

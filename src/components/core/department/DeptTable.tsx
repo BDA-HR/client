@@ -20,10 +20,10 @@ import {
   PencilIcon,
   TrashIcon
 } from 'lucide-react';
-import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
+import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import EditDepartmentForm from './EditDeptForm';
-import type { Department } from '../../types/department';
-import { companies } from '../../data/company-branches';
+import type { Department } from '../../../types/department';
+import { companies } from '../../../data/company-branches';
 
 interface DepartmentTableProps {
   departments: Department[];

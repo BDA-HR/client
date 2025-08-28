@@ -3,14 +3,14 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
 import { companies } from '../../../data/company';
-import CompSection from '../../../components/core/CompSection';
+import CompSection from '../../../components/core/company/CompSection';
 import { ArrowLeft, Plus } from 'lucide-react';
-import BranchTable from '../../../components/core/BranchTable';
+import BranchTable from '../../../components/core/company/BranchTable';
 import type { Branch } from '../../../types/branches';
 import { dummyBranches } from '../../../types/branches';
-import BranchHeader from '../../../components/core/BranchHeader';
-import { AddBranchModal } from '../../../components/core/AddBranchModal';
-import AddHierarchy from '../../../components/core/HierSection';
+import BranchHeader from '../../../components/core/company/BranchHeader';
+import { AddBranchModal } from '../../../components/core/company/AddBranchModal';
+import AddHierarchy from '../../../components/core/company/HierSection';
 
 const CompanyBranchesPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
