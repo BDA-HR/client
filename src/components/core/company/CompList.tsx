@@ -49,7 +49,7 @@ const CompList: React.FC<CompListProps> = ({
               <h4 className="text-md font-semibold text-black ">{company.nameAm}</h4>
               <p className="text-sm text-gray-600 ">{company.name}</p>
               <p className="text-xs text-gray-500 mt-1">
-                {company.branches?.length || 0} branches
+                {company.branchCount} branches
               </p>
             </div>
 
@@ -58,7 +58,6 @@ const CompList: React.FC<CompListProps> = ({
                 className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 cursor-pointer"
                 size="sm"
                 onClick={() => onViewBranches(company.id)}
-                disabled={!company.branches || company.branches.length === 0}
               >
                 View Branches
               </Button>

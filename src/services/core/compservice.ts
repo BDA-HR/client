@@ -3,7 +3,7 @@ import type { Company, UUID } from '../../types/core/comp';
 import type { Branch } from '../../types/core/branch';
 
 class CompanyService {
-  private baseUrl = `${import.meta.env.VITE_CORE_URL || 'http://localhost:1212/api/core/v1'}/companies`;
+  private baseUrl = `${import.meta.env.VITE_CORE_URL || 'core/v1'}/company`;
 
   async getAllCompanies(): Promise<Company[]> {
     try {
