@@ -1,10 +1,27 @@
-export type UUID = string;
 export interface Branch {
-  id: UUID;
-  branchId: string;
+  id: string;
   name: string;
-  status: 'active' | 'inactive' | 'pending';
-  city: string;
-  country: string;
-  // ... other branch properties
+  nameAm: string;
+  code: string;
+  location: string;
+  openDate: string;
+  branchType: BranchType;
+  branchStat: BranchStat;
+  compId: string;
+  compName: string;
+  compNameAm: string;
+  rowVersion?: string;
+}
+
+export enum BranchType {
+  HeadOff = "Head Office",
+  RegOff = "Regional",
+  LocOff = "Local",
+  VirOff = "Virtual"
+}
+
+export enum BranchStat {
+  Active = "Active",
+  InAct = "Inactive",
+  UndCon = "Under construction"
 }

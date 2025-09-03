@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { companyService } from '../../../services/core/compservice';
-import type { Company, UUID } from '../../types/core/comp';
-import type { Branch } from '../../types/core/branch';
+import type { Company, UUID } from '../../../types/core/comp';
+import type { Branch } from '../../../types/core/branch';
 import AddCompModal from './AddCompModal';
 import EditCompModal from './EditCompModal';
 import CompList from './CompList';
@@ -79,6 +79,11 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
 
   const handleViewBranches = async (companyId: UUID) => {
     try {
+      // Call the onClick prop to notify the parent component
+      onClick(companyId);
+      
+      // If you want to also show branches in this component, uncomment below
+      /*
       const branches = await companyService.getCompanyBranches(companyId);
       const company = companies.find(c => c.id === companyId);
       
@@ -87,8 +92,8 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
           companyId,
           branches
         });
-        onClick(companyId);
       }
+      */
     } catch (err) {
       console.error('Failed to fetch branches:', err);
       setError('Failed to load branches. Please try again.');
@@ -99,6 +104,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     setViewingBranches(null);
   };
 
+  // If viewing branches in this component (if you uncommented the code above)
   if (viewingBranches) {
     const company = companies.find(c => c.id === viewingBranches.companyId);
     

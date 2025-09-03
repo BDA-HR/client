@@ -1,8 +1,8 @@
 import { api } from '../api';
-import type { Branch, UUID } from '../../types/core/branch';
+import type { Branch, BranchType, BranchStat } from '../../types/core/branch';
 
 class BranchService {
-  private baseUrl = `${import.meta.env.VITE_CORE_URL || 'core/v1'}/branch`;
+  private baseUrl = `${import.meta.env.VITE_CORE_URL || 'api'}/branch`;
 
   async getBranchById(id: string): Promise<Branch> {
     try {
@@ -14,9 +14,9 @@ class BranchService {
     }
   }
 
-  async getCompanyBranches(companyId: UUID): Promise<Branch[]> {
+  async getCompanyBranches(companyId: string): Promise<Branch[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/CompBranches/${companyId}`);
+      const response = await api.get(`${this.baseUrl}/company/${companyId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching company branches:', error);
@@ -24,9 +24,22 @@ class BranchService {
     }
   }
 
-  async createBranch(companyId: UUID, branch: Omit<Branch, 'id'>): Promise<Branch> {
+  async getAllBranches(): Promise<Branch[]> {
     try {
-      const response = await api.post(`${this.baseUrl}/${companyId}/branches`, branch);
+      const response = await api.get(`${this.baseUrl}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all branches:', error);
+      throw error;
+    }
+  }
+
+  async createBranch(companyId: string, branch: Omit<Branch, 'id'>): Promise<Branch> {
+    try {
+      const response = await api.post(`${this.baseUrl}`, {
+        ...branch,
+        compId: companyId
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating branch:', error);
@@ -34,9 +47,12 @@ class BranchService {
     }
   }
 
-  async updateBranch(companyId: UUID, branchId: UUID, branch: Partial<Branch>): Promise<Branch> {
+  async updateBranch(companyId: string, branchId: string, branch: Partial<Branch>): Promise<Branch> {
     try {
-      const response = await api.put(`${this.baseUrl}/${companyId}/branches/${branchId}`, branch);
+      const response = await api.put(`${this.baseUrl}/${branchId}`, {
+        ...branch,
+        compId: companyId
+      });
       return response.data;
     } catch (error) {
       console.error('Error updating branch:', error);
@@ -44,15 +60,14 @@ class BranchService {
     }
   }
 
-  async deleteBranch(companyId: UUID, branchId: UUID): Promise<void> {
+  async deleteBranch(companyId: string, branchId: string): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/${companyId}/branches/${branchId}`);
+      await api.delete(`${this.baseUrl}/${branchId}?companyId=${companyId}`);
     } catch (error) {
       console.error('Error deleting branch:', error);
       throw error;
     }
   }
 }
-
 
 export const branchService = new BranchService();

@@ -9,6 +9,7 @@ import {
 } from '../../../components/ui/dropdown-menu';
 import { motion } from 'framer-motion';
 import type { Company } from '../../../services/core/compservice';
+import { useNavigate } from 'react-router-dom';
 
 interface CompListProps {
   companies: Company[];
@@ -21,8 +22,13 @@ const CompList: React.FC<CompListProps> = ({
   companies,
   onEditCompany,
   onDeleteCompany,
-  onViewBranches
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewBranches = (companyId: string) => {
+    navigate(`/branches?companyId=${companyId}`);
+  };
+
   return (
     <motion.div
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -57,7 +63,7 @@ const CompList: React.FC<CompListProps> = ({
               <Button
                 className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 cursor-pointer"
                 size="sm"
-                onClick={() => onViewBranches(company.id)}
+                onClick={() => handleViewBranches(company.id)}
               >
                 View Branches
               </Button>
