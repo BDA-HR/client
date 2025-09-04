@@ -6,7 +6,7 @@ import type { Branch } from '../../../types/core/branch';
 import AddCompModal from './AddCompModal';
 import EditCompModal from './EditCompModal';
 import CompList from './CompList';
-import BranchView from './BranchView';
+import BranchView from '../branch/BranchView';
 
 interface CompSectionProps {
   onClick: (companyId: UUID) => void;

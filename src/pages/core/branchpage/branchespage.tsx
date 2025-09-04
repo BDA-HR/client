@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
 import { Plus } from 'lucide-react';
-import BranchTable from '../../../components/core/company/BranchTable';
-import { AddBranchModal } from '../../../components/core/company/AddBranchModal';
+import BranchTable from '../../../components/core/branch/BranchTable';
+import { AddBranchModal } from '../../../components/core/branch/AddBranchModal';
 import { branchService } from '../../../services/core/branchservice';
 import type { Branch } from '../../../types/core/branch';
 
