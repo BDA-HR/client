@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import {
   Dialog,
   DialogTrigger,
@@ -10,10 +9,10 @@ import {
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Plus } from 'lucide-react';
-import type { Company } from '../../../services/core/compservice';
+import type { AddCompDto } from '../../../types/core/comp'; //changed import
 
 interface AddCompModalProps {
-  onAddCompany: (company: Company) => void;
+  onAddCompany: (company: AddCompDto) => void;
 }
 
 const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
@@ -33,10 +32,8 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
     if (!newCompany.name || !newCompany.nameAm) return;
 
     onAddCompany({
-      //id: uuidv4(), // Generate UUID
       name: newCompany.name,
       nameAm: newCompany.nameAm,
-      //branches: [] // Add empty branches array
     });
 
     setNewCompany({ name: '', nameAm: '' });

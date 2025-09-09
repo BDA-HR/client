@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { companyService } from '../../../services/core/compservice';
-import type { Company, UUID } from '../../../types/core/comp';
+import type { CompListDto, UUID } from '../../../types/core/comp'; // Changed from Company to CompListDto
 import type { Branch } from '../../../types/core/branch';
 import AddCompModal from './AddCompModal';
 import EditCompModal from './EditCompModal';
@@ -13,10 +13,10 @@ interface CompSectionProps {
 }
 
 const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companies, setCompanies] = useState<CompListDto[]>([]); // Changed from Company[] to CompListDto[]
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editCompany, setEditCompany] = useState<Company | null>(null);
+  const [editCompany, setEditCompany] = useState<CompListDto | null>(null); // Changed from Company to CompListDto
   const [viewingBranches, setViewingBranches] = useState<{companyId: UUID, branches: Branch[]} | null>(null);
 
   // Fetch companies on component mount
@@ -38,7 +38,8 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     fetchCompanies();
   }, []);
 
-  const handleAddCompany = async (companyData: Omit<Company, 'id' | 'branches'>) => {
+  // Update the handleAddCompany parameter type
+  const handleAddCompany = async (companyData: { name: string; nameAm: string }) => {
     try {
       const newCompany = await companyService.createCompany(companyData);
       setCompanies((prev) => [...prev, newCompany]);
@@ -50,10 +51,10 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     }
   };
 
-  const handleEditCompany = async (updatedCompany: Company) => {
+  // Update the handleEditCompany parameter type
+  const handleEditCompany = async (updatedCompany: CompListDto) => {
     try {
-      const { id, ...companyData } = updatedCompany;
-      const result = await companyService.updateCompany(id, companyData);
+      const result = await companyService.updateCompany(updatedCompany);
       setCompanies((prev) =>
         prev.map((comp) => (comp.id === result.id ? result : comp))
       );
@@ -81,19 +82,6 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     try {
       // Call the onClick prop to notify the parent component
       onClick(companyId);
-      
-      // If you want to also show branches in this component, uncomment below
-      /*
-      const branches = await companyService.getCompanyBranches(companyId);
-      const company = companies.find(c => c.id === companyId);
-      
-      if (company) {
-        setViewingBranches({
-          companyId,
-          branches
-        });
-      }
-      */
     } catch (err) {
       console.error('Failed to fetch branches:', err);
       setError('Failed to load branches. Please try again.');
@@ -104,7 +92,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     setViewingBranches(null);
   };
 
-  // If viewing branches in this component (if you uncommented the code above)
+  // If viewing branches in this component
   if (viewingBranches) {
     const company = companies.find(c => c.id === viewingBranches.companyId);
     

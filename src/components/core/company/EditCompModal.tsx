@@ -8,11 +8,11 @@ import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import DialogOverlay from '../../ui/dialog-overlay';
-import type { Company } from '../../../types/core/comp';
+import type { CompListDto } from '../../../types/core/comp'; // Changed import
 
 interface EditCompModalProps {
-  company: Company | null;
-  onSave: (company: Company) => void;
+  company: CompListDto | null; // Changed from Company to CompListDto
+  onSave: (company: CompListDto) => void; // Changed from Company to CompListDto
   onClose: () => void;
 }
 
