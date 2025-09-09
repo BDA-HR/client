@@ -117,42 +117,9 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <motion.h1 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
-          >
-            Companies
-          </motion.h1>
-        </div>
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-          {error}
-          <button 
-            onClick={() => window.location.reload()} 
-            className="ml-4 text-red-800 underline"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header - Always rendered */}
       <div className="flex justify-between items-center">
         <motion.h1 
           initial={{ opacity: 0, x: -10 }}
@@ -179,13 +146,22 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
         </div>
       )}
 
-      {/* Companies List */}
-      <CompList 
-        companies={companies}
-        onEditCompany={setEditCompany}
-        onDeleteCompany={handleDeleteCompany}
-        onViewBranches={handleViewBranches}
-      />
+      {/* Loading state */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+        </div>
+      )}
+
+      {/* Companies List - Only show when not loading */}
+      {!loading && (
+        <CompList 
+          companies={companies}
+          onEditCompany={setEditCompany}
+          onDeleteCompany={handleDeleteCompany}
+          onViewBranches={handleViewBranches}
+        />
+      )}
 
       {/* Edit Modal */}
       <EditCompModal 
