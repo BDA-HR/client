@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid'; 
 import {
   Dialog,
   DialogTrigger,
@@ -12,7 +13,7 @@ import { Plus } from 'lucide-react';
 import type { Company } from '../../../services/core/compservice';
 
 interface AddCompModalProps {
-  onAddCompany: (company: Omit<Company, 'id' | 'branches'>) => void;
+  onAddCompany: (company: Company) => void; 
 }
 
 const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
@@ -23,7 +24,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (amharicRegex.test(value)) {
+    if (value === '' || amharicRegex.test(value)) {
       setNewCompany((prev) => ({ ...prev, nameAm: value }));
     }
   };
@@ -32,8 +33,10 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
     if (!newCompany.name || !newCompany.nameAm) return;
     
     onAddCompany({
+      id: uuidv4(), // Generate UUID
       name: newCompany.name,
       nameAm: newCompany.nameAm,
+      branches: [] // Add empty branches array
     });
     
     setNewCompany({ name: '', nameAm: '' });
@@ -44,7 +47,6 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger asChild>
         <Button 
-          type="submit"
           className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
         >
           <Plus size={18} />
