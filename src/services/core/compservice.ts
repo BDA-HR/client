@@ -1,13 +1,13 @@
 
 import { api } from '../api';
-import type { Company, CreateCompanyDto, UpdateCompanyDto, UUID   } from '../../types/core/comp';
+import type { CompListDto, AddCompDto, EditCompDto, UUID } from '../../types/core/comp';
 
 class CompanyService {
   private baseUrl = `${import.meta.env.VITE_CORE_URL || 'core/v1'}/company`;
 
-  async getAllCompanies(): Promise<Company[]> {
+  async getAllCompanies(): Promise<CompListDto[]> {
     try {
-      const response = await api.get(this.baseUrl);
+      const response = await api.get(`${this.baseUrl}/AllCompany`);
       return response.data;
     } catch (error) {
       console.error('Error fetching companies:', error);
@@ -15,7 +15,7 @@ class CompanyService {
     }
   }
 
-  async getCompanyById(id: UUID): Promise<Company> {
+  async getCompanyById(id: UUID): Promise<CompListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/${id}`);
       return response.data;
@@ -25,9 +25,9 @@ class CompanyService {
     }
   }
 
-  async createCompany(company: CreateCompanyDto): Promise<Company> {
+  async createCompany(company: AddCompDto): Promise<CompListDto> {
     try {
-      const response = await api.post(this.baseUrl, company);
+      const response = await api.post(`${this.baseUrl}/AddCompany`, company);
       return response.data;
     } catch (error) {
       console.error('Error creating company:', error);
@@ -35,7 +35,7 @@ class CompanyService {
     }
   }
 
-  async updateCompany(updateData: UpdateCompanyDto): Promise<Company> {
+  async updateCompany(updateData: EditCompDto): Promise<CompListDto> {
     try {
       const response = await api.put(
         `${this.baseUrl}/${updateData.id}`,

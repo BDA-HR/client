@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 import {
   Dialog,
   DialogTrigger,
@@ -13,7 +13,7 @@ import { Plus } from 'lucide-react';
 import type { Company } from '../../../services/core/compservice';
 
 interface AddCompModalProps {
-  onAddCompany: (company: Company) => void; 
+  onAddCompany: (company: Company) => void;
 }
 
 const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
@@ -31,14 +31,14 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
 
   const handleSubmit = () => {
     if (!newCompany.name || !newCompany.nameAm) return;
-    
+
     onAddCompany({
-      id: uuidv4(), // Generate UUID
+      //id: uuidv4(), // Generate UUID
       name: newCompany.name,
       nameAm: newCompany.nameAm,
-      branches: [] // Add empty branches array
+      //branches: [] // Add empty branches array
     });
-    
+
     setNewCompany({ name: '', nameAm: '' });
     setOpenDialog(false);
   };
@@ -46,7 +46,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger asChild>
-        <Button 
+        <Button
           className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
         >
           <Plus size={18} />
@@ -82,8 +82,8 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           </div>
         </div>
         <div className="flex justify-end">
-          <Button 
-            className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer" 
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
             onClick={handleSubmit}
           >
             Save

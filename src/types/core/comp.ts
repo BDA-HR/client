@@ -2,18 +2,18 @@ import type { BaseDto } from './BaseDto';
 
 export type UUID = string;
 
-export interface Company extends BaseDto {
+export interface CompListDto extends BaseDto {
   name: string;
   nameAm: string;
-  branchCount: number; 
+  branchCount: number;
 }
 
-export interface CreateCompanyDto {
+export interface AddCompDto {
   name: string;
   nameAm: string;
 }
 
-export interface UpdateCompanyDto {
+export interface EditCompDto {
   id: UUID;
   name: string;
   nameAm: string;
