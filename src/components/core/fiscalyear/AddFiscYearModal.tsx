@@ -16,7 +16,7 @@ export const AddFiscalYearModal = ({
   setNewYear: (year: NewFiscalYear) => void;
   onAddFiscalYear: () => void;
 }) => {
-  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s]*$/;
+  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s0-9]*$/;
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

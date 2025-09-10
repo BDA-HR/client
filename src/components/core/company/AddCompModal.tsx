@@ -19,7 +19,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
 
-  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s]*$/;
+  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s0-9]*$/;
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -61,7 +61,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
               id="nameAm"
               value={newCompany.nameAm}
               onChange={handleAmharicChange}
-              placeholder="ምሳሌ፡ አክሜ ኢንት"
+              placeholder="ምሳሌ፡ አክሜ ኢንት 1"
               className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
             />
           </div>
@@ -74,7 +74,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
                 setNewCompany((prev) => ({ ...prev, name: e.target.value }))
               }
               className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
-              placeholder="Eg. Acme int"
+              placeholder="Eg. Acme int 1"
             />
           </div>
         </div>
