@@ -82,9 +82,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
             onClick={handleSubmit}
-          >
-            Save
-          </Button>
+          >Save</Button>
         </div>
       </DialogContent>
     </Dialog>
