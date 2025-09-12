@@ -11,6 +11,7 @@ import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Plus } from 'lucide-react';
 import type { AddCompDto } from '../../../types/core/comp'; //changed import
+import { amharicRegex } from '../../../utils/amharic-regex';
 
 interface AddCompModalProps {
   onAddCompany: (company: AddCompDto) => void;
@@ -19,8 +20,6 @@ interface AddCompModalProps {
 const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
-
-  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s0-9]*$/;
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -51,7 +50,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           Add Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]" aria-describedby="delete-company-desc">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
           <DialogDescription>Add New Company</DialogDescription>
