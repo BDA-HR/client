@@ -53,7 +53,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
-          <DialogDescription>Add New Company</DialogDescription>
+          <DialogDescription className='hidden'>Add New Company</DialogDescription>
         </DialogHeader>
         <div className="grid grid-row-2 gap-4 py-4">
           <div className="flex flex-col gap-2">
