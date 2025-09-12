@@ -1,0 +1,1 @@
+export const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s0-9]*$/;
