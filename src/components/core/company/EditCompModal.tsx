@@ -53,7 +53,7 @@ const EditCompModal: React.FC<EditCompModalProps> = ({ company, onSave, onClose 
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogOverlay>
-        <DialogContent className="sm:max-w-[500px]" aria-description='Edit company'>
+        <DialogContent className="sm:max-w-[500px]" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Edit Company</DialogTitle>
           </DialogHeader>

@@ -49,7 +49,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           Add Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]" aria-description='Add new company'>
+      <DialogContent className="sm:max-w-[500px]" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
         </DialogHeader>
