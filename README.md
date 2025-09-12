@@ -8,7 +8,7 @@ Welcome to BDA investment group ERP react Project! This project is designed to p
 2. Navigate to the project directory: `cd client`
 3. Install dependencies: `npm install`
 4. Start the development server: `npm run dev`
-5. Open your browser and visit `http://localhost:5173` to access the application.
+5. Open your browser and visit `http://localhost:1211` to access the application.
 
 ## Technologies Used
 
