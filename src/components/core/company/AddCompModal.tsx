@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription
 } from '../../../components/ui/dialog';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
@@ -50,9 +51,10 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           Add Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" aria-describedby="delete-company-desc">
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
+          <DialogDescription>Add New Company</DialogDescription>
         </DialogHeader>
         <div className="grid grid-row-2 gap-4 py-4">
           <div className="flex flex-col gap-2">
@@ -82,7 +84,9 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
             onClick={handleSubmit}
-          >Save</Button>
+          >
+            Save
+            </Button>
         </div>
       </DialogContent>
     </Dialog>

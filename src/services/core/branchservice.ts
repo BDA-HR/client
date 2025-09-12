@@ -16,7 +16,7 @@ class BranchService {
 
   async getCompanyBranches(companyId: UUID): Promise<Branch[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/company/${companyId}/branches`);
+      const response = await api.get(`${this.baseUrl}/BranchComp/${companyId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching company branches:', error);
