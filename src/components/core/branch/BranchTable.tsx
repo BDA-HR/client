@@ -6,21 +6,22 @@ import {
   MapPin,
   Building,
   MoreVertical,
-  User,
   X,
-  Mail,
-  Phone,
-  Clock,
-  DollarSign,
-  Star,
-  TrendingUp,
-  Layers,
-  BarChart2,
   Calendar
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
-import type { Branch, BranchTableProps } from '../../../types/branches';
-import { companies } from '../../../data/company-branches';
+import type { BranchListDto } from '../../../types/core/branch';
+
+interface BranchTableProps {
+  branches: BranchListDto[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  onBranchUpdate: (branch: BranchListDto) => void;
+  onBranchStatusChange: (id: string, status: string) => void;
+  onBranchDelete: (id: string) => void;
+}
 
 const BranchTable: React.FC<BranchTableProps> = ({
   branches,
@@ -30,41 +31,35 @@ const BranchTable: React.FC<BranchTableProps> = ({
   onPageChange,
   onBranchUpdate,
   onBranchStatusChange,
-  onBranchDelete,
-  companyId
+  onBranchDelete
 }) => {
-  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<BranchListDto | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
-  // Get branches for the specific company if companyId is provided
-  const companyBranches = companyId 
-    ? companies.find(c => c.id === companyId)?.branches || []
-    : branches;
-
-  const sortedBranches = [...companyBranches].sort((a, b) => {
-    return new Date(b.openingDate).getTime() - new Date(a.openingDate).getTime();
+  const sortedBranches = [...branches].sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
-  const handleViewDetails = (branch: Branch) => {
+  const handleViewDetails = (branch: BranchListDto) => {
     setSelectedBranch(branch);
     setModalType('view');
     setPopoverOpen(null);
   };
 
-  const handleEdit = (branch: Branch) => {
+  const handleEdit = (branch: BranchListDto) => {
     setSelectedBranch(branch);
     setModalType('edit');
     setPopoverOpen(null);
   };
 
-  const handleStatusChange = (branch: Branch) => {
+  const handleStatusChange = (branch: BranchListDto) => {
     setSelectedBranch(branch);
     setModalType('status');
     setPopoverOpen(null);
   };
 
-  const handleDelete = (branch: Branch) => {
+  const handleDelete = (branch: BranchListDto) => {
     setSelectedBranch(branch);
     setModalType('delete');
     setPopoverOpen(null);
@@ -72,13 +67,13 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
   const confirmStatusChange = () => {
     if (selectedBranch) {
-      let newStatus: "active" | "inactive" | "under-construction";
-      if (selectedBranch.status === 'active') {
-        newStatus = 'inactive';
-      } else if (selectedBranch.status === 'inactive') {
-        newStatus = 'under-construction';
+      let newStatus: string;
+      if (selectedBranch.branchStat === 'ACTIVE') {
+        newStatus = 'INACTIVE';
+      } else if (selectedBranch.branchStat === 'INACTIVE') {
+        newStatus = 'UNDER_CONSTRUCTION';
       } else {
-        newStatus = 'active';
+        newStatus = 'ACTIVE';
       }
       onBranchStatusChange(selectedBranch.id, newStatus);
       setModalType(null);
@@ -92,28 +87,26 @@ const BranchTable: React.FC<BranchTableProps> = ({
     }
   };
 
-  const handleSaveChanges = (updatedBranch: Branch) => {
+  const handleSaveChanges = (updatedBranch: BranchListDto) => {
     onBranchUpdate(updatedBranch);
     setModalType(null);
   };
 
-  const getStatusColor = (status: Branch["status"]): string => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'active': return 'bg-emerald-100 text-emerald-800';
-      case 'inactive': return 'bg-red-100 text-red-800';
-      case 'under-construction': return 'bg-yellow-100 text-yellow-800';
+      case 'ACTIVE': return 'bg-emerald-100 text-emerald-800';
+      case 'INACTIVE': return 'bg-red-100 text-red-800';
+      case 'UNDER_CONSTRUCTION': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getCountryColor = (country: string): string => {
-    switch (country) {
-      case "USA": return "text-red-600";
-      case "UK": return "text-blue-600";
-      case "Canada": return "text-emerald-600";
-      case "Australia": return "text-amber-600";
-      case "Germany": return "text-indigo-600";
-      default: return "text-gray-600";
+  const getStatusText = (status: string): string => {
+    switch (status) {
+      case 'ACTIVE': return 'Active';
+      case 'INACTIVE': return 'Inactive';
+      case 'UNDER_CONSTRUCTION': return 'Under Construction';
+      default: return status;
     }
   };
 
@@ -155,6 +148,9 @@ const BranchTable: React.FC<BranchTableProps> = ({
                   Location
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                  Company
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Opened
                 </th>
                 <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -185,27 +181,32 @@ const BranchTable: React.FC<BranchTableProps> = ({
                           {branch.name}
                         </div>
                         <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                          ID: {branch.branchId}
+                          {branch.code}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.status)}`}>
-                      {branch.status === "active" ? "Active" : 
-                       branch.status === "inactive" ? "Inactive" : "Under Construction"}
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
+                      {getStatusText(branch.branchStat)}
                     </span>
                   </td>
-                  <td className={`px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell ${getCountryColor(branch.country)}`}>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
                     <div className="flex items-center">
                       <MapPin className="text-gray-400 mr-2 h-4 w-4" />
-                      <span className="truncate max-w-[120px]">{branch.city}, {branch.country}</span>
+                      <span className="truncate max-w-[120px]">{branch.location}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                    <div className="flex items-center">
+                      <Building className="text-gray-400 mr-2 h-4 w-4" />
+                      <span>{branch.comp}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <div className="flex items-center">
                       <Calendar className="text-gray-400 mr-2 h-4 w-4" />
-                      <span>{branch.openingDate}</span>
+                      <span>{branch.dateOpened}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -318,14 +319,14 @@ const BranchTable: React.FC<BranchTableProps> = ({
         </div>
       </motion.div>
 
-      {/* Enhanced Branch Details Modal */}
+      {/* View Details Modal */}
       {selectedBranch && modalType === 'view' && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
               <div>
                 <h2 className="text-2xl font-bold">{selectedBranch.name}</h2>
-                <p className="text-gray-600">{selectedBranch.type} • {selectedBranch.city}, {selectedBranch.country}</p>
+                <p className="text-gray-600">{selectedBranch.code} • {selectedBranch.location}</p>
               </div>
               <button
                 onClick={() => setModalType(null)}
@@ -335,194 +336,78 @@ const BranchTable: React.FC<BranchTableProps> = ({
               </button>
             </div>
 
-            <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Basic Information */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Building className="mr-2 text-emerald-500" size={20} />
                     Branch Information
                   </h3>
                   <div className="space-y-3">
-                    <div className="flex items-start">
-                      <MapPin className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Address</p>
-                        <p>{selectedBranch.address}, {selectedBranch.city}, {selectedBranch.country}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Phone className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Phone</p>
-                        <p>{selectedBranch.phone}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Mail className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Email</p>
-                        <p>{selectedBranch.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <User className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Manager</p>
-                        <p>{selectedBranch.manager}</p>
-                      </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Name (English)</p>
+                      <p className="font-medium">{selectedBranch.name}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Branch ID</p>
-                      <p className="font-medium">{selectedBranch.branchId}</p>
+                      <p className="text-sm text-gray-500">Name (Amharic)</p>
+                      <p className="font-medium">{selectedBranch.nameAm}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Code</p>
+                      <p className="font-medium">{selectedBranch.code}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Location</p>
+                      <p className="font-medium">{selectedBranch.location}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Operating Details */}
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Clock className="mr-2 text-blue-500" size={20} />
-                    Operating Details
+                    <MapPin className="mr-2 text-blue-500" size={20} />
+                    Status & Company
                   </h3>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-gray-500">Opening Date</p>
-                      <p>{selectedBranch.openingDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Operating Hours</p>
-                      <p>{selectedBranch.operatingHours}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Total Employees</p>
-                      <p>{selectedBranch.totalEmployees}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Facilities</p>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {selectedBranch.facilities.map((facility, index) => (
-                          <span key={index} className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                            {facility}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Financial Information */}
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <DollarSign className="mr-2 text-green-500" size={20} />
-                    Financial Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-500">Annual Revenue</p>
-                      <p className="text-lg font-medium">
-                        {selectedBranch.currency} {selectedBranch.annualRevenue.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Tax ID</p>
-                      <p>{selectedBranch.taxId}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Bank Accounts</p>
-                      <div className="mt-2 space-y-2">
-                        {selectedBranch.bankAccounts.map((account, index) => (
-                          <div key={index} className="text-sm p-2 bg-gray-50 rounded">
-                            <p className="font-medium">{account.bankName}</p>
-                            <p className="text-gray-500">••••{account.accountNumber.slice(-4)}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Services */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Layers className="mr-2 text-purple-500" size={20} />
-                    Services Offered
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedBranch.services.map((service, index) => (
-                      <span key={index} className="px-3 py-1 text-sm rounded-full bg-emerald-100 text-emerald-800">
-                        {service}
+                      <p className="text-sm text-gray-500">Status</p>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedBranch.branchStat)}`}>
+                        {getStatusText(selectedBranch.branchStat)}
                       </span>
-                    ))}
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Company</p>
+                      <p className="font-medium">{selectedBranch.comp}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Company (Amharic)</p>
+                      <p className="font-medium">{selectedBranch.compAm}</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Performance Metrics */}
-              <div className="space-y-6">
+              {/* Dates and Additional Info */}
+              <div className="space-y-4">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <BarChart2 className="mr-2 text-amber-500" size={20} />
-                    Performance Metrics
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Customer Satisfaction</p>
-                      <div className="flex items-center">
-                        <span className="px-2 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
-                          {selectedBranch.customerSatisfaction}/10
-                        </span>
-                        <div className="ml-2 flex">
-                          {[...Array(10)].map((_, i) => (
-                            <Star 
-                              key={i} 
-                              size={16} 
-                              className={`${i < Math.floor(selectedBranch.customerSatisfaction) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Last Audit Date</p>
-                      <p>{selectedBranch.lastAuditDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Audit Score</p>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                        <div 
-                          className="h-2.5 rounded-full bg-emerald-500" 
-                          style={{ width: `${selectedBranch.auditScore}%` }}
-                        ></div>
-                      </div>
-                      <p className="text-right text-sm mt-1">{selectedBranch.auditScore}%</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* KPIs */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <TrendingUp className="mr-2 text-blue-500" size={20} />
-                    Key Performance Indicators
+                    <Calendar className="mr-2 text-purple-500" size={20} />
+                    Date Information
                   </h3>
                   <div className="space-y-3">
-                    {selectedBranch.keyPerformanceIndicators.slice(0, 3).map((kpi, index) => (
-                      <div key={index} className="text-sm">
-                        <div className="flex justify-between">
-                          <span className="font-medium">{kpi.name}</span>
-                          <span className="text-emerald-600">{kpi.actual}/{kpi.target}</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                          <div 
-                            className="h-1.5 rounded-full bg-emerald-500" 
-                            style={{ width: `${(parseFloat(kpi.actual) / parseFloat(kpi.target)) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
+                    <div>
+                      <p className="text-sm text-gray-500">Date Opened (Gregorian)</p>
+                      <p className="font-medium">{selectedBranch.dateOpened}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Date Opened (Ethiopian)</p>
+                      <p className="font-medium">{selectedBranch.dateOpenedAm}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Created At</p>
+                      <p className="font-medium">{new Date(selectedBranch.createdAt).toLocaleDateString()}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -554,7 +439,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
               </button>
             </div>
             <div className="p-6">
-              {/* Edit form would go here */}
               <p className="text-gray-600">Edit form implementation would go here...</p>
             </div>
             <div className="border-t p-4 flex justify-end space-x-3 sticky bottom-0 bg-white">
@@ -583,8 +467,8 @@ const BranchTable: React.FC<BranchTableProps> = ({
               <h2 className="text-xl font-bold mb-4">Confirm Status Change</h2>
               <p className="text-gray-600 mb-6">
                 Are you sure you want to change {selectedBranch.name}'s status to{' '}
-                {selectedBranch.status === 'active' ? 'Inactive' : 
-                 selectedBranch.status === 'inactive' ? 'Under Construction' : 'Active'}?
+                {selectedBranch.branchStat === 'ACTIVE' ? 'Inactive' : 
+                 selectedBranch.branchStat === 'INACTIVE' ? 'Under Construction' : 'Active'}?
               </p>
               <div className="flex justify-end space-x-3">
                 <button

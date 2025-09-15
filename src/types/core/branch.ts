@@ -1,12 +1,57 @@
 import type { BaseDto } from './BaseDto';
-import { BranchStat } from './enum';
 
+export type UUID = string;
+
+export interface BranchListDto extends BaseDto {
+  name: string;
+  nameAm: string;
+  code: string;
+  location: string;
+  branchType: string;
+  branchStat: string;
+  comp: string;
+  compAm: string;
+  dateOpenedAm: string;
+  dateOpened: string;
+}
+
+export interface AddBranchDto {
+  name: string;
+  nameAm: string;
+  code: string;
+  location: string;
+  dateOpened: string; // ISO string format
+  branchType: string;
+  branchStat: string;
+  compId: UUID;
+}
+
+export interface EditBranchDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+  code: string;
+  location: string;
+  dateOpened: string; // ISO string format
+  branchType: string;
+  branchStat: string;
+  compId: UUID;
+  rowVersion: string;
+}
+
+// Original Branch interface for detailed view
 export interface Branch extends BaseDto {
   branchId: string;
   name: string;
-  status: BranchStat;
-  city: string;
-  country: string;
+  nameAm: string;
+  code: string;
+  location: string;
+  branchType: string;
+  branchStat: string;
+  compId: UUID;
+  comp: string;
+  compAm: string;
+  openDate: string; // ISO string format
+  dateOpenedAm: string;
+  dateOpened: string;
 }
-
-export type { UUID } from './BaseDto';

@@ -1,12 +1,24 @@
 import { api } from '../api';
-import type { Branch, UUID } from '../../types/core/branch';
+import type { Branch, BranchListDto, AddBranchDto, EditBranchDto, UUID } from '../../types/core/branch';
 
 class BranchService {
   private baseUrl = `${import.meta.env.VITE_CORE_URL || 'core/v1'}/branch`;
 
-  async getBranchById(id: string): Promise<Branch> {
+  // GET: baseurl/AllBranch
+  async getAllBranches(): Promise<BranchListDto[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/${id}`);
+      const response = await api.get(`${this.baseUrl}/AllBranch`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+      throw error;
+    }
+  }
+
+  // GET: baseurl/GetBranch/{id}
+  async getBranchById(id: UUID): Promise<Branch> {
+    try {
+      const response = await api.get(`${this.baseUrl}/GetBranch/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching branch:', error);
@@ -14,7 +26,8 @@ class BranchService {
     }
   }
 
-  async getCompanyBranches(companyId: UUID): Promise<Branch[]> {
+  // GET: baseurl/BranchComp/{id}
+  async getCompanyBranches(companyId: UUID): Promise<BranchListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/BranchComp/${companyId}`);
       return response.data;
@@ -24,9 +37,10 @@ class BranchService {
     }
   }
 
-  async createBranch(branch: Omit<Branch, 'id'>): Promise<Branch> {
+  // POST: baseurl/AddBranch
+  async createBranch(branch: AddBranchDto): Promise<BranchListDto> {
     try {
-      const response = await api.post(this.baseUrl, branch);
+      const response = await api.post(`${this.baseUrl}/AddBranch`, branch);
       return response.data;
     } catch (error) {
       console.error('Error creating branch:', error);
@@ -34,9 +48,10 @@ class BranchService {
     }
   }
 
-  async updateBranch(id: UUID, branch: Partial<Branch>): Promise<Branch> {
+  // PUT: baseurl/ModBranch/{id}
+  async updateBranch(updateData: EditBranchDto): Promise<BranchListDto> {
     try {
-      const response = await api.put(`${this.baseUrl}/${id}`, branch);
+      const response = await api.put(`${this.baseUrl}/ModBranch/${updateData.id}`, updateData);
       return response.data;
     } catch (error) {
       console.error('Error updating branch:', error);
@@ -44,15 +59,15 @@ class BranchService {
     }
   }
 
+  // DELETE: baseurl/DelBranch/{id}
   async deleteBranch(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/${id}`);
+      await api.delete(`${this.baseUrl}/DelBranch/${id}`);
     } catch (error) {
       console.error('Error deleting branch:', error);
       throw error;
     }
   }
 }
-
 
 export const branchService = new BranchService();
