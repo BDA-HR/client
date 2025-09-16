@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { BranchListDto } from '../../../types/core/branch';
+import type { EditBranchDto } from '../../../types/core/branch';
+import { EditBranchModal } from './EditBranchModal';
 
 interface BranchTableProps {
   branches: BranchListDto[];
@@ -36,6 +38,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
   const [selectedBranch, setSelectedBranch] = useState<BranchListDto | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const sortedBranches = [...branches].sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -49,7 +52,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
   const handleEdit = (branch: BranchListDto) => {
     setSelectedBranch(branch);
-    setModalType('edit');
+    setIsEditModalOpen(true);
     setPopoverOpen(null);
   };
 
@@ -87,9 +90,19 @@ const BranchTable: React.FC<BranchTableProps> = ({
     }
   };
 
-  const handleSaveChanges = (updatedBranch: BranchListDto) => {
+  const handleSaveChanges = (updatedData: EditBranchDto) => {
+    const updatedBranch: BranchListDto = {
+      ...selectedBranch!,
+      ...updatedData,
+      comp: selectedBranch!.comp,
+      compAm: selectedBranch!.compAm,
+      dateOpenedAm: selectedBranch!.dateOpenedAm,
+      isDeleted: selectedBranch!.isDeleted,
+      createdAt: selectedBranch!.createdAt,
+    };
+
     onBranchUpdate(updatedBranch);
-    setModalType(null);
+    setIsEditModalOpen(false);
   };
 
   const getStatusColor = (status: string): string => {
@@ -317,7 +330,71 @@ const BranchTable: React.FC<BranchTableProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Status Change Confirmation Modal */}
+        {selectedBranch && modalType === 'status' && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+              <div className="p-6">
+                <h2 className="text-xl font-bold mb-4">Confirm Status Change</h2>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to change the status of {selectedBranch.name} branch?
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setModalType(null)}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmStatusChange}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {selectedBranch && modalType === 'delete' && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+              <div className="p-6">
+                <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to delete {selectedBranch.name} branch? This action cannot be undone.
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setModalType(null)}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeletion}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </motion.div>
+
+      {/* Edit Modal */}
+      <EditBranchModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveChanges}
+        branch={selectedBranch}
+      />
 
       {/* View Details Modal */}
       {selectedBranch && modalType === 'view' && (
@@ -420,98 +497,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
               >
                 Close
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {selectedBranch && modalType === 'edit' && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold">Edit Branch Details</h2>
-              <button
-                onClick={() => setModalType(null)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={24} />
-              </button>
-            </div>
-            <div className="p-6">
-              <p className="text-gray-600">Edit form implementation would go here...</p>
-            </div>
-            <div className="border-t p-4 flex justify-end space-x-3 sticky bottom-0 bg-white">
-              <button
-                onClick={() => setModalType(null)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleSaveChanges(selectedBranch)}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Status Change Confirmation Modal */}
-      {selectedBranch && modalType === 'status' && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <h2 className="text-xl font-bold mb-4">Confirm Status Change</h2>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to change {selectedBranch.name}'s status to{' '}
-                {selectedBranch.branchStat === 'ACTIVE' ? 'Inactive' : 
-                 selectedBranch.branchStat === 'INACTIVE' ? 'Under Construction' : 'Active'}?
-              </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setModalType(null)}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmStatusChange}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {selectedBranch && modalType === 'delete' && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to delete {selectedBranch.name} branch? This action cannot be undone.
-              </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setModalType(null)}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDeletion}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white"
-                >
-                  Delete
-                </button>
-              </div>
             </div>
           </div>
         </div>
