@@ -17,6 +17,8 @@ const BranchesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const companyName = branches.length > 0 ? branches[0].comp : '';
+
   useEffect(() => {
     if (companyId) {
       loadCompanyBranches(companyId);
@@ -160,11 +162,11 @@ const BranchesPage = () => {
             animate={{ opacity: 1, x: 0 }}
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
-            {companyId ? `Branches for Company ${companyId}` : 'All Branches'}
+            {companyId ? `Branches for ${companyName || 'Company'}` : 'All Branches'}
           </motion.h1>
           {companyId && (
             <p className="text-gray-600 mt-1">
-              Viewing branches specific to this company
+              {`Viewing branches for ${companyName || 'this company'}`}
             </p>
           )}
         </div>
@@ -206,6 +208,7 @@ const BranchesPage = () => {
         onClose={() => setIsAddModalOpen(false)}
         onAddBranch={handleAddBranch}
         defaultCompanyId={companyId || undefined}
+        companyName={companyName}
       />
     </div>
   );

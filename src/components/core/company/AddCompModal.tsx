@@ -55,7 +55,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           <DialogTitle>Add New Company</DialogTitle>
           <DialogDescription className='hidden'>Add New Company</DialogDescription>
         </DialogHeader>
-        <div className="grid grid-row-2 gap-4 py-4">
+        <div className="flex gap-4 py-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="nameAm">የኩባንያው ስም</Label>
             <input

@@ -11,13 +11,15 @@ interface AddBranchModalProps {
   onClose: () => void;
   onAddBranch: (branchData: AddBranchDto) => void;
   defaultCompanyId?: string;
+  companyName?: string; // Prop for company name
 }
 
 export const AddBranchModal: React.FC<AddBranchModalProps> = ({ 
   isOpen, 
   onClose,
   onAddBranch,
-  defaultCompanyId 
+  defaultCompanyId,
+  companyName = '' // Default to empty string
 }) => {
   const [branchName, setBranchName] = useState('');
   const [branchNameAm, setBranchNameAm] = useState('');
@@ -39,9 +41,7 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
         nameAm: branchNameAm.trim(),
         code: branchCode.trim(),
         location: branchLocation.trim(),
-        dateOpened: new Date().toISOString(), // Current date as default
-        branchType: 'REGULAR', // Default value
-        branchStat: 'ACTIVE', // Default value
+        branchStat: 'ACTIVE',
         compId: defaultCompanyId
       };
       
@@ -82,7 +82,8 @@ export const AddBranchModal: React.FC<AddBranchModalProps> = ({
               {defaultCompanyId && (
                 <div className="bg-gray-100 p-3 rounded-md">
                   <p className="text-sm text-gray-600">
-                    Adding branch to Company ID: {defaultCompanyId}
+                    {/* Display company name if available */}
+                    Adding branch to: {companyName || `Company ID: ${defaultCompanyId}`}
                   </p>
                 </div>
               )}
