@@ -1,6 +1,6 @@
-import { Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
-import type { NewFiscalYear } from '../../../types/fiscalYear';
+import type { AddFiscYearDto } from '../../../types/core/fisc';
 import React from 'react';
 
 export const AddFiscalYearModal = ({
@@ -12,19 +12,10 @@ export const AddFiscalYearModal = ({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  newYear: NewFiscalYear;
-  setNewYear: (year: NewFiscalYear) => void;
+  newYear: AddFiscYearDto;
+  setNewYear: (year: AddFiscYearDto) => void;
   onAddFiscalYear: () => void;
 }) => {
-  const amharicRegex = /^[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\s0-9]*$/;
-
-  const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (amharicRegex.test(value)) {
-      setNewYear({ ...newYear, nameAm: value });
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAddFiscalYear();
@@ -41,32 +32,15 @@ export const AddFiscalYearModal = ({
                 Fill in the details below to create a new fiscal year period.
               </DialogDescription>
             </div>
-
           </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
           <div className="grid md:grid-cols-2 gap-6 mt-4">
-            {/* Amharic Name */}
-            <div>
-              <label htmlFor="yearNameAm" className="block text-sm font-medium text-gray-700 mb-1">
-                የበጀት አመት  <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="yearNameAm"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                placeholder="ምሳሌ፡ 2017 ዓ.ም"
-                value={newYear.nameAm || ''}
-                onChange={handleAmharicChange}
-                required
-              />
-            </div>
-
-            {/* English Name */}
+            {/* Name */}
             <div>
               <label htmlFor="yearName" className="block text-sm font-medium text-gray-700 mb-1">
-                Fiscal Year  <span className="text-red-500">*</span>
+                Fiscal Year Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -87,9 +61,9 @@ export const AddFiscalYearModal = ({
               <select
                 id="isActive"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                value={newYear.isActive}
+                value={newYear.isActive || 'Yes'}
                 onChange={(e) =>
-                  setNewYear({ ...newYear, isActive: e.target.value as 'Yes' | 'No' })
+                  setNewYear({ ...newYear, isActive: e.target.value })
                 }
               >
                 <option value="Yes">Active</option>
@@ -106,8 +80,11 @@ export const AddFiscalYearModal = ({
                 type="date"
                 id="startDate"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                value={newYear.dateStart}
-                onChange={(e) => setNewYear({ ...newYear, dateStart: e.target.value })}
+                value={newYear.dateStart ? newYear.dateStart.split('T')[0] : ''}
+                onChange={(e) => setNewYear({ 
+                  ...newYear, 
+                  dateStart: e.target.value ? new Date(e.target.value).toISOString() : '' 
+                })}
                 required
               />
             </div>
@@ -121,8 +98,11 @@ export const AddFiscalYearModal = ({
                 type="date"
                 id="endDate"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                value={newYear.dateEnd}
-                onChange={(e) => setNewYear({ ...newYear, dateEnd: e.target.value })}
+                value={newYear.dateEnd ? newYear.dateEnd.split('T')[0] : ''}
+                onChange={(e) => setNewYear({ 
+                  ...newYear, 
+                  dateEnd: e.target.value ? new Date(e.target.value).toISOString() : '' 
+                })}
                 required
               />
             </div>
