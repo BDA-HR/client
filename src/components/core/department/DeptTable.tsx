@@ -8,17 +8,6 @@ import {
   MoreVertical,
   User,
   X,
-  Mail,
-  Phone,
-  Clock,
-  DollarSign,
-  Star,
-  TrendingUp,
-  Layers,
-  BarChart2,
-  Calendar,
-  PencilIcon,
-  TrashIcon
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import EditDepartmentForm from './EditDeptForm';
@@ -31,7 +20,7 @@ interface DepartmentTableProps {
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  onDepartmentUpdate: (department: Department) => void;
+  onEditDepartment: (department: Department) => void;
   onDepartmentStatusChange: (id: string, status: "active" | "inactive") => void;
   onDepartmentDelete: (id: string) => void;
 }
@@ -42,14 +31,13 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   totalPages,
   totalItems,
   onPageChange,
-  onDepartmentUpdate,
+  onEditDepartment,
   onDepartmentStatusChange,
   onDepartmentDelete,
 }) => {
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
-  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
 
   const getCompanyName = (companyId: number): string => {
     const company = companies.find(c => c.id === companyId);
@@ -66,8 +54,8 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   };
 
   const handleEditSubmit = (values: Department) => {
-    onDepartmentUpdate(values);
-    setEditingDepartment(null);
+    onEditDepartment(values);
+    setModalType(null);
   };
 
   const handleStatusToggle = (department: Department) => {
@@ -124,17 +112,8 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
             }
           }
         }}
-        className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm overflow-hidden"
+        className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-sm overflow-hidden ${modalType === 'edit' ? 'blur-sm' : ''}`}
       >
-        {editingDepartment && (
-          <EditDepartmentForm
-            department={editingDepartment}
-            companies={companies}
-            onSubmit={handleEditSubmit}
-            onCancel={() => setEditingDepartment(null)}
-          />
-        )}
-
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -235,10 +214,11 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                               View Details
                             </button>
                             <button 
-                              onClick={() => setEditingDepartment(department)}
+                              onClick={() => onEditDepartment(department)}
+                              
                               className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
-                            >
-                              Edit
+                              >
+                               Edit
                             </button>
                             <button 
                               onClick={() => handleStatusToggle(department)}
@@ -328,7 +308,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
 
       {/* Enhanced Department Details Modal */}
       {selectedDepartment && modalType === 'view' && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-500/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
               <div>
@@ -347,8 +327,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
               {/* Basic Information */}
               <div className="space-y-6">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Building className="mr-2 text-emerald-500" size={20} />
+                  <h3 className="text-lg font-semibold mb-4">
                     Department Information
                   </h3>
                   <div className="space-y-3">
@@ -384,8 +363,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
 
                 {/* Description */}
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Building className="mr-2 text-blue-500" size={20} />
+                  <h3 className="text-lg font-semibold mb-4">
                     Description
                   </h3>
                   <p className="text-gray-700">
@@ -397,8 +375,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
               {/* Company Information */}
               <div className="space-y-6">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Building className="mr-2 text-purple-500" size={20} />
+                  <h3 className="text-lg font-semibold mb-4">
                     Company Details
                   </h3>
                   <div className="space-y-3">
@@ -436,7 +413,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
 
       {/* Delete Confirmation Modal */}
       {selectedDepartment && modalType === 'delete' && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-500/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
             <div className="p-6">
               <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
@@ -457,6 +434,31 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                   Delete
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal - Only the form without dark background */}
+      {selectedDepartment && modalType === 'edit' && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Edit Department</h2>
+                <button
+                  onClick={() => setModalType(null)}
+                  className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <EditDepartmentForm
+                department={selectedDepartment}
+                companies={companies}
+                onSubmit={handleEditSubmit}
+                onCancel={() => setModalType(null)}
+              />
             </div>
           </div>
         </div>

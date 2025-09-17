@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import DepartmentManagementHeader from '../../../components/core/department/DeptHeader';
 import DepartmentStatsCards from '../../../components/core/department/DeptStatusCards';
 import DepartmentSearchFilters from '../../../components/core/department/DeptSearchFilters';
 import DepartmentTable from '../../../components/core/department/DeptTable';
+import EditDepartmentForm from '../../../components/core/department/AddDeptForm';
 import type { Department } from '../../../types/department';
 import { initialDepartments } from '../../../data/department';
 
@@ -14,6 +15,8 @@ const DepartmentOverview = () => {
     location: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const itemsPerPage = 8;
   const [departments, setDepartments] = useState<Department[]>(initialDepartments);
 
@@ -27,10 +30,21 @@ const DepartmentOverview = () => {
     setCurrentPage(1);
   };
 
+  const handleEditClick = (department: Department) => {
+    setEditingDepartment(department);
+    setIsEditModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsEditModalOpen(false);
+    setEditingDepartment(null);
+  };
+
   const handleDepartmentUpdate = (updatedDepartment: Department) => {
     setDepartments(prev => 
       prev.map(dept => dept.id === updatedDepartment.id ? updatedDepartment : dept)
     );
+    handleModalClose();
   };
 
   const handleDepartmentStatusChange = (departmentId: string, newStatus: "active" | "inactive") => {
@@ -69,44 +83,59 @@ const DepartmentOverview = () => {
   const locations = [...new Set(departments.map(dept => dept.location))];
 
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="p-4 md:p-6 bg-gray-50 min-h-screen"
-    >
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col space-y-6">
-          <DepartmentManagementHeader />
-          
-          <DepartmentStatsCards 
-            totalDepartments={departments.length}
-            activeDepartments={departments.filter(d => d.status === "active").length}
-            employeeCount={departments.reduce((sum, dept) => sum + dept.employeeCount, 0)}
-          />
+    <>
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className={`p-4 md:p-6 bg-gray-50 min-h-screen transition-all duration-300 ${isEditModalOpen ? 'blur-sm' : ''}`}
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col space-y-6">
+            <DepartmentManagementHeader />
+            
+            <DepartmentStatsCards 
+              totalDepartments={departments.length}
+              activeDepartments={departments.filter(d => d.status === "active").length}
+              employeeCount={departments.reduce((sum, dept) => sum + dept.employeeCount, 0)}
+            />
 
-          <DepartmentSearchFilters 
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filters={filters}
-            setFilters={setFilters}
-            locations={locations}
-            onAddDepartment={handleAddDepartment}
-          />
+            <DepartmentSearchFilters 
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              filters={filters}
+              setFilters={setFilters}
+              locations={locations}
+              onAddDepartment={handleAddDepartment}
+            />
 
-          <DepartmentTable 
-            departments={paginatedDepartments}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={filteredDepartments.length}
-            onPageChange={setCurrentPage}
-            onDepartmentUpdate={handleDepartmentUpdate}
-            onDepartmentStatusChange={handleDepartmentStatusChange}
-            onDepartmentDelete={handleDepartmentDelete}
-          />
+            <DepartmentTable 
+              departments={paginatedDepartments}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredDepartments.length}
+              onPageChange={setCurrentPage}
+              onEditDepartment={handleEditClick}
+              onDepartmentStatusChange={handleDepartmentStatusChange}
+              onDepartmentDelete={handleDepartmentDelete}
+            />
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Edit Department Modal */}
+      {isEditModalOpen && editingDepartment && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 shadow-xl">
+            <EditDepartmentForm
+              department={editingDepartment}
+              onSubmit={handleDepartmentUpdate}
+              onCancel={handleModalClose}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
