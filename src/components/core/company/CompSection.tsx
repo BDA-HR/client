@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { companyService } from '../../../services/core/compservice';
-import type { CompListDto, UUID } from '../../../types/core/comp'; // Changed from Company to CompListDto
+import type { CompListDto, UUID } from '../../../types/core/comp';
 import type { Branch } from '../../../types/core/branch';
 import AddCompModal from './AddCompModal';
 import EditCompModal from './EditCompModal';
@@ -9,14 +9,14 @@ import CompList from './CompList';
 import BranchView from '../branch/BranchView';
 
 interface CompSectionProps {
-  onClick: (companyId: UUID) => void;
+  onClick?: (companyId: UUID) => void;
 }
 
 const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
-  const [companies, setCompanies] = useState<CompListDto[]>([]); // Changed from Company[] to CompListDto[]
+  const [companies, setCompanies] = useState<CompListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editCompany, setEditCompany] = useState<CompListDto | null>(null); // Changed from Company to CompListDto
+  const [editCompany, setEditCompany] = useState<CompListDto | null>(null);
   const [viewingBranches, setViewingBranches] = useState<{companyId: UUID, branches: Branch[]} | null>(null);
 
   // Fetch companies on component mount
@@ -47,7 +47,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     } catch (err) {
       console.error('Failed to create company:', err);
       setError('Failed to create company. Please try again.');
-      throw err; // Re-throw to let the modal handle the error
+      throw err;
     }
   };
 
@@ -63,7 +63,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     } catch (err) {
       console.error('Failed to update company:', err);
       setError('Failed to update company. Please try again.');
-      throw err; // Re-throw to let the modal handle the error
+      throw err;
     }
   };
 
@@ -80,8 +80,10 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
 
   const handleViewBranches = async (companyId: UUID) => {
     try {
-      // Call the onClick prop to notify the parent component
-      onClick(companyId);
+      // Only call onClick if it was provided
+      if (onClick) {
+        onClick(companyId);
+      }
     } catch (err) {
       console.error('Failed to fetch branches:', err);
       setError('Failed to load branches. Please try again.');

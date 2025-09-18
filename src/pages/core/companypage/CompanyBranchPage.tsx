@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
-import { companies } from '../../../data/company';
 import CompSection from '../../../components/core/company/CompSection';
 import AddHierarchy from '../../../components/core/company/HierSection';
 
@@ -9,12 +8,14 @@ const CompanyBranchesPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const navigate = useNavigate();
 
-  const company = companies.find(c => c.id === Number(companyId)) || companies[0];
-  const selectedCompany = company.name;
-
-
   const handleViewBranches = () => {
     navigate(`/branches?companyId=${companyId}`);
+  };
+
+  // Add this function to handle company clicks
+  const handleCompanyClick = (companyId: string) => {
+    // You can implement logic here if needed
+    console.log('Company clicked:', companyId);
   };
 
   return (
@@ -26,7 +27,8 @@ const CompanyBranchesPage = () => {
         className="flex items-center justify-between"
       ></motion.div>
         <>
-          <CompSection />
+          {/* Pass the onClick prop to CompSection */}
+          <CompSection onClick={handleCompanyClick} />
           <Button 
               onClick={handleViewBranches}
               className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer"

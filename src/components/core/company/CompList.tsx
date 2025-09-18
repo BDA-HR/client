@@ -8,14 +8,14 @@ import {
   DropdownMenuItem,
 } from '../../../components/ui/dropdown-menu';
 import { motion } from 'framer-motion';
-import type { CompListDto } from '../../../types/core/comp'; // Changed import
+import type { CompListDto, UUID } from '../../../types/core/comp'; // Changed import
 import { useNavigate } from 'react-router-dom';
 
 interface CompListProps {
   companies: CompListDto[]; // Changed from Company[] to CompListDto[]
   onEditCompany: (company: CompListDto) => void; // Changed from Company to CompListDto
-  onDeleteCompany: (companyId: string) => void;
-  onViewBranches: (companyId: string) => void;
+  onDeleteCompany: (companyId: UUID) => void;
+  onViewBranches: (companyId: UUID) => void;
 }
 
 const CompList: React.FC<CompListProps> = ({
