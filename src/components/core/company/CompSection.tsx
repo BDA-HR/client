@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { companyService } from '../../../services/core/compservice';
 import type { CompListDto, UUID } from '../../../types/core/comp';
-import type { Branch } from '../../../types/core/branch';
 import AddCompModal from './AddCompModal';
 import EditCompModal from './EditCompModal';
+import DeleteCompDialog from './DeleteCompModal';
 import CompList from './CompList';
-import BranchView from '../branch/BranchView';
 
 interface CompSectionProps {
   onClick?: (companyId: UUID) => void;
@@ -17,7 +16,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editCompany, setEditCompany] = useState<CompListDto | null>(null);
-  const [viewingBranches, setViewingBranches] = useState<{companyId: UUID, branches: Branch[]} | null>(null);
+  const [deleteCompany, setDeleteCompany] = useState<CompListDto | null>(null);
 
   // Fetch companies on component mount
   useEffect(() => {
@@ -38,7 +37,6 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     fetchCompanies();
   }, []);
 
-  // Update the handleAddCompany parameter type
   const handleAddCompany = async (companyData: { name: string; nameAm: string }) => {
     try {
       const newCompany = await companyService.createCompany(companyData);
@@ -51,7 +49,6 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     }
   };
 
-  // Update the handleEditCompany parameter type
   const handleEditCompany = async (updatedCompany: CompListDto) => {
     try {
       const result = await companyService.updateCompany(updatedCompany);
@@ -71,6 +68,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     try {
       await companyService.deleteCompany(companyId);
       setCompanies((prev) => prev.filter((c) => c.id !== companyId));
+      setDeleteCompany(null);
       setError(null);
     } catch (err) {
       console.error('Failed to delete company:', err);
@@ -78,34 +76,11 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     }
   };
 
-  const handleViewBranches = async (companyId: UUID) => {
-    try {
-      // Only call onClick if it was provided
-      if (onClick) {
-        onClick(companyId);
-      }
-    } catch (err) {
-      console.error('Failed to fetch branches:', err);
-      setError('Failed to load branches. Please try again.');
+  const handleViewBranches = (companyId: UUID) => {
+    if (onClick) {
+      onClick(companyId);
     }
   };
-
-  const handleBackToCompanies = () => {
-    setViewingBranches(null);
-  };
-
-  // If viewing branches in this component
-  if (viewingBranches) {
-    const company = companies.find(c => c.id === viewingBranches.companyId);
-    
-    return (
-      <BranchView 
-        company={company}
-        branches={viewingBranches.branches}
-        onBack={handleBackToCompanies}
-      />
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -148,7 +123,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
         <CompList 
           companies={companies}
           onEditCompany={setEditCompany}
-          onDeleteCompany={handleDeleteCompany}
+          onDeleteCompany={setDeleteCompany}
           onViewBranches={handleViewBranches}
         />
       )}
@@ -156,8 +131,17 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
       {/* Edit Modal */}
       <EditCompModal 
         company={editCompany}
-        onSave={handleEditCompany}
+        isOpen={!!editCompany}
         onClose={() => setEditCompany(null)}
+        onSave={handleEditCompany}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteCompDialog
+        company={deleteCompany}
+        isOpen={!!deleteCompany}
+        onClose={() => setDeleteCompany(null)}
+        onConfirm={handleDeleteCompany}
       />
     </div>
   );
