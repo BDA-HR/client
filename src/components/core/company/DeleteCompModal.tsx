@@ -56,12 +56,7 @@ const DeleteCompModal: React.FC<DeleteCompModalProps> = ({
           </div>
         )}
         
-        <DialogFooter className="flex justify-end gap-2">
-          <DialogClose asChild>
-            <Button variant="outline" className="cursor-pointer">
-              Cancel
-            </Button>
-          </DialogClose>
+        <DialogFooter className="flex justify-center gap-2">
           <Button 
             variant="destructive" 
             onClick={handleConfirm}
@@ -69,6 +64,11 @@ const DeleteCompModal: React.FC<DeleteCompModalProps> = ({
           >
             Delete
           </Button>
+            <DialogClose asChild>
+            <Button variant="outline" className="cursor-pointer">
+              Cancel
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
