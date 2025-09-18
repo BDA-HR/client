@@ -1,15 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 import BranchTable from '../../../components/core/branch/BranchTable';
 import { AddBranchModal } from '../../../components/core/branch/AddBranchModal';
 import { branchService } from '../../../services/core/branchservice';
 import type { BranchListDto, AddBranchDto, EditBranchDto } from '../../../types/core/branch';
+import type { UUID } from '../../../types/core/branch';
 
-const BranchesPage = () => {
+interface BranchesPageProps {
+  onBack?: () => void; // Made optional
+}
+
+const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const companyId = searchParams.get('companyId');
   
   const [branches, setBranches] = useState<BranchListDto[]>([]);
@@ -44,7 +50,7 @@ const BranchesPage = () => {
   const loadCompanyBranches = async (compId: string) => {
     try {
       setLoading(true);
-      const companyBranches = await branchService.getCompanyBranches(compId);
+      const companyBranches = await branchService.getCompanyBranches(compId as UUID);
       setBranches(companyBranches);
       setError(null);
     } catch (err) {
@@ -70,9 +76,8 @@ const BranchesPage = () => {
 
   const handleBranchUpdate = async (updatedBranch: BranchListDto) => {
     try {
-      // Convert to EditBranchDto for the update
       const updateData: EditBranchDto = {
-        id: updatedBranch.id,
+        id: updatedBranch.id as UUID,
         name: updatedBranch.name,
         nameAm: updatedBranch.nameAm,
         code: updatedBranch.code,
@@ -80,7 +85,7 @@ const BranchesPage = () => {
         dateOpened: new Date().toISOString(), 
         branchType: 'REGULAR',
         branchStat: updatedBranch.branchStat,
-        compId: updatedBranch.comp,
+        compId: updatedBranch.comp as UUID,
         rowVersion: updatedBranch.rowVersion
       };
       
@@ -99,7 +104,7 @@ const BranchesPage = () => {
       const branch = branches.find(b => b.id === id);
       if (branch) {
         const updateData: EditBranchDto = {
-          id: branch.id,
+          id: branch.id as UUID,
           name: branch.name,
           nameAm: branch.nameAm,
           code: branch.code,
@@ -107,7 +112,7 @@ const BranchesPage = () => {
           dateOpened: new Date().toISOString(),
           branchType: 'REGULAR',
           branchStat: status,
-          compId: branch.comp,
+          compId: branch.comp as UUID,
           rowVersion: branch.rowVersion
         };
         
@@ -123,7 +128,7 @@ const BranchesPage = () => {
 
   const handleBranchDelete = async (id: string) => {
     try {
-      await branchService.deleteBranch(id);
+      await branchService.deleteBranch(id as UUID);
       setBranches(branches.filter(b => b.id !== id));
       setError(null);
     } catch (err) {
@@ -140,6 +145,15 @@ const BranchesPage = () => {
     setIsAddModalOpen(true);
   };
 
+  // Handle back navigation
+  const handleBack = () => {
+    if (onBack) {
+      onBack(); // Use the provided onBack function if available
+    } else {
+      navigate(-1); // Fallback to browser history navigation
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -150,6 +164,16 @@ const BranchesPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* Back Button - Positioned above the header */}
+      <Button 
+        onClick={handleBack} // Use the new handleBack function
+        variant="outline"
+        className="cursor-pointer flex items-center gap-2 mb-4"
+      >
+        <ArrowLeft size={16} />
+        Back to Companies
+      </Button>
+
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -172,10 +196,10 @@ const BranchesPage = () => {
         </div>
         <Button 
           onClick={openAddModal}
-          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer"
+          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-2"
           disabled={!companyId}
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus size={16} />
           Add Branch
         </Button>
       </motion.div>
@@ -185,7 +209,7 @@ const BranchesPage = () => {
           {error}
           <button 
             onClick={() => setError(null)} 
-            className="absolute top-0 right-0 p-2"
+            className="absolute top-0 right-0 p-2 cursor-pointer"
           >
             <span className="text-2xl">&times;</span>
           </button>
@@ -207,7 +231,7 @@ const BranchesPage = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddBranch={handleAddBranch}
-        defaultCompanyId={companyId || undefined}
+        defaultCompanyId={companyId as UUID || undefined}
         companyName={companyName}
       />
     </div>

@@ -10,7 +10,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
-import type { BranchListDto } from '../../../types/core/branch';
+import type { BranchListDto, UUID } from '../../../types/core/branch';
 import type { EditBranchDto } from '../../../types/core/branch';
 import { EditBranchModal } from './EditBranchModal';
 
@@ -21,7 +21,7 @@ interface BranchTableProps {
   totalItems: number;
   onPageChange: (page: number) => void;
   onBranchUpdate: (branch: BranchListDto) => void;
-  onBranchStatusChange: (id: string, status: string) => void;
+  onBranchStatusChange: (id: UUID, status: string) => void;
   onBranchDelete: (id: string) => void;
 }
 
@@ -68,28 +68,27 @@ const BranchTable: React.FC<BranchTableProps> = ({
     setPopoverOpen(null);
   };
 
-  const confirmStatusChange = () => {
-    if (selectedBranch) {
-      let newStatus: string;
-      if (selectedBranch.branchStat === 'ACTIVE') {
-        newStatus = 'INACTIVE';
-      } else if (selectedBranch.branchStat === 'INACTIVE') {
-        newStatus = 'UNDER_CONSTRUCTION';
-      } else {
-        newStatus = 'ACTIVE';
-      }
-      onBranchStatusChange(selectedBranch.id, newStatus);
-      setModalType(null);
+const confirmStatusChange = () => {
+  if (selectedBranch) {
+    let newStatus: string;
+    if (selectedBranch.branchStat === 'ACTIVE') {
+      newStatus = 'INACTIVE';
+    } else if (selectedBranch.branchStat === 'INACTIVE') {
+      newStatus = 'UNDER_CONSTRUCTION';
+    } else {
+      newStatus = 'ACTIVE';
     }
-  };
+    onBranchStatusChange(selectedBranch.id, newStatus);
+    setModalType(null);
+  }
+};
 
-  const confirmDeletion = () => {
-    if (selectedBranch) {
-      onBranchDelete(selectedBranch.id);
-      setModalType(null);
-    }
-  };
-
+const confirmDeletion = () => {
+  if (selectedBranch) {
+    onBranchDelete(selectedBranch.id);
+    setModalType(null);
+  }
+};
   const handleSaveChanges = (updatedData: EditBranchDto) => {
     const updatedBranch: BranchListDto = {
       ...selectedBranch!,
