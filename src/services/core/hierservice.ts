@@ -2,7 +2,7 @@ import { api } from '../api';
 import type { HierListDto, AddHierDto, EditHierDto, UUID } from '../../types/core/hier';
 
 class HierarchyService {
-  private baseUrl = `${import.meta.env.VITE_CORE_URL || 'core/v1'}/hierarchy`;
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/hierarchy`;
 
   async getAllHierarchies(): Promise<HierListDto[]> {
     try {

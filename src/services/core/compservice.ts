@@ -3,7 +3,7 @@ import { api } from '../api';
 import type { CompListDto, AddCompDto, EditCompDto, UUID } from '../../types/core/comp';
 
 class CompanyService {
-  private baseUrl = `${import.meta.env.VITE_CORE_URL || 'core/v1'}/company`;
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/company`;
 
   async getAllCompanies(): Promise<CompListDto[]> {
     try {
