@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { Button } from '../../../components/ui/button';
 import { Plus, ArrowLeft } from 'lucide-react';
 import BranchTable from '../../../components/core/branch/BranchTable';
@@ -22,8 +23,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const companyName = branches.length > 0 ? branches[0].comp : '';
+  const [companyName, setCompanyName] = useState<string>('');
 
   useEffect(() => {
     if (companyId) {
@@ -40,7 +40,9 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       setBranches(allBranches);
       setError(null);
     } catch (err) {
-      setError('Failed to load branches. Please try again later.');
+      const errorMessage = 'Failed to load branches. Please try again later.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error loading branches:', err);
     } finally {
       setLoading(false);
@@ -52,9 +54,19 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       setLoading(true);
       const companyBranches = await branchService.getCompanyBranches(compId as UUID);
       setBranches(companyBranches);
+      if (companyBranches.length > 0) {
+        const name = companyBranches[0].compAm || companyBranches[0].comp;
+        setCompanyName(name || 'this company');
+      } else {
+        // If no branches, use a generic name
+        setCompanyName('this company');
+      }
+      
       setError(null);
     } catch (err) {
-      setError('Failed to load company branches. Please try again later.');
+      const errorMessage = 'Failed to load company branches. Please try again later.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error loading company branches:', err);
     } finally {
       setLoading(false);
@@ -67,8 +79,11 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       setBranches([...branches, newBranch]);
       setIsAddModalOpen(false);
       setError(null);
+      toast.success('Branch added successfully!');
     } catch (err) {
-      setError('Failed to add branch. Please try again.');
+      const errorMessage = 'Failed to add branch. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error adding branch:', err);
       throw err;
     }
@@ -92,8 +107,11 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       const updated = await branchService.updateBranch(updateData);
       setBranches(branches.map(b => b.id === updated.id ? updated : b));
       setError(null);
+      toast.success('Branch updated successfully!');
     } catch (err) {
-      setError('Failed to update branch. Please try again.');
+      const errorMessage = 'Failed to update branch. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error updating branch:', err);
       throw err;
     }
@@ -119,9 +137,12 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         const updated = await branchService.updateBranch(updateData);
         setBranches(branches.map(b => b.id === updated.id ? updated : b));
         setError(null);
+        toast.success(`Branch status updated to ${status}`);
       }
     } catch (err) {
-      setError('Failed to update branch status. Please try again.');
+      const errorMessage = 'Failed to update branch status. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error updating branch status:', err);
     }
   };
@@ -131,15 +152,26 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       await branchService.deleteBranch(id as UUID);
       setBranches(branches.filter(b => b.id !== id));
       setError(null);
+      toast.success('Branch deleted successfully!');
     } catch (err) {
-      setError('Failed to delete branch. Please try again.');
+      const errorMessage = 'Failed to delete branch. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error deleting branch:', err);
     }
   };
 
   const openAddModal = () => {
     if (!companyId) {
-      setError('Please select a company first');
+      const warningMessage = 'Please select a company first';
+      setError(warningMessage);
+      toast(warningMessage, {
+        icon: '⚠️',
+        style: {
+          background: '#ffcc00',
+          color: '#000',
+        },
+      });
       return;
     }
     setIsAddModalOpen(true);
@@ -166,7 +198,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
     <div className="space-y-6">
       {/* Back Button - Positioned above the header */}
       <Button 
-        onClick={handleBack} // Use the new handleBack function
+        onClick={handleBack}
         variant="outline"
         className="cursor-pointer flex items-center gap-2 mb-4"
       >
@@ -186,11 +218,15 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
             animate={{ opacity: 1, x: 0 }}
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
-            {companyId ? `Branches for ${companyName || 'Company'}` : 'All Branches'}
+            {companyId ? `Branches for ${companyName}` : 'Branches for All Companies'}
           </motion.h1>
-          {companyId && (
+          {companyId ? (
             <p className="text-gray-600 mt-1">
-              {`Viewing branches for ${companyName || 'this company'}`}
+              {`Viewing branches for ${companyName}`}
+            </p>
+          ) : (
+            <p className="text-gray-600 mt-1">
+              Viewing branches across all companies
             </p>
           )}
         </div>

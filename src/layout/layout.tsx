@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { Outlet } from 'react-router';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { Toaster } from 'react-hot-toast';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -26,6 +27,28 @@ const Layout: React.FC = () => {
         <Header toggleSidebar={toggleSidebar} />
         
         <main className="flex-1 overflow-y-auto py-6 px-4 lg:px-6">
+          {/* React Hot Toast Container */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      
           <Outlet />
         </main>
       </div>
