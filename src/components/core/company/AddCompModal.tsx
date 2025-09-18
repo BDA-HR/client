@@ -5,12 +5,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
+  DialogClose
 } from '../../../components/ui/dialog';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Plus } from 'lucide-react';
-import type { AddCompDto } from '../../../types/core/comp'; //changed import
+import type { AddCompDto } from '../../../types/core/comp';
 import { amharicRegex } from '../../../utils/amharic-regex';
 
 interface AddCompModalProps {
@@ -50,12 +51,17 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
           Add Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Add New Company</DialogTitle>
-          <DialogDescription className='hidden'>Add New Company</DialogDescription>
+      <DialogContent 
+        className="sm:max-w-[500px]"
+        onInteractOutside={(e) => e.preventDefault()} // Prevent closing when clicking outside
+      >
+        <DialogHeader className='border-b pb-3 flex flex-row justify-between items-center'>
+          <div>
+            <DialogTitle>Add New Company</DialogTitle>
+            <DialogDescription className='hidden'>Add New Company</DialogDescription>
+          </div>
         </DialogHeader>
-        <div className="flex gap-4 py-4">
+        <div className="grid grid-row-2 gap-4 py-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="nameAm">የኩባንያው ስም</Label>
             <input
@@ -79,13 +85,16 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
             />
           </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-center items-center gap-1.5 border-t pt-6">
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
             onClick={handleSubmit}
           >
             Save
-            </Button>
+          </Button>
+          <DialogClose asChild>
+            <Button variant={'outline'} className='cursor-pointer'>Cancel</Button>
+          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>
