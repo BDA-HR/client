@@ -53,10 +53,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
     return company ? company.branches : [];
   };
 
-  const handleEditSubmit = (values: Department) => {
-    onEditDepartment(values);
-    setModalType(null);
-  };
+  
 
   const handleStatusToggle = (department: Department) => {
     const newStatus = department.status === "active" ? "inactive" : "active";
@@ -87,6 +84,17 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
       setModalType(null);
     }
   };
+  const handleSave = (updatedDepartment: Department) => {
+  // Update your departments state here
+  setDepartments(prev => 
+    prev.map(dept => dept.id === updatedDepartment.id ? updatedDepartment : dept)
+  );
+  setModalType(null); // Close the modal
+};
+
+const handleClose = () => {
+  setModalType(null); // Close the modal
+};
 
   const getStatusColor = (status: "active" | "inactive"): string => {
     return status === "active" 
@@ -214,11 +222,10 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                               View Details
                             </button>
                             <button 
-                              onClick={() => onEditDepartment(department)}
-                              
+                              onClick={() => handleEdit(department)}
                               className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
-                              >
-                               Edit
+                            >
+                              Edit
                             </button>
                             <button 
                               onClick={() => handleStatusToggle(department)}
@@ -439,10 +446,20 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
         </div>
       )}
 
-      {/* Edit Modal - Only the form without dark background */}
+      {/* Edit Modal */}
       {selectedDepartment && modalType === 'edit' && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4"
+        >
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="bg-white rounded-xl shadow-xl max-w-md w-full"
+          >
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Edit Department</h2>
@@ -455,14 +472,16 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
               </div>
               <EditDepartmentForm
                 department={selectedDepartment}
-                companies={companies}
-                onSubmit={handleEditSubmit}
-                onCancel={() => setModalType(null)}
+                onSave={handleSave}
+                onClose={handleClose}
               />
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
+    
       )}
+        
+      
     </>
   );
 };

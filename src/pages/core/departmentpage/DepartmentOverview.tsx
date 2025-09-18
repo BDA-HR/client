@@ -125,8 +125,8 @@ const DepartmentOverview = () => {
 
       {/* Edit Department Modal */}
       {isEditModalOpen && editingDepartment && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 shadow-xl">
+        <div className="fixed inset-0 bg-gray-500/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
             <EditDepartmentForm
               department={editingDepartment}
               onSubmit={handleDepartmentUpdate}
