@@ -1,3 +1,5 @@
+import type { UUID } from "crypto";
+
 export interface BaseDto {
   id: UUID;
   isDeleted: boolean;
@@ -7,5 +9,3 @@ export interface BaseDto {
   modifiedAt: string;
   modifiedAtAm: string;
 }
-
-export type UUID = string;

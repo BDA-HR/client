@@ -1,11 +1,10 @@
+import type { UUID } from 'crypto';
 import type { BaseDto } from './BaseDto';
-
-export type UUID = string;
 
 export interface CompListDto extends BaseDto {
   name: string;
   nameAm: string;
-  branchCount: number;
+  branchCount: string;
 }
 
 export interface AddCompDto {
