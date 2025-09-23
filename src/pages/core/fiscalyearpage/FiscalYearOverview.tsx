@@ -8,6 +8,7 @@ import { EditFiscModal } from '../../../components/core/fiscalyear/EditFiscModal
 import { DeleteFiscModal } from '../../../components/core/fiscalyear/DeleteFiscModal';
 import { fiscalYearService } from '../../../services/core/fiscservice';
 import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../../../types/core/fisc';
+import PeriodSection from '../../../components/core/fiscalyear/PeriodSection';
 const getDefaultFiscalYear = (): AddFiscYearDto => ({
   name: '',
   dateStart: new Date().toISOString(),
@@ -140,7 +141,8 @@ export default function FiscalYearOverview() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+    <div className="bg-gray-50">
       <Dialog>
         <FiscalYearManagementHeader setDialogOpen={setAddModalOpen} />
         
@@ -226,5 +228,7 @@ export default function FiscalYearOverview() {
         onConfirm={handleYearDelete}
       />
     </div>
+    <PeriodSection />
+    </>
   );
 }
