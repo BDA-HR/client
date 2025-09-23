@@ -7,7 +7,11 @@ import {
   Building,
   MoreVertical,
   X,
-  Calendar
+  Calendar,
+  Eye,
+  Pencil,
+  Repeat,
+  Trash2
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { BranchListDto, UUID } from '../../../types/core/branch';
@@ -232,34 +236,42 @@ const confirmDeletion = () => {
                           <MoreVertical className="h-5 w-5" />
                         </motion.button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-48 p-0" align="end">
-                        <div className="py-1">
-                          <button 
-                            onClick={() => handleViewDetails(branch)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
-                          >
-                            View Details
-                          </button>
-                          <button 
-                            onClick={() => handleEdit(branch)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            onClick={() => handleStatusChange(branch)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
-                          >
-                            Change Status
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(branch)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </PopoverContent>
+<PopoverContent className="w-48 p-0" align="end">
+  <div className="py-1">
+    <button 
+      onClick={() => handleViewDetails(branch)}
+      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+    >
+      <Eye size={16} />
+      View Details
+    </button>
+
+    <button 
+      onClick={() => handleEdit(branch)}
+      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+    >
+      <Pencil size={16} />
+      Edit
+    </button>
+
+    <button 
+      onClick={() => handleStatusChange(branch)}
+      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+    >
+      <Repeat size={16} />
+      Change Status
+    </button>
+
+    <button 
+      onClick={() => handleDelete(branch)}
+      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+    >
+      <Trash2 size={16} />
+      Delete
+    </button>
+  </div>
+</PopoverContent>
+
                     </Popover>
                   </td>
                 </motion.tr>

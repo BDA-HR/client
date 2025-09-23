@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, Pencil, Trash2, Power } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { FiscYearListDto } from '../../../types/core/fisc'; // Fixed import path
 import { formatDate } from '../../../utils/format-date'; // Assuming this is the correct path
@@ -172,26 +172,30 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                       <div className="py-1">
                         <button 
                           onClick={() => onViewDetails(year)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                         >
+                          <Eye size={16} />
                           View Details
                         </button>
                         <button 
                           onClick={() => onEdit(year)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                         >
+                          <Pencil size={16} />
                           Edit
                         </button>
                         <button 
                           onClick={() => onYearStatusChange(year.id, year.isActive === 'Yes' ? 'No' : 'Yes')}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                         >
+                          <Power size={16} />
                           {year.isActive === 'Yes' ? 'Deactivate' : 'Activate'}
                         </button>
                         <button 
                           onClick={() => onYearDelete(year.id)}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded"
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                         >
+                          <Trash2 />
                           Delete
                         </button>
                       </div>

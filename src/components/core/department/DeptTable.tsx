@@ -8,6 +8,10 @@ import {
   MoreVertical,
   User,
   X,
+  Trash2,
+  Repeat,
+  Pencil,
+  Eye,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import EditDepartmentForm from './EditDeptForm';
@@ -217,26 +221,29 @@ const handleClose = () => {
                           <div className="py-1">
                             <button 
                               onClick={() => handleViewDetails(department)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                             >
+                              <Eye size={16} />
                               View Details
                             </button>
                             <button 
                               onClick={() => handleEdit(department)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                             >
+                              <Pencil size={16} />
                               Edit
                             </button>
                             <button 
                               onClick={() => handleStatusToggle(department)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                             >
-                              Toggle Status
+      <Repeat size={16} />                              Toggle Status
                             </button>
                             <button 
                               onClick={() => handleDelete(department)}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded"
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                             >
+                              <Trash2 size={16} />
                               Delete
                             </button>
                           </div>
