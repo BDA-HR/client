@@ -11,9 +11,6 @@ const DepartmentManagementHeader = () => {
       <h1 className="text-3xl font-bold text-gray-800">
         <span className="bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent">Department
           </span> Management</h1>
-      <p className="text-gray-600">
-        Manage all departments, their status, and team members
-      </p>
     </motion.div>
   );
 };

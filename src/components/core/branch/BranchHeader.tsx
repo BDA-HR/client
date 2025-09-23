@@ -19,14 +19,6 @@ const BranchHeader = ({ companyName }: BranchHeaderProps) => {
           {companyName}
         </span> Branches
       </motion.h1>
-      <motion.p 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="text-gray-600 dark:text-gray-400"
-      >
-        Manage {companyName}'s branch operations, users, and financial accounts
-      </motion.p>
     </motion.div>
   );
 };

@@ -13,13 +13,10 @@ export const FiscalYearManagementHeader = ({ setDialogOpen }: { setDialogOpen: (
       className="flex flex-col space-y-2">
           <h1 className="text-3xl font-bold">
   <span className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent mr-2">
-    Fiscal Year
+    Fiscal 
   </span>
-  Management
+  Year
 </h1>
-          <p className="text-gray-600">
-            Organize financial activities, ensure compliance, and manage reporting periods
-          </p>
         </motion.div>
         <DialogTrigger asChild>
           <motion.button

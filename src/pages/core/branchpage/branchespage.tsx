@@ -212,11 +212,6 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
           >
             {companyId ? `Branches for ${companyName}` : 'Branches for All Companies'}
           </motion.h1>
-          {companyId ? (
-            <p className="text-gray-600 mt-1">{`Viewing branches for ${companyName}`}</p>
-          ) : (
-            <p className="text-gray-600 mt-1">Viewing branches across all companies</p>
-          )}
         </div>
 
         {/* Render Add Branch Modal button only if companyId is available */}
