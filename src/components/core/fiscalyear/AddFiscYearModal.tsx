@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import type { AddFiscYearDto } from '../../../types/core/fisc';
 import React from 'react';
 import { Button } from '../../ui/button';
+import toast from 'react-hot-toast';
 
 export const AddFiscalYearModal = ({
   open,
@@ -15,11 +16,62 @@ export const AddFiscalYearModal = ({
   onOpenChange: (open: boolean) => void;
   newYear: AddFiscYearDto;
   setNewYear: (year: AddFiscYearDto) => void;
-  onAddFiscalYear: () => void;
+  onAddFiscalYear: () => Promise<void>;
 }) => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onAddFiscalYear();
+    
+    // Validation
+    if (!newYear.name || !newYear.dateStart || !newYear.dateEnd) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    // Date validation
+    const startDate = new Date(newYear.dateStart);
+    const endDate = new Date(newYear.dateEnd);
+    
+    if (endDate <= startDate) {
+      toast.error('End date must be after start date');
+      return;
+    }
+
+    try {
+      // Show loading toast
+      toast.loading('Adding fiscal year...');
+      
+      // Call the add function
+      await onAddFiscalYear();
+      
+      // Success notification
+      toast.success('Fiscal year added successfully!');
+      
+      // Reset form and close modal
+      setNewYear({
+        name: '',
+        dateStart: new Date().toISOString(),
+        dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        isActive: 'Yes'
+      });
+      
+      onOpenChange(false);
+      
+    } catch (error) {
+      // Error notification - this will be called if onAddFiscalYear throws an error
+      toast.error('Failed to add fiscal year');
+      console.error('Error adding fiscal year:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    // Reset form when canceling
+    setNewYear({
+      name: '',
+      dateStart: new Date().toISOString(),
+      dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      isActive: 'Yes'
+    });
+    onOpenChange(false);
   };
 
   return (
@@ -114,13 +166,18 @@ export const AddFiscalYearModal = ({
           {/* Buttons */}
           <div className="flex flex-row-reverse justify-center items-center gap-3 mt-4 border-t pt-2 pb-0" >
             <DialogClose asChild>
-            <Button variant="outline" className="cursor-pointer px-6">
-              Cancel
-            </Button>
-          </DialogClose>
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="cursor-pointer px-6"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+            </DialogClose>
             <Button
               type="submit"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white cursor-pointer"
             >
               Add Fiscal Year
             </Button>

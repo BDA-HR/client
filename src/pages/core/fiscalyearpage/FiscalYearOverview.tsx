@@ -99,29 +99,20 @@ export default function FiscalYearOverview() {
     }
   };
 
-  const handleAddFiscalYear = async () => {
-    try {
-      if (!newYear.name || !newYear.dateStart || !newYear.dateEnd) {
-        alert('Please fill all required fields');
-        return;
-      }
-
-      const createdYear = await fiscalYearService.createFiscalYear(newYear);
-      setYears([createdYear, ...years]);
-      setNewYear({
-        name: '',
-        dateStart: new Date().toISOString(),
-        dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-        isActive: 'Yes'
-      });
-      
-      setAddModalOpen(false);
-      setCurrentPage(1);
-    } catch (err) {
-      console.error('Error creating fiscal year:', err);
-      setError('Failed to create fiscal year');
-    }
-  };
+const handleAddFiscalYear = async (): Promise<void> => {
+  // Remove the validation from here since it's now handled in the modal
+  const createdYear = await fiscalYearService.createFiscalYear(newYear);
+  setYears([createdYear, ...years]);
+  setNewYear({
+    name: '',
+    dateStart: new Date().toISOString(),
+    dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+    isActive: 'Yes'
+  });
+  
+  setAddModalOpen(false);
+  setCurrentPage(1);
+};
 
   const handleViewDetails = (year: FiscYearListDto) => {
     setSelectedYear(year);
