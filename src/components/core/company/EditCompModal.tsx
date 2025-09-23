@@ -95,7 +95,7 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
             onClick={handleSubmit}
             disabled={!editedCompany.name || !editedCompany.nameAm}
           >
-            Save Changes
+            Edit/Modify
           </Button>
           <DialogClose asChild>
             <Button variant={'outline'} className='cursor-pointer'>Cancel</Button>

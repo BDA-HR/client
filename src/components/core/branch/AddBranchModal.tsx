@@ -1,174 +1,181 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { Label } from '../../ui/label';
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Label } from '../../../components/ui/label';
+import { Plus } from 'lucide-react';
+import { Input } from '../../../components/ui/input';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import type { AddBranchDto, UUID } from '../../../types/core/branch';
 
 interface AddBranchModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddBranch: (branchData: AddBranchDto) => void;
+  onAddBranch: (branch: AddBranchDto) => void;
   defaultCompanyId?: string;
-  companyName?: string;
 }
 
-export const AddBranchModal: React.FC<AddBranchModalProps> = ({ 
-  isOpen, 
-  onClose,
+const AddBranchModal: React.FC<AddBranchModalProps> = ({
   onAddBranch,
   defaultCompanyId,
-  companyName = '' // Default to empty string
 }) => {
+  const [openDialog, setOpenDialog] = useState(false);
   const [branchName, setBranchName] = useState('');
   const [branchNameAm, setBranchNameAm] = useState('');
   const [branchCode, setBranchCode] = useState('');
   const [branchLocation, setBranchLocation] = useState('');
+  const [dateOpened, setDateOpened] = useState(() => new Date().toISOString().split('T')[0]); // Current date in YYYY-MM-DD format
+  const [branchType, setBranchType] = useState('STANDARD');
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (amharicRegex.test(value) || value === '') {
+    if (value === '' || amharicRegex.test(value)) {
       setBranchNameAm(value);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (branchName.trim() && defaultCompanyId) {
-      const branchData: AddBranchDto = {
-        name: branchName.trim(),
-        nameAm: branchNameAm.trim(),
-        code: branchCode.trim(),
-        location: branchLocation.trim(),
-        branchStat: 'ACTIVE',
-        compId: defaultCompanyId as UUID
-      };
-      
-      onAddBranch(branchData);
-      setBranchName('');
-      setBranchNameAm('');
-      setBranchCode('');
-      setBranchLocation('');
-    }
+  const handleSubmit = () => {
+    if (!branchName.trim() || !defaultCompanyId) return;
+
+    const newBranch: AddBranchDto = {
+      name: branchName.trim(),
+      nameAm: branchNameAm.trim(),
+      code: branchCode.trim(),
+      location: branchLocation.trim(),
+      dateOpened: new Date(dateOpened).toISOString(), // Convert to ISO string
+      branchType: branchType,
+      branchStat: 'ACTIVE',
+      compId: defaultCompanyId as UUID,
+    };
+
+    onAddBranch(newBranch);
+
+    // Reset form
+    setBranchName('');
+    setBranchNameAm('');
+    setBranchCode('');
+    setBranchLocation('');
+    setDateOpened(new Date().toISOString().split('T')[0]); // Reset to current date
+    setBranchType('STANDARD');
+    setOpenDialog(false);
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4 h-screen"
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      <DialogTrigger asChild>
+        <Button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer">
+          <Plus size={18} />
+          Add Branch
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent
+        className="sm:max-w-[600px]"
+        onInteractOutside={(e) => e.preventDefault()} // Prevent close on outside click
+      >
+        <DialogHeader className="border-b pb-3 flex flex-row justify-between items-center">
+          <div>
+            <DialogTitle>Add New Branch</DialogTitle>
+            <DialogDescription className="hidden">Add New Branch</DialogDescription>
+          </div>
+        </DialogHeader>
+
+        <div className="grid grid-cols-1 gap-1.5 py-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="branchNameAm">ቅርንጫፍ ስም (አማርኛ)</Label>
+            <Input
+              id="branchNameAm"
+              value={branchNameAm}
+              onChange={handleAmharicChange}
+              placeholder="ምሳሌ፡ አክሜ ቅርንጫፍ 1"
+              className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="branchName">Branch Name (English) *</Label>
+            <Input
+              id="branchName"
+              value={branchName}
+              onChange={(e) => setBranchName(e.target.value)}
+              placeholder="Eg. Acme Branch 1"
+              className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="branchCode">Branch Code</Label>
+            <Input
+              id="branchCode"
+              value={branchCode}
+              onChange={(e) => setBranchCode(e.target.value)}
+              placeholder="Eg. BR-001"
+              className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="branchType">Branch Type</Label>
+            <select
+              id="branchType"
+              value={branchType}
+              onChange={(e) => setBranchType(e.target.value)}
+              className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+            >
+              <option value="STANDARD">Standard</option>
+              <option value="MAIN">Main Branch</option>
+              <option value="REGIONAL">Regional</option>
+              <option value="SUB">Sub Branch</option>
+              <option value="TEMPORARY">Temporary</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="branchLocation">Location</Label>
+            <Input
+              id="branchLocation"
+              value={branchLocation}
+              onChange={(e) => setBranchLocation(e.target.value)}
+              placeholder="Eg. Addis Ababa"
+              className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="dateOpened">Date Opened</Label>
+            <Input
+              id="dateOpened"
+              type="date"
+              value={dateOpened}
+              onChange={(e) => setDateOpened(e.target.value)}
+              className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-center items-center gap-2 border-t pt-6">
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+            onClick={handleSubmit}
+            disabled={!branchName.trim() || !defaultCompanyId}
           >
-            <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 p-6 sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Add New Branch</h2>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              {defaultCompanyId && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
-                  <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                    Adding branch to: <span className="font-semibold">{companyName || `Company ID: ${defaultCompanyId}`}</span>
-                  </p>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="branchNameAm" className="text-base font-medium">
-                    Branch Name (Amharic)
-                  </Label>
-                  <Input
-                    id="branchNameAm"
-                    type="text"
-                    placeholder="የምዝግብ ስም አስገባ"
-                    value={branchNameAm}
-                    onChange={handleAmharicChange}
-                    className="w-full h-12 text-lg"
-                  />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Amharic characters only</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="branchName" className="text-base font-medium">
-                    Branch Name (English) *
-                  </Label>
-                  <Input
-                    id="branchName"
-                    type="text"
-                    placeholder="Enter branch name"
-                    value={branchName}
-                    onChange={(e) => setBranchName(e.target.value)}
-                    required
-                    className="w-full h-12 text-lg"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="branchCode" className="text-base font-medium">
-                    Branch Code
-                  </Label>
-                  <Input
-                    id="branchCode"
-                    type="text"
-                    placeholder="Enter branch code"
-                    value={branchCode}
-                    onChange={(e) => setBranchCode(e.target.value)}
-                    className="w-full h-12 text-lg"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="branchLocation" className="text-base font-medium">
-                    Location
-                  </Label>
-                  <Input
-                    id="branchLocation"
-                    type="text"
-                    placeholder="Enter location"
-                    value={branchLocation}
-                    onChange={(e) => setBranchLocation(e.target.value)}
-                    className="w-full h-12 text-lg"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-center space-x-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                <Button
-                  type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer h-11 px-8 text-base"
-                  disabled={!branchName.trim() || !defaultCompanyId}
-                >
-                  Add Branch
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  className="h-11 px-6 text-base cursor-pointer"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            Save
+          </Button>
+          <DialogClose asChild>
+            <Button variant="outline" className="cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+              Cancel
+            </Button>
+          </DialogClose>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
+
+export default AddBranchModal;

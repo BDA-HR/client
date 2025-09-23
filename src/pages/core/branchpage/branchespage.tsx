@@ -5,22 +5,21 @@ import toast from 'react-hot-toast';
 import { Button } from '../../../components/ui/button';
 import { Plus, ArrowLeft } from 'lucide-react';
 import BranchTable from '../../../components/core/branch/BranchTable';
-import { AddBranchModal } from '../../../components/core/branch/AddBranchModal';
+import AddBranchModal from '../../../components/core/branch/AddBranchModal';
 import { branchService } from '../../../services/core/branchservice';
 import type { BranchListDto, AddBranchDto, EditBranchDto } from '../../../types/core/branch';
 import type { UUID } from '../../../types/core/branch';
 
 interface BranchesPageProps {
-  onBack?: () => void; // Made optional
+  onBack?: () => void;
 }
 
 const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const companyId = searchParams.get('companyId');
-  
+
   const [branches, setBranches] = useState<BranchListDto[]>([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>('');
@@ -54,14 +53,14 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       setLoading(true);
       const companyBranches = await branchService.getCompanyBranches(compId as UUID);
       setBranches(companyBranches);
+
       if (companyBranches.length > 0) {
         const name = companyBranches[0].compAm || companyBranches[0].comp;
         setCompanyName(name || 'this company');
       } else {
-        // If no branches, use a generic name
         setCompanyName('this company');
       }
-      
+
       setError(null);
     } catch (err) {
       const errorMessage = 'Failed to load company branches. Please try again later.';
@@ -77,7 +76,6 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
     try {
       const newBranch = await branchService.createBranch(branchData);
       setBranches([...branches, newBranch]);
-      setIsAddModalOpen(false);
       setError(null);
       toast.success('Branch added successfully!');
     } catch (err) {
@@ -97,15 +95,15 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         nameAm: updatedBranch.nameAm,
         code: updatedBranch.code,
         location: updatedBranch.location,
-        dateOpened: new Date().toISOString(), 
+        dateOpened: new Date().toISOString(),
         branchType: 'REGULAR',
         branchStat: updatedBranch.branchStat,
         compId: updatedBranch.comp as UUID,
-        rowVersion: updatedBranch.rowVersion
+        rowVersion: updatedBranch.rowVersion,
       };
-      
+
       const updated = await branchService.updateBranch(updateData);
-      setBranches(branches.map(b => b.id === updated.id ? updated : b));
+      setBranches(branches.map((b) => (b.id === updated.id ? updated : b)));
       setError(null);
       toast.success('Branch updated successfully!');
     } catch (err) {
@@ -119,7 +117,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
 
   const handleBranchStatusChange = async (id: string, status: string) => {
     try {
-      const branch = branches.find(b => b.id === id);
+      const branch = branches.find((b) => b.id === id);
       if (branch) {
         const updateData: EditBranchDto = {
           id: branch.id as UUID,
@@ -131,11 +129,11 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
           branchType: 'REGULAR',
           branchStat: status,
           compId: branch.comp as UUID,
-          rowVersion: branch.rowVersion
+          rowVersion: branch.rowVersion,
         };
-        
+
         const updated = await branchService.updateBranch(updateData);
-        setBranches(branches.map(b => b.id === updated.id ? updated : b));
+        setBranches(branches.map((b) => (b.id === updated.id ? updated : b)));
         setError(null);
         toast.success(`Branch status updated to ${status}`);
       }
@@ -150,7 +148,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const handleBranchDelete = async (id: string) => {
     try {
       await branchService.deleteBranch(id as UUID);
-      setBranches(branches.filter(b => b.id !== id));
+      setBranches(branches.filter((b) => b.id !== id));
       setError(null);
       toast.success('Branch deleted successfully!');
     } catch (err) {
@@ -161,29 +159,24 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
     }
   };
 
-  const openAddModal = () => {
-    if (!companyId) {
-      const warningMessage = 'Please select a company first';
-      setError(warningMessage);
-      toast(warningMessage, {
-        icon: '⚠️',
-        style: {
-          background: '#ffcc00',
-          color: '#000',
-        },
-      });
-      return;
-    }
-    setIsAddModalOpen(true);
-  };
-
-  // Handle back navigation
   const handleBack = () => {
     if (onBack) {
-      onBack(); // Use the provided onBack function if available
+      onBack();
     } else {
-      navigate(-1); // Fallback to browser history navigation
+      navigate(-1);
     }
+  };
+
+  const showAddBranchWarning = () => {
+    const warningMessage = 'Please select a company first';
+    setError(warningMessage);
+    toast(warningMessage, {
+      icon: '⚠️',
+      style: {
+        background: '#ffcc00',
+        color: '#000',
+      },
+    });
   };
 
   if (loading) {
@@ -196,8 +189,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
 
   return (
     <div className="space-y-6">
-      {/* Back Button - Positioned above the header */}
-      <Button 
+      <Button
         onClick={handleBack}
         variant="outline"
         className="cursor-pointer flex items-center gap-2 mb-4"
@@ -206,14 +198,14 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         Back to Companies
       </Button>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         className="flex items-center justify-between"
       >
         <div>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
@@ -221,30 +213,31 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
             {companyId ? `Branches for ${companyName}` : 'Branches for All Companies'}
           </motion.h1>
           {companyId ? (
-            <p className="text-gray-600 mt-1">
-              {`Viewing branches for ${companyName}`}
-            </p>
+            <p className="text-gray-600 mt-1">{`Viewing branches for ${companyName}`}</p>
           ) : (
-            <p className="text-gray-600 mt-1">
-              Viewing branches across all companies
-            </p>
+            <p className="text-gray-600 mt-1">Viewing branches across all companies</p>
           )}
         </div>
-        <Button 
-          onClick={openAddModal}
-          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-2"
-          disabled={!companyId}
-        >
-          <Plus size={16} />
-          Add Branch
-        </Button>
+
+        {/* Render Add Branch Modal button only if companyId is available */}
+        {companyId ? (
+          <AddBranchModal onAddBranch={handleAddBranch} defaultCompanyId={companyId as UUID} />
+        ) : (
+          <Button
+            onClick={showAddBranchWarning}
+            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-2"
+          >
+            <Plus size={16} />
+            Add Branch
+          </Button>
+        )}
       </motion.div>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
           {error}
-          <button 
-            onClick={() => setError(null)} 
+          <button
+            onClick={() => setError(null)}
             className="absolute top-0 right-0 p-2 cursor-pointer"
           >
             <span className="text-2xl">&times;</span>
@@ -252,8 +245,8 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         </div>
       )}
 
-      <BranchTable 
-        branches={branches} 
+      <BranchTable
+        branches={branches}
         currentPage={1}
         totalPages={1}
         totalItems={branches.length}
@@ -261,14 +254,6 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         onBranchUpdate={handleBranchUpdate}
         onBranchStatusChange={handleBranchStatusChange}
         onBranchDelete={handleBranchDelete}
-      />
-
-      <AddBranchModal 
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAddBranch={handleAddBranch}
-        defaultCompanyId={companyId as UUID || undefined}
-        companyName={companyName}
       />
     </div>
   );

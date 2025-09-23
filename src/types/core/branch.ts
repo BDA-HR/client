@@ -21,6 +21,8 @@ export interface AddBranchDto {
   nameAm: string;
   code: string;
   location: string;
+  dateOpened: string; // ISO string format for DateTime
+  branchType: string;
   branchStat: string;
   compId: UUID;
 }

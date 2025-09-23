@@ -2,8 +2,6 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogDescription,
   DialogFooter,
   DialogClose
 } from '../../../components/ui/dialog';
@@ -34,29 +32,23 @@ const DeleteCompModal: React.FC<DeleteCompModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <div className="flex items-center gap-2 text-red-600">
+          <div className="flex items-center justify-center p-2 bg-red-300 rounded-full gap-2 text-red-600">
             <AlertTriangle size={24} />
-            <DialogTitle>Delete Company</DialogTitle>
           </div>
-          <DialogDescription>
-            Are you sure you want to delete this company? This action cannot be undone.
-          </DialogDescription>
         </DialogHeader>
-        
         {company && (
           <div className="py-4">
             <p className="font-medium">{company.nameAm}</p>
             <p className="text-sm text-gray-600">{company.name}</p>
             {parseInt(company.branchCount) > 0 && (
               <p className="text-sm text-red-600 mt-2">
-                Warning: This company has {company.branchCount} branch(es). 
-                Deleting it will also remove all associated branches.
+                  Are you sure you want to delete this company? 
               </p>
             )}
           </div>
         )}
         
-        <DialogFooter className="flex justify-center gap-2">
+        <DialogFooter className="flex justify-center items-center gap-2">
           <Button 
             variant="destructive" 
             onClick={handleConfirm}

@@ -271,7 +271,7 @@ const AddHierarchy = () => {
 
       {/* Top Bar */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Organization Hierarchy</h2>
+        <h2 className="text-xl font-semibold">Organization Structure</h2>
         <div className="flex gap-2">
           <Button
             onClick={toggleVisualization}
