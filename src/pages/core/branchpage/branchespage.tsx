@@ -1,23 +1,29 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { Button } from '../../../components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 import BranchTable from '../../../components/core/branch/BranchTable';
 import { AddBranchModal } from '../../../components/core/branch/AddBranchModal';
 import { branchService } from '../../../services/core/branchservice';
 import type { BranchListDto, AddBranchDto, EditBranchDto } from '../../../types/core/branch';
+import type { UUID } from '../../../types/core/branch';
 
-const BranchesPage = () => {
+interface BranchesPageProps {
+  onBack?: () => void; // Made optional
+}
+
+const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const companyId = searchParams.get('companyId');
   
   const [branches, setBranches] = useState<BranchListDto[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const companyName = branches.length > 0 ? branches[0].comp : '';
+  const [companyName, setCompanyName] = useState<string>('');
 
   useEffect(() => {
     if (companyId) {
@@ -34,7 +40,9 @@ const BranchesPage = () => {
       setBranches(allBranches);
       setError(null);
     } catch (err) {
-      setError('Failed to load branches. Please try again later.');
+      const errorMessage = 'Failed to load branches. Please try again later.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error loading branches:', err);
     } finally {
       setLoading(false);
@@ -44,11 +52,21 @@ const BranchesPage = () => {
   const loadCompanyBranches = async (compId: string) => {
     try {
       setLoading(true);
-      const companyBranches = await branchService.getCompanyBranches(compId);
+      const companyBranches = await branchService.getCompanyBranches(compId as UUID);
       setBranches(companyBranches);
+      if (companyBranches.length > 0) {
+        const name = companyBranches[0].compAm || companyBranches[0].comp;
+        setCompanyName(name || 'this company');
+      } else {
+        // If no branches, use a generic name
+        setCompanyName('this company');
+      }
+      
       setError(null);
     } catch (err) {
-      setError('Failed to load company branches. Please try again later.');
+      const errorMessage = 'Failed to load company branches. Please try again later.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error loading company branches:', err);
     } finally {
       setLoading(false);
@@ -61,8 +79,11 @@ const BranchesPage = () => {
       setBranches([...branches, newBranch]);
       setIsAddModalOpen(false);
       setError(null);
+      toast.success('Branch added successfully!');
     } catch (err) {
-      setError('Failed to add branch. Please try again.');
+      const errorMessage = 'Failed to add branch. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error adding branch:', err);
       throw err;
     }
@@ -70,9 +91,8 @@ const BranchesPage = () => {
 
   const handleBranchUpdate = async (updatedBranch: BranchListDto) => {
     try {
-      // Convert to EditBranchDto for the update
       const updateData: EditBranchDto = {
-        id: updatedBranch.id,
+        id: updatedBranch.id as UUID,
         name: updatedBranch.name,
         nameAm: updatedBranch.nameAm,
         code: updatedBranch.code,
@@ -80,15 +100,18 @@ const BranchesPage = () => {
         dateOpened: new Date().toISOString(), 
         branchType: 'REGULAR',
         branchStat: updatedBranch.branchStat,
-        compId: updatedBranch.comp,
+        compId: updatedBranch.comp as UUID,
         rowVersion: updatedBranch.rowVersion
       };
       
       const updated = await branchService.updateBranch(updateData);
       setBranches(branches.map(b => b.id === updated.id ? updated : b));
       setError(null);
+      toast.success('Branch updated successfully!');
     } catch (err) {
-      setError('Failed to update branch. Please try again.');
+      const errorMessage = 'Failed to update branch. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error updating branch:', err);
       throw err;
     }
@@ -99,7 +122,7 @@ const BranchesPage = () => {
       const branch = branches.find(b => b.id === id);
       if (branch) {
         const updateData: EditBranchDto = {
-          id: branch.id,
+          id: branch.id as UUID,
           name: branch.name,
           nameAm: branch.nameAm,
           code: branch.code,
@@ -107,37 +130,60 @@ const BranchesPage = () => {
           dateOpened: new Date().toISOString(),
           branchType: 'REGULAR',
           branchStat: status,
-          compId: branch.comp,
+          compId: branch.comp as UUID,
           rowVersion: branch.rowVersion
         };
         
         const updated = await branchService.updateBranch(updateData);
         setBranches(branches.map(b => b.id === updated.id ? updated : b));
         setError(null);
+        toast.success(`Branch status updated to ${status}`);
       }
     } catch (err) {
-      setError('Failed to update branch status. Please try again.');
+      const errorMessage = 'Failed to update branch status. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error updating branch status:', err);
     }
   };
 
   const handleBranchDelete = async (id: string) => {
     try {
-      await branchService.deleteBranch(id);
+      await branchService.deleteBranch(id as UUID);
       setBranches(branches.filter(b => b.id !== id));
       setError(null);
+      toast.success('Branch deleted successfully!');
     } catch (err) {
-      setError('Failed to delete branch. Please try again.');
+      const errorMessage = 'Failed to delete branch. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error deleting branch:', err);
     }
   };
 
   const openAddModal = () => {
     if (!companyId) {
-      setError('Please select a company first');
+      const warningMessage = 'Please select a company first';
+      setError(warningMessage);
+      toast(warningMessage, {
+        icon: '⚠️',
+        style: {
+          background: '#ffcc00',
+          color: '#000',
+        },
+      });
       return;
     }
     setIsAddModalOpen(true);
+  };
+
+  // Handle back navigation
+  const handleBack = () => {
+    if (onBack) {
+      onBack(); // Use the provided onBack function if available
+    } else {
+      navigate(-1); // Fallback to browser history navigation
+    }
   };
 
   if (loading) {
@@ -150,6 +196,16 @@ const BranchesPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* Back Button - Positioned above the header */}
+      <Button 
+        onClick={handleBack}
+        variant="outline"
+        className="cursor-pointer flex items-center gap-2 mb-4"
+      >
+        <ArrowLeft size={16} />
+        Back to Companies
+      </Button>
+
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -162,20 +218,24 @@ const BranchesPage = () => {
             animate={{ opacity: 1, x: 0 }}
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
-            {companyId ? `Branches for ${companyName || 'Company'}` : 'All Branches'}
+            {companyId ? `Branches for ${companyName}` : 'Branches for All Companies'}
           </motion.h1>
-          {companyId && (
+          {companyId ? (
             <p className="text-gray-600 mt-1">
-              {`Viewing branches for ${companyName || 'this company'}`}
+              {`Viewing branches for ${companyName}`}
+            </p>
+          ) : (
+            <p className="text-gray-600 mt-1">
+              Viewing branches across all companies
             </p>
           )}
         </div>
         <Button 
           onClick={openAddModal}
-          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer"
+          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-2"
           disabled={!companyId}
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus size={16} />
           Add Branch
         </Button>
       </motion.div>
@@ -185,7 +245,7 @@ const BranchesPage = () => {
           {error}
           <button 
             onClick={() => setError(null)} 
-            className="absolute top-0 right-0 p-2"
+            className="absolute top-0 right-0 p-2 cursor-pointer"
           >
             <span className="text-2xl">&times;</span>
           </button>
@@ -207,7 +267,7 @@ const BranchesPage = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddBranch={handleAddBranch}
-        defaultCompanyId={companyId || undefined}
+        defaultCompanyId={companyId as UUID || undefined}
         companyName={companyName}
       />
     </div>

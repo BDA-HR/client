@@ -9,6 +9,7 @@ import {
 } from '../../../components/ui/dropdown-menu';
 import { motion } from 'framer-motion';
 import type { CompListDto, UUID } from '../../../types/core/comp';
+import { useNavigate } from 'react-router-dom';
 
 interface CompListProps {
   companies: CompListDto[];
@@ -23,9 +24,11 @@ const CompList: React.FC<CompListProps> = ({
   onDeleteCompany,
   onViewBranches,
 }) => {
+  const navigate = useNavigate();
 
-  const handleViewBranches = (companyId: string) => {
+  const handleViewBranches = (companyId: UUID) => {
     onViewBranches(companyId as UUID);
+    navigate(`/branches?companyId=${companyId}`);
   };
 
   return (

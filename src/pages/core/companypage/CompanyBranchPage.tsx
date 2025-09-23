@@ -12,11 +12,6 @@ const CompanyBranchesPage = () => {
     navigate(`/branches?companyId=${companyId}`);
   };
 
-  // Add this function to handle company clicks
-  const handleCompanyClick = (companyId: string) => {
-    // You can implement logic here if needed
-    console.log('Company clicked:', companyId);
-  };
 
   return (
     <div className="space-y-6">
@@ -27,8 +22,7 @@ const CompanyBranchesPage = () => {
         className="flex items-center justify-between"
       ></motion.div>
         <>
-          {/* Pass the onClick prop to CompSection */}
-          <CompSection onClick={handleCompanyClick} />
+          <CompSection />
           <Button 
               onClick={handleViewBranches}
               className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer"
