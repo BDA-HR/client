@@ -30,7 +30,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
   const [branchCode, setBranchCode] = useState('');
   const [branchLocation, setBranchLocation] = useState('');
   const [dateOpened, setDateOpened] = useState(() => new Date().toISOString().split('T')[0]); // Current date in YYYY-MM-DD format
-  const [branchType, setBranchType] = useState('STANDARD');
+  const [branchType, setBranchType] = useState('0');
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -49,7 +49,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       location: branchLocation.trim(),
       dateOpened: new Date(dateOpened).toISOString(), // Convert to ISO string
       branchType: branchType,
-      branchStat: 'ACTIVE',
+      branchStat: '0',
       compId: defaultCompanyId as UUID,
     };
 
@@ -61,7 +61,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     setBranchCode('');
     setBranchLocation('');
     setDateOpened(new Date().toISOString().split('T')[0]); // Reset to current date
-    setBranchType('STANDARD');
+    setBranchType('0');
     setOpenDialog(false);
   };
 
@@ -80,19 +80,19 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       >
         <DialogHeader className="border-b pb-3 flex flex-row justify-between items-center">
           <div>
-            <DialogTitle>Add New Branch</DialogTitle>
-            <DialogDescription className="hidden">Add New Branch</DialogDescription>
+            <DialogTitle>Add New</DialogTitle>
+            <DialogDescription className="hidden">Add New</DialogDescription>
           </div>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-1.5 py-4">
+        <div className="grid grid-cols-1 gap-1.5">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchNameAm">ቅርንጫፍ ስም (አማርኛ)</Label>
+            <Label htmlFor="branchNameAm">የቅርንጫፍ ስም (አማርኛ) *</Label>
             <Input
               id="branchNameAm"
               value={branchNameAm}
               onChange={handleAmharicChange}
-              placeholder="ምሳሌ፡ አክሜ ቅርንጫፍ 1"
+              placeholder="ምሳሌ፡ ቅርንጫፍ 1"
               className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
@@ -103,14 +103,14 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
               id="branchName"
               value={branchName}
               onChange={(e) => setBranchName(e.target.value)}
-              placeholder="Eg. Acme Branch 1"
+              placeholder="Eg. Branch 1"
               className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
               required
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchCode">Branch Code</Label>
+            <Label htmlFor="branchCode">Branch Code *</Label>
             <Input
               id="branchCode"
               value={branchCode}
@@ -121,23 +121,22 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchType">Branch Type</Label>
+            <Label htmlFor="branchType">Branch Type *</Label>
             <select
               id="branchType"
               value={branchType}
               onChange={(e) => setBranchType(e.target.value)}
               className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
             >
-              <option value="STANDARD">Standard</option>
-              <option value="MAIN">Main Branch</option>
-              <option value="REGIONAL">Regional</option>
-              <option value="SUB">Sub Branch</option>
-              <option value="TEMPORARY">Temporary</option>
+              <option value="0">Head Office</option>
+              <option value="1">Regional</option>
+              <option value="2">Local</option>
+              <option value="3">Virtual</option>
             </select>
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchLocation">Location</Label>
+            <Label htmlFor="branchLocation">Location *</Label>
             <Input
               id="branchLocation"
               value={branchLocation}
@@ -159,7 +158,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-center items-center gap-2 border-t pt-6">
+        <div className="flex justify-center items-center gap-3 border-t pt-2 pb-0">
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
             onClick={handleSubmit}
