@@ -1,6 +1,6 @@
 import { Card } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -77,13 +77,16 @@ const CompList: React.FC<CompListProps> = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onEditCompany(company)}>
+                  <DropdownMenuItem onClick={() => onEditCompany(company)}
+                    className='flex items-center gap-2'>
+                      <Pencil size={16}/>
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => onDeleteCompany(company)}
-                    className="text-red-500"
+                    className="text-red-500 flex items-center gap-2"
                   >
+                    <Trash2 size={16} />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
