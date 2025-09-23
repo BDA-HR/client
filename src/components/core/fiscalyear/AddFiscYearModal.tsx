@@ -1,7 +1,8 @@
-import { BadgePlus, Plus } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
+import { BadgePlus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '../../ui/dialog';
 import type { AddFiscYearDto } from '../../../types/core/fisc';
 import React from 'react';
+import { Button } from '../../ui/button';
 
 export const AddFiscalYearModal = ({
   open,
@@ -23,12 +24,14 @@ export const AddFiscalYearModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl"
+      onInteractOutside={(e) => e.preventDefault()} 
+      >
+        <DialogHeader className='border-b pb-3 flex flex-row justify-between items-center'>
           <div className="flex justify-between items-center">
             <div>
               <DialogTitle className='flex items-center gap-2'> <BadgePlus size={20} /> Add New</DialogTitle>
-              <DialogDescription>
+              <DialogDescription className='hidden'>
                 Fill in the details below to create a new fiscal year period.
               </DialogDescription>
             </div>
@@ -36,7 +39,7 @@ export const AddFiscalYearModal = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid md:grid-cols-2 gap-6 mt-4">
+          <div className="grid grid-cols-1 gap-6 mt-4">
             {/* Name */}
             <div>
               <label htmlFor="yearName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -109,21 +112,18 @@ export const AddFiscalYearModal = ({
           </div>
 
           {/* Buttons */}
-          <div className="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 cursor-pointer"
-            >
+          <div className="flex flex-row-reverse justify-center items-center gap-3 mt-4 border-t pt-2 pb-0" >
+            <DialogClose asChild>
+            <Button variant="outline" className="cursor-pointer px-6">
               Cancel
-            </button>
-            <button
+            </Button>
+          </DialogClose>
+            <Button
               type="submit"
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
             >
-              <Plus size={18} />
               Add Fiscal Year
-            </button>
+            </Button>
           </div>
         </form>
       </DialogContent>

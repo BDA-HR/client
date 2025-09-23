@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Dialog } from '../../../components/ui/dialog';
 import { FiscalYearManagementHeader } from '../../../components/core/fiscalyear/FiscYearHeader';
 import { FiscalYearTable } from '../../../components/core/fiscalyear/FiscYearTable';
-import { FiscalYearModal } from '../../../components/core/fiscalyear/FiscYearModal';
 import { AddFiscalYearModal } from '../../../components/core/fiscalyear/AddFiscYearModal';
+import { ViewFiscModal } from '../../../components/core/fiscalyear/ViewFiscModal';
+import { EditFiscModal } from '../../../components/core/fiscalyear/EditFiscModal';
+import { DeleteFiscModal } from '../../../components/core/fiscalyear/DeleteFiscModal';
 import { fiscalYearService } from '../../../services/core/fiscservice';
-import type { FiscYearListDto, AddFiscYearDto, UUID } from '../../../types/core/fisc';
+import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../../../types/core/fisc';
 
 export default function FiscalYearOverview() {
   const [years, setYears] = useState<FiscYearListDto[]>([]);
@@ -19,8 +21,10 @@ export default function FiscalYearOverview() {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | 'add' | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<FiscYearListDto | null>(null);
 
   const itemsPerPage = 10;
@@ -47,20 +51,11 @@ export default function FiscalYearOverview() {
     }
   };
 
-  const handleYearUpdate = async (updatedYear: FiscYearListDto) => {
+  const handleYearUpdate = async (updatedYear: EditFiscYearDto) => {
     try {
-      const editData = {
-        id: updatedYear.id,
-        name: updatedYear.name,
-        dateStart: updatedYear.dateStart,
-        dateEnd: updatedYear.dateEnd,
-        isActive: updatedYear.isActive,
-        rowVersion: updatedYear.rowVersion || '1'
-      };
-      
-      const result = await fiscalYearService.updateFiscalYear(editData);
+      const result = await fiscalYearService.updateFiscalYear(updatedYear);
       setYears(years.map(year => year.id === result.id ? result : year));
-      setModalType(null);
+      setEditModalOpen(false);
     } catch (err) {
       console.error('Error updating fiscal year:', err);
       setError('Failed to update fiscal year');
@@ -72,7 +67,7 @@ export default function FiscalYearOverview() {
       const year = years.find(y => y.id === yearId);
       if (!year) return;
 
-      const editData = {
+      const editData: EditFiscYearDto = {
         id: yearId,
         name: year.name,
         dateStart: year.dateStart,
@@ -83,7 +78,6 @@ export default function FiscalYearOverview() {
       
       const result = await fiscalYearService.updateFiscalYear(editData);
       setYears(years.map(y => y.id === result.id ? result : y));
-      setModalType(null);
     } catch (err) {
       console.error('Error updating fiscal year status:', err);
       setError('Failed to update status');
@@ -94,7 +88,7 @@ export default function FiscalYearOverview() {
     try {
       await fiscalYearService.deleteFiscalYear(yearId);
       setYears(years.filter(year => year.id !== yearId));
-      setModalType(null);
+      setDeleteModalOpen(false);
       
       if (paginatedYears.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -114,14 +108,14 @@ export default function FiscalYearOverview() {
 
       const createdYear = await fiscalYearService.createFiscalYear(newYear);
       setYears([createdYear, ...years]);
-        setNewYear({
+      setNewYear({
         name: '',
         dateStart: new Date().toISOString(),
         dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         isActive: 'Yes'
       });
       
-      setDialogOpen(false);
+      setAddModalOpen(false);
       setCurrentPage(1);
     } catch (err) {
       console.error('Error creating fiscal year:', err);
@@ -129,10 +123,29 @@ export default function FiscalYearOverview() {
     }
   };
 
+  const handleViewDetails = (year: FiscYearListDto) => {
+    setSelectedYear(year);
+    setViewModalOpen(true);
+  };
+
+  const handleEdit = (year: FiscYearListDto) => {
+    setSelectedYear(year);
+    setEditModalOpen(true);
+  };
+
+  const handleDelete = (year: FiscYearListDto) => {
+    setSelectedYear(year);
+    setDeleteModalOpen(true);
+  };
+
+  const handleStatusChange = (year: FiscYearListDto) => {
+    handleYearStatusChange(year.id, year.isActive === 'Yes' ? 'No' : 'Yes');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <FiscalYearManagementHeader setDialogOpen={setDialogOpen} />
+      <Dialog>
+        <FiscalYearManagementHeader setDialogOpen={setAddModalOpen} />
         
         <div className="max-w-7xl mx-auto px-4 py-8">
           {error && (
@@ -176,42 +189,45 @@ export default function FiscalYearOverview() {
                 totalPages={totalPages}
                 totalItems={totalItems}
                 onPageChange={setCurrentPage}
-                onYearUpdate={handleYearUpdate}
-                onYearStatusChange={handleYearStatusChange}
-                onYearDelete={handleYearDelete}
-                onViewDetails={(year) => {
-                  setSelectedYear(year);
-                  setModalType('view');
-                }}
-                onEdit={(year) => {
-                  setSelectedYear(year);
-                  setModalType('edit');
-                }}
+                onViewDetails={handleViewDetails}
+                onEdit={handleEdit}
+                onStatusChange={handleStatusChange}
+                onDelete={handleDelete}
               />
             </>
           )}
         </div>
 
+        {/* Add Modal */}
         <AddFiscalYearModal
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
+          open={addModalOpen}
+          onOpenChange={setAddModalOpen}
           newYear={newYear}
           setNewYear={setNewYear}
-          onAddFiscalYear={handleAddFiscalYear}
-        />
-
-        <FiscalYearModal
-          modalType={modalType}
-          selectedYear={selectedYear}
-          newYear={newYear}
-          setNewYear={setNewYear}
-          onClose={() => setModalType(null)}
-          onYearUpdate={handleYearUpdate}
-          onYearStatusChange={handleYearStatusChange}
-          onYearDelete={handleYearDelete}
           onAddFiscalYear={handleAddFiscalYear}
         />
       </Dialog>
+
+      {/* Separate modals */}
+      <ViewFiscModal
+        fiscalYear={selectedYear}
+        isOpen={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+      />
+
+      <EditFiscModal
+        fiscalYear={selectedYear}
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSave={handleYearUpdate}
+      />
+
+      <DeleteFiscModal
+        fiscalYear={selectedYear}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleYearDelete}
+      />
     </div>
   );
 }

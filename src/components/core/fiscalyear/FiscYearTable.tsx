@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, Pencil, Trash2, Power } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
-import type { FiscYearListDto } from '../../../types/core/fisc'; // Fixed import path
-import { formatDate } from '../../../utils/format-date'; // Assuming this is the correct path
+import type { FiscYearListDto } from '../../../types/core/fisc';
+import { formatDate } from '../../../utils/format-date';
 
 interface FiscalYearTableProps {
   years: FiscYearListDto[];
@@ -11,11 +11,10 @@ interface FiscalYearTableProps {
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  onYearUpdate: (updatedYear: FiscYearListDto) => void;
-  onYearStatusChange: (yearId: string, newStatus: string) => void;
-  onYearDelete: (yearId: string) => void;
   onViewDetails: (year: FiscYearListDto) => void;
   onEdit: (year: FiscYearListDto) => void;
+  onStatusChange: (year: FiscYearListDto) => void;
+  onDelete: (year: FiscYearListDto) => void;
 }
 
 export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
@@ -24,10 +23,10 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
   totalPages,
   totalItems,
   onPageChange,
-  onYearStatusChange,
-  onYearDelete,
   onViewDetails,
   onEdit,
+  onStatusChange,
+  onDelete,
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
@@ -185,17 +184,17 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                           Edit
                         </button>
                         <button 
-                          onClick={() => onYearStatusChange(year.id, year.isActive === 'Yes' ? 'No' : 'Yes')}
+                          onClick={() => onStatusChange(year)}
                           className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                         >
                           <Power size={16} />
                           {year.isActive === 'Yes' ? 'Deactivate' : 'Activate'}
                         </button>
                         <button 
-                          onClick={() => onYearDelete(year.id)}
+                          onClick={() => onDelete(year)}
                           className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                         >
-                          <Trash2 />
+                          <Trash2 size={16} />
                           Delete
                         </button>
                       </div>
