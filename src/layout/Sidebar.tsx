@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -34,6 +34,7 @@ interface NavItemProps {
   activeBg: string;
   textColor: string;
   hoverBg: string;
+  matchPaths?: string[]; // New prop to specify which paths should activate this item
 }
 
 const NavItem: React.FC<NavItemProps> = ({ 
@@ -43,19 +44,43 @@ const NavItem: React.FC<NavItemProps> = ({
   end = false, 
   activeBg, 
   textColor, 
-  hoverBg 
+  hoverBg,
+  matchPaths = [] // Array of paths that should activate this item
 }) => {
+  const location = useLocation();
+  
+  // Function to check if the current path matches
+  const isActive = () => {
+    const currentPath = location.pathname;
+    
+    // Check if current path matches the main 'to' path
+    if (end) {
+      if (currentPath === to) return true;
+    } else {
+      if (currentPath.startsWith(to)) return true;
+    }
+    
+    // Check if current path matches any of the additional matchPaths
+    if (matchPaths.length > 0) {
+      return matchPaths.some(path => currentPath.startsWith(path));
+    }
+    
+    return false;
+  };
+
+  const active = isActive();
+
   return (
     <NavLink
       to={to}
       end={end}
-      className={({ isActive }) =>
-        `flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-          isActive 
+      className={() => {
+        return `flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
+          active 
             ? `${activeBg} ${textColor}` 
             : `text-gray-600 ${hoverBg}`
-        }`
-      }
+        }`;
+      }}
     >
       {icon && <span className="mr-3">{icon}</span>}
       {label}
@@ -121,8 +146,6 @@ const Sidebar: React.FC = () => {
   const toggleGroup = (groupLabel: string) => {
     setOpenGroup(prev => prev === groupLabel ? null : groupLabel);
   };
-
- 
 
   const themeMap: Record<string, { textColor: string; activeBg: string; hoverBg: string }> = {
     Inventory: { textColor: 'text-yellow-700', activeBg: 'bg-yellow-100', hoverBg: 'hover:bg-yellow-50' },
@@ -231,7 +254,6 @@ const Sidebar: React.FC = () => {
             </>
           )}
 
-          {/* Other module sections remain the same... */}
           {activeModule === 'Inventory' && (
             <>
               <NavItem to="/inventory/tracking" icon={<FileText size={18} />} label="Inventory Tracking" {...theme} />
@@ -245,37 +267,16 @@ const Sidebar: React.FC = () => {
 
           {activeModule === 'Core' && (
             <>
-    <NavItem to="/core/company" icon={<Users size={18} />} label="Companies" {...theme} />
-    {/* <NavGroup 
-      icon={<Building2 size={18} />} 
-      label="Companies" 
-      isOpen={openGroup === 'Companies'} 
-      onToggle={() => toggleGroup('Companies')} 
-      hoverBg={theme.hoverBg}
-    >
-      <NavItem 
-        to="/core/company/1/branches" 
-        icon={<Building2 size={18} />} 
-        label="BDA Investment Group" 
-        {...theme} 
-      />
-      <NavItem 
-        to="/core/company/2/branches" 
-        icon={<Building2 size={18} />} 
-        label="BDA Technologies" 
-        {...theme} 
-      />
-      <NavItem 
-        to="/core/company/3/branches" 
-        icon={<Building2 size={18} />} 
-        label="BDA Holdings" 
-        {...theme} 
-      />
-    </NavGroup>*/}
+              <NavItem 
+                to="/core/company" 
+                icon={<Users size={18} />} 
+                label="Companies" 
+                {...theme}
+                matchPaths={['/branches']} // This will make it active for /branches routes
+              />
               <NavItem to="/core/department" icon={<Users size={18} />} label="Department" {...theme} /> 
               <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
               <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
-
             </>
           )}
 
@@ -294,10 +295,8 @@ const Sidebar: React.FC = () => {
           {activeModule === 'Finance' && (
             <>
               <NavItem to="/finance/gl" icon={<FileText size={18} />} label="General Ledger" {...theme} />
-              <NavItem to="/finance/accounts" icon={<Package size={18} />} label="Accounts " {...theme} />
-              {/* <NavItem to="/finance/ar" icon={<DollarSign size={18} />} label="Accounts Receivable" {...theme} /> */}
+              <NavItem to="/finance/accounts" icon={<Package size={18} />} label="Accounts" {...theme} />
               <NavItem to="/finance/assets" icon={<Briefcase size={18} />} label="Assets" {...theme} />
-        
               <NavItem to="/finance/budget-list" icon={<FileSpreadsheet size={18} />} label="Budgeting" {...theme} />
               <NavItem to="/finance/payroll" icon={<FileSpreadsheet size={18} />} label="Payroll" {...theme} />
               <NavItem to="/finance/transactions" icon={<FileSpreadsheet size={18} />} label="Transaction" {...theme} />
@@ -320,7 +319,6 @@ const Sidebar: React.FC = () => {
 
       <div className="p-4 border-t border-gray-200">
         <NavItem to="/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
-
       </div>
     </div>
   );
