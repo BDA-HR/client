@@ -80,7 +80,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       >
         <DialogHeader className="border-b pb-3 flex flex-row justify-between items-center">
           <div>
-            <DialogTitle>Add New Branch</DialogTitle>
+            <DialogTitle>Add New</DialogTitle>
             <DialogDescription className="hidden">Add New</DialogDescription>
           </div>
         </DialogHeader>
