@@ -8,17 +8,18 @@ import { EditFiscModal } from '../../../components/core/fiscalyear/EditFiscModal
 import { DeleteFiscModal } from '../../../components/core/fiscalyear/DeleteFiscModal';
 import { fiscalYearService } from '../../../services/core/fiscservice';
 import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../../../types/core/fisc';
+const getDefaultFiscalYear = (): AddFiscYearDto => ({
+  name: '',
+  dateStart: new Date().toISOString(),
+  dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+  isActive: 'Yes'
+});
 
 export default function FiscalYearOverview() {
   const [years, setYears] = useState<FiscYearListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newYear, setNewYear] = useState<AddFiscYearDto>({
-    name: '',
-    dateStart: new Date().toISOString(),
-    dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-    isActive: 'Yes'
-  });
+  const [newYear, setNewYear] = useState<AddFiscYearDto>(getDefaultFiscalYear());
 
   const [currentPage, setCurrentPage] = useState(1);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -36,6 +37,11 @@ export default function FiscalYearOverview() {
   useEffect(() => {
     loadFiscalYears();
   }, []);
+  useEffect(() => {
+    if (addModalOpen) {
+      setNewYear(getDefaultFiscalYear());
+    }
+  }, [addModalOpen]);
 
   const loadFiscalYears = async () => {
     try {
@@ -99,20 +105,12 @@ export default function FiscalYearOverview() {
     }
   };
 
-const handleAddFiscalYear = async (): Promise<void> => {
-  // Remove the validation from here since it's now handled in the modal
-  const createdYear = await fiscalYearService.createFiscalYear(newYear);
-  setYears([createdYear, ...years]);
-  setNewYear({
-    name: '',
-    dateStart: new Date().toISOString(),
-    dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-    isActive: 'Yes'
-  });
-  
-  setAddModalOpen(false);
-  setCurrentPage(1);
-};
+  const handleAddFiscalYear = async (): Promise<void> => {
+    const createdYear = await fiscalYearService.createFiscalYear(newYear);
+    setYears([createdYear, ...years]);
+    setAddModalOpen(false);
+    setCurrentPage(1);
+  };
 
   const handleViewDetails = (year: FiscYearListDto) => {
     setSelectedYear(year);
@@ -131,6 +129,14 @@ const handleAddFiscalYear = async (): Promise<void> => {
 
   const handleStatusChange = (year: FiscYearListDto) => {
     handleYearStatusChange(year.id, year.isActive === 'Yes' ? 'No' : 'Yes');
+  };
+
+  // Function to handle modal open/close
+  const handleAddModalOpenChange = (open: boolean) => {
+    setAddModalOpen(open);
+    if (!open) {
+      setNewYear(getDefaultFiscalYear());
+    }
   };
 
   return (
@@ -192,7 +198,7 @@ const handleAddFiscalYear = async (): Promise<void> => {
         {/* Add Modal */}
         <AddFiscalYearModal
           open={addModalOpen}
-          onOpenChange={setAddModalOpen}
+          onOpenChange={handleAddModalOpenChange}
           newYear={newYear}
           setNewYear={setNewYear}
           onAddFiscalYear={handleAddFiscalYear}
