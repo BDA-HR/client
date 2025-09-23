@@ -374,16 +374,6 @@ const handleClose = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Description */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4">
-                    Description
-                  </h3>
-                  <p className="text-gray-700">
-                    {selectedDepartment.description || "No description available"}
-                  </p>
-                </div>
               </div>
 
               {/* Company Information */}

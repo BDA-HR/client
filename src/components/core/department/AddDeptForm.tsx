@@ -53,7 +53,7 @@ const AddDepartmentForm = () => {
 
         <div className="flex flex-col gap-2">
 
-          <Label htmlFor="nameAm">የዲፓርትመንት ስም</Label>
+          <Label htmlFor="nameAm">የዲፓርትመንት ስም<span className='text-red-500'>*</span></Label>
 
           <input
 
@@ -73,7 +73,7 @@ const AddDepartmentForm = () => {
 
         <div className="flex flex-col gap-2">
 
-          <Label htmlFor="name">Department Name</Label>
+          <Label htmlFor="name">Department Name<span className='text-red-500'>*</span></Label>
 
           <input
 

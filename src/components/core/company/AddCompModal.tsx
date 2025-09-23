@@ -10,7 +10,7 @@ import {
 } from '../../../components/ui/dialog';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
-import { Plus } from 'lucide-react';
+import { BadgePlus, Plus } from 'lucide-react';
 import type { AddCompDto } from '../../../types/core/comp';
 import { amharicRegex } from '../../../utils/amharic-regex';
 
@@ -57,13 +57,13 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
       >
         <DialogHeader className='border-b pb-3 flex flex-row justify-between items-center'>
           <div>
-            <DialogTitle>Add New Company</DialogTitle>
+            <DialogTitle className='flex items-center gap-2'> <BadgePlus size={20}/> Add New</DialogTitle>
             <DialogDescription className='hidden'>Add New Company</DialogDescription>
           </div>
         </DialogHeader>
         <div className="grid grid-row-2 gap-4 py-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="nameAm">የኩባንያው ስም</Label>
+            <Label htmlFor="nameAm">የኩባንያው ስም<span className='text-red-500'>*</span></Label>
             <input
               id="nameAm"
               value={newCompany.nameAm}
@@ -73,7 +73,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name">Company Name</Label>
+            <Label htmlFor="name">Company Name<span className='text-red-500'>*</span></Label>
             <input
               id="name"
               value={newCompany.name}

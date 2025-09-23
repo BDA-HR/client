@@ -14,6 +14,7 @@ import { Plus } from 'lucide-react';
 import { Input } from '../../../components/ui/input';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import type { AddBranchDto, UUID } from '../../../types/core/branch';
+import { BranchType, BranchStat } from '../../../types/core/enum'; // Adjust the import path as needed
 
 interface AddBranchModalProps {
   onAddBranch: (branch: AddBranchDto) => void;
@@ -30,7 +31,11 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
   const [branchCode, setBranchCode] = useState('');
   const [branchLocation, setBranchLocation] = useState('');
   const [dateOpened, setDateOpened] = useState(() => new Date().toISOString().split('T')[0]); // Current date in YYYY-MM-DD format
-  const [branchType, setBranchType] = useState('0');
+  const [branchType, setBranchType] = useState<BranchType>(BranchType.HeadOff);
+  const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
+    key,
+    value
+  }));
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -49,7 +54,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       location: branchLocation.trim(),
       dateOpened: new Date(dateOpened).toISOString(), // Convert to ISO string
       branchType: branchType,
-      branchStat: '0',
+      branchStat: BranchStat.Active,
       compId: defaultCompanyId as UUID,
     };
 
@@ -61,7 +66,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     setBranchCode('');
     setBranchLocation('');
     setDateOpened(new Date().toISOString().split('T')[0]); // Reset to current date
-    setBranchType('0');
+    setBranchType(BranchType.HeadOff);
     setOpenDialog(false);
   };
 
@@ -80,14 +85,14 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       >
         <DialogHeader className="border-b pb-3 flex flex-row justify-between items-center">
           <div>
-            <DialogTitle>Add New</DialogTitle>
+            <DialogTitle className='flex items-center gap-2'> <Plus size={20}/> Add New</DialogTitle>
             <DialogDescription className="hidden">Add New</DialogDescription>
           </div>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-1.5">
+        <div className="grid grid-cols-1 gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchNameAm">የቅርንጫፍ ስም (አማርኛ) *</Label>
+            <Label htmlFor="branchNameAm">የቅርንጫፍ ስም (አማርኛ) <span className='text-red-500'>*</span></Label>
             <Input
               id="branchNameAm"
               value={branchNameAm}
@@ -98,7 +103,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchName">Branch Name (English) *</Label>
+            <Label htmlFor="branchName">Branch Name (English) <span className='text-red-500'>*</span></Label>
             <Input
               id="branchName"
               value={branchName}
@@ -110,7 +115,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchCode">Branch Code *</Label>
+            <Label htmlFor="branchCode">Branch Code <span className='text-red-500'>*</span></Label>
             <Input
               id="branchCode"
               value={branchCode}
@@ -121,22 +126,23 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchType">Branch Type *</Label>
+            <Label htmlFor="branchType">Branch Type <span className='text-red-500'>*</span></Label>
             <select
               id="branchType"
               value={branchType}
-              onChange={(e) => setBranchType(e.target.value)}
+              onChange={(e) => setBranchType(e.target.value as BranchType)}
               className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
             >
-              <option value="0">Head Office</option>
-              <option value="1">Regional</option>
-              <option value="2">Local</option>
-              <option value="3">Virtual</option>
+              {branchTypeOptions.map((option) => (
+                <option key={option.key} value={option.value}>
+                  {option.value}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branchLocation">Location *</Label>
+            <Label htmlFor="branchLocation">Location <span className='text-red-500'>*</span></Label>
             <Input
               id="branchLocation"
               value={branchLocation}

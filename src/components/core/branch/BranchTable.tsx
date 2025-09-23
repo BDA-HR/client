@@ -17,6 +17,8 @@ import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { BranchListDto, UUID } from '../../../types/core/branch';
 import type { EditBranchDto } from '../../../types/core/branch';
 import { EditBranchModal } from './EditBranchModal';
+import DeleteBranchModal from './DeleteBranchModal';
+import StatBranchModal from './StatBranchModal';
 
 interface BranchTableProps {
   branches: BranchListDto[];
@@ -40,9 +42,11 @@ const BranchTable: React.FC<BranchTableProps> = ({
   onBranchDelete
 }) => {
   const [selectedBranch, setSelectedBranch] = useState<BranchListDto | null>(null);
-  const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | null>(null);
+  const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isStatModalOpen, setIsStatModalOpen] = useState(false); // Added state for status modal
 
   const sortedBranches = [...branches].sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -62,37 +66,26 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
   const handleStatusChange = (branch: BranchListDto) => {
     setSelectedBranch(branch);
-    setModalType('status');
+    setIsStatModalOpen(true); // Use the new state for status modal
     setPopoverOpen(null);
   };
 
   const handleDelete = (branch: BranchListDto) => {
     setSelectedBranch(branch);
-    setModalType('delete');
+    setIsDeleteModalOpen(true);
     setPopoverOpen(null);
   };
 
-const confirmStatusChange = () => {
-  if (selectedBranch) {
-    let newStatus: string;
-    if (selectedBranch.branchStat === 'ACTIVE') {
-      newStatus = 'INACTIVE';
-    } else if (selectedBranch.branchStat === 'INACTIVE') {
-      newStatus = 'UNDER_CONSTRUCTION';
-    } else {
-      newStatus = 'ACTIVE';
-    }
-    onBranchStatusChange(selectedBranch.id, newStatus);
-    setModalType(null);
-  }
-};
+  const confirmStatusChange = (branchId: UUID, newStatus: string) => {
+    onBranchStatusChange(branchId, newStatus);
+    setIsStatModalOpen(false);
+  };
 
-const confirmDeletion = () => {
-  if (selectedBranch) {
-    onBranchDelete(selectedBranch.id);
-    setModalType(null);
-  }
-};
+  const confirmDeletion = (branchId: UUID) => {
+    onBranchDelete(branchId);
+    setIsDeleteModalOpen(false);
+  };
+
   const handleSaveChanges = (updatedData: EditBranchDto) => {
     const updatedBranch: BranchListDto = {
       ...selectedBranch!,
@@ -236,42 +229,41 @@ const confirmDeletion = () => {
                           <MoreVertical className="h-5 w-5" />
                         </motion.button>
                       </PopoverTrigger>
-<PopoverContent className="w-48 p-0" align="end">
-  <div className="py-1">
-    <button 
-      onClick={() => handleViewDetails(branch)}
-      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-    >
-      <Eye size={16} />
-      View Details
-    </button>
+                      <PopoverContent className="w-48 p-0" align="end">
+                        <div className="py-1">
+                          <button 
+                            onClick={() => handleViewDetails(branch)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                          >
+                            <Eye size={16} />
+                            View Details
+                          </button>
 
-    <button 
-      onClick={() => handleEdit(branch)}
-      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-    >
-      <Pencil size={16} />
-      Edit
-    </button>
+                          <button 
+                            onClick={() => handleEdit(branch)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                          >
+                            <Pencil size={16} />
+                            Edit
+                          </button>
 
-    <button 
-      onClick={() => handleStatusChange(branch)}
-      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-    >
-      <Repeat size={16} />
-      Change Status
-    </button>
+                          <button 
+                            onClick={() => handleStatusChange(branch)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                          >
+                            <Repeat size={16} />
+                            Change Status
+                          </button>
 
-    <button 
-      onClick={() => handleDelete(branch)}
-      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-    >
-      <Trash2 size={16} />
-      Delete
-    </button>
-  </div>
-</PopoverContent>
-
+                          <button 
+                            onClick={() => handleDelete(branch)}
+                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+                          >
+                            <Trash2 size={16} />
+                            Delete
+                          </button>
+                        </div>
+                      </PopoverContent>
                     </Popover>
                   </td>
                 </motion.tr>
@@ -341,62 +333,6 @@ const confirmDeletion = () => {
             </div>
           </div>
         </div>
-
-        {/* Status Change Confirmation Modal */}
-        {selectedBranch && modalType === 'status' && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-              <div className="p-6">
-                <h2 className="text-xl font-bold mb-4">Confirm Status Change</h2>
-                <p className="text-gray-600 mb-6">
-                  Are you sure you want to change the status of {selectedBranch.name} branch?
-                </p>
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={() => setModalType(null)}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={confirmStatusChange}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white"
-                  >
-                    Confirm
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Delete Confirmation Modal */}
-        {selectedBranch && modalType === 'delete' && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-              <div className="p-6">
-                <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-                <p className="text-gray-600 mb-6">
-                  Are you sure you want to delete {selectedBranch.name} branch? This action cannot be undone.
-                </p>
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={() => setModalType(null)}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={confirmDeletion}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </motion.div>
 
       {/* Edit Modal */}
@@ -405,6 +341,22 @@ const confirmDeletion = () => {
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleSaveChanges}
         branch={selectedBranch}
+      />
+
+      {/* Status Change Modal */}
+      <StatBranchModal
+        branch={selectedBranch}
+        isOpen={isStatModalOpen}
+        onClose={() => setIsStatModalOpen(false)}
+        onConfirm={confirmStatusChange}
+      />
+
+      {/* Delete Modal */}
+      <DeleteBranchModal
+        branch={selectedBranch}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeletion}
       />
 
       {/* View Details Modal */}

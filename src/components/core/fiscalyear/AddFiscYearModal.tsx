@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { BadgePlus, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
 import type { AddFiscYearDto } from '../../../types/core/fisc';
 import React from 'react';
@@ -27,7 +27,7 @@ export const AddFiscalYearModal = ({
         <DialogHeader>
           <div className="flex justify-between items-center">
             <div>
-              <DialogTitle className="text-2xl">Add New Fiscal Year</DialogTitle>
+              <DialogTitle className='flex items-center gap-2'> <BadgePlus size={20} /> Add New</DialogTitle>
               <DialogDescription>
                 Fill in the details below to create a new fiscal year period.
               </DialogDescription>
