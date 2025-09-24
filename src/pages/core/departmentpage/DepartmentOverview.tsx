@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DepartmentManagementHeader from '../../../components/core/department/DeptHeader';
 import DepartmentStatsCards from '../../../components/core/department/DeptStatusCards';
 import DepartmentSearchFilters from '../../../components/core/department/DeptSearchFilters';
 import DepartmentTable from '../../../components/core/department/DeptTable';
-import EditDeptModal from '../../../components/core/department/EditDeptForm';
-import type { Department } from '../../../types/department';
-import type { AddDeptDto, EditDeptDto, UUID } from '../../../types/core/dept';
-import { initialDepartments } from '../../../data/department';
+import EditDeptModal from '../../../components/core/department/EditDeptModal';
+import AddDeptModal from '../../../components/core/department/AddDeptModal';
+import type { AddDeptDto, EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
+import { departmentService } from '../../../services/core/deptservice';
 
 const DepartmentOverview = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,84 +17,115 @@ const DepartmentOverview = () => {
     companyId: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
+  const [editingDepartment, setEditingDepartment] = useState<DeptListDto | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [departments, setDepartments] = useState<DeptListDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 8;
-  const [departments, setDepartments] = useState<Department[]>(initialDepartments);
 
-  const handleAddDepartment = (newDepartment: AddDeptDto) => {
-    const departmentWithId: Department = {
-      id: `dept-${Date.now()}`,
-      name: newDepartment.name,
-      nameAm: newDepartment.nameAm,
-      manager: 'To be assigned',
-      location: 'Main Branch',
-      employeeCount: 0,
-      status: newDepartment.deptStat === 'Active' ? 'active' : 'inactive',
-      branchId: newDepartment.branchId,
-      companyId: 1, // Default company ID
-      description: `${newDepartment.name} Department` // Added missing description
-    };
-    setDepartments(prev => [...prev, departmentWithId]);
-    setCurrentPage(1);
+  // Load departments on component mount
+  useEffect(() => {
+    loadDepartments();
+  }, []);
+
+  const loadDepartments = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await departmentService.getAllDepartments();
+      setDepartments(data);
+    } catch (err) {
+      console.error('Error loading departments:', err);
+      setError('Failed to load departments. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddDepartment = async (newDepartment: AddDeptDto) => {
+    try {
+      setError(null);
+      const createdDept = await departmentService.createDepartment(newDepartment);
+      setDepartments(prev => [...prev, createdDept]);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error('Error creating department:', err);
+      setError('Failed to create department. Please try again.');
+      throw err;
+    }
   };
 
   const handleEditClick = (department: EditDeptDto) => {
-    // Convert EditDeptDto back to Department for editing
-    const departmentToEdit: Department = {
-      id: department.id,
-      name: department.name,
-      nameAm: department.nameAm,
-      manager: 'To be assigned', // You might want to preserve the actual manager
-      location: department.branch,
-      employeeCount: 0, // You might want to preserve the actual count
-      status: department.deptStat.toLowerCase() as 'active' | 'inactive',
-      branchId: department.branchId,
-      companyId: 1, // Default company ID
-      description: `${department.name} Department` // Added missing description
-    };
-    setEditingDepartment(departmentToEdit);
-    setIsEditModalOpen(true);
+    const departmentToEdit = departments.find(dept => dept.id === department.id);
+    if (departmentToEdit) {
+      setEditingDepartment(departmentToEdit);
+      setIsEditModalOpen(true);
+    }
   };
 
-  const handleUpdateDepartment = (updatedDepartment: EditDeptDto) => {
-    setDepartments(prev =>
-      prev.map(dept =>
-        dept.id === updatedDepartment.id ? {
-          ...dept,
-          name: updatedDepartment.name,
-          nameAm: updatedDepartment.nameAm,
-          location: updatedDepartment.branch,
-          status: updatedDepartment.deptStat.toLowerCase() as 'active' | 'inactive',
-          branchId: updatedDepartment.branchId
-        } : dept
-      )
-    );
-    setIsEditModalOpen(false);
-    setEditingDepartment(null);
+  const handleUpdateDepartment = async (updatedDepartment: EditDeptDto) => {
+    try {
+      setError(null);
+      const updatedDept = await departmentService.updateDepartment(updatedDepartment);
+      setDepartments(prev =>
+        prev.map(dept =>
+          dept.id === updatedDept.id ? updatedDept : dept
+        )
+      );
+      setIsEditModalOpen(false);
+      setEditingDepartment(null);
+    } catch (err) {
+      console.error('Error updating department:', err);
+      setError('Failed to update department. Please try again.');
+      throw err;
+    }
   };
 
-  const handleDepartmentStatusChange = (departmentId: string, newStatus: "active" | "inactive") => {
-    setDepartments(prev => 
-      prev.map(dept => 
-        dept.id === departmentId ? { ...dept, status: newStatus } : dept
-      )
-    );
+  const handleDepartmentStatusChange = async (departmentId: string, newStatus: "active" | "inactive") => {
+    try {
+      setError(null);
+      const department = departments.find(dept => dept.id === departmentId);
+      if (department) {
+        const updatedDept = await departmentService.updateDepartment({
+          ...department,
+          deptStat: newStatus === 'active' ? 'Active' : 'Inactive',
+          rowVersion: department.rowVersion
+        });
+        setDepartments(prev =>
+          prev.map(dept =>
+            dept.id === updatedDept.id ? updatedDept : dept
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Error updating department status:', err);
+      setError('Failed to update department status. Please try again.');
+    }
   };
 
-  const handleDepartmentDelete = (departmentId: string) => {
-    setDepartments(prev => prev.filter(dept => dept.id !== departmentId));
+  const handleDepartmentDelete = async (departmentId: UUID) => {
+    try {
+      setError(null);
+      await departmentService.deleteDepartment(departmentId);
+      setDepartments(prev => prev.filter(dept => dept.id !== departmentId));
+    } catch (err) {
+      console.error('Error deleting department:', err);
+      setError('Failed to delete department. Please try again.');
+      throw err;
+    }
   };
 
   // Filter departments based on search and filters
   const filteredDepartments = departments.filter(department => {
     const matchesSearch = 
       department.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      department.manager.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      department.location.toLowerCase().includes(searchTerm.toLowerCase());
+      department.nameAm.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      department.branch.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = filters.status ? department.status === filters.status : true;
-    const matchesLocation = filters.location ? department.location === filters.location : true;
+    const matchesStatus = filters.status ? 
+      (filters.status === 'active' ? department.deptStat === 'Active' : department.deptStat === 'Inactive') : true;
+    const matchesLocation = filters.location ? department.branch === filters.location : true;
     const matchesCompany = filters.companyId ? department.branchId === filters.companyId : true;
 
     return matchesSearch && matchesStatus && matchesLocation && matchesCompany;
@@ -108,7 +139,12 @@ const DepartmentOverview = () => {
   );
 
   // Get unique locations for filter dropdown
-  const locations = [...new Set(departments.map(dept => dept.location))];
+  const locations = [...new Set(departments.map(dept => dept.branch))];
+
+  // Calculate stats for cards
+  const totalDepartments = departments.length;
+  const activeDepartments = departments.filter(d => d.deptStat === 'Active').length;
+  const employeeCount = 0; // This would need to come from your API
 
   return (
     <>
@@ -122,32 +158,131 @@ const DepartmentOverview = () => {
           <div className="flex flex-col space-y-6">
             <DepartmentManagementHeader />
             
-            <DepartmentStatsCards 
-              totalDepartments={departments.length}
-              activeDepartments={departments.filter(d => d.status === "active").length}
-              employeeCount={departments.reduce((sum, dept) => sum + dept.employeeCount, 0)}
-            />
+            {/* Loading State - Under Header */}
+            {loading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-center items-center py-12"
+              >
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+                </div>
+              </motion.div>
+            )}
 
-            <DepartmentSearchFilters 
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              filters={filters}
-              setFilters={setFilters}
-              locations={locations}
-              onAddDepartment={handleAddDepartment}
-              selectedBranchId={filters.companyId || ''}
-            />
+            {/* Error State - Under Header when no data */}
+            {error && departments.length === 0 && !loading && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="py-12"
+              >
+                <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg w-full mx-auto">
+                  <p className="font-medium">
+                    Failed to load departments.{" "}
+                    <button 
+                      onClick={loadDepartments}
+                      className="underline hover:text-red-800 font-semibold focus:outline-none"
+                    >
+                      Try again
+                    </button>{" "}
+                    later.
+                  </p>
+                </div>
+              </motion.div>
+            )}
 
-            <DepartmentTable 
-              departments={paginatedDepartments}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={filteredDepartments.length}
-              onPageChange={setCurrentPage}
-              onEditDepartment={handleEditClick}
-              onDepartmentStatusChange={handleDepartmentStatusChange}
-              onDepartmentDelete={handleDepartmentDelete}
-            />
+            {!loading && departments.length > 0 && (
+              <>
+                <DepartmentStatsCards 
+                  totalDepartments={totalDepartments}
+                  activeDepartments={activeDepartments}
+                  employeeCount={employeeCount}
+                />
+
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">
+                        {error.includes('load') ? (
+                          <>
+                            Failed to load departments.{" "}
+                            <button 
+                              onClick={loadDepartments}
+                              className="underline hover:text-red-800 font-semibold focus:outline-none"
+                            >
+                              Try again
+                            </button>{" "}
+                            later.
+                          </>
+                        ) : error.includes('create') ? (
+                          "Failed to create department. Please try again."
+                        ) : error.includes('update') ? (
+                          "Failed to update department. Please try again."
+                        ) : error.includes('delete') ? (
+                          "Failed to delete department. Please try again."
+                        ) : (
+                          error
+                        )}
+                      </span>
+                      <button 
+                        onClick={() => setError(null)} 
+                        className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                <DepartmentSearchFilters 
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  filters={filters}
+                  setFilters={setFilters}
+                  locations={locations}
+                  onAddDepartment={handleAddDepartment}
+                  selectedBranchId={filters.companyId || ''}
+                />
+
+                <DepartmentTable 
+                  departments={paginatedDepartments}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={filteredDepartments.length}
+                  onPageChange={setCurrentPage}
+                  onEditDepartment={handleEditClick}
+                  onDepartmentStatusChange={handleDepartmentStatusChange}
+                  onDepartmentDelete={handleDepartmentDelete}
+                />
+              </>
+            )}
+
+            {/* Empty State - When loading is done but no departments */}
+            {!loading && departments.length === 0 && !error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="text-center py-12"
+              >
+                <div className="bg-gray-100 border border-gray-300 text-gray-700 px-6 py-8 rounded-lg max-w-md mx-auto">
+                  <p className="font-medium text-lg mb-2">No departments found</p>
+                  <p className="text-gray-600 mb-4">Get started by creating your first department.</p>
+                  <AddDeptModal 
+                    onAddDepartment={handleAddDepartment} 
+                    branchId={filters.companyId || ''} 
+                  />
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </motion.div>
@@ -155,20 +290,9 @@ const DepartmentOverview = () => {
       {/* Edit Department Modal */}
       {isEditModalOpen && editingDepartment && (
         <EditDeptModal
-          department={{
-            id: editingDepartment.id as UUID,
-            name: editingDepartment.name,
-            nameAm: editingDepartment.nameAm || `አማርኛ-${editingDepartment.name}`,
-            deptStat: editingDepartment.status === 'active' ? 'Active' : 'Inactive',
-            branchId: editingDepartment.branchId,
-            branch: editingDepartment.location,
-            branchAm: editingDepartment.location,
-            rowVersion: '1'
-          }}
+          department={editingDepartment}
           branches={[
-            { id: '1', name: 'Main Branch', nameAm: 'ዋና ቅርንጫፍ' },
-            { id: '2', name: 'Regional Office', nameAm: 'ክልላዊ ቢሮ' },
-            { id: '3', name: 'Local Branch', nameAm: 'አገር አቀፍ ቅርንጫፍ' },
+            { id: editingDepartment.branchId, name: editingDepartment.branch, nameAm: editingDepartment.branchAm },
           ]}
           onEditDepartment={handleUpdateDepartment}
           isOpen={isEditModalOpen}

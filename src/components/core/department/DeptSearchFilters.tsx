@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import AddDeptModal from './AddDeptModal';
 import type { AddDeptDto } from '../../../types/core/dept';
-import { companies } from '../../../data/company-branches';
 
 interface DepartmentSearchFiltersProps {
   searchTerm: string;
@@ -69,9 +68,8 @@ const DepartmentSearchFilters = ({
               onChange={(e) => setFilters({ ...filters, companyId: e.target.value })}
             >
               <option value="">All Companies</option>
-              {companies.map((company) => (
-                <option key={company.id} value={company.id}>{company.name}</option>
-              ))}
+              <option value="1">Main Company</option>
+              <option value="2">Branch Office</option>
             </select>
           </div>
 

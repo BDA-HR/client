@@ -4,16 +4,16 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '../../../components/ui/dialog';
-import { Button } from '../../../components/ui/button';
-import { Label } from '../../../components/ui/label';
+} from '../../ui/dialog';
+import { Button } from '../../ui/button';
+import { Label } from '../../ui/label';
 import { PenBox } from 'lucide-react';
 import type { EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import { DeptStat } from '../../../types/core/enum';
 
 interface Branch {
-  id: UUID; // Change from string to UUID
+  id: UUID;
   name: string;
   nameAm: string;
 }
@@ -61,19 +61,16 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     }
   };
 
-  // Fix the branchId change handler to ensure it's treated as UUID
   const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as UUID; // Cast to UUID type
+    const value = e.target.value as UUID;
     setEditedDepartment((prev) => ({ ...prev, branchId: value }));
   };
 
-  // Fix the status change handler
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setEditedDepartment((prev) => ({ ...prev, deptStat: value }));
   };
 
-  // Fix the name change handler
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEditedDepartment((prev) => ({ ...prev, name: value }));
@@ -83,7 +80,6 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     if (!editedDepartment.name || !editedDepartment.nameAm || !editedDepartment.branchId) return;
 
     onEditDepartment(editedDepartment);
-    onClose();
   };
 
   return (

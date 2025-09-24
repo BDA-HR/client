@@ -3,10 +3,8 @@ import { motion } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
-  MapPin,
   Building,
   MoreVertical,
-  User,
   X,
   Trash2,
   Repeat,
@@ -14,33 +12,19 @@ import {
   Eye,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
-import EditDeptModal from './EditDeptForm';
+import EditDeptModal from './EditDeptModal';
 import DeleteDeptModal from './DeleteDeptModal';
-import type { Department } from '../../../types/department';
-import type { EditDeptDto, DeptListDto } from '../../../types/core/dept';
-import { companies } from '../../../data/company-branches';
-
-// Convert your Department type to match DeptListDto structure
-const convertToDeptListDto = (dept: Department): DeptListDto => ({
-  id: dept.id,
-  name: dept.name,
-  nameAm: dept.nameAm || `አማርኛ-${dept.name}`,
-  deptStat: dept.status === 'active' ? 'Active' : 'Inactive',
-  branchId: dept.branchId || '1',
-  branch: dept.location || 'Main Branch',
-  branchAm: dept.location || 'ዋና ቅርንጫፍ',
-  rowVersion: '1'
-});
+import type { EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
 
 interface DepartmentTableProps {
-  departments: Department[];
+  departments: DeptListDto[];
   currentPage: number;
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
   onEditDepartment: (department: EditDeptDto) => void;
   onDepartmentStatusChange: (id: string, status: "active" | "inactive") => void;
-  onDepartmentDelete: (id: string) => void;
+  onDepartmentDelete: (id: UUID) => void;
 }
 
 const DepartmentTable: React.FC<DepartmentTableProps> = ({
@@ -53,54 +37,37 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   onDepartmentStatusChange,
   onDepartmentDelete,
 }) => {
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState<DeptListDto | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  // Mock branches data for testing
-  const branches = [
-    { id: '1', name: 'Main Branch', nameAm: 'ዋና ቅርንጫፍ' },
-    { id: '2', name: 'Regional Office', nameAm: 'ክልላዊ ቢሮ' },
-    { id: '3', name: 'Local Branch', nameAm: 'አገር አቀፍ ቅርንጫፍ' },
-  ];
-
-  const getCompanyName = (companyId: number): string => {
-    const company = companies.find(c => c.id === companyId);
-    return company ? company.name : 'Unknown Company';
-  };
-
-  const getCompanyBranches = (companyId: number) => {
-    const company = companies.find(c => c.id === companyId);
-    return company ? company.branches : [];
-  };
-
-  const handleStatusToggle = (department: Department) => {
-    const newStatus = department.status === "active" ? "inactive" : "active";
+  const handleStatusToggle = (department: DeptListDto) => {
+    const newStatus = department.deptStat === "Active" ? "inactive" : "active";
     onDepartmentStatusChange(department.id, newStatus);
     setPopoverOpen(null);
   };
 
-  const handleViewDetails = (department: Department) => {
+  const handleViewDetails = (department: DeptListDto) => {
     setSelectedDepartment(department);
     setModalType('view');
     setPopoverOpen(null);
   };
 
-  const handleEdit = (department: Department) => {
+  const handleEdit = (department: DeptListDto) => {
     setSelectedDepartment(department);
     setIsEditModalOpen(true);
     setPopoverOpen(null);
   };
 
-  const handleDelete = (department: Department) => {
+  const handleDelete = (department: DeptListDto) => {
     setSelectedDepartment(department);
     setIsDeleteModalOpen(true);
     setPopoverOpen(null);
   };
 
-  const handleConfirmDelete = (departmentId: string) => {
+  const handleConfirmDelete = (departmentId: UUID) => {
     onDepartmentDelete(departmentId);
     setIsDeleteModalOpen(false);
     setSelectedDepartment(null);
@@ -112,8 +79,8 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
     setSelectedDepartment(null);
   };
 
-  const getStatusColor = (status: "active" | "inactive"): string => {
-    return status === "active" 
+  const getStatusColor = (status: string): string => {
+    return status === "Active" 
       ? "bg-emerald-100 text-emerald-800" 
       : "bg-gray-100 text-gray-800";
   };
@@ -147,13 +114,13 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                   Department
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                  Company
+                  Branch
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Location
+                  Amharic Name
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Employees
+                  Status
                 </th>
                 <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -193,7 +160,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                             {department.name}
                           </div>
                           <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                            {department.description || `${department.name} Department`}
+                            ID: {department.id}
                           </div>
                         </div>
                       </div>
@@ -201,20 +168,18 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                       <div className="flex items-center">
                         <Building className="text-gray-400 mr-2 h-4 w-4" />
-                        <span>{getCompanyName(department.companyId)}</span>
+                        <span>{department.branch}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
-                      <div className="flex items-center">
-                        <MapPin className="text-gray-400 mr-2 h-4 w-4" />
-                        <span>{department.location}</span>
+                      <div className="text-sm text-gray-900">
+                        {department.nameAm}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
-                      <div className="flex items-center">
-                        <User className="text-gray-400 mr-2 h-4 w-4" />
-                        <span>{department.employeeCount}</span>
-                      </div>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(department.deptStat)}`}>
+                        {department.deptStat}
+                      </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Popover open={popoverOpen === department.id} onOpenChange={(open) => setPopoverOpen(open ? department.id : null)}>
@@ -268,7 +233,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
           </table>
         </div>
 
-        {/* Pagination - unchanged */}
+        {/* Pagination */}
         <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
@@ -331,11 +296,13 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
         </div>
       </motion.div>
 
-      {/* Modals remain unchanged */}
+      {/* Edit Modal */}
       {selectedDepartment && (
         <EditDeptModal
-          department={convertToDeptListDto(selectedDepartment)}
-          branches={branches}
+          department={selectedDepartment}
+          branches={[
+            { id: selectedDepartment.branchId, name: selectedDepartment.branch, nameAm: selectedDepartment.branchAm },
+          ]}
           onEditDepartment={handleSaveChanges}
           isOpen={isEditModalOpen}
           onClose={() => {
@@ -345,8 +312,9 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
         />
       )}
 
+      {/* Delete Modal */}
       <DeleteDeptModal
-        department={selectedDepartment ? convertToDeptListDto(selectedDepartment) : null}
+        department={selectedDepartment}
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false);
@@ -355,6 +323,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
         onConfirm={handleConfirmDelete}
       />
 
+      {/* View Details Modal */}
       {selectedDepartment && modalType === 'view' && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div 
@@ -365,7 +334,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white z-10">
               <div>
                 <h2 className="text-2xl font-bold">{selectedDepartment.name}</h2>
-                <p className="text-gray-600">{getCompanyName(selectedDepartment.companyId)} • {selectedDepartment.location}</p>
+                <p className="text-gray-600">{selectedDepartment.branch}</p>
               </div>
               <button
                 onClick={() => {
@@ -382,53 +351,41 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Department Information</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center">
-                    <MapPin className="text-gray-500 mr-3" size={16} />
-                    <div>
-                      <p className="text-sm text-gray-500">Location</p>
-                      <p>{selectedDepartment.location}</p>
-                    </div>
+                  <div>
+                    <p className="text-sm text-gray-500">English Name</p>
+                    <p className="font-medium">{selectedDepartment.name}</p>
                   </div>
-                  <div className="flex items-center">
-                    <User className="text-gray-500 mr-3" size={16} />
-                    <div>
-                      <p className="text-sm text-gray-500">Manager</p>
-                      <p>{selectedDepartment.manager}</p>
-                    </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Amharic Name</p>
+                    <p className="font-medium">{selectedDepartment.nameAm}</p>
                   </div>
-                  <div className="flex items-center">
-                    <User className="text-gray-500 mr-3" size={16} />
-                    <div>
-                      <p className="text-sm text-gray-500">Employees</p>
-                      <p>{selectedDepartment.employeeCount}</p>
-                    </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Branch</p>
+                    <p>{selectedDepartment.branch}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Status</p>
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedDepartment.status)}`}>
-                      {selectedDepartment.status === "active" ? "Active" : "Inactive"}
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedDepartment.deptStat)}`}>
+                      {selectedDepartment.deptStat}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Company Details</h3>
+                <h3 className="text-lg font-semibold">Additional Details</h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-500">Company</p>
-                    <p className="font-medium">{getCompanyName(selectedDepartment.companyId)}</p>
+                    <p className="text-sm text-gray-500">Department ID</p>
+                    <p className="font-mono text-sm">{selectedDepartment.id}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Available Branches</p>
-                    <div className="mt-1 space-y-1">
-                      {getCompanyBranches(selectedDepartment.companyId).map(branch => (
-                        <div key={branch.id} className="flex items-center">
-                          <MapPin className="text-gray-400 mr-2 h-3 w-3" />
-                          <span className="text-sm">{branch.name} - {branch.city}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-sm text-gray-500">Branch ID</p>
+                    <p className="font-mono text-sm">{selectedDepartment.branchId}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Row Version</p>
+                    <p className="font-mono text-sm">{selectedDepartment.rowVersion}</p>
                   </div>
                 </div>
               </div>
