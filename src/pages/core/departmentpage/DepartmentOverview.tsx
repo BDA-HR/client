@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import DepartmentManagementHeader from '../../../components/core/department/DeptHeader';
 import DepartmentStatsCards from '../../../components/core/department/DeptStatusCards';
 import DepartmentSearchFilters from '../../../components/core/department/DeptSearchFilters';
 import DepartmentTable from '../../../components/core/department/DeptTable';
-import EditDepartmentForm from '../../../components/core/department/AddDeptForm';
+import EditDeptModal from '../../../components/core/department/EditDeptForm';
 import type { Department } from '../../../types/department';
+import type { AddDeptDto, EditDeptDto, UUID } from '../../../types/core/dept';
 import { initialDepartments } from '../../../data/department';
 
 const DepartmentOverview = () => {
@@ -13,6 +14,7 @@ const DepartmentOverview = () => {
   const [filters, setFilters] = useState({
     status: '',
     location: '',
+    companyId: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
@@ -20,31 +22,56 @@ const DepartmentOverview = () => {
   const itemsPerPage = 8;
   const [departments, setDepartments] = useState<Department[]>(initialDepartments);
 
-  const handleAddDepartment = (newDepartment: Omit<Department, 'id'>) => {
-    const departmentWithId = {
-      ...newDepartment,
+  const handleAddDepartment = (newDepartment: AddDeptDto) => {
+    const departmentWithId: Department = {
       id: `dept-${Date.now()}`,
-      employeeCount: 0
+      name: newDepartment.name,
+      nameAm: newDepartment.nameAm,
+      manager: 'To be assigned',
+      location: 'Main Branch',
+      employeeCount: 0,
+      status: newDepartment.deptStat === 'Active' ? 'active' : 'inactive',
+      branchId: newDepartment.branchId,
+      companyId: 1, // Default company ID
+      description: `${newDepartment.name} Department` // Added missing description
     };
     setDepartments(prev => [...prev, departmentWithId]);
     setCurrentPage(1);
   };
 
-  const handleEditClick = (department: Department) => {
-    setEditingDepartment(department);
+  const handleEditClick = (department: EditDeptDto) => {
+    // Convert EditDeptDto back to Department for editing
+    const departmentToEdit: Department = {
+      id: department.id,
+      name: department.name,
+      nameAm: department.nameAm,
+      manager: 'To be assigned', // You might want to preserve the actual manager
+      location: department.branch,
+      employeeCount: 0, // You might want to preserve the actual count
+      status: department.deptStat.toLowerCase() as 'active' | 'inactive',
+      branchId: department.branchId,
+      companyId: 1, // Default company ID
+      description: `${department.name} Department` // Added missing description
+    };
+    setEditingDepartment(departmentToEdit);
     setIsEditModalOpen(true);
   };
 
-  const handleModalClose = () => {
+  const handleUpdateDepartment = (updatedDepartment: EditDeptDto) => {
+    setDepartments(prev =>
+      prev.map(dept =>
+        dept.id === updatedDepartment.id ? {
+          ...dept,
+          name: updatedDepartment.name,
+          nameAm: updatedDepartment.nameAm,
+          location: updatedDepartment.branch,
+          status: updatedDepartment.deptStat.toLowerCase() as 'active' | 'inactive',
+          branchId: updatedDepartment.branchId
+        } : dept
+      )
+    );
     setIsEditModalOpen(false);
     setEditingDepartment(null);
-  };
-
-  const handleDepartmentUpdate = (updatedDepartment: Department) => {
-    setDepartments(prev => 
-      prev.map(dept => dept.id === updatedDepartment.id ? updatedDepartment : dept)
-    );
-    handleModalClose();
   };
 
   const handleDepartmentStatusChange = (departmentId: string, newStatus: "active" | "inactive") => {
@@ -68,8 +95,9 @@ const DepartmentOverview = () => {
     
     const matchesStatus = filters.status ? department.status === filters.status : true;
     const matchesLocation = filters.location ? department.location === filters.location : true;
+    const matchesCompany = filters.companyId ? department.branchId === filters.companyId : true;
 
-    return matchesSearch && matchesStatus && matchesLocation;
+    return matchesSearch && matchesStatus && matchesLocation && matchesCompany;
   });
 
   // Pagination logic
@@ -107,6 +135,7 @@ const DepartmentOverview = () => {
               setFilters={setFilters}
               locations={locations}
               onAddDepartment={handleAddDepartment}
+              selectedBranchId={filters.companyId || ''}
             />
 
             <DepartmentTable 
@@ -125,15 +154,29 @@ const DepartmentOverview = () => {
 
       {/* Edit Department Modal */}
       {isEditModalOpen && editingDepartment && (
-        <div className="fixed inset-0 bg-gray-500/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <EditDepartmentForm
-              department={editingDepartment}
-              onSubmit={handleDepartmentUpdate}
-              onCancel={handleModalClose}
-            />
-          </div>
-        </div>
+        <EditDeptModal
+          department={{
+            id: editingDepartment.id as UUID,
+            name: editingDepartment.name,
+            nameAm: editingDepartment.nameAm || `አማርኛ-${editingDepartment.name}`,
+            deptStat: editingDepartment.status === 'active' ? 'Active' : 'Inactive',
+            branchId: editingDepartment.branchId,
+            branch: editingDepartment.location,
+            branchAm: editingDepartment.location,
+            rowVersion: '1'
+          }}
+          branches={[
+            { id: '1', name: 'Main Branch', nameAm: 'ዋና ቅርንጫፍ' },
+            { id: '2', name: 'Regional Office', nameAm: 'ክልላዊ ቢሮ' },
+            { id: '3', name: 'Local Branch', nameAm: 'አገር አቀፍ ቅርንጫፍ' },
+          ]}
+          onEditDepartment={handleUpdateDepartment}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingDepartment(null);
+          }}
+        />
       )}
     </>
   );

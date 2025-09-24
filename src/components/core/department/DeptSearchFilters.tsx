@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '../../ui/dialog';
-import AddDepartmentForm from './AddDeptForm';
-import type { DepartmentFormValues } from '../../../types/department';
+import AddDeptModal from './AddDeptModal';
+import type { AddDeptDto } from '../../../types/core/dept';
 import { companies } from '../../../data/company-branches';
 
 interface DepartmentSearchFiltersProps {
@@ -15,7 +13,8 @@ interface DepartmentSearchFiltersProps {
   };
   setFilters: (filters: { status: string; location: string; companyId: string }) => void;
   locations: string[];
-  onAddDepartment: (department: DepartmentFormValues) => void;
+  onAddDepartment: (department: AddDeptDto) => void;
+  selectedBranchId: string;
 }
 
 const DepartmentSearchFilters = ({
@@ -25,12 +24,10 @@ const DepartmentSearchFilters = ({
   setFilters,
   locations,
   onAddDepartment,
+  selectedBranchId,
 }: DepartmentSearchFiltersProps) => {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-
-  const handleAddSubmit = (values: DepartmentFormValues) => {
-    onAddDepartment(values);
-    setIsAddDialogOpen(false);
+  const handleAddDepartment = (department: AddDeptDto) => {
+    onAddDepartment(department);
   };
 
   return (
@@ -109,28 +106,10 @@ const DepartmentSearchFilters = ({
             </select>
           </div>
 
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <motion.button
-              whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-                type="button"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 hover:cursor-pointer"
-              >
-                Add Department
-              </motion.button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Add New Department</DialogTitle>
-              </DialogHeader>
-              <AddDepartmentForm 
-                companies={companies}
-                onSubmit={handleAddSubmit}
-                onCancel={() => setIsAddDialogOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
+          <AddDeptModal 
+            onAddDepartment={handleAddDepartment} 
+            branchId={selectedBranchId} 
+          />
         </div>
       </div>
     </motion.div>
