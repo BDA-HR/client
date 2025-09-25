@@ -1,6 +1,6 @@
 import { Card } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { MoreVertical, PenBox, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -79,7 +79,7 @@ const CompList: React.FC<CompListProps> = ({
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => onEditCompany(company)}
                     className='flex items-center gap-2'>
-                      <Pencil size={16}/>
+                      <PenBox size={16}/>
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem

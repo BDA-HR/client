@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, Pencil, Trash2, Power } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, Trash2, PenBox } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { FiscYearListDto } from '../../../types/core/fisc';
 import { formatDate } from '../../../utils/format-date';
@@ -25,7 +25,6 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
   onPageChange,
   onViewDetails,
   onEdit,
-  onStatusChange,
   onDelete,
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
@@ -180,15 +179,8 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                           onClick={() => onEdit(year)}
                           className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                         >
-                          <Pencil size={16} />
+                          <PenBox size={16} />
                           Edit
-                        </button>
-                        <button 
-                          onClick={() => onStatusChange(year)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                        >
-                          <Power size={16} />
-                          {year.isActive === 'Yes' ? 'Deactivate' : 'Activate'}
                         </button>
                         <button 
                           onClick={() => onDelete(year)}

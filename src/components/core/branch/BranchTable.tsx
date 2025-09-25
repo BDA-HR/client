@@ -9,7 +9,6 @@ import {
   X,
   Calendar,
   Eye,
-  Repeat,
   Trash2,
   BadgeInfo,
   GitBranch,
@@ -63,12 +62,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
   const handleEdit = (branch: BranchListDto) => {
     setSelectedBranch(branch);
     setIsEditModalOpen(true);
-    setPopoverOpen(null);
-  };
-
-  const handleStatusChange = (branch: BranchListDto) => {
-    setSelectedBranch(branch);
-    setIsStatModalOpen(true);
     setPopoverOpen(null);
   };
 
@@ -276,14 +269,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
                           >
                             <PenBox size={16} />
                             Edit
-                          </button>
-
-                          <button 
-                            onClick={() => handleStatusChange(branch)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                          >
-                            <Repeat size={16} />
-                            Change Status
                           </button>
 
                           <button 
