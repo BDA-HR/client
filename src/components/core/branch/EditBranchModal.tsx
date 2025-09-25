@@ -50,8 +50,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     code: '',
     location: '',
     dateOpened: new Date().toISOString().split('T')[0],
-    branchType: BranchType.LocOff, // Use enum default
-    branchStat: BranchStat.Active, // Use enum default
+    branchType: '0',
+    branchStat: 'Active',
     compId: (defaultCompanyId || '') as UUID,
     rowVersion: '',
   });
@@ -69,8 +69,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         dateOpened: branch.dateOpened
           ? new Date(branch.dateOpened).toISOString().split('T')[0]
           : new Date().toISOString().split('T')[0],
-        branchType: branch.branchType || BranchType.LocOff, // Use enum
-        branchStat: branch.branchStat || BranchStat.Active, // Use enum
+        branchType: branch.branchType || '0', // Use the key
+        branchStat: branch.branchStat || 'Active', // Use the key
         compId: (defaultCompanyId || '') as UUID,
         rowVersion: branch.rowVersion || '',
       });
@@ -137,6 +137,10 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     key,
     value
   }));
+  const getDisplayValue = (key: string, options: Array<{key: string, value: string}>) => {
+    const option = options.find(opt => opt.key === key);
+    return option ? option.value : '';
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -249,12 +253,14 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                 onValueChange={(value) => handleInputChange('branchStat', value)}
               >
                 <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="Select status">
+                    {getDisplayValue(formData.branchStat, branchStatOptions)}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {branchStatOptions.map((option) => (
-                    <SelectItem key={option.key} value={option.value}>
-                      {option.value}
+                    <SelectItem key={option.key} value={option.key}> {/* Use option.key as value */}
+                      {option.value} {/* Display the human-readable value */}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -271,12 +277,14 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                 onValueChange={(value) => handleInputChange('branchType', value)}
               >
                 <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder="Select type">
+                    {getDisplayValue(formData.branchType, branchTypeOptions)}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {branchTypeOptions.map((option) => (
-                    <SelectItem key={option.key} value={option.value}>
-                      {option.value}
+                    <SelectItem key={option.key} value={option.key}> {/* Use option.key as value */}
+                      {option.value} {/* Display the human-readable value */}
                     </SelectItem>
                   ))}
                 </SelectContent>

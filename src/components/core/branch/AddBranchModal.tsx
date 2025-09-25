@@ -10,7 +10,7 @@ import {
 } from '../../../components/ui/dialog';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
-import { BadgePlus, Plus } from 'lucide-react';
+import { BadgePlus, } from 'lucide-react';
 import { Input } from '../../../components/ui/input';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import type { AddBranchDto, UUID } from '../../../types/core/branch';
@@ -85,7 +85,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       >
         <DialogHeader className="border-b pb-3 flex flex-row justify-between items-center">
           <div>
-            <DialogTitle className='flex items-center gap-2'> <Plus size={20}/> Add New</DialogTitle>
+            <DialogTitle className='flex items-center gap-2'> <BadgePlus size={20}/> Add New</DialogTitle>
             <DialogDescription className="hidden">Add New</DialogDescription>
           </div>
         </DialogHeader>
@@ -114,15 +114,28 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="branchCode">Branch Code <span className='text-red-500'>*</span></Label>
-            <Input
-              id="branchCode"
-              value={branchCode}
-              onChange={(e) => setBranchCode(e.target.value)}
-              placeholder="Eg. BR-001"
-              className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="branchCode">Branch Code <span className='text-red-500'>*</span></Label>
+              <Input
+                id="branchCode"
+                value={branchCode}
+                onChange={(e) => setBranchCode(e.target.value)}
+                placeholder="Eg. BR-001"
+                className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="dateOpened">Date Opened</Label>
+              <Input
+                id="dateOpened"
+                type="date"
+                value={dateOpened}
+                onChange={(e) => setDateOpened(e.target.value)}
+                className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
@@ -151,20 +164,9 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
               className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="dateOpened">Date Opened</Label>
-            <Input
-              id="dateOpened"
-              type="date"
-              value={dateOpened}
-              onChange={(e) => setDateOpened(e.target.value)}
-              className="w-full h-11 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-            />
-          </div>
         </div>
 
-        <div className="flex justify-center items-center gap-3 border-t pt-2 pb-0">
+        <div className="flex justify-center items-center gap-3 border-t pt-6">
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
             onClick={handleSubmit}

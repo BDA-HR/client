@@ -50,19 +50,21 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
           </div>
         )}
         
-        <DialogFooter className="flex justify-center items-center gap-1.5 border-t pt-6">
+        <DialogFooter className="border-t pt-6">
+          <div className="flex justify-center items-center gap-3">
           <Button 
             variant="destructive" 
             onClick={handleConfirm}
             className="cursor-pointer px-6"
           >
-            Delete Branch
+            Delete
           </Button>
           <DialogClose asChild>
             <Button variant="outline" className="cursor-pointer px-6">
               Cancel
             </Button>
           </DialogClose>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

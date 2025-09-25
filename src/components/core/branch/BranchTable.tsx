@@ -9,9 +9,11 @@ import {
   X,
   Calendar,
   Eye,
-  Pencil,
   Repeat,
-  Trash2
+  Trash2,
+  BadgeInfo,
+  GitBranch,
+  PenBox
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { BranchListDto, UUID } from '../../../types/core/branch';
@@ -46,7 +48,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isStatModalOpen, setIsStatModalOpen] = useState(false); // Added state for status modal
+  const [isStatModalOpen, setIsStatModalOpen] = useState(false);
 
   const sortedBranches = [...branches].sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -66,7 +68,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
   const handleStatusChange = (branch: BranchListDto) => {
     setSelectedBranch(branch);
-    setIsStatModalOpen(true); // Use the new state for status modal
+    setIsStatModalOpen(true);
     setPopoverOpen(null);
   };
 
@@ -119,6 +121,27 @@ const BranchTable: React.FC<BranchTableProps> = ({
     }
   };
 
+  const getBranchTypeText = (branchType: string): string => {
+    // Convert the key to the display value
+    switch (branchType) {
+      case '0': return 'Head Office';
+      case '1': return 'Regional';
+      case '2': return 'Local';
+      case '3': return 'Virtual';
+      default: return branchType;
+    }
+  };
+
+  const getBranchTypeColor = (branchType: string): string => {
+    switch (branchType) {
+      case '0': return 'bg-purple-100 text-purple-800'; // Head Office
+      case '1': return 'bg-blue-100 text-blue-800';    // Regional
+      case '2': return 'bg-green-100 text-green-800';  // Local
+      case '3': return 'bg-orange-100 text-orange-800'; // Virtual
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <>
       <motion.div 
@@ -151,15 +174,18 @@ const BranchTable: React.FC<BranchTableProps> = ({
                   Branch
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  Type
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   Status
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Location
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Company
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Opened
                 </th>
                 <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -196,6 +222,11 @@ const BranchTable: React.FC<BranchTableProps> = ({
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(branch.branchType)}`}>
+                      {getBranchTypeText(branch.branchType)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
                       {getStatusText(branch.branchStat)}
                     </span>
@@ -206,13 +237,13 @@ const BranchTable: React.FC<BranchTableProps> = ({
                       <span className="truncate max-w-[120px]">{branch.location}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
                       <Building className="text-gray-400 mr-2 h-4 w-4" />
-                      <span>{branch.comp}</span>
+                      <span className="truncate max-w-[120px]">{branch.comp}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
                       <Calendar className="text-gray-400 mr-2 h-4 w-4" />
                       <span>{branch.dateOpened}</span>
@@ -243,7 +274,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
                             onClick={() => handleEdit(branch)}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                           >
-                            <Pencil size={16} />
+                            <PenBox size={16} />
                             Edit
                           </button>
 
@@ -364,9 +395,9 @@ const BranchTable: React.FC<BranchTableProps> = ({
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
-              <div>
-                <h2 className="text-2xl font-bold">{selectedBranch.name}</h2>
-                <p className="text-gray-600">{selectedBranch.code} • {selectedBranch.location}</p>
+              <div className='flex items-center gap-2 text-2xl font-bold'>
+                <BadgeInfo size={18} />
+                Details
               </div>
               <button
                 onClick={() => setModalType(null)}
@@ -406,16 +437,34 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <MapPin className="mr-2 text-blue-500" size={20} />
-                    Status & Company
+                    <GitBranch className="mr-2 text-purple-500" size={20} />
+                    Type & Status
                   </h3>
                   <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-gray-500">Branch Type</p>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(selectedBranch.branchType)}`}>
+                        {getBranchTypeText(selectedBranch.branchType)}
+                      </span>
+                    </div>
                     <div>
                       <p className="text-sm text-gray-500">Status</p>
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedBranch.branchStat)}`}>
                         {getStatusText(selectedBranch.branchStat)}
                       </span>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dates and Additional Info */}
+              <div className="space-y-4">
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <MapPin className="mr-2 text-blue-500" size={20} />
+                    Company Information
+                  </h3>
+                  <div className="space-y-3">
                     <div>
                       <p className="text-sm text-gray-500">Company</p>
                       <p className="font-medium">{selectedBranch.comp}</p>
@@ -426,10 +475,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Dates and Additional Info */}
-              <div className="space-y-4">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Calendar className="mr-2 text-purple-500" size={20} />
