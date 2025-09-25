@@ -23,6 +23,8 @@ import {
   Briefcase,
   ClipboardCheck,
   LineChart,
+  Building,
+  Network,
 } from 'lucide-react';
 import { useModule } from '../ModuleContext';
 
@@ -269,12 +271,12 @@ const Sidebar: React.FC = () => {
             <>
               <NavItem 
                 to="/core/company" 
-                icon={<Users size={18} />} 
+                icon={<Building size={18} />} 
                 label="Companies" 
                 {...theme}
                 matchPaths={['/branches']} // This will make it active for /branches routes
               />
-              <NavItem to="/core/department" icon={<Users size={18} />} label="Department" {...theme} /> 
+              <NavItem to="/core/department" icon={<Network size={18} />} label="Department" {...theme} /> 
               <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
               <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
             </>
