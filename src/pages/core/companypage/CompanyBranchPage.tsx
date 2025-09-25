@@ -2,7 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
 import CompSection from '../../../components/core/company/CompSection';
-import AddHierarchy from '../../../components/core/company/HierSection';
 
 const CompanyBranchesPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -30,7 +29,7 @@ const CompanyBranchesPage = () => {
               View All Branches
             </Button>
           <div className="pt-6">
-            <AddHierarchy />
+            {/* <AddHierarchy /> */}
           </div>
         </>
     </div>
