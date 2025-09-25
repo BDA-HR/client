@@ -11,7 +11,7 @@ import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import type { CompListDto } from '../../../types/core/comp';
 import { amharicRegex } from '../../../utils/amharic-regex';
-import { PenBox, PenBoxIcon } from 'lucide-react';
+import { PenBox } from 'lucide-react';
 
 interface EditCompModalProps {
   company: CompListDto | null;
@@ -63,7 +63,6 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader className='border-b pb-3 flex flex-row justify-between items-center gap-2'>
-          <PenBoxIcon size={20} />
           <div>
             <DialogTitle className='flex items-center gap-2'><PenBox size={20}/> Edit</DialogTitle>
             <DialogDescription className='hidden'>Edit Company Details</DialogDescription>

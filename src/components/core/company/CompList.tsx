@@ -84,7 +84,7 @@ const CompList: React.FC<CompListProps> = ({
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => onDeleteCompany(company)}
-                    className="text-red-500 flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                   >
                     <Trash2 size={16} />
                     Delete
