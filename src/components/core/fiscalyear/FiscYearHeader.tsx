@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { BadgePlus } from 'lucide-react';
 import { DialogTrigger } from '../../ui/dialog';
 
 export const FiscalYearManagementHeader = ({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) => {
@@ -22,10 +22,10 @@ export const FiscalYearManagementHeader = ({ setDialogOpen }: { setDialogOpen: (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-md shadow-sm hover:from-emerald-600 hover:to-emerald-700 transition-colors hover:cursor-pointer"
+            className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
             onClick={() => setDialogOpen(true)}
           >
-            <Plus size={18} />
+            <BadgePlus size={18} />
             <span>Add Fiscal Year</span>
           </motion.button>
         </DialogTrigger>

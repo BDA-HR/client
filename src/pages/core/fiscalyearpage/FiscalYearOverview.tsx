@@ -9,6 +9,9 @@ import { DeleteFiscModal } from '../../../components/core/fiscalyear/DeleteFiscM
 import { fiscalYearService } from '../../../services/core/fiscservice';
 import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../../../types/core/fisc';
 import PeriodSection from '../../../components/core/fiscalyear/PeriodSection';
+import ActiveFisc from '../../../components/core/fiscalyear/ActFiscYear';
+import { motion } from 'framer-motion';
+
 const getDefaultFiscalYear = (): AddFiscYearDto => ({
   name: '',
   dateStart: new Date().toISOString(),
@@ -34,10 +37,14 @@ export default function FiscalYearOverview() {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const paginatedYears = years.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  // Get active fiscal year
+  const activeYear = years.find(year => year.isActive === 'Yes') || null;
+
   // Load fiscal years from API
   useEffect(() => {
     loadFiscalYears();
   }, []);
+  
   useEffect(() => {
     if (addModalOpen) {
       setNewYear(getDefaultFiscalYear());
@@ -142,93 +149,106 @@ export default function FiscalYearOverview() {
 
   return (
     <>
-    <div className="bg-gray-50">
-      <Dialog>
-        <FiscalYearManagementHeader setDialogOpen={setAddModalOpen} />
-        
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
-              <div className="flex items-center">
-                <span>{error}</span>
-                <button 
-                  onClick={loadFiscalYears}
-                  className="ml-4 text-red-800 hover:text-red-900 underline font-medium cursor-pointer"
-                >
-                  Try Again
-                </button>
-              </div>
-              <button 
-                onClick={() => setError(null)} 
-                className="absolute top-0 right-0 p-2"
+      <div className="bg-gray-50">
+        <Dialog>
+          <FiscalYearManagementHeader setDialogOpen={setAddModalOpen} />
+          
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            {/* Single Error Message - Shows instead of both ActiveFisc and Table */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-6 mb-6"
               >
-                <span className="text-2xl">&times;</span>
-              </button>
-            </div>
-          )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-red-700 mt-1">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-          {loading && (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-            </div>
-          )}
-
-          {!loading && (
-            <>
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">Fiscal Years</h2>
-                <p className="text-sm text-gray-600">
-                  {totalItems} fiscal year{totalItems !== 1 ? 's' : ''} found
-                </p>
+            {/* Loading State */}
+            {loading && !error && (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
               </div>
-              
-              <FiscalYearTable
-                years={paginatedYears}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                onPageChange={setCurrentPage}
-                onViewDetails={handleViewDetails}
-                onEdit={handleEdit}
-                onStatusChange={handleStatusChange}
-                onDelete={handleDelete}
-              />
-            </>
-          )}
-        </div>
+            )}
 
-        {/* Add Modal */}
-        <AddFiscalYearModal
-          open={addModalOpen}
-          onOpenChange={handleAddModalOpenChange}
-          newYear={newYear}
-          setNewYear={setNewYear}
-          onAddFiscalYear={handleAddFiscalYear}
+            {!loading && !error && (
+              <>
+                <ActiveFisc
+                  activeYear={activeYear}
+                  loading={loading}
+                  error={error}
+                  onViewDetails={handleViewDetails}
+                />
+
+                {/* All Fiscal Years Section */}
+                <div className="mb-4">
+                  <h2 className="text-lg font-semibold text-gray-800 mb-2">All Fiscal Years (History)</h2>
+                  <p className="text-sm text-gray-600">
+                    {totalItems} fiscal year{totalItems !== 1 ? 's' : ''} found
+                  </p>
+                </div>
+                
+                <FiscalYearTable
+                  years={paginatedYears}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  onPageChange={setCurrentPage}
+                  onViewDetails={handleViewDetails}
+                  onEdit={handleEdit}
+                  onStatusChange={handleStatusChange}
+                  onDelete={handleDelete}
+                />
+              </>
+            )}
+          </div>
+
+          {/* Add Modal */}
+          <AddFiscalYearModal
+            open={addModalOpen}
+            onOpenChange={handleAddModalOpenChange}
+            newYear={newYear}
+            setNewYear={setNewYear}
+            onAddFiscalYear={handleAddFiscalYear}
+          />
+        </Dialog>
+
+        {/* Separate modals */}
+        <ViewFiscModal
+          fiscalYear={selectedYear}
+          isOpen={viewModalOpen}
+          onClose={() => setViewModalOpen(false)}
         />
-      </Dialog>
 
-      {/* Separate modals */}
-      <ViewFiscModal
-        fiscalYear={selectedYear}
-        isOpen={viewModalOpen}
-        onClose={() => setViewModalOpen(false)}
-      />
+        <EditFiscModal
+          fiscalYear={selectedYear}
+          isOpen={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          onSave={handleYearUpdate}
+        />
 
-      <EditFiscModal
-        fiscalYear={selectedYear}
-        isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        onSave={handleYearUpdate}
-      />
-
-      <DeleteFiscModal
-        fiscalYear={selectedYear}
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleYearDelete}
-      />
-    </div>
-    <PeriodSection />
+        <DeleteFiscModal
+          fiscalYear={selectedYear}
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={handleYearDelete}
+        />
+      </div>
+      <PeriodSection />
     </>
   );
 }
