@@ -10,7 +10,7 @@ import {
 } from '../../../components/ui/dialog';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
-import { Plus } from 'lucide-react';
+import { BadgePlus, Plus } from 'lucide-react';
 import { Input } from '../../../components/ui/input';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import type { AddBranchDto, UUID } from '../../../types/core/branch';
@@ -31,7 +31,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
   const [branchCode, setBranchCode] = useState('');
   const [branchLocation, setBranchLocation] = useState('');
   const [dateOpened, setDateOpened] = useState(() => new Date().toISOString().split('T')[0]); // Current date in YYYY-MM-DD format
-  const [branchType, setBranchType] = useState<BranchType>(BranchType[0]);
+  const [branchType, setBranchType] = useState<keyof typeof BranchType>('0'); // Store the key, not the value
   const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
     key,
     value
@@ -53,7 +53,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       code: branchCode.trim(),
       location: branchLocation.trim(),
       dateOpened: new Date(dateOpened).toISOString(), // Convert to ISO string
-      branchType: branchType,
+      branchType: branchType, // This will now be the key ('0', '1', '2', '3')
       branchStat: BranchStat.Active,
       compId: defaultCompanyId as UUID,
     };
@@ -65,8 +65,8 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     setBranchNameAm('');
     setBranchCode('');
     setBranchLocation('');
-    setDateOpened(new Date().toISOString().split('T')[0]); // Reset to current date
-    setBranchType(BranchType[0]);
+    setDateOpened(new Date().toISOString().split('T')[0]);
+    setBranchType('0');
     setOpenDialog(false);
   };
 
@@ -74,7 +74,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger asChild>
         <Button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer">
-          <Plus size={18} />
+          <BadgePlus size={18} />
           Add Branch
         </Button>
       </DialogTrigger>
@@ -130,12 +130,12 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
             <select
               id="branchType"
               value={branchType}
-              onChange={(e) => setBranchType(e.target.value as BranchType)}
+              onChange={(e) => setBranchType(e.target.value as keyof typeof BranchType)}
               className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
             >
               {branchTypeOptions.map((option) => (
-                <option key={option.key} value={option.value}>
-                  {option.value}
+                <option key={option.key} value={option.key}>
+                  {option.value} {/* Display the human-readable value */}
                 </option>
               ))}
             </select>
