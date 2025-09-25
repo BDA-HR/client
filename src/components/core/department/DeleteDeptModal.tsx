@@ -6,7 +6,7 @@ import {
   DialogClose
 } from '../../../components/ui/dialog';
 import { Button } from '../../../components/ui/button';
-import { AlertTriangle, Building2, Users } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import type { DeptListDto, UUID } from '../../../types/core/dept';
 
 interface DeleteDeptModalProps {
@@ -32,32 +32,17 @@ const DeleteDeptModal: React.FC<DeleteDeptModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <div className="flex items-center justify-center p-2 bg-red-100 rounded-full gap-2 text-red-600 mx-auto">
-            <AlertTriangle size={24} />
+          <div className="flex items-center justify-center p-3 bg-red-100 rounded-full gap-2 text-red-600 mx-auto">
+            <AlertTriangle size={32} />
           </div>
         </DialogHeader>
         {department && (
           <div className="py-4 text-center">
-            <div className="flex items-center justify-center mb-3">
-              <Building2 className="text-gray-600 mr-2" size={20} />
-              <p className="font-medium text-lg">{department.name}</p>
-            </div>
-            <p className="text-sm text-gray-600 mb-2">{department.nameAm}</p>
-            <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-              <span className="flex items-center">
-                <Users size={16} className="mr-1" />
-                Branch: {department.branch}
-              </span>
-              <span className={`px-2 py-1 rounded-full text-xs ${
-                department.deptStat === 'Active' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {department.deptStat}
-              </span>
-            </div>
-            <p className="text-sm text-red-600 mt-4 font-medium">
-              Are you sure you want to delete this department? This action cannot be undone.
+            <p className="text-lg font-medium text-red-600 mt-4">
+              Are you sure you want to delete this department?
+            </p>
+            <p className="text-sm text-red-600 mt-2">
+              This action cannot be undone.
             </p>
             {department.deptStat === 'Active' && (
               <p className="text-sm text-amber-600 mt-2">
@@ -74,7 +59,7 @@ const DeleteDeptModal: React.FC<DeleteDeptModalProps> = ({
             onClick={handleConfirm}
             className="cursor-pointer px-6"
           >
-            Delete Department
+            Delete
           </Button>
           <DialogClose asChild>
             <Button variant="outline" className="cursor-pointer px-6">

@@ -7,9 +7,8 @@ import {
   MoreVertical,
   X,
   Trash2,
-  Repeat,
-  Pencil,
   Eye,
+  PenBox,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import EditDeptModal from './EditDeptModal';
@@ -34,7 +33,6 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   totalItems,
   onPageChange,
   onEditDepartment,
-  onDepartmentStatusChange,
   onDepartmentDelete,
 }) => {
   const [selectedDepartment, setSelectedDepartment] = useState<DeptListDto | null>(null);
@@ -42,12 +40,6 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const handleStatusToggle = (department: DeptListDto) => {
-    const newStatus = department.deptStat === "Active" ? "inactive" : "active";
-    onDepartmentStatusChange(department.id, newStatus);
-    setPopoverOpen(null);
-  };
 
   const handleViewDetails = (department: DeptListDto) => {
     setSelectedDepartment(department);
@@ -205,15 +197,8 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                               onClick={() => handleEdit(department)}
                               className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                             >
-                              <Pencil size={16} />
+                              <PenBox size={16} />
                               Edit
-                            </button>
-                            <button 
-                              onClick={() => handleStatusToggle(department)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                            >
-                              <Repeat size={16} />
-                              Toggle Status
                             </button>
                             <button 
                               onClick={() => handleDelete(department)}

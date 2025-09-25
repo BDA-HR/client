@@ -96,16 +96,6 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment, branchId }
               className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="branchId">Branch ID</Label>
-            <input
-              id="branchId"
-              value={branchId}
-              disabled
-              className="w-full px-3 py-2 bg-gray-100 border rounded-md text-gray-600"
-            />
-            <p className="text-sm text-gray-500">This department will be assigned to the selected branch</p>
-          </div>
         </div>
         <div className="flex justify-center items-center gap-1.5 border-t pt-6">
           <Button
