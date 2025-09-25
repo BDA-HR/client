@@ -1,15 +1,7 @@
-import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '../../../components/ui/button';
 import CompSection from '../../../components/core/company/CompSection';
-
+import AllBranchs from '../../../components/core/company/AllBranches';
 const CompanyBranchesPage = () => {
-  const { companyId } = useParams<{ companyId: string }>();
-  const navigate = useNavigate();
-
-  const handleViewBranches = () => {
-    navigate(`/branches?companyId=${companyId}`);
-  };
 
 
   return (
@@ -22,12 +14,9 @@ const CompanyBranchesPage = () => {
       ></motion.div>
         <>
           <CompSection />
-          <Button 
-              onClick={handleViewBranches}
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer"
-            >
-              View All Branches
-            </Button>
+          
+          {/* Add the AllBranchs component */}
+          <AllBranchs />       
           <div className="pt-6">
             {/* <AddHierarchy /> */}
           </div>
