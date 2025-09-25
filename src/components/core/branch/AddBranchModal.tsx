@@ -31,7 +31,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
   const [branchCode, setBranchCode] = useState('');
   const [branchLocation, setBranchLocation] = useState('');
   const [dateOpened, setDateOpened] = useState(() => new Date().toISOString().split('T')[0]); // Current date in YYYY-MM-DD format
-  const [branchType, setBranchType] = useState<BranchType>(BranchType.HeadOff);
+  const [branchType, setBranchType] = useState<BranchType>(BranchType[0]);
   const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
     key,
     value
@@ -66,7 +66,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     setBranchCode('');
     setBranchLocation('');
     setDateOpened(new Date().toISOString().split('T')[0]); // Reset to current date
-    setBranchType(BranchType.HeadOff);
+    setBranchType(BranchType[0]);
     setOpenDialog(false);
   };
 

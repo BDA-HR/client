@@ -11,10 +11,10 @@ export const YesNo = {
 export type YesNo = typeof YesNo[keyof typeof YesNo];
 
 export const BranchType = {
-  HeadOff: 'Head Office',
-  RegOff: 'Regional',
-  LocOff: 'Local',
-  VirOff: 'Virtual'
+  "0": 'Head Office',
+  "1": 'Regional',
+  "2": 'Local',
+  "3": 'Virtual'
 } as const;
 export type BranchType = typeof BranchType[keyof typeof BranchType];
 

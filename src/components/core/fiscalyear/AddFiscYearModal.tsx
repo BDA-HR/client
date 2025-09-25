@@ -121,8 +121,8 @@ export const AddFiscalYearModal = ({
                   setNewYear({ ...newYear, isActive: e.target.value })
                 }
               >
-                <option value="Yes">Active</option>
-                <option value="No">Inactive</option>
+                <option value="0">YES</option>
+                <option value="1">No</option>
               </select>
             </div>
 

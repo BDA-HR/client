@@ -2,7 +2,7 @@ import { api } from '../api';
 import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../../types/core/fisc';
 
 class FiscalYearService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/fiscalYear`;
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/fiscalyear`;
 
   async getAllFiscalYears(): Promise<FiscYearListDto[]> {
     try {
