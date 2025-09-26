@@ -156,7 +156,10 @@ const DepartmentOverview = () => {
       >
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-6">
-            <DepartmentManagementHeader />
+            <DepartmentManagementHeader                   
+            onAddDepartment={handleAddDepartment}
+              branchId={filters.companyId || ''} 
+             />
             
             {/* Loading State - Under Header */}
             {loading && (

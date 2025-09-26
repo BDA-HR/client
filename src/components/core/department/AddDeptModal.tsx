@@ -9,7 +9,7 @@ import {
 } from '../../ui/dialog';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
-import { BadgePlus, Plus } from 'lucide-react';
+import { BadgePlus } from 'lucide-react';
 import type { AddDeptDto, UUID } from '../../../types/core/dept';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import { DeptStat } from '../../../types/core/enum';
@@ -60,7 +60,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment, branchId }
         <Button
           className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
         >
-          <Plus size={18} />
+          <BadgePlus size={18} />
           Add Department
         </Button>
       </DialogTrigger>
