@@ -19,7 +19,6 @@ export interface AddFiscYearDto {
   name: string;
   dateStart: string; 
   dateEnd: string;
-  isActive: string;
 }
 
 export interface EditFiscYearDto {

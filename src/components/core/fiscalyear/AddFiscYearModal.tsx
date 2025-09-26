@@ -50,8 +50,7 @@ export const AddFiscalYearModal = ({
       setNewYear({
         name: '',
         dateStart: new Date().toISOString(),
-        dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-        isActive: 'Yes'
+        dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
       });
       
       onOpenChange(false);
@@ -68,8 +67,7 @@ export const AddFiscalYearModal = ({
     setNewYear({
       name: '',
       dateStart: new Date().toISOString(),
-      dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-      isActive: 'Yes'
+      dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
     });
     onOpenChange(false);
   };
@@ -108,7 +106,7 @@ export const AddFiscalYearModal = ({
               />
             </div>
 
-            {/* Status */}
+            {/* Status 
             <div>
               <label htmlFor="isActive" className="block text-sm font-medium text-gray-700 mb-1">
                 Status
@@ -124,7 +122,7 @@ export const AddFiscalYearModal = ({
                 <option value="0">YES</option>
                 <option value="1">No</option>
               </select>
-            </div>
+            </div>*/}
 
             {/* Start Date */}
             <div>
