@@ -1,4 +1,3 @@
-// types/core/period.ts
 import type { UUID } from 'crypto';
 import type { BaseDto } from './BaseDto';
 

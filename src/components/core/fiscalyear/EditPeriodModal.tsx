@@ -1,285 +1,175 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '../../../components/ui/dialog';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+} from '../../ui/dialog';
+import { Button } from '../../ui/button';
+import { Label } from '../../ui/label';
 import { PenBox } from 'lucide-react';
 import type { EditPeriodDto, PeriodListDto, UUID } from '../../../types/core/period';
+import toast from 'react-hot-toast';
 
 interface EditPeriodModalProps {
+  period: PeriodListDto;
+  onEditPeriod: (period: EditPeriodDto) => void;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (periodData: EditPeriodDto) => void;
-  period: PeriodListDto | null;
-  quarters: { id: UUID; name: string }[];
-  fiscalYears: { id: UUID; name: string }[];
 }
 
-interface FormErrors {
-  name?: string;
-  dateStart?: string;
-  dateEnd?: string;
-  isActive?: string;
-  quarterId?: string;
-  fiscalYearId?: string;
-}
-
-export const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
+const EditPeriodModal: React.FC<EditPeriodModalProps> = ({ 
+  period, 
+  onEditPeriod, 
   isOpen,
-  onClose,
-  onSave,
-  period,
-  quarters,
-  fiscalYears,
+  onClose 
 }) => {
-  const [formData, setFormData] = useState<EditPeriodDto>({
-    id: '' as UUID,
-    name: '',
-    dateStart: new Date().toISOString(),
-    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    isActive: 'Yes',
+  const [editedPeriod, setEditedPeriod] = useState<EditPeriodDto>({
+    id: period.id,
+    name: period.name,
+    dateStart: period.dateStart,
+    dateEnd: period.dateEnd,
+    isActive: period.isActive,
     quarterId: '' as UUID,
     fiscalYearId: '' as UUID,
-    rowVersion: '',
+    rowVersion: period.rowVersion || ''
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (period) {
-      setFormData({
-        id: period.id,
-        name: period.name || '',
-        dateStart: period.dateStart,
-        dateEnd: period.dateEnd,
-        isActive: period.isActive || 'Yes',
-        quarterId: '' as UUID, // You'll need to map quarter name to ID or get from API
-        fiscalYearId: '' as UUID, // You'll need to map fiscal year to ID or get from API
-        rowVersion: period.rowVersion || '',
-      });
-    }
+    setEditedPeriod({
+      id: period.id,
+      name: period.name,
+      dateStart: period.dateStart,
+      dateEnd: period.dateEnd,
+      isActive: period.isActive,
+      quarterId: '' as UUID,
+      fiscalYearId: '' as UUID,
+      rowVersion: period.rowVersion || ''
+    });
   }, [period]);
 
-  const handleInputChange = (field: keyof EditPeriodDto, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEditedPeriod((prev) => ({ ...prev, name: value }));
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+  const handleDateStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEditedPeriod((prev) => ({ ...prev, dateStart: value }));
+  };
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Period name is required';
+  const handleDateEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEditedPeriod((prev) => ({ ...prev, dateEnd: value }));
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setEditedPeriod((prev) => ({ ...prev, isActive: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!editedPeriod.name || !editedPeriod.dateStart || !editedPeriod.dateEnd) {
+      toast.error('Please fill all required fields');
+      return;
     }
+
+    // Date validation
+    const startDate = new Date(editedPeriod.dateStart);
+    const endDate = new Date(editedPeriod.dateEnd);
     
-    if (!formData.dateStart) {
-      newErrors.dateStart = 'Start date is required';
-    }
-    
-    if (!formData.dateEnd) {
-      newErrors.dateEnd = 'End date is required';
+    if (endDate <= startDate) {
+      toast.error('End date must be after start date');
+      return;
     }
 
-    if (!formData.quarterId) {
-      newErrors.quarterId = 'Quarter is required';
+    try {
+      setLoading(true);
+      await onEditPeriod(editedPeriod);
+    } catch (error) {
+      console.error('Error updating period:', error);
+    } finally {
+      setLoading(false);
     }
-
-    if (!formData.fiscalYearId) {
-      newErrors.fiscalYearId = 'Fiscal year is required';
-    }
-    
-    if (formData.dateStart && formData.dateEnd) {
-      const startDate = new Date(formData.dateStart);
-      const endDate = new Date(formData.dateEnd);
-      
-      if (endDate <= startDate) {
-        newErrors.dateEnd = 'End date must be after start date';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (validateForm()) {
-      const submitData: EditPeriodDto = {
-        ...formData,
-        dateStart: new Date(formData.dateStart).toISOString(),
-        dateEnd: new Date(formData.dateEnd).toISOString(),
-      };
-      onSave(submitData);
-      handleClose();
-    }
-  };
-
-  const handleClose = () => {
-    setErrors({});
-    onClose();
-  };
-
-  const formatDateForInput = (dateString: string): string => {
-    return dateString ? new Date(dateString).toISOString().split('T')[0] : '';
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent 
-        className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto"
-        onInteractOutside={(e) => e.preventDefault()}
-      >
-        <DialogHeader className="border-b pb-3">
-          <DialogTitle className="flex items-center gap-2">
-            <PenBox size={20} />
-            Edit Period
-          </DialogTitle>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogHeader className='border-b pb-3 flex flex-row justify-between items-center'>
+          <div>
+            <DialogTitle className='flex items-center gap-2'>
+              <PenBox size={20} /> Edit
+            </DialogTitle>
+          </div>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="periodName" className="text-base font-medium">
-                Period Name
-              </Label>
-              <Input
-                id="periodName"
-                type="text"
-                placeholder="e.g., January 2024"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                required
-                className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+        <div className="grid grid-cols-1 gap-4 py-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="edit-name">Period Name </Label>
+            <input
+              id="edit-name"
+              value={editedPeriod.name}
+              onChange={handleNameChange}
+              placeholder="Q1 2024"
+              className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="edit-dateStart">Start Date </Label>
+              <input
+                id="edit-dateStart"
+                type="date"
+                value={editedPeriod.dateStart}
+                onChange={handleDateStartChange}
+                className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="startDate" className="text-base font-medium">
-                  Start Date
-                </Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={formatDateForInput(formData.dateStart)}
-                  onChange={(e) => handleInputChange('dateStart', e.target.value)}
-                  required
-                  className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-                />
-                {errors.dateStart && <p className="text-red-500 text-sm">{errors.dateStart}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="endDate" className="text-base font-medium">
-                  End Date
-                </Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={formatDateForInput(formData.dateEnd)}
-                  onChange={(e) => handleInputChange('dateEnd', e.target.value)}
-                  required
-                  className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-                />
-                {errors.dateEnd && <p className="text-red-500 text-sm">{errors.dateEnd}</p>}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="quarter" className="text-base font-medium">
-                  Quarter
-                </Label>
-                <Select
-                  value={formData.quarterId}
-                  onValueChange={(value) => handleInputChange('quarterId', value)}
-                >
-                  <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                    <SelectValue placeholder="Select quarter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {quarters.map((quarter) => (
-                      <SelectItem key={quarter.id} value={quarter.id}>
-                        {quarter.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.quarterId && <p className="text-red-500 text-sm">{errors.quarterId}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="fiscalYear" className="text-base font-medium">
-                  Fiscal Year
-                </Label>
-                <Select
-                  value={formData.fiscalYearId}
-                  onValueChange={(value) => handleInputChange('fiscalYearId', value)}
-                >
-                  <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                    <SelectValue placeholder="Select fiscal year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {fiscalYears.map((fiscalYear) => (
-                      <SelectItem key={fiscalYear.id} value={fiscalYear.id}>
-                        {fiscalYear.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.fiscalYearId && <p className="text-red-500 text-sm">{errors.fiscalYearId}</p>}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status" className="text-base font-medium">
-                Status
-              </Label>
-              <Select
-                value={formData.isActive}
-                onValueChange={(value) => handleInputChange('isActive', value)}
-              >
-                <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Yes">Active</SelectItem>
-                  <SelectItem value="No">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.isActive && <p className="text-red-500 text-sm">{errors.isActive}</p>}
+            
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="edit-dateEnd">End Date </Label>
+              <input
+                id="edit-dateEnd"
+                type="date"
+                value={editedPeriod.dateEnd}
+                onChange={handleDateEndChange}
+                className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
+              />
             </div>
           </div>
-
-          <div className="flex justify-center items-center gap-1.5 border-t pt-6">
-            <Button
-              type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer h-11 px-8 text-base focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              disabled={!formData.name.trim() || !formData.dateStart || !formData.dateEnd || !formData.quarterId || !formData.fiscalYearId}
+          
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="edit-isActive">Status</Label>
+            <select
+              id="edit-isActive"
+              value={editedPeriod.isActive}
+              onChange={handleStatusChange}
+              className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
             >
-              Save Changes
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="h-11 px-6 text-base cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-            >
-              Cancel
-            </Button>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
           </div>
-        </form>
+        </div>
+        <div className="flex justify-center items-center gap-1.5 border-t pt-6">
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
+            onClick={handleSubmit}
+            disabled={!editedPeriod.name || !editedPeriod.dateStart || 
+                     !editedPeriod.dateEnd || loading}
+          >
+            {loading ? 'Updating...' : 'Update'}
+          </Button>
+          <Button variant={'outline'} className='cursor-pointer' onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
 };
+
+export default EditPeriodModal;

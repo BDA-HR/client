@@ -1,135 +1,127 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { BadgePlus, XCircleIcon } from 'lucide-react';
 import { Button } from '../../ui/button';
-import { Plus } from 'lucide-react';
 import { AddPeriodModal } from './AddPeriodModal';
 import { PeriodTable } from './PeriodTable';
-import { EditPeriodModal } from './EditPeriodModal';
+import EditPeriodModal from './EditPeriodModal';
 import { DeletePeriodModal } from './DeletePeriodModal';
-import type { AddPeriodDto, PeriodListDto, EditPeriodDto } from '../../../types/core/period';
+import type { AddPeriodDto, PeriodListDto, EditPeriodDto, UUID } from '../../../types/core/period';
+import { periodService } from '../../../services/core/periodservice';
+import toast from 'react-hot-toast';
 
 function PeriodSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages] = useState(5);
-  const [totalItems] = useState(48);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(null);
+  const [periods, setPeriods] = useState<PeriodListDto[]>([]);
+  const [loading, setLoading] = useState(true); // Changed to true initially
+  const [error, setError] = useState<string | null>(null); // Added error state
   
   const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
     name: '',
-    dateStart: new Date().toISOString(),
-    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    isActive: '0',
-    quarterId: '00000000-0000-0000-0000-000000000000',
-    fiscalYearId: '00000000-0000-0000-0000-000000000000'
+    dateStart: new Date().toISOString().split('T')[0],
+    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    isActive: 'true',
+    quarterId: '' as UUID,
+    fiscalYearId: '' as UUID
   });
 
-  // TEMPORARY MOCK DATA - Replace this with your actual API data
-  const [periods, setPeriods] = useState<PeriodListDto[]>([
-    {
-      id: '1',
-      name: 'January 2024',
-      quarter: 'Q1',
-      fiscYear: 'FY 2024',
-      isActive: 'Yes',
-      dateStart: '2024-01-01T00:00:00',
-      dateEnd: '2024-01-31T23:59:59',
-      startDate: 'January 01, 2024',
-      startDateAm: 'Tir 22, 2016',
-      endDate: 'January 31, 2024',
-      endDateAm: 'Yekatit 22, 2016',
-      createdBy: 'Admin',
-      createdAt: '2023-12-15T10:30:00',
-      modifiedBy: 'Admin',
-      modifiedAt: '2023-12-15T10:30:00'
-    },
-    {
-      id: '2',
-      name: 'February 2024',
-      quarter: 'Q1',
-      fiscYear: 'FY 2024',
-      isActive: 'Yes',
-      dateStart: '2024-02-01T00:00:00',
-      dateEnd: '2024-02-29T23:59:59',
-      startDate: 'February 01, 2024',
-      startDateAm: 'Yekatit 23, 2016',
-      endDate: 'February 29, 2024',
-      endDateAm: 'Megabit 20, 2016',
-      createdBy: 'Admin',
-      createdAt: '2024-01-15T14:20:00',
-      modifiedBy: 'Admin',
-      modifiedAt: '2024-01-15T14:20:00'
-    },
-    {
-      id: '3',
-      name: 'March 2024',
-      quarter: 'Q1',
-      fiscYear: 'FY 2024',
-      isActive: 'No',
-      dateStart: '2024-03-01T00:00:00',
-      dateEnd: '2024-03-31T23:59:59',
-      startDate: 'March 01, 2024',
-      startDateAm: 'Megabit 21, 2016',
-      endDate: 'March 31, 2024',
-      endDateAm: 'Miyazya 21, 2016',
-      createdBy: 'Admin',
-      createdAt: '2024-02-15T09:15:00',
-      modifiedBy: 'Admin',
-      modifiedAt: '2024-02-15T09:15:00'
+  // Fetch periods on component mount
+  useEffect(() => {
+    fetchPeriods();
+  }, [currentPage]);
+
+  const fetchPeriods = async () => {
+    try {
+      setLoading(true);
+      setError(null); // Clear error on new fetch
+      const periodsData = await periodService.getAllPeriods();
+      setPeriods(periodsData);
+      setTotalItems(periodsData.length);
+      setTotalPages(Math.ceil(periodsData.length / 10)); // Assuming 10 items per page
+    } catch (err) {
+      console.error('Error fetching periods:', err);
+      setError('Failed to load periods. Please try again later.');
+      toast.error('Failed to fetch periods');
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const mockQuarters = [
-    { id: '1', name: 'Q1 2024' },
-    { id: '2', name: 'Q2 2024' },
-    { id: '3', name: 'Q3 2024' },
-    { id: '4', name: 'Q4 2024' }
-  ];
-
-  const mockFiscalYears = [
-    { id: '1', name: 'FY 2024' },
-    { id: '2', name: 'FY 2025' },
-    { id: '3', name: 'FY 2026' }
-  ];
+  };
 
   const handleAddPeriod = async () => {
-    console.log('Adding period:', newPeriod);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // Add your API call logic here
+    try {
+      toast.loading('Adding period...');
+      setError(null); // Clear error before operation
+      const createdPeriod = await periodService.createPeriod(newPeriod);
+      setPeriods(prev => [createdPeriod, ...prev]);
+      setNewPeriod({
+        name: '',
+        dateStart: new Date().toISOString().split('T')[0],
+        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        isActive: 'true',
+        quarterId: '' as UUID,
+        fiscalYearId: '' as UUID
+      });
+      setIsModalOpen(false);
+      toast.dismiss();
+      toast.success('Period added successfully!');
+    } catch (err) {
+      console.error('Error adding period:', err);
+      toast.dismiss();
+      toast.error('Failed to add period');
+      setError('Failed to add period. Please try again.');
+      throw err;
+    }
   };
 
   const handleEditPeriod = async (periodData: EditPeriodDto) => {
-    console.log('Editing period:', periodData);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // Add your API call logic here
+    try {
+      toast.loading('Updating period...');
+      setError(null); // Clear error before operation
+      const updatedPeriod = await periodService.updatePeriod(periodData);
+      setPeriods(prev => prev.map(p => p.id === updatedPeriod.id ? updatedPeriod : p));
+      setIsEditModalOpen(false);
+      toast.dismiss();
+      toast.success('Period updated successfully!');
+    } catch (err) {
+      console.error('Error updating period:', err);
+      toast.dismiss();
+      toast.error('Failed to update period');
+      setError('Failed to update period. Please try again.');
+      throw err;
+    }
   };
 
-  const handleDeletePeriod = async (periodId: string) => {
-    console.log('Deleting period with ID:', periodId);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // Remove the period from the local state
-    setPeriods(prev => prev.filter(p => p.id !== periodId));
-    setIsDeleteModalOpen(false);
+  const handleDeletePeriod = async (periodId: UUID) => {
+    try {
+      toast.loading('Deleting period...');
+      setError(null); // Clear error before operation
+      await periodService.deletePeriod(periodId);
+      setPeriods(prev => prev.filter(p => p.id !== periodId));
+      setIsDeleteModalOpen(false);
+      toast.dismiss();
+      toast.success('Period deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting period:', err);
+      toast.dismiss();
+      toast.error('Failed to delete period');
+      setError('Failed to delete period. Please try again.');
+    }
   };
 
   const handleViewDetails = (period: PeriodListDto) => {
     console.log('View details:', period);
+    // You can implement a details view modal here if needed
   };
 
   const handleEdit = (period: PeriodListDto) => {
     setSelectedPeriod(period);
     setIsEditModalOpen(true);
-  };
-
-  const handleStatusChange = (period: PeriodListDto) => {
-    console.log('Toggle status for period:', period);
-    // Update the period status in the local state
-    setPeriods(prev => prev.map(p => 
-      p.id === period.id 
-        ? { ...p, isActive: p.isActive === 'Yes' ? 'No' : 'Yes' }
-        : p
-    ));
   };
 
   const handleDelete = (period: PeriodListDto) => {
@@ -139,29 +131,86 @@ function PeriodSection() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    console.log('Page changed to:', page);
   };
 
   return (
-    <div className='max-w-7xl mx-auto px-4 py-8'>
+    <div className='max-w-7xl mx-auto px-4 py-8 space-y-6'>
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Period Management</h2>
+          <motion.h2 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
+          >
+            Period Management
+          </motion.h2>
           <p className="text-sm text-gray-600 mt-1">
             Manage your fiscal periods, quarters, and date ranges
           </p>
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 cursor-pointer"
+          disabled={loading}
         >
-          <Plus size={20} />
+          <BadgePlus size={20} />
           Add New Period
         </Button>
       </div>
 
-      {/* Periods Table */}
+      {/* Error message for API errors */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div className="ml-3">
+                <p className="text-red-700 mt-1">{error}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Loading state */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+        </div>
+      )}
+
+      {/* No periods message - Show when not loading and periods array is empty */}
+      {!loading && periods.length === 0 && !error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-6 mb-6"
+        >
+          <div className="flex items-center">
+            <XCircleIcon className="h-5 w-5 text-yellow-400 mr-3" />
+            <div>
+              <h3 className="text-yellow-800 font-medium">No Periods Found</h3>
+              <p className="text-yellow-700 text-sm mt-1">
+                There are currently no periods in the system. Please add a period to get started.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Periods Table - Show when not loading and periods exist */}
+      {!loading && periods.length > 0 && (
         <PeriodTable
           periods={periods}
           currentPage={currentPage}
@@ -170,9 +219,10 @@ function PeriodSection() {
           onPageChange={handlePageChange}
           onViewDetails={handleViewDetails}
           onEdit={handleEdit}
-          onStatusChange={handleStatusChange}
           onDelete={handleDelete}
+          loading={loading}
         />
+      )}
 
       {/* Add Period Modal */}
       <AddPeriodModal
@@ -181,19 +231,17 @@ function PeriodSection() {
         newPeriod={newPeriod}
         setNewPeriod={setNewPeriod}
         onAddPeriod={handleAddPeriod}
-        quarters={mockQuarters}
-        fiscalYears={mockFiscalYears}
       />
 
       {/* Edit Period Modal */}
-      <EditPeriodModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSave={handleEditPeriod}
-        period={selectedPeriod}
-        quarters={mockQuarters}
-        fiscalYears={mockFiscalYears}
-      />
+      {selectedPeriod && (
+        <EditPeriodModal
+          period={selectedPeriod}
+          onEditPeriod={handleEditPeriod}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
 
       {/* Delete Period Modal */}
       <DeletePeriodModal
