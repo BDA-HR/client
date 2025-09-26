@@ -150,8 +150,6 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
           </div>
         </motion.div>
       )}
-
-      {/* Companies List - Only show when not loading and there are companies */}
       {!loading && companies.length > 0 && (
         <CompList 
           companies={companies}
