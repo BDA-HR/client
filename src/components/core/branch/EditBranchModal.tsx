@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
+  DialogHeader, 
   DialogTitle,
   DialogDescription,
 } from '../../ui/dialog';
@@ -229,19 +229,46 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
               {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="dateOpened" className="text-base font-medium">
-                Date Opened
-              </Label>
-              <Input
-                id="dateOpened"
-                type="date"
-                value={formData.dateOpened}
-                onChange={(e) => handleInputChange('dateOpened', e.target.value)}
-                required
-                className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              />
-              {errors.dateOpened && <p className="text-red-500 text-sm">{errors.dateOpened}</p>}
+            {/* Date Opened and Branch Type side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="dateOpened" className="text-base font-medium">
+                  Date Opened
+                </Label>
+                <Input
+                  id="dateOpened"
+                  type="date"
+                  value={formData.dateOpened}
+                  onChange={(e) => handleInputChange('dateOpened', e.target.value)}
+                  required
+                  className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                />
+                {errors.dateOpened && <p className="text-red-500 text-sm">{errors.dateOpened}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="branchType" className="text-base font-medium">
+                  Branch Type
+                </Label>
+                <Select
+                  value={formData.branchType}
+                  onValueChange={(value) => handleInputChange('branchType', value)}
+                >
+                  <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                    <SelectValue placeholder="Select type">
+                      {getDisplayValue(formData.branchType, branchTypeOptions)}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {branchTypeOptions.map((option) => (
+                      <SelectItem key={option.key} value={option.key}>
+                        {option.value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.branchType && <p className="text-red-500 text-sm">{errors.branchType}</p>}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -259,37 +286,13 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   {branchStatOptions.map((option) => (
-                    <SelectItem key={option.key} value={option.key}> {/* Use option.key as value */}
-                      {option.value} {/* Display the human-readable value */}
+                    <SelectItem key={option.key} value={option.key}>
+                      {option.value}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {errors.branchStat && <p className="text-red-500 text-sm">{errors.branchStat}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="branchType" className="text-base font-medium">
-                Branch Type
-              </Label>
-              <Select
-                value={formData.branchType}
-                onValueChange={(value) => handleInputChange('branchType', value)}
-              >
-                <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                  <SelectValue placeholder="Select type">
-                    {getDisplayValue(formData.branchType, branchTypeOptions)}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {branchTypeOptions.map((option) => (
-                    <SelectItem key={option.key} value={option.key}> {/* Use option.key as value */}
-                      {option.value} {/* Display the human-readable value */}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.branchType && <p className="text-red-500 text-sm">{errors.branchType}</p>}
             </div>
           </div>
 
