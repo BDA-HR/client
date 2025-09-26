@@ -133,9 +133,8 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                     custom={index}
                     initial="hidden"
                     animate="visible"
-                    whileHover={{ backgroundColor: "rgba(0, 0, 0, 0.02)" }}
                     variants={rowVariants}
-                    className="transition-colors duration-200"
+                    className="transition-colors hover:bg-gray-50"
                   >
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center">

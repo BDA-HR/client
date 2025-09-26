@@ -49,8 +49,8 @@ export const AddFiscalYearModal = ({
       // Reset form and close modal
       setNewYear({
         name: '',
-        dateStart: new Date().toISOString(),
-        dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+        dateStart: '',
+        dateEnd: ''
       });
       
       onOpenChange(false);
@@ -66,8 +66,8 @@ export const AddFiscalYearModal = ({
     // Reset form when canceling
     setNewYear({
       name: '',
-      dateStart: new Date().toISOString(),
-      dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+      dateStart: '',
+      dateEnd: ''
     });
     onOpenChange(false);
   };
@@ -106,58 +106,42 @@ export const AddFiscalYearModal = ({
               />
             </div>
 
-            {/* Status 
-            <div>
-              <label htmlFor="isActive" className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                id="isActive"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                value={newYear.isActive || 'Yes'}
-                onChange={(e) =>
-                  setNewYear({ ...newYear, isActive: e.target.value })
-                }
-              >
-                <option value="0">YES</option>
-                <option value="1">No</option>
-              </select>
-            </div>*/}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              {/* Start Date */}
+              <div className='space-y-4'>
+                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="startDate"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                  value={newYear.dateStart ? newYear.dateStart.split('T')[0] : newYear.dateStart}
+                  onChange={(e) => setNewYear({ 
+                    ...newYear, 
+                    dateStart: e.target.value
+                  })}
+                  required
+                />
+              </div>
 
-            {/* Start Date */}
-            <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                id="startDate"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                value={newYear.dateStart ? newYear.dateStart.split('T')[0] : ''}
-                onChange={(e) => setNewYear({ 
-                  ...newYear, 
-                  dateStart: e.target.value ? new Date(e.target.value).toISOString() : '' 
-                })}
-                required
-              />
-            </div>
-
-            {/* End Date */}
-            <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                End Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                id="endDate"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                value={newYear.dateEnd ? newYear.dateEnd.split('T')[0] : ''}
-                onChange={(e) => setNewYear({ 
-                  ...newYear, 
-                  dateEnd: e.target.value ? new Date(e.target.value).toISOString() : '' 
-                })}
-                required
-              />
+              {/* End Date */}
+              <div className='space-y-4'>
+                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="endDate"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                  value={newYear.dateEnd ? newYear.dateEnd.split('T')[0] : newYear.dateEnd}
+                  onChange={(e) => setNewYear({ 
+                    ...newYear, 
+                    dateEnd: e.target.value
+                  })}
+                  required
+                />
+              </div>
             </div>
           </div>
 
@@ -177,7 +161,7 @@ export const AddFiscalYearModal = ({
               type="submit"
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white cursor-pointer"
             >
-              Add Fiscal Year
+              Save
             </Button>
           </div>
         </form>

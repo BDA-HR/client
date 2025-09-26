@@ -162,7 +162,6 @@ function PeriodSection() {
       </div>
 
       {/* Periods Table */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         <PeriodTable
           periods={periods}
           currentPage={currentPage}
@@ -174,7 +173,6 @@ function PeriodSection() {
           onStatusChange={handleStatusChange}
           onDelete={handleDelete}
         />
-      </div>
 
       {/* Add Period Modal */}
       <AddPeriodModal

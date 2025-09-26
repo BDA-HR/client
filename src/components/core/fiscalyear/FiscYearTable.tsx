@@ -117,8 +117,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                 variants={rowVariants}
                 initial="hidden"
                 animate="visible"
-                whileHover="hover"
-                className="hover:bg-gray-50"
+                className="transition-colors hover:bg-gray-50"
               >
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="flex items-center">

@@ -35,8 +35,8 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
   const [formData, setFormData] = useState<EditFiscYearDto>({
     id: '' as UUID,
     name: '',
-    dateStart: new Date().toISOString(),
-    dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+    dateStart: '',
+    dateEnd: '',
     isActive: 'Yes',
     rowVersion: '',
   });
@@ -45,11 +45,17 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
 
   useEffect(() => {
     if (fiscalYear) {
+      const formatDateForInput = (dateString: string): string => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+      };
+
       setFormData({
         id: fiscalYear.id,
         name: fiscalYear.name || '',
-        dateStart: fiscalYear.dateStart,
-        dateEnd: fiscalYear.dateEnd,
+        dateStart: formatDateForInput(fiscalYear.dateStart),
+        dateEnd: formatDateForInput(fiscalYear.dateEnd),
         isActive: fiscalYear.isActive || 'Yes',
         rowVersion: fiscalYear.rowVersion || '',
       });
@@ -97,8 +103,9 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
     if (validateForm()) {
       const submitData: EditFiscYearDto = {
         ...formData,
-        dateStart: new Date(formData.dateStart).toISOString(),
-        dateEnd: new Date(formData.dateEnd).toISOString(),
+        // Remove the Date conversion - send the string directly
+        dateStart: formData.dateStart,
+        dateEnd: formData.dateEnd,
       };
       onSave(submitData);
       handleClose();
@@ -108,10 +115,6 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
   const handleClose = () => {
     setErrors({});
     onClose();
-  };
-
-  const formatDateForInput = (dateString: string): string => {
-    return dateString ? new Date(dateString).toISOString().split('T')[0] : '';
   };
 
   return (
@@ -153,7 +156,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
                 <Input
                   id="startDate"
                   type="date"
-                  value={formatDateForInput(formData.dateStart)}
+                  value={formData.dateStart}
                   onChange={(e) => handleInputChange('dateStart', e.target.value)}
                   required
                   className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
@@ -168,7 +171,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
                 <Input
                   id="endDate"
                   type="date"
-                  value={formatDateForInput(formData.dateEnd)}
+                  value={formData.dateEnd}
                   onChange={(e) => handleInputChange('dateEnd', e.target.value)}
                   required
                   className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"

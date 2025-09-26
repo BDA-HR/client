@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog } from '../../../components/ui/dialog';
 import { FiscalYearManagementHeader } from '../../../components/core/fiscalyear/FiscYearHeader';
-import { FiscalYearTable } from '../../../components/core/fiscalyear/FiscYearTable';
 import { AddFiscalYearModal } from '../../../components/core/fiscalyear/AddFiscYearModal';
 import { ViewFiscModal } from '../../../components/core/fiscalyear/ViewFiscModal';
 import { EditFiscModal } from '../../../components/core/fiscalyear/EditFiscModal';
@@ -11,15 +11,16 @@ import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../
 import PeriodSection from '../../../components/core/fiscalyear/PeriodSection';
 import ActiveFisc from '../../../components/core/fiscalyear/ActFiscYear';
 import { motion } from 'framer-motion';
+import { Button } from '../../../components/ui/button';
 
 const getDefaultFiscalYear = (): AddFiscYearDto => ({
   name: '',
   dateStart: new Date().toISOString(),
   dateEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-  isActive: 'Yes'
 });
 
 export default function FiscalYearOverview() {
+  const navigate = useNavigate();
   const [years, setYears] = useState<FiscYearListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +35,6 @@ export default function FiscalYearOverview() {
 
   const itemsPerPage = 10;
   const totalItems = years.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const paginatedYears = years.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   // Get active fiscal year
@@ -76,27 +76,7 @@ export default function FiscalYearOverview() {
     }
   };
 
-  const handleYearStatusChange = async (yearId: UUID, newStatus: string) => {
-    try {
-      const year = years.find(y => y.id === yearId);
-      if (!year) return;
 
-      const editData: EditFiscYearDto = {
-        id: yearId,
-        name: year.name,
-        dateStart: year.dateStart,
-        dateEnd: year.dateEnd,
-        isActive: newStatus,
-        rowVersion: year.rowVersion || '1'
-      };
-      
-      const result = await fiscalYearService.updateFiscalYear(editData);
-      setYears(years.map(y => y.id === result.id ? result : y));
-    } catch (err) {
-      console.error('Error updating fiscal year status:', err);
-      setError('Failed to update status');
-    }
-  };
 
   const handleYearDelete = async (yearId: UUID) => {
     try {
@@ -124,22 +104,10 @@ export default function FiscalYearOverview() {
     setSelectedYear(year);
     setViewModalOpen(true);
   };
-
-  const handleEdit = (year: FiscYearListDto) => {
-    setSelectedYear(year);
-    setEditModalOpen(true);
+  const handleViewHistory = () => {
+    navigate('/core/fiscal-year/history');
   };
 
-  const handleDelete = (year: FiscYearListDto) => {
-    setSelectedYear(year);
-    setDeleteModalOpen(true);
-  };
-
-  const handleStatusChange = (year: FiscYearListDto) => {
-    handleYearStatusChange(year.id, year.isActive === 'Yes' ? 'No' : 'Yes');
-  };
-
-  // Function to handle modal open/close
   const handleAddModalOpenChange = (open: boolean) => {
     setAddModalOpen(open);
     if (!open) {
@@ -194,29 +162,23 @@ export default function FiscalYearOverview() {
                   onViewDetails={handleViewDetails}
                 />
 
-                {/* All Fiscal Years Section */}
-                <div className="mb-4">
-                  <h2 className="text-lg font-semibold text-gray-800 mb-2">All Fiscal Years (History)</h2>
-                  <p className="text-sm text-gray-600">
-                    {totalItems} fiscal year{totalItems !== 1 ? 's' : ''} found
-                  </p>
-                </div>
-                
-                <FiscalYearTable
-                  years={paginatedYears}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  totalItems={totalItems}
-                  onPageChange={setCurrentPage}
-                  onViewDetails={handleViewDetails}
-                  onEdit={handleEdit}
-                  onStatusChange={handleStatusChange}
-                  onDelete={handleDelete}
-                />
+                {/* View History Button */}
+
               </>
             )}
           </div>
-
+<div className="w-full mx-4 mt-2">
+                  <Button
+                    onClick={handleViewHistory}
+                    variant={'outline'}
+                    className=" cursor-pointer"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    View History ({totalItems} fiscal year{totalItems !== 1 ? 's' : ''})
+                  </Button>
+                </div>
           {/* Add Modal */}
           <AddFiscalYearModal
             open={addModalOpen}
