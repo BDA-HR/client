@@ -152,7 +152,6 @@ function PeriodSection() {
         <Button 
           onClick={() => setIsModalOpen(true)}
           className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 cursor-pointer"
-          disabled={loading}
         >
           <BadgePlus size={20} />
           Add New Period
