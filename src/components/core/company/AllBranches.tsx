@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { branchService } from '../../../services/core/branchservice';
-import type { BranchListDto, AddBranchDto } from '../../../types/core/branch';
+import type { BranchListDto } from '../../../types/core/branch';
 import { Button } from '../../../components/ui/button';
 import { RefreshCw, Building, ChevronRight, ChevronLeft, CalendarDays, MapPin } from 'lucide-react';
-import AddBranchModal from '../branch/AddBranchModal';
-
 const AllBranchs: React.FC = () => {
   const [branches, setBranches] = useState<BranchListDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,19 +38,6 @@ const AllBranchs: React.FC = () => {
     setCurrentPage(page);
   };
 
-  const handleAddBranch = async (branchData: AddBranchDto) => {
-    try {
-      const newBranch = await branchService.createBranch(branchData);
-      setBranches(prev => [newBranch, ...prev]);
-      setTotalItems(prev => prev + 1);
-      setTotalPages(Math.ceil((totalItems + 1) / itemsPerPage));
-      fetchBranches();
-    } catch (error) {
-      console.error('Error adding branch:', error);
-      setError('Failed to add branch. Please try again.');
-    }
-  };
-
   const paginatedBranches = branches.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -81,10 +66,6 @@ const AllBranchs: React.FC = () => {
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
-<AddBranchModal
-  onAddBranch={handleAddBranch}
-  defaultCompanyId={undefined}
-/>
         </div>
       </div>
 
@@ -140,7 +121,7 @@ const AllBranchs: React.FC = () => {
               }
             }
           }}
-          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm overflow-hidden"
+          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md overflow-hidden"
         >
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -309,10 +290,6 @@ const AllBranchs: React.FC = () => {
             <p className="text-gray-600 mb-4">
               There are no branches available. Start by adding your first branch.
             </p>
-            <AddBranchModal
-  onAddBranch={handleAddBranch}
-  defaultCompanyId={undefined} // Since this is for all branches, no default company
-/>
           </div>
         </motion.div>
       )}
