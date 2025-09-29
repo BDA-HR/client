@@ -36,3 +36,9 @@ export const FiscStat = {
   "1": 'Inactive'
 } as const;
 export type FiscStat = typeof FiscStat[keyof typeof FiscStat];
+
+export const PeriodStat = {
+  "0": 'Active',
+  "1": 'Inactive'
+} as const;
+export type PeriodStat = typeof FiscStat[keyof typeof PeriodStat];

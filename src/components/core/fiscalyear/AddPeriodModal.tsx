@@ -4,6 +4,7 @@ import type { AddPeriodDto, UUID } from '../../../types/core/period';
 import React from 'react';
 import { Button } from '../../ui/button';
 import toast from 'react-hot-toast';
+import { PeriodStat } from '../../../types/core/enum';
 
 interface AddPeriodModalProps {
   open: boolean;
@@ -21,6 +22,9 @@ export const AddPeriodModal = ({
   onAddPeriod
 }: AddPeriodModalProps) => {
   const [loading, setLoading] = React.useState(false);
+
+  // Create options from PeriodStat enum
+  const periodStatusOptions = Object.entries(PeriodStat); // [["0", "Active"], ["1", "Inactive"]]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,9 +61,9 @@ export const AddPeriodModal = ({
   const handleCancel = () => {
     setNewPeriod({
       name: '',
-      dateStart: '', // Changed from converted date to empty string
-      dateEnd: '',   // Changed from converted date to empty string
-      isActive: 'true',
+      dateStart: '',
+      dateEnd: '',
+      isActive: PeriodStat["0"], // Default to 'Active' using enum
       quarterId: '' as UUID,
       fiscalYearId: '' as UUID
     });
@@ -167,8 +171,11 @@ export const AddPeriodModal = ({
                 value={newPeriod.isActive}
                 onChange={(e) => setNewPeriod({ ...newPeriod, isActive: e.target.value })}
               >
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
+                {periodStatusOptions.map(([key, label]) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
