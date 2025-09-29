@@ -125,7 +125,7 @@ const AllBranchs: React.FC = () => {
         >
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <motion.tr 
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -158,8 +158,7 @@ const AllBranchs: React.FC = () => {
                     custom={index}
                     initial="hidden"
                     animate="visible"
-                    whileHover="hover"
-                    className="hover:bg-gray-50"
+                    className="transition-colors hover:bg-gray-50"
                   >
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -276,24 +275,6 @@ const AllBranchs: React.FC = () => {
           </div>
         </motion.div>
       )}
-
-      {/* Empty State - Only show when not loading, no error, and no branches */}
-      {!loading && !error && branches.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12"
-        >
-          <div className="bg-gray-50 rounded-lg p-8">
-            <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No branches found</h3>
-            <p className="text-gray-600 mb-4">
-              There are no branches available. Start by adding your first branch.
-            </p>
-          </div>
-        </motion.div>
-      )}
-
     </motion.div>
   );
 };

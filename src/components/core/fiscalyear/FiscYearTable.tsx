@@ -70,16 +70,12 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
     return 'text-gray-600';
   };
 
-  const getPeriodColor = (periodName: string): string => {
-    if (periodName.includes('Q1')) return 'text-blue-600';
-    if (periodName.includes('Q2')) return 'text-purple-600';
-    if (periodName.includes('Q3')) return 'text-orange-600';
-    if (periodName.includes('Q4')) return 'text-red-600';
-    return 'text-gray-600';
-  };
-
   const formatDate = (dateString: string): string => {
     return dateString;
+  };
+
+  const getDuration = (startDate: string, endDate: string): string => {
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
   };
 
   return (
@@ -90,7 +86,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
     >
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-white">
             <motion.tr 
               variants={headerVariants}
               initial="hidden"
@@ -100,7 +96,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                 Fiscal Year
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Period
+                Duration
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                 Status
@@ -133,7 +129,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                         {year.name}
                       </div>
                       <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                        {formatDate(year.dateStart)} - {formatDate(year.dateEnd)}
+                        {getDuration(year.startDate, year.endDate)}
                       </div>
                     </div>
                   </div>
@@ -147,11 +143,11 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                       <Clock className="text-blue-600 h-5 w-5" />
                     </motion.div>
                     <div className="ml-3">
-                      <div className={`text-sm font-medium truncate max-w-[120px] md:max-w-none ${getPeriodColor(year.name)}`}>
-                        {year.name} Periods
+                      <div className="text-sm font-medium truncate max-w-[120px] md:max-w-none text-gray-900">
+                        Duration
                       </div>
                       <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                        {formatDate(year.dateStart)} - {formatDate(year.dateEnd)}
+                        {getDuration(year.startDate, year.endDate)}
                       </div>
                     </div>
                   </div>

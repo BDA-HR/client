@@ -82,13 +82,14 @@ const CompList: React.FC<CompListProps> = ({
                       <PenBox size={16}/>
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onDeleteCompany(company)}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                  >
-                    <Trash2 size={16} />
-                    Delete
-                  </DropdownMenuItem>
+ <DropdownMenuItem
+  onClick={() => onDeleteCompany(company)}
+  className="flex items-center gap-2 text-red-600 data-[highlighted]:!bg-red-50 data-[highlighted]:text-red-700"
+>
+  <Trash2 size={16} className="text-red-600" />
+  <p className="text-red-600">Delete</p>
+</DropdownMenuItem>
+
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

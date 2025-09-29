@@ -95,7 +95,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
     >
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-white">
             <motion.tr 
               variants={headerVariants}
               initial="hidden"
@@ -159,7 +159,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div className="flex items-center">
                       <Clock className="text-gray-400 mr-2 h-4 w-4" />
-                      <span>{getDuration(period.dateStart, period.dateEnd)}</span>
+                      <span>{getDuration(period.startDate, period.endDate)}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
