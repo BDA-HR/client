@@ -4,7 +4,6 @@ import type { AddPeriodDto, UUID } from '../../../types/core/period';
 import React from 'react';
 import { Button } from '../../ui/button';
 import toast from 'react-hot-toast';
-import { PeriodStat } from '../../../types/core/enum';
 
 interface AddPeriodModalProps {
   open: boolean;
@@ -22,8 +21,6 @@ export const AddPeriodModal = ({
   onAddPeriod
 }: AddPeriodModalProps) => {
   const [loading, setLoading] = React.useState(false);
-
-  const periodStatusOptions = Object.entries(PeriodStat);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +59,7 @@ export const AddPeriodModal = ({
       name: '',
       dateStart: '',
       dateEnd: '',
-      isActive: PeriodStat["0"], // Default to 'Active' using enum
+      isActive: '0', // Default to active status
       quarterId: '' as UUID,
       fiscalYearId: '' as UUID
     });
@@ -138,7 +135,7 @@ export const AddPeriodModal = ({
                 type="date"
                 id="startDate"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                value={newPeriod.dateStart ? newPeriod.dateStart.split('T')[0] : newPeriod.dateStart}
+                value={newPeriod.dateStart}
                 onChange={(e) => setNewPeriod({ ...newPeriod, dateStart: e.target.value })}
                 required
               />
@@ -153,29 +150,10 @@ export const AddPeriodModal = ({
                 type="date"
                 id="endDate"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                value={newPeriod.dateEnd ? newPeriod.dateEnd.split('T')[0] : newPeriod.dateEnd}
+                value={newPeriod.dateEnd}
                 onChange={(e) => setNewPeriod({ ...newPeriod, dateEnd: e.target.value })}
                 required
               />
-            </div>
-
-            {/* Status - Full Width */}
-            <div className="md:col-span-2">
-              <label htmlFor="isActive" className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                id="isActive"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                value={newPeriod.isActive}
-                onChange={(e) => setNewPeriod({ ...newPeriod, isActive: e.target.value })}
-              >
-                {periodStatusOptions.map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
 
