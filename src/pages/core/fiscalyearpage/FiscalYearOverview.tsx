@@ -11,7 +11,6 @@ import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../
 import PeriodSection from '../../../components/core/fiscalyear/PeriodSection';
 import ActiveFisc from '../../../components/core/fiscalyear/ActFiscYear';
 import { motion } from 'framer-motion';
-import { Button } from '../../../components/ui/button';
 
 const getDefaultFiscalYear = (): AddFiscYearDto => ({
   name: '',
@@ -76,8 +75,6 @@ export default function FiscalYearOverview() {
     }
   };
 
-
-
   const handleYearDelete = async (yearId: UUID) => {
     try {
       await fiscalYearService.deleteFiscalYear(yearId);
@@ -104,6 +101,7 @@ export default function FiscalYearOverview() {
     setSelectedYear(year);
     setViewModalOpen(true);
   };
+
   const handleViewHistory = () => {
     navigate('/core/fiscal-year/history');
   };
@@ -119,7 +117,11 @@ export default function FiscalYearOverview() {
     <>
       <div className="bg-gray-50">
         <Dialog>
-          <FiscalYearManagementHeader setDialogOpen={setAddModalOpen} />
+          <FiscalYearManagementHeader 
+            setDialogOpen={setAddModalOpen}
+            onViewHistory={handleViewHistory}
+            totalItems={totalItems}
+          />
           
           <div className="max-w-7xl mx-auto px-4 py-8">
             {/* Single Error Message - Shows instead of both ActiveFisc and Table */}
@@ -154,31 +156,15 @@ export default function FiscalYearOverview() {
             )}
 
             {!loading && !error && (
-              <>
-                <ActiveFisc
-                  activeYear={activeYear}
-                  loading={loading}
-                  error={error}
-                  onViewDetails={handleViewDetails}
-                />
-
-                {/* View History Button */}
-
-              </>
+              <ActiveFisc
+                activeYear={activeYear}
+                loading={loading}
+                error={error}
+                onViewDetails={handleViewDetails}
+              />
             )}
           </div>
-<div className="w-full mx-4 mt-2">
-                  <Button
-                    onClick={handleViewHistory}
-                    variant={'outline'}
-                    className=" cursor-pointer"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    View History ({totalItems} fiscal year{totalItems !== 1 ? 's' : ''})
-                  </Button>
-                </div>
+
           {/* Add Modal */}
           <AddFiscalYearModal
             open={addModalOpen}

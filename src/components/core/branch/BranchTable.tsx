@@ -107,9 +107,9 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
   const getStatusText = (status: string): string => {
     switch (status) {
-      case 'ACTIVE': return 'Active';
-      case 'INACTIVE': return 'Inactive';
-      case 'UNDER_CONSTRUCTION': return 'Under Construction';
+      case '0': return 'Active';
+      case '1': return 'Inactive';
+      case '2': return 'Under Construction';
       default: return status;
     }
   };

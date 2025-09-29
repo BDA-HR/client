@@ -51,7 +51,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     location: '',
     dateOpened: new Date().toISOString().split('T')[0],
     branchType: '0',
-    branchStat: 'Active',
+    branchStat: '0',
     compId: (defaultCompanyId || '') as UUID,
     rowVersion: '',
   });
@@ -69,8 +69,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         dateOpened: branch.dateOpened
           ? new Date(branch.dateOpened).toISOString().split('T')[0]
           : new Date().toISOString().split('T')[0],
-        branchType: branch.branchType || '0', // Use the key
-        branchStat: branch.branchStat || 'Active', // Use the key
+        branchType: branch.branchType || '0',
+        branchStat: branch.branchStat || '0',
         compId: (defaultCompanyId || '') as UUID,
         rowVersion: branch.rowVersion || '',
       });
@@ -137,10 +137,12 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     key,
     value
   }));
-  const getDisplayValue = (key: string, options: Array<{key: string, value: string}>) => {
-    const option = options.find(opt => opt.key === key);
-    return option ? option.value : '';
+
+  const getDisplayValue = (currentKey: string, options: Array<{key: string, value: string}>) => {
+    const option = options.find(opt => opt.key === currentKey);
+    return option ? option.value : currentKey;
   };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -255,7 +257,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   onValueChange={(value) => handleInputChange('branchType', value)}
                 >
                   <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                    <SelectValue placeholder="Select type">
+                    <SelectValue>
                       {getDisplayValue(formData.branchType, branchTypeOptions)}
                     </SelectValue>
                   </SelectTrigger>
@@ -280,7 +282,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                 onValueChange={(value) => handleInputChange('branchStat', value)}
               >
                 <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                  <SelectValue placeholder="Select status">
+                  <SelectValue>
                     {getDisplayValue(formData.branchStat, branchStatOptions)}
                   </SelectValue>
                 </SelectTrigger>

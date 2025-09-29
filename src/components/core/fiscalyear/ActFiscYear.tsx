@@ -12,10 +12,10 @@ interface ActiveFiscProps {
 export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
         <div className="animate-pulse">
-          <div className="h-5 bg-gray-200 rounded w-1/4 mb-3"></div>
-          <div className="h-3 bg-gray-200 rounded w-3/4 mb-1"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-3 bg-gray-200 rounded w-2/3 mb-1"></div>
           <div className="h-3 bg-gray-200 rounded w-1/2"></div>
         </div>
       </div>
@@ -27,13 +27,13 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-4 mb-4"
+        className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-3"
       >
         <div className="flex items-center">
-          <XCircleIcon className="h-4 w-4 text-yellow-400 mr-2" />
+          <XCircleIcon className="h-3 w-3 text-yellow-400 mr-2" />
           <div>
-            <h3 className="text-yellow-800 font-medium text-sm">No Active Fiscal Year</h3>
-            <p className="text-yellow-700 text-xs mt-1">
+            <h3 className="text-yellow-800 font-medium text-xs">No Active Fiscal Year</h3>
+            <p className="text-yellow-700 text-xs mt-0.5">
               Please set a fiscal year as active to continue.
             </p>
           </div>
@@ -47,47 +47,45 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg shadow-sm p-4 mb-4"
+      className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg shadow-sm p-3"
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="bg-emerald-100 p-2 rounded-full">
-            <CalendarIcon className="h-4 w-4 text-emerald-600" />
+        <div className="flex items-center space-x-2">
+          <div className="bg-emerald-100 p-1.5 rounded-full">
+            <CalendarIcon className="h-3 w-3 text-emerald-600" />
           </div>
           <div>
-            <div className="flex items-center space-x-2">
-              <h3 className="text-base font-semibold text-gray-900">{activeYear.name}</h3>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                <CheckCircleIcon className="h-2.5 w-2.5 mr-1" />
+            <div className="flex items-center space-x-1">
+              <h3 className="text-sm font-semibold text-gray-900">{activeYear.name}</h3>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                <CheckCircleIcon className="h-2 w-2 mr-0.5" />
                 Active
               </span>
             </div>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-xs text-gray-600">
               {activeYear.startDate} - {activeYear.endDate}
             </p>
           </div>
         </div>
         
         <div className="text-right">
-          <div className="text-lg font-bold text-emerald-600">Current</div>
-          <div className="text-xs text-gray-500">Fiscal Year</div>
+          <div className="text-sm font-bold text-emerald-600">Current</div>
+          <div className="text-xs text-gray-500">FY</div>
         </div>
       </div>
       
-      <div className="mt-3 pt-3 border-t border-emerald-100">
-        <div className="grid grid-cols-2 gap-4 text-xs">
+      <div className="mt-2 pt-2 border-t border-emerald-100">
+        <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
-            <span className="text-gray-500">Start Date:</span>
-            <div className="font-medium text-gray-900">
-              <div>{activeYear.startDate} / {activeYear.startDateAm}</div>
-              <div className="text-gray-500 text-xs">ISO: {new Date(activeYear.dateStart).toLocaleDateString()}</div>
+            <span className="text-gray-500">Start:</span>
+            <div className="font-medium text-gray-900 text-xs">
+              {activeYear.startDate} / {activeYear.startDateAm}
             </div>
           </div>
           <div>
-            <span className="text-gray-500">End Date:</span>
-            <div className="font-medium text-gray-900">
-              <div>{activeYear.endDate} / {activeYear.endDateAm}</div>
-              <div className="text-gray-500 text-xs">ISO: {new Date(activeYear.dateEnd).toLocaleDateString()}</div>
+            <span className="text-gray-500">End:</span>
+            <div className="font-medium text-gray-900 text-xs">
+              {activeYear.endDate} / {activeYear.endDateAm}
             </div>
           </div>
         </div>

@@ -47,7 +47,6 @@ function PeriodSection() {
     } catch (err) {
       console.error('Error fetching periods:', err);
       setError('Failed to load periods. Please try again later.');
-      toast.error('Failed to fetch periods');
     } finally {
       setLoading(false);
     }

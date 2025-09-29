@@ -24,7 +24,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment, branchId }
   const [newDepartment, setNewDepartment] = useState({ 
     name: '', 
     nameAm: '', 
-    deptStat: DeptStat.Active,
+    deptStat: DeptStat["0"],
     branchId: branchId
   });
 
@@ -48,7 +48,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment, branchId }
     setNewDepartment({ 
       name: '', 
       nameAm: '', 
-      deptStat: DeptStat.Active,
+      deptStat: DeptStat["0"],
       branchId: branchId 
     });
     setOpenDialog(false);

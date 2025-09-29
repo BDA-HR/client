@@ -41,6 +41,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     branchId: department.branchId,
     rowVersion: department.rowVersion
   });
+  const deptStatusOptions = Object.entries(DeptStat); 
 
   // Update form when department prop changes
   useEffect(() => {
@@ -67,7 +68,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
+    const value = e.target.value as DeptStat;
     setEditedDepartment((prev) => ({ ...prev, deptStat: value }));
   };
 
@@ -137,8 +138,11 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
               onChange={handleStatusChange}
               className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
             >
-              <option value={DeptStat.Active}>Active</option>
-              <option value={DeptStat.InAct}>Inactive</option>
+              {deptStatusOptions.map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
             </select>
           </div>
         </div>

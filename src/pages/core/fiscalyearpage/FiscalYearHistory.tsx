@@ -4,36 +4,15 @@ import { FiscalYearTable } from '../../../components/core/fiscalyear/FiscYearTab
 import { ViewFiscModal } from '../../../components/core/fiscalyear/ViewFiscModal';
 import { EditFiscModal } from '../../../components/core/fiscalyear/EditFiscModal';
 import { DeleteFiscModal } from '../../../components/core/fiscalyear/DeleteFiscModal';
-import { AddFiscalYearModal } from '../../../components/core/fiscalyear/AddFiscYearModal';
 import { fiscalYearService } from '../../../services/core/fiscservice';
-import type { FiscYearListDto, EditFiscYearDto, AddFiscYearDto, UUID } from '../../../types/core/fisc';
+import type { FiscYearListDto, EditFiscYearDto, UUID } from '../../../types/core/fisc';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
-import { ArrowLeft, BadgePlus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface FiscalYearHistoryProps {
   onBack?: () => void;
 }
-
-// Helper function to format date as YYYY-MM-DD
-const formatDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-const getDefaultFiscalYear = (): AddFiscYearDto => {
-  const today = new Date();
-  const oneYearLater = new Date(today);
-  oneYearLater.setFullYear(today.getFullYear() + 1);
-  
-  return {
-    name: '',
-    dateStart: formatDate(today),
-    dateEnd: formatDate(oneYearLater),
-  };
-};
 
 export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
   const navigate = useNavigate();
@@ -44,9 +23,7 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<FiscYearListDto | null>(null);
-  const [newYear, setNewYear] = useState<AddFiscYearDto>(getDefaultFiscalYear());
 
   const itemsPerPage = 10;
   const totalItems = years.length;
@@ -56,12 +33,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
   useEffect(() => {
     loadFiscalYears();
   }, []);
-
-  useEffect(() => {
-    if (addModalOpen) {
-      setNewYear(getDefaultFiscalYear());
-    }
-  }, [addModalOpen]);
 
   const loadFiscalYears = async () => {
     try {
@@ -74,30 +45,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
       console.error('Error loading fiscal years:', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleAddFiscalYear = async (): Promise<void> => {
-    try {
-      // Validate dates
-      if (!newYear.dateStart || !newYear.dateEnd) {
-        setError('Start date and end date are required');
-        return;
-      }
-
-      if (newYear.dateStart >= newYear.dateEnd) {
-        setError('End date must be after start date');
-        return;
-      }
-
-      const createdYear = await fiscalYearService.createFiscalYear(newYear);
-      setYears([createdYear, ...years]);
-      setAddModalOpen(false);
-      setCurrentPage(1);
-      setError(null);
-    } catch (err) {
-      console.error('Error adding fiscal year:', err);
-      setError('Failed to add fiscal year');
     }
   };
 
@@ -181,13 +128,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
     }
   };
 
-  const handleAddModalOpenChange = (open: boolean) => {
-    setAddModalOpen(open);
-    if (!open) {
-      setNewYear(getDefaultFiscalYear());
-      setError(null);
-    }
-  };
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -201,22 +141,16 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
           Back to Overview
         </Button>
         
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold">
             <span className='bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent'>
               Fiscal Year 
             </span>{" "}
             History
           </h1>
-          
-          {/* Add Fiscal Year Button */}
-          <Button
-            onClick={() => setAddModalOpen(true)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer flex items-center gap-2"
-          >
-            <BadgePlus size={16} />
-            Add Fiscal Year
-          </Button>
+                        <p className="text-sm text-gray-600">
+                {totalItems} fiscal year{totalItems !== 1 ? 's' : ''} found
+              </p>
         </div>
 
         {/* Error Message */}
@@ -253,13 +187,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
         {/* Content */}
         {!loading && !error && (
           <>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">All Fiscal Years (History)</h2>
-              <p className="text-sm text-gray-600">
-                {totalItems} fiscal year{totalItems !== 1 ? 's' : ''} found
-              </p>
-            </div>
-            
             <FiscalYearTable
               years={paginatedYears}
               currentPage={currentPage}
@@ -273,15 +200,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
             />
           </>
         )}
-
-        {/* Add Fiscal Year Modal */}
-        <AddFiscalYearModal
-          open={addModalOpen}
-          onOpenChange={handleAddModalOpenChange}
-          newYear={newYear}
-          setNewYear={setNewYear}
-          onAddFiscalYear={handleAddFiscalYear}
-        />
 
         {/* View Modal */}
         <ViewFiscModal

@@ -280,10 +280,6 @@ const DepartmentOverview = () => {
                 <div className="bg-gray-100 border border-gray-300 text-gray-700 px-6 py-8 rounded-lg max-w-md mx-auto">
                   <p className="font-medium text-lg mb-2">No departments found</p>
                   <p className="text-gray-600 mb-4">Get started by creating your first department.</p>
-                  <AddDeptModal 
-                    onAddDepartment={handleAddDepartment} 
-                    branchId={filters.companyId || ''} 
-                  />
                 </div>
               </motion.div>
             )}

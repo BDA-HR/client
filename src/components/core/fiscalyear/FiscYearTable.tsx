@@ -95,12 +95,6 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                 Status
               </th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                Created
-              </th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                Modified
-              </th>
               <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
@@ -144,12 +138,6 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                   <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(year.isActive)}`}>
                     {year.isActive === "Yes" ? "Active" : "Inactive"}
                   </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                  {year.createdAt ? formatDate(year.createdAt) : 'N/A'}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                  {year.modifiedAt ? formatDate(year.modifiedAt) : 'N/A'}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Popover open={popoverOpen === year.id} onOpenChange={(open) => setPopoverOpen(open ? year.id : null)}>

@@ -19,14 +19,20 @@ export const BranchType = {
 export type BranchType = typeof BranchType[keyof typeof BranchType];
 
 export const BranchStat = {
-  Active: 'Active',
-  InAct: 'Inactive',
-  UndCon: 'Under construction'
+  "0": 'Active',
+  "1": 'Inactive',
+  "2": 'Under construction'
 } as const;
 export type BranchStat = typeof BranchStat[keyof typeof BranchStat];
 
 export const DeptStat = {
-  Active: 'Active',
-  InAct: 'Inactive'
+  "0": 'Active',
+  "1": 'Inactive'
 } as const;
 export type DeptStat = typeof DeptStat[keyof typeof DeptStat];
+
+export const FiscStat = {
+  "0": 'Active',
+  "1": 'Inactive'
+} as const;
+export type FiscStat = typeof FiscStat[keyof typeof FiscStat];
