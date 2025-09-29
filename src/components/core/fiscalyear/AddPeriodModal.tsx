@@ -23,8 +23,7 @@ export const AddPeriodModal = ({
 }: AddPeriodModalProps) => {
   const [loading, setLoading] = React.useState(false);
 
-  // Create options from PeriodStat enum
-  const periodStatusOptions = Object.entries(PeriodStat); // [["0", "Active"], ["1", "Inactive"]]
+  const periodStatusOptions = Object.entries(PeriodStat);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

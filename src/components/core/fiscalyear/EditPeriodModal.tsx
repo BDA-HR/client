@@ -10,6 +10,7 @@ import { Label } from '../../ui/label';
 import { PenBox } from 'lucide-react';
 import type { EditPeriodDto, PeriodListDto, UUID } from '../../../types/core/period';
 import toast from 'react-hot-toast';
+import { PeriodStat } from '../../../types/core/enum';
 
 interface EditPeriodModalProps {
   period: PeriodListDto;
@@ -36,6 +37,8 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
   });
 
   const [loading, setLoading] = useState(false);
+
+  const periodStatusOptions = Object.entries(PeriodStat);
 
   useEffect(() => {
     setEditedPeriod({
@@ -149,8 +152,11 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
               onChange={handleStatusChange}
               className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md"
             >
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
+              {periodStatusOptions.map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
