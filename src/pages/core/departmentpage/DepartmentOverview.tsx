@@ -5,7 +5,6 @@ import DepartmentStatsCards from '../../../components/core/department/DeptStatus
 import DepartmentSearchFilters from '../../../components/core/department/DeptSearchFilters';
 import DepartmentTable from '../../../components/core/department/DeptTable';
 import EditDeptModal from '../../../components/core/department/EditDeptModal';
-import AddDeptModal from '../../../components/core/department/AddDeptModal';
 import type { AddDeptDto, EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
 import { departmentService } from '../../../services/core/deptservice';
 

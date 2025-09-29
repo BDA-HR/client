@@ -9,7 +9,6 @@ interface DepartmentManagementHeaderProps {
 
 const DepartmentManagementHeader: React.FC<DepartmentManagementHeaderProps> = ({ 
   onAddDepartment, 
-  branchId 
 }) => {
   return (
     <motion.div
@@ -22,9 +21,7 @@ const DepartmentManagementHeader: React.FC<DepartmentManagementHeaderProps> = ({
         Departments
       </h1>
       <AddDeptModal 
-        onAddDepartment={onAddDepartment} 
-        branchId={branchId} 
-      />
+        onAddDepartment={onAddDepartment}      />
     </motion.div>
   );
 };
