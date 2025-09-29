@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { Branch, BranchListDto, AddBranchDto, EditBranchDto, UUID } from '../../types/core/branch';
+import type { Branch, BranchListDto, AddBranchDto, EditBranchDto, BranchCompListDto, UUID } from '../../types/core/branch';
 
 class BranchService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/branch`;
@@ -33,6 +33,17 @@ class BranchService {
       return response.data;
     } catch (error) {
       console.error('Error fetching company branches:', error);
+      throw error;
+    }
+  }
+
+  // NEW: GET: baseurl/BranchCompList
+  async getBranchCompanyList(): Promise<BranchCompListDto[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/BranchCompList`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching branch company list:', error);
       throw error;
     }
   }
