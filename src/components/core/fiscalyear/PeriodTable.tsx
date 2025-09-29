@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, PenBox, Trash2, Loader } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { PeriodListDto } from '../../../types/core/period';
-import { formatDate } from '../../../utils/format-date';
 
 interface PeriodTableProps {
   periods: PeriodListDto[];
@@ -30,17 +29,16 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
-  
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { 
-      staggerChildren: 0.1,
-      when: "beforeChildren"
-    } 
-  }
-};
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1, 
+      transition: { 
+        staggerChildren: 0.1,
+        when: "beforeChildren"
+      } 
+    }
+  };
 
   const rowVariants = {
     hidden: { opacity: 0, y: 10 },
@@ -72,12 +70,12 @@ const containerVariants = {
     return 'text-gray-600';
   };
 
+  const formatDate = (dateString: string): string => {
+    return dateString;
+  };
+
   const getDuration = (startDate: string, endDate: string): string => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return `${diffDays} days`;
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
   };
 
   if (loading) {
@@ -153,7 +151,7 @@ const containerVariants = {
                           {period.name}
                         </div>
                         <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                          {formatDate(period.dateStart)} - {formatDate(period.dateEnd)}
+                          {period.quarter}
                         </div>
                       </div>
                     </div>

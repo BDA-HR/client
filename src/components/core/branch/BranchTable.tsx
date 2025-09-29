@@ -12,7 +12,8 @@ import {
   Trash2,
   BadgeInfo,
   GitBranch,
-  PenBox
+  PenBox,
+  Barcode
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { BranchListDto, UUID } from '../../../types/core/branch';
@@ -166,6 +167,9 @@ const BranchTable: React.FC<BranchTableProps> = ({
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                   Branch
                 </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                  Code
+                </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   Type
                 </th>
@@ -174,9 +178,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Location
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                  Company
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Opened
@@ -209,10 +210,16 @@ const BranchTable: React.FC<BranchTableProps> = ({
                           {branch.name}
                         </div>
                         <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                          {branch.code}
+                          {branch.nameAm}
                         </div>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                    <Barcode className="text-gray-400 mr-2 h-4 w-4" />
+                    <span className='truncate max-w-[120px]'>
+                      {branch.code}
+                    </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(branch.branchType)}`}>
@@ -228,12 +235,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
                     <div className="flex items-center">
                       <MapPin className="text-gray-400 mr-2 h-4 w-4" />
                       <span className="truncate max-w-[120px]">{branch.location}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                    <div className="flex items-center">
-                      <Building className="text-gray-400 mr-2 h-4 w-4" />
-                      <span className="truncate max-w-[120px]">{branch.comp}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">

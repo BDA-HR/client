@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, Trash2, PenBox } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { FiscYearListDto } from '../../../types/core/fisc';
-import { formatDate } from '../../../utils/format-date';
 
 interface FiscalYearTableProps {
   years: FiscYearListDto[];
@@ -43,16 +42,15 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
   };
 
   const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { 
-      staggerChildren: 0.1,
-      when: "beforeChildren"
-    } 
-  }
-};
-
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1, 
+      transition: { 
+        staggerChildren: 0.1,
+        when: "beforeChildren"
+      } 
+    }
+  };
 
   const headerVariants = {
     hidden: { opacity: 0, y: -10 },
@@ -70,6 +68,18 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
     if (yearNum === currentYear) return 'text-emerald-600';
     if (yearNum > currentYear) return 'text-blue-600';
     return 'text-gray-600';
+  };
+
+  const getPeriodColor = (periodName: string): string => {
+    if (periodName.includes('Q1')) return 'text-blue-600';
+    if (periodName.includes('Q2')) return 'text-purple-600';
+    if (periodName.includes('Q3')) return 'text-orange-600';
+    if (periodName.includes('Q4')) return 'text-red-600';
+    return 'text-gray-600';
+  };
+
+  const formatDate = (dateString: string): string => {
+    return dateString;
   };
 
   return (
@@ -128,10 +138,22 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-4 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <Clock className="text-gray-400 mr-2 h-4 w-4" />
-                    <span>{formatDate(year.dateStart)} - {formatDate(year.dateEnd)}</span>
+                    <motion.div 
+                      whileHover={{ rotate: 10 }}
+                      className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
+                    >
+                      <Clock className="text-blue-600 h-5 w-5" />
+                    </motion.div>
+                    <div className="ml-3">
+                      <div className={`text-sm font-medium truncate max-w-[120px] md:max-w-none ${getPeriodColor(year.name)}`}>
+                        {year.name} Periods
+                      </div>
+                      <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
+                        {formatDate(year.dateStart)} - {formatDate(year.dateEnd)}
+                      </div>
+                    </div>
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
