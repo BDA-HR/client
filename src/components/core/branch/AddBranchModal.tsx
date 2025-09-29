@@ -14,7 +14,7 @@ import { BadgePlus, } from 'lucide-react';
 import { Input } from '../../../components/ui/input';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import type { AddBranchDto, UUID } from '../../../types/core/branch';
-import { BranchType, BranchStat } from '../../../types/core/enum'; 
+import { BranchType} from '../../../types/core/enum'; 
 
 interface AddBranchModalProps {
   onAddBranch: (branch: AddBranchDto) => void;
@@ -36,8 +36,6 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     key,
     value
   }));  
-  const [branchStat, setBranchStat] = useState<keyof typeof BranchStat>('0'); 
-
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === '' || amharicRegex.test(value)) {
@@ -55,7 +53,6 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
       location: branchLocation.trim(),
       dateOpened: new Date(dateOpened).toISOString(), // Convert to ISO string
       branchType: branchType, // This will now be the key ('0', '1', '2', '3')
-      branchStat: branchStat,
       compId: defaultCompanyId as UUID,
     };
 
@@ -68,7 +65,6 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     setBranchLocation('');
     setDateOpened(new Date().toISOString().split('T')[0]);
     setBranchType('0');
-    setBranchStat('0');
     setOpenDialog(false);
   };
 
