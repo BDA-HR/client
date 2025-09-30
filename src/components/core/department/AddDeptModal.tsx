@@ -10,7 +10,9 @@ import {
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { BadgePlus } from 'lucide-react';
-import type { AddDeptDto, UUID } from '../../../types/core/dept';
+import List from '../../../components/List/list';
+import type { ListItem, UUID } from '../../../types/List/list';
+import type { AddDeptDto } from '../../../types/core/dept';
 import type { BranchCompListDto } from '../../../types/core/branch';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import { branchService } from '../../../services/core/branchservice';
@@ -23,6 +25,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState<UUID | undefined>(undefined);
   const [newDepartment, setNewDepartment] = useState({ 
     name: '', 
     nameAm: '',
@@ -46,17 +49,21 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
       setLoading(false);
     }
   };
+  const branchListItems: ListItem[] = branches.map(branch => ({
+    id: branch.id,
+    name: branch.name
+  }));
+
+  const handleSelectBranch = (item: ListItem) => {
+    setSelectedBranch(item.id);
+    setNewDepartment(prev => ({ ...prev, branchId: item.id }));
+  };
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === '' || amharicRegex.test(value)) {
       setNewDepartment((prev) => ({ ...prev, nameAm: value }));
     }
-  };
-
-  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const branchId = e.target.value as UUID;
-    setNewDepartment((prev) => ({ ...prev, branchId }));
   };
 
   const handleSubmit = () => {
@@ -74,6 +81,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
       nameAm: '',       
       branchId: '' as UUID
     });
+    setSelectedBranch(undefined);
     setOpenDialog(false);
   };
 
@@ -99,23 +107,17 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
           </div>
         </DialogHeader>
         <div className="grid grid-cols-1 gap-4 py-4">
-          {/* Branch Selection Dropdown */}
+          {/* Branch Selection using List Component */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="branch">Select Branch<span className='text-red-500'>*</span></Label>
-            <select
-              id="branch"
-              value={newDepartment.branchId}
-              onChange={handleBranchChange}
-              className="w-full px-3 py-2 focus:outline-none focus:border-emerald-500 focus:outline-2 border rounded-md bg-white"
+            <List
+              items={branchListItems}
+              selectedValue={selectedBranch}
+              onSelect={handleSelectBranch}
+              label="Select Branch"
+              placeholder="Select a branch"
+              required
               disabled={loading}
-            >
-              <option value="">Select a branch</option>
-              {branches.map((branch) => (
-                <option key={branch.id} value={branch.id}>
-                  {branch.name}
-                </option>
-              ))}
-            </select>
+            />
             {loading && <p className="text-sm text-gray-500">Loading branches...</p>}
           </div>
 

@@ -4,6 +4,8 @@ import type { AddPeriodDto, UUID } from '../../../types/core/period';
 import React from 'react';
 import { Button } from '../../ui/button';
 import toast from 'react-hot-toast';
+import List from '../../../components/List/list';
+import type { ListItem } from '../../../types/List/list';
 
 interface AddPeriodModalProps {
   open: boolean;
@@ -21,6 +23,70 @@ export const AddPeriodModal = ({
   onAddPeriod
 }: AddPeriodModalProps) => {
   const [loading, setLoading] = React.useState(false);
+  const [fiscalYears, setFiscalYears] = React.useState<ListItem[]>([]);
+  const [quarters, setQuarters] = React.useState<ListItem[]>([]);
+  const [loadingFiscalYears, setLoadingFiscalYears] = React.useState(false);
+  const [loadingQuarters, setLoadingQuarters] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open) {
+      fetchFiscalYears();
+      fetchQuarters();
+    }
+  }, [open]);
+
+  // TODO: Replace with your actual fiscal year service
+  const fetchFiscalYears = async () => {
+    try {
+      setLoadingFiscalYears(true);
+      // const fiscalYearsData = await fiscalYearService.getFiscalYearList();
+      // const fiscalYearListItems: ListItem[] = fiscalYearsData.map(fy => ({
+      //   id: fy.id,
+      //   name: fy.name
+      // }));
+      // setFiscalYears(fiscalYearListItems);
+      
+      // Temporary mock data - replace with actual API call
+      const mockFiscalYears: ListItem[] = [
+        { id: '1' as UUID, name: 'FY 2024' },
+        { id: '2' as UUID, name: 'FY 2025' },
+        { id: '3' as UUID, name: 'FY 2026' },
+      ];
+      setFiscalYears(mockFiscalYears);
+    } catch (error) {
+      console.error('Error fetching fiscal years:', error);
+      toast.error('Failed to load fiscal years');
+    } finally {
+      setLoadingFiscalYears(false);
+    }
+  };
+
+  // TODO: Replace with your actual quarter service
+  const fetchQuarters = async () => {
+    try {
+      setLoadingQuarters(true);
+      const mockQuarters: ListItem[] = [
+        { id: '1' as UUID, name: 'Q1' },
+        { id: '2' as UUID, name: 'Q2' },
+        { id: '3' as UUID, name: 'Q3' },
+        { id: '4' as UUID, name: 'Q4' },
+      ];
+      setQuarters(mockQuarters);
+    } catch (error) {
+      console.error('Error fetching quarters:', error);
+      toast.error('Failed to load quarters');
+    } finally {
+      setLoadingQuarters(false);
+    }
+  };
+
+  const handleSelectFiscalYear = (item: ListItem) => {
+    setNewPeriod({ ...newPeriod, fiscalYearId: item.id });
+  };
+
+  const handleSelectQuarter = (item: ListItem) => {
+    setNewPeriod({ ...newPeriod, quarterId: item.id });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +125,7 @@ export const AddPeriodModal = ({
       name: '',
       dateStart: '',
       dateEnd: '',
-      isActive: '0', // Default to active status
+      isActive: '0',
       quarterId: '' as UUID,
       fiscalYearId: '' as UUID
     });
@@ -96,34 +162,30 @@ export const AddPeriodModal = ({
 
             {/* Quarter Selection */}
             <div>
-              <label htmlFor="quarterId" className="block text-sm font-medium text-gray-700 mb-2">
-                Quarter ID <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="quarterId"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                placeholder="Enter quarter ID"
-                value={newPeriod.quarterId}
-                onChange={(e) => setNewPeriod({ ...newPeriod, quarterId: e.target.value as UUID })}
+              <List
+                items={quarters}
+                selectedValue={newPeriod.quarterId}
+                onSelect={handleSelectQuarter}
+                label="Quarter"
+                placeholder="Select a quarter"
                 required
+                disabled={loadingQuarters}
               />
+              {loadingQuarters && <p className="text-sm text-gray-500 mt-1">Loading quarters...</p>}
             </div>
 
             {/* Fiscal Year Selection */}
             <div>
-              <label htmlFor="fiscalYearId" className="block text-sm font-medium text-gray-700 mb-2">
-                Fiscal Year ID <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="fiscalYearId"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                placeholder="Enter fiscal year ID"
-                value={newPeriod.fiscalYearId}
-                onChange={(e) => setNewPeriod({ ...newPeriod, fiscalYearId: e.target.value as UUID })}
+              <List
+                items={fiscalYears}
+                selectedValue={newPeriod.fiscalYearId}
+                onSelect={handleSelectFiscalYear}
+                label="Fiscal Year"
+                placeholder="Select a fiscal year"
                 required
+                disabled={loadingFiscalYears}
               />
+              {loadingFiscalYears && <p className="text-sm text-gray-500 mt-1">Loading fiscal years...</p>}
             </div>
 
             {/* Start Date */}
@@ -162,7 +224,7 @@ export const AddPeriodModal = ({
             <Button
               type="submit"
               className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white cursor-pointer transition-colors"
-              disabled={loading}
+              disabled={loading || loadingFiscalYears || loadingQuarters}
             >
               {loading ? 'Adding...' : 'Save'}
             </Button>
