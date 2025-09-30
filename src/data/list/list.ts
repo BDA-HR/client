@@ -24,3 +24,10 @@ export const STATUS_OPTIONS: ListItem[] = [
   { id: asUUID(uuidv4()), name: 'Pending' },
   { id: asUUID(uuidv4()), name: 'Suspended' }
 ];
+
+export const BRANCH_COMP_LIST: ListItem[] = [
+  { id: asUUID(uuidv4()), name: 'Active' },
+  { id: asUUID(uuidv4()), name: 'Inactive' },
+  { id: asUUID(uuidv4()), name: 'Pending' },
+  { id: asUUID(uuidv4()), name: 'Suspended' }
+];

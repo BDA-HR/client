@@ -16,7 +16,6 @@ export interface DeptListDto extends BaseDto {
 export interface AddDeptDto {
   name: string;
   nameAm: string;
-  deptStat: string;
   branchId: UUID;
 }
 

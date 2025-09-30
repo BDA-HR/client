@@ -55,6 +55,7 @@ export interface Branch extends BaseDto {
   dateOpenedAm: string;
   dateOpened: string;
 }
+
 export interface BranchCompListDto {
   id: UUID;
   name: string;

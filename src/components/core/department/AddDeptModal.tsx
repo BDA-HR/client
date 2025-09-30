@@ -11,9 +11,8 @@ import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { BadgePlus } from 'lucide-react';
 import type { AddDeptDto, UUID } from '../../../types/core/dept';
-import type { BranchListDto } from '../../../types/core/branch';
+import type { BranchCompListDto } from '../../../types/core/branch';
 import { amharicRegex } from '../../../utils/amharic-regex';
-import { DeptStat } from '../../../types/core/enum';
 import { branchService } from '../../../services/core/branchservice';
 
 interface AddDeptModalProps {
@@ -22,12 +21,11 @@ interface AddDeptModalProps {
 
 const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
   const [openDialog, setOpenDialog] = useState(false);
-  const [branches, setBranches] = useState<BranchListDto[]>([]);
+  const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [newDepartment, setNewDepartment] = useState({ 
     name: '', 
-    nameAm: '', 
-    deptStat: DeptStat["0"],
+    nameAm: '',
     branchId: '' as UUID
   });
 
@@ -40,7 +38,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
   const fetchBranches = async () => {
     try {
       setLoading(true);
-      const branchesData = await branchService.getAllBranches();
+      const branchesData = await branchService.getBranchCompanyList();
       setBranches(branchesData);
     } catch (error) {
       console.error('Error fetching branches:', error);
@@ -67,15 +65,13 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
     onAddDepartment({
       name: newDepartment.name,
       nameAm: newDepartment.nameAm,
-      deptStat: newDepartment.deptStat,
       branchId: newDepartment.branchId,
     });
 
     // Reset form
     setNewDepartment({ 
       name: '', 
-      nameAm: '', 
-      deptStat: DeptStat["0"],
+      nameAm: '',       
       branchId: '' as UUID
     });
     setOpenDialog(false);
@@ -116,7 +112,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
               <option value="">Select a branch</option>
               {branches.map((branch) => (
                 <option key={branch.id} value={branch.id}>
-                  {branch.name} - {branch.code}
+                  {branch.name}
                 </option>
               ))}
             </select>
