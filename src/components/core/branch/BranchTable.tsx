@@ -3,17 +3,12 @@ import { motion } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
-  MapPin,
   Building,
   MoreVertical,
   X,
-  Calendar,
   Eye,
   Trash2,
-  BadgeInfo,
-  GitBranch,
   PenBox,
-  Barcode
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { BranchListDto, UUID } from '../../../types/core/branch';
@@ -158,7 +153,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
       >
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <motion.tr 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -216,7 +211,6 @@ const BranchTable: React.FC<BranchTableProps> = ({
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                    <Barcode className="text-gray-400 mr-2 h-4 w-4" />
                     <span className='truncate max-w-[120px]'>
                       {branch.code}
                     </span>
@@ -233,13 +227,11 @@ const BranchTable: React.FC<BranchTableProps> = ({
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
                     <div className="flex items-center">
-                      <MapPin className="text-gray-400 mr-2 h-4 w-4" />
                       <span className="truncate max-w-[120px]">{branch.location}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
-                      <Calendar className="text-gray-400 mr-2 h-4 w-4" />
                       <span>{branch.dateOpened}</span>
                     </div>
                   </td>
@@ -290,7 +282,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
         </div>
 
         {/* Pagination */}
-        <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+        <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
               onClick={() => onPageChange(Math.max(1, currentPage - 1))}
@@ -378,15 +370,22 @@ const BranchTable: React.FC<BranchTableProps> = ({
 
       {/* View Details Modal */}
       {selectedBranch && modalType === 'view' && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
-              <div className='flex items-center gap-2 text-2xl font-bold'>
-                <BadgeInfo size={18} />
-                Details
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white z-10">
+              <div className='flex gap-2'>
+                <Eye size={18} />
+                <h2 className="text-2xl font-bold">Details</h2>
               </div>
               <button
-                onClick={() => setModalType(null)}
+                onClick={() => {
+                  setModalType(null);
+                  setSelectedBranch(null);
+                }}
                 className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
               >
                 <X size={24} />
@@ -394,64 +393,26 @@ const BranchTable: React.FC<BranchTableProps> = ({
             </div>
 
             <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Basic Information */}
               <div className="space-y-4">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Building className="mr-2 text-emerald-500" size={20} />
-                    Branch Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-500">Name (English)</p>
-                      <p className="font-medium">{selectedBranch.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Name (Amharic)</p>
-                      <p className="font-medium">{selectedBranch.nameAm}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Code</p>
-                      <p className="font-medium">{selectedBranch.code}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Location</p>
-                      <p className="font-medium">{selectedBranch.location}</p>
-                    </div>
+                <h3 className="text-lg font-semibold">Branch Information</h3>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500">English Name</p>
+                    <p className="font-medium">{selectedBranch.name}</p>
                   </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <GitBranch className="mr-2 text-purple-500" size={20} />
-                    Type & Status
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-500">Branch Type</p>
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(selectedBranch.branchType)}`}>
-                        {getBranchTypeText(selectedBranch.branchType)}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Status</p>
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedBranch.branchStat)}`}>
-                        {getStatusText(selectedBranch.branchStat)}
-                      </span>
-                    </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Amharic Name</p>
+                    <p className="font-medium">{selectedBranch.nameAm}</p>
                   </div>
-                </div>
-              </div>
-
-              {/* Dates and Additional Info */}
-              <div className="space-y-4">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <MapPin className="mr-2 text-blue-500" size={20} />
-                    Company Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
+                                    <div>
+                    <p className="text-sm text-gray-500">Branch Code</p>
+                    <p className="font-medium">{selectedBranch.code}</p>
+                  </div>
+                                                      <div>
+                    <p className="text-sm text-gray-500">Location</p>
+                    <p className="font-medium">{selectedBranch.location}</p>
+                  </div>
+                                      <div>
                       <p className="text-sm text-gray-500">Company</p>
                       <p className="font-medium">{selectedBranch.comp}</p>
                     </div>
@@ -459,41 +420,44 @@ const BranchTable: React.FC<BranchTableProps> = ({
                       <p className="text-sm text-gray-500">Company (Amharic)</p>
                       <p className="font-medium">{selectedBranch.compAm}</p>
                     </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Status</p>
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedBranch.branchStat)}`}>
+                      {selectedBranch.branchStat}
+                    </span>
                   </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Calendar className="mr-2 text-purple-500" size={20} />
-                    Date Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-500">Date Opened (Gregorian)</p>
-                      <p className="font-medium">{selectedBranch.dateOpened}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Date Opened (Ethiopian)</p>
-                      <p className="font-medium">{selectedBranch.dateOpenedAm}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Created At</p>
-                      <p className="font-medium">{new Date(selectedBranch.createdAt).toLocaleDateString()}</p>
-                    </div>
+                                    <div>
+                    <p className="text-sm text-gray-500">Type</p>
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedBranch.branchType)}`}>
+                      {selectedBranch.branchType}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
+            <div className='w-full flex justify-between flex-wrap'>
+              <div>
+                <h2>Created at:</h2>
+                <p>{selectedBranch.createdAt}</p>
+              </div>
+              <div>
+                <h2>Modified at:</h2>
+                <p>{selectedBranch.modifiedAt}</p>
+              </div>
+            </div>
 
-            <div className="border-t p-4 flex justify-end sticky bottom-0 bg-white/90">
+            <div className="border-t p-4 flex justify-center">
               <button
-                onClick={() => setModalType(null)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+                onClick={() => {
+                  setModalType(null);
+                  setSelectedBranch(null);
+                }}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 w-full"
               >
                 Close
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </>

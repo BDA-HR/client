@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { branchService } from '../../../services/core/branchservice';
 import type { BranchListDto } from '../../../types/core/branch';
 import { Button } from '../../../components/ui/button';
-import { RefreshCw, Building, ChevronRight, ChevronLeft, CalendarDays, MapPin } from 'lucide-react';
+import { RefreshCw, Building, ChevronRight, ChevronLeft} from 'lucide-react';
 const AllBranchs: React.FC = () => {
   const [branches, setBranches] = useState<BranchListDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -190,19 +190,16 @@ const AllBranchs: React.FC = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
                       <div className="flex items-center">
-                        <MapPin className="text-gray-400 mr-2 h-4 w-4" />
                         <span className="truncate max-w-[120px]">{branch.location}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                       <div className="flex items-center">
-                        <Building className="text-gray-400 mr-2 h-4 w-4" />
                         <span className="truncate max-w-[120px]">{branch.comp}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                       <div className="flex items-center">
-                        <CalendarDays className="text-gray-400 mr-2 h-4 w-4" />
                         <span>{branch.dateOpened}</span>
                       </div>
                     </td>
@@ -213,7 +210,7 @@ const AllBranchs: React.FC = () => {
           </div>
 
           {/* Pagination */}
-          <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+          <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}

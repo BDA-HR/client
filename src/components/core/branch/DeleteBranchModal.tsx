@@ -47,7 +47,7 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
           </div>
         )}
         
-        <DialogFooter className="border-t pt-6">
+        <DialogFooter className="border-t pt-3">
           <div className="mx-auto flex justify-center items-center gap-1.5">
             <Button 
               variant="destructive" 
