@@ -42,7 +42,7 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   const getStatusText = (status: string): string => {
     // Handle both string numbers and actual numbers
     const statusNum = parseInt(status);
-    
+
     switch (statusNum) {
       case 0:
         return "Active";
@@ -59,7 +59,7 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   const getBranchTypeText = (branchType: string): string => {
     // Handle both string numbers and actual numbers
     const typeNum = parseInt(branchType);
-    
+
     switch (typeNum) {
       case 0:
         return "Head Office";
@@ -77,49 +77,53 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
 
   // Filter branches based on search term - FIXED VERSION
   const filteredBranches = useMemo(() => {
-    console.log('Searching for:', searchTerm);
-    console.log('Total branches:', branches.length);
+    console.log("Searching for:", searchTerm);
+    console.log("Total branches:", branches.length);
 
     if (!searchTerm.trim()) {
       return branches;
     }
 
     const lowercasedSearch = searchTerm.toLowerCase().trim();
-    
+
     const filtered = branches.filter((branch) => {
       // Safely check basic fields with null checks
-      const basicMatch = 
+      const basicMatch =
         (branch.name && branch.name.toLowerCase().includes(lowercasedSearch)) ||
-        (branch.nameAm && branch.nameAm.toLowerCase().includes(lowercasedSearch)) ||
+        (branch.nameAm &&
+          branch.nameAm.toLowerCase().includes(lowercasedSearch)) ||
         (branch.code && branch.code.toLowerCase().includes(lowercasedSearch)) ||
-        (branch.location && branch.location.toLowerCase().includes(lowercasedSearch));
+        (branch.location &&
+          branch.location.toLowerCase().includes(lowercasedSearch));
 
       // Check status text - handle both string and number status
-      const statusValue = branch.branchStat?.toString() || '';
+      const statusValue = branch.branchStat?.toString() || "";
       const statusText = getStatusText(statusValue);
       const statusMatch = statusText.toLowerCase().includes(lowercasedSearch);
 
       // Check branch type text - handle both string and number type
-      const branchTypeValue = branch.branchType?.toString() || '';
+      const branchTypeValue = branch.branchType?.toString() || "";
       const branchTypeText = getBranchTypeText(branchTypeValue);
-      const branchTypeMatch = branchTypeText.toLowerCase().includes(lowercasedSearch);
+      const branchTypeMatch = branchTypeText
+        .toLowerCase()
+        .includes(lowercasedSearch);
 
       const matches = basicMatch || statusMatch || branchTypeMatch;
-      
+
       if (matches) {
-        console.log('Match found:', branch.name, {
+        console.log("Match found:", branch.name, {
           name: branch.name,
           status: statusText,
           type: branchTypeText,
-          searchTerm: lowercasedSearch
+          searchTerm: lowercasedSearch,
         });
       }
-      
+
       return matches;
     });
 
-    console.log('Filtered results:', filtered.length);
-    console.log('Sample of filtered:', filtered.slice(0, 3));
+    console.log("Filtered results:", filtered.length);
+    console.log("Sample of filtered:", filtered.slice(0, 3));
     return filtered;
   }, [branches, searchTerm]);
 
@@ -157,13 +161,19 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   // Debug effect to see branch data
   useEffect(() => {
     if (branches.length > 0) {
-      console.log('Sample branch data:', branches[0]);
-      console.log('All branch names:', branches.map(b => b.name));
-      console.log('All branch statuses:', branches.map(b => ({ 
-        name: b.name, 
-        status: b.branchStat, 
-        statusText: getStatusText(b.branchStat?.toString() || '')
-      })));
+      console.log("Sample branch data:", branches[0]);
+      console.log(
+        "All branch names:",
+        branches.map((b) => b.name)
+      );
+      console.log(
+        "All branch statuses:",
+        branches.map((b) => ({
+          name: b.name,
+          status: b.branchStat,
+          statusText: getStatusText(b.branchStat?.toString() || ""),
+        }))
+      );
     }
   }, [branches]);
 
@@ -171,7 +181,7 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
     try {
       setLoading(true);
       const allBranches = await branchService.getAllBranches();
-      console.log('Loaded all branches:', allBranches);
+      console.log("Loaded all branches:", allBranches);
       setBranches(allBranches);
       setError(null);
     } catch (err) {
@@ -190,7 +200,7 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
       const companyBranches = await branchService.getCompanyBranches(
         compId as UUID
       );
-      console.log('Loaded company branches:', companyBranches);
+      console.log("Loaded company branches:", companyBranches);
       setBranches(companyBranches);
       setError(null);
     } catch (err) {
@@ -205,7 +215,7 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   };
 
   const handleSearchChange = (term: string) => {
-    console.log('Search term changed:', term);
+    console.log("Search term changed:", term);
     setSearchTerm(term);
     setCurrentPage(1); // Reset to first page when searching
   };
@@ -333,32 +343,15 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
           <motion.h1
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
+            className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
-            {companyId
-              ? `Branches for this company`
-              : "Branches for All Companies"}
+            {companyId ? `Company Branches` : "Branches for All Companies"}
           </motion.h1>
         </div>
-
-        {companyId ? (
-          <AddBranchModal
-            onAddBranch={handleAddBranch}
-            defaultCompanyId={companyId as UUID}
-          />
-        ) : (
-          <Button
-            onClick={showAddBranchWarning}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-2"
-          >
-            <Plus size={16} />
-            Add Branch
-          </Button>
-        )}
       </motion.div>
 
-      <AddHeader 
-        searchTerm={searchTerm} 
+      <AddHeader
+        searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
         onAddBranch={companyId ? handleAddBranch : undefined}
         defaultCompanyId={companyId as UUID}
