@@ -182,7 +182,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
                   whileHover="hover"
                   className="hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-1 whitespace-nowrap">
                     <div className="flex items-center">
                       <motion.div 
                         whileHover={{ rotate: 10 }}
@@ -366,7 +366,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
       animate={{ opacity: 1, scale: 1 }}
       className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
     >
-      <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white z-10">
+      <div className="flex justify-between items-center border-b p-2 sticky top-0 bg-white z-10">
         <div className='flex items-center gap-2'>
           <Eye size={18} />
           <h2 className="text-2xl font-bold">Details</h2>
@@ -388,18 +388,18 @@ const BranchTable: React.FC<BranchTableProps> = ({
             {/* Name Section - Combined English and Amharic */}
             <div>
               <p className="text-sm text-gray-500 mb-2">Name</p>
-              <div className="space-y-1">
+              <div>
                 <p className="font-medium text-gray-900">{selectedBranch.name}</p>
-                <p className="font-medium text-gray-600 text-sm">{selectedBranch.nameAm}</p>
+                <p className="font-medium text-gray-900">{selectedBranch.nameAm}</p>
               </div>
             </div>
 
             {/* Company Section - Combined English and Amharic */}
             <div>
               <p className="text-sm text-gray-500 mb-2">Company</p>
-              <div className="space-y-1">
+              <div>
                 <p className="font-medium text-gray-900">{selectedBranch.comp}</p>
-                <p className="font-medium text-gray-600 text-sm">{selectedBranch.compAm}</p>
+                <p className="font-medium text-gray-900">{selectedBranch.compAm}</p>
               </div>
             </div>
 
@@ -434,20 +434,16 @@ const BranchTable: React.FC<BranchTableProps> = ({
             <div>
               <p className="text-sm text-gray-500">Date Opened</p>
               <p className="font-medium">{selectedBranch.dateOpened}</p>
+                <p className="font-medium">{selectedBranch.dateOpenedAm}</p>
             </div>
 
-            {selectedBranch.dateOpenedAm && (
-              <div>
-                <p className="text-sm text-gray-500">Date Opened (Amharic)</p>
-                <p className="font-medium">{selectedBranch.dateOpenedAm}</p>
-              </div>
-            )}
+            
           </div>
         </div>
       </div>
 
-      <div className="border-t p-6">
-        <div className="flex flex-wrap justify-around">
+      <div className="border-t p-2">
+        <div className="flex flex-wrap justify-between">
           <div>
             <p className="text-sm text-gray-500 mb-1">Created At:<span> {selectedBranch.createdAt} </span></p>
           </div>
@@ -457,13 +453,13 @@ const BranchTable: React.FC<BranchTableProps> = ({
         </div>
       </div>
 
-      <div className="border-t p-4 flex justify-center">
+      <div className="border-t p-2 flex justify-center">
         <button
           onClick={() => {
             setModalType(null);
             setSelectedBranch(null);
           }}
-          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 w-full transition-colors duration-200"
+          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200"
         >
           Close
         </button>
