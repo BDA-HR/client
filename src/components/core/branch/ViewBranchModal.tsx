@@ -21,14 +21,14 @@ const ViewBranchModal: React.FC<ViewBranchModalProps> = ({
   if (!selectedBranch) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
-        <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white z-10">
+        <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className='flex items-center gap-2'>
             <Eye size={20} />
             <h2 className="text-lg font-bold text-gray-800">Details</h2>
@@ -102,7 +102,7 @@ const ViewBranchModal: React.FC<ViewBranchModalProps> = ({
       </div>
 
 
-        <div className="border-t p-2">
+        <div className="border-t px-6 py-2">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <p className="text-sm text-gray-500 mb-1">Created At:<span> {selectedBranch.createdAt} </span></p>
