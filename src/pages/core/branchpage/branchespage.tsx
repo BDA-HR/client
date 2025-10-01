@@ -279,36 +279,16 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
           <motion.h1
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
+            className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
-            {companyId
-              ? `Branches for this company`
-              : "Branches for All Companies"}
+            {companyId ? `Company Branches` : "Branches for All Companies"}
           </motion.h1>
-          <p className="text-gray-600 mt-1">
-            {filteredBranches.length} branch{filteredBranches.length !== 1 ? 'es' : ''} found
-          </p>
         </div>
-
-        {companyId ? (
-          <AddBranchModal
-            onAddBranch={handleAddBranch}
-            defaultCompanyId={companyId as UUID}
-          />
-        ) : (
-          <Button
-            onClick={showAddBranchWarning}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-2"
-          >
-            <Plus size={16} />
-            Add Branch
-          </Button>
-        )}
       </motion.div>
 
       {/* Updated AddHeader with proper props */}
-      <AddHeader 
-        searchTerm={searchTerm} 
+      <AddHeader
+        searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
         onAddBranch={companyId ? handleAddBranch : undefined}
         defaultCompanyId={companyId as UUID}
