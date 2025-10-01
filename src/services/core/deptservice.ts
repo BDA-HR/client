@@ -2,7 +2,7 @@ import { api } from '../api';
 import type { DeptListDto, AddDeptDto, EditDeptDto, UUID } from '../../types/core/dept';
 
 class DepartmentService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/department`;
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Department`;
 
   async getAllDepartments(): Promise<DeptListDto[]> {
     try {

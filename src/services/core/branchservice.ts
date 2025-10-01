@@ -2,7 +2,7 @@ import { api } from '../api';
 import type { Branch, BranchListDto, AddBranchDto, EditBranchDto, BranchCompListDto, UUID } from '../../types/core/branch';
 
 class BranchService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/branch`;
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Branch`;
 
   // GET: baseurl/AllBranch
   async getAllBranches(): Promise<BranchListDto[]> {

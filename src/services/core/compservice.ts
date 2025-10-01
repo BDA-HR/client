@@ -4,7 +4,7 @@ import type { CompListDto, AddCompDto, EditCompDto} from '../../types/core/comp'
 import type { UUID } from 'crypto';
 
 class CompanyService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/company`;
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Company`;
 
   async getAllCompanies(): Promise<CompListDto[]> {
     try {

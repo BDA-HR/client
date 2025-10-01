@@ -2,7 +2,7 @@ import { api } from '../api';
 import type { PeriodListDto, AddPeriodDto, EditPeriodDto, UUID } from '../../types/core/period';
 
 class PeriodService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/period`;
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Period`;
 
   async getAllPeriods(): Promise<PeriodListDto[]> {
     try {
