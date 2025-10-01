@@ -27,8 +27,9 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const [branches, setBranches] = useState<BranchListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [companyName, setCompanyName] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState(""); // Add search state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (companyId) {
@@ -51,8 +52,6 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         branch.nameAm?.toLowerCase().includes(lowercasedSearch) ||
         branch.location?.toLowerCase().includes(lowercasedSearch) ||
         branch.code?.toLowerCase().includes(lowercasedSearch) ||
-        // You can also search by manager name if available in your data
-        // branch.manager?.toLowerCase().includes(lowercasedSearch) ||
         getBranchTypeText(branch.branchType)
           ?.toLowerCase()
           .includes(lowercasedSearch) ||
@@ -61,6 +60,14 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
           .includes(lowercasedSearch)
     );
   }, [branches, searchTerm]);
+
+  // Paginate filtered branches
+  const paginatedBranches = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredBranches.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredBranches, currentPage]);
+
+  const totalPages = Math.ceil(filteredBranches.length / itemsPerPage);
 
   const loadAllBranches = async () => {
     try {
@@ -86,13 +93,6 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       );
       setBranches(companyBranches);
 
-      if (companyBranches.length > 0) {
-        const name = companyBranches[0].compAm || companyBranches[0].comp;
-        setCompanyName(name || "this company");
-      } else {
-        setCompanyName("this company");
-      }
-
       setError(null);
     } catch (err) {
       const errorMessage =
@@ -107,9 +107,14 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
 
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
-  // Helper functions for search (you might want to move these to a utils file)
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Helper functions for search
   const getStatusText = (status: string): string => {
     switch (status) {
       case "0":
@@ -201,7 +206,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         const updated = await branchService.updateBranch(updateData);
         setBranches(branches.map((b) => (b.id === updated.id ? updated : b)));
         setError(null);
-        toast.success(`Branch status updated to ${status}`);
+        toast.success(`Branch status updated to ${getStatusText(status)}`);
       }
     } catch (err) {
       const errorMessage = "Failed to update branch status. Please try again.";
@@ -277,12 +282,14 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
             {companyId
-              ? `Branches for ${companyName}`
+              ? `Branches for this company`
               : "Branches for All Companies"}
           </motion.h1>
+          <p className="text-gray-600 mt-1">
+            {filteredBranches.length} branch{filteredBranches.length !== 1 ? 'es' : ''} found
+          </p>
         </div>
 
-        {/* Render Add Branch Modal button only if companyId is available */}
         {companyId ? (
           <AddBranchModal
             onAddBranch={handleAddBranch}
@@ -299,8 +306,13 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         )}
       </motion.div>
 
-      {/* Add the Search Component */}
-      <AddHeader searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+      {/* Updated AddHeader with proper props */}
+      <AddHeader 
+        searchTerm={searchTerm} 
+        onSearchChange={handleSearchChange}
+        onAddBranch={companyId ? handleAddBranch : undefined}
+        defaultCompanyId={companyId as UUID}
+      />
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
@@ -314,13 +326,12 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         </div>
       )}
 
-      {/* Pass filtered branches to the table */}
       <BranchTable
-        branches={filteredBranches}
-        currentPage={1}
-        totalPages={1}
+        branches={paginatedBranches}
+        currentPage={currentPage}
+        totalPages={totalPages}
         totalItems={filteredBranches.length}
-        onPageChange={() => {}}
+        onPageChange={handlePageChange}
         onBranchUpdate={handleBranchUpdate}
         onBranchStatusChange={handleBranchStatusChange}
         onBranchDelete={handleBranchDelete}

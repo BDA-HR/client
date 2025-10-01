@@ -1,34 +1,25 @@
 import { motion } from "framer-motion";
-import AddDeptModal from "./AddBranchModal";
-import type { AddDeptDto } from "../../../types/core/dept";
+import type { AddBranchDto } from "../../../types/core/branch";
 import AddBranchModal from "./AddBranchModal";
 
-interface DepartmentSearchFiltersProps {
+interface AddHeaderProps {
   searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  filters: {
-    status: string;
-    location: string;
-    companyId: string;
-  };
-  setFilters: (filters: {
-    status: string;
-    location: string;
-    companyId: string;
-  }) => void;
-  locations: string[];
-  onAddDepartment: (department: AddDeptDto) => void;
-  selectedBranchId: string;
+  onSearchChange: (term: string) => void;
+  onAddBranch?: (branch: AddBranchDto) => void;
+  selectedBranchId?: string;
+  defaultCompanyId?: string;
 }
 
-const DepartmentSearchFilters = ({
+const AddHeader = ({
   searchTerm,
-  setSearchTerm,
-  onAddDepartment,
-  selectedBranchId,
-}: DepartmentSearchFiltersProps) => {
-  const handleAddDepartment = (department: AddDeptDto) => {
-    onAddDepartment(department);
+  onSearchChange,
+  onAddBranch,
+  defaultCompanyId,
+}: AddHeaderProps) => {
+  const handleAddBranch = (branch: AddBranchDto) => {
+    if (onAddBranch) {
+      onAddBranch(branch);
+    }
   };
 
   return (
@@ -41,7 +32,7 @@ const DepartmentSearchFilters = ({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
-            Search
+            Search branches
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -61,23 +52,25 @@ const DepartmentSearchFilters = ({
               id="search"
               name="search"
               type="text"
-              placeholder="Search departments..."
-              className="block w-1/2 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+              placeholder="Search branches "
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <AddBranchModal
-            onAddBranch={handleAddDepartment}
-            branchId={selectedBranchId}
-          />
+          {onAddBranch && defaultCompanyId && (
+            <AddBranchModal
+              onAddBranch={handleAddBranch}
+              defaultCompanyId={defaultCompanyId}
+            />
+          )}
         </div>
       </div>
     </motion.div>
   );
 };
 
-export default DepartmentSearchFilters;
+export default AddHeader;
