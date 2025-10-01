@@ -76,7 +76,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
         className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
       >
         <BadgePlus size={18} />
-        Add New
+        Add Branch
       </Button>
 
       {/* Modal */}
@@ -101,9 +101,10 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 <X size={24} />
               </button>
             </div>
+
             {/* body */}
-            <div className="p-6">
-              <div className="py-4">
+            <div className="px-6">
+              <div className="py-4 space-y-3">
                 {/* Branch Names */}
                 <div className="space-y-2">
                   <Label
@@ -207,24 +208,25 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                   />
                 </div>
               </div>
-              {/* footer */}
-              <div className="border-t px-6 py-2">
-                <div className="mx-auto flex justify-center items-center gap-1.5">
-                  <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
-                    onClick={handleSubmit}
-                    disabled={!branchName.trim() || !defaultCompanyId}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer px-6"
-                    onClick={handleClose}
-                  >
-                    Cancel
-                  </Button>
-                </div>
+            </div>
+
+            {/* footer */}
+            <div className="border-t px-6 py-2">
+              <div className="mx-auto flex justify-center items-center gap-1.5">
+                <Button
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
+                  onClick={handleSubmit}
+                  disabled={!branchName.trim() || !defaultCompanyId}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer px-6"
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
               </div>
             </div>
           </motion.div>

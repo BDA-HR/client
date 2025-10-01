@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import AddDeptModal from "./AddDeptModal";
+import AddDeptModal from "./AddBranchModal";
 import type { AddDeptDto } from "../../../types/core/dept";
+import AddBranchModal from "./AddBranchModal";
 
 interface DepartmentSearchFiltersProps {
   searchTerm: string;
@@ -23,9 +24,6 @@ interface DepartmentSearchFiltersProps {
 const DepartmentSearchFilters = ({
   searchTerm,
   setSearchTerm,
-  filters,
-  setFilters,
-  locations,
   onAddDepartment,
   selectedBranchId,
 }: DepartmentSearchFiltersProps) => {
@@ -72,8 +70,8 @@ const DepartmentSearchFilters = ({
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <AddDeptModal
-            onAddDepartment={handleAddDepartment}
+          <AddBranchModal
+            onAddBranch={handleAddDepartment}
             branchId={selectedBranchId}
           />
         </div>

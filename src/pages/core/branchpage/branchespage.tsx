@@ -1,15 +1,19 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
-import { Button } from '../../../components/ui/button';
-import { Plus, ArrowLeft } from 'lucide-react';
-import BranchTable from '../../../components/core/branch/BranchTable';
-import AddBranchModal from '../../../components/core/branch/AddBranchModal';
-import { BranchSearch } from '../../../components/core/branch/BranchsSearch';
-import { branchService } from '../../../services/core/branchservice';
-import type { BranchListDto, AddBranchDto, EditBranchDto } from '../../../types/core/branch';
-import type { UUID } from '../../../types/core/branch';
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import { Button } from "../../../components/ui/button";
+import { Plus, ArrowLeft } from "lucide-react";
+import BranchTable from "../../../components/core/branch/BranchTable";
+import AddBranchModal from "../../../components/core/branch/AddBranchModal";
+import AddHeader from "../../../components/core/branch/AddHeader";
+import { branchService } from "../../../services/core/branchservice";
+import type {
+  BranchListDto,
+  AddBranchDto,
+  EditBranchDto,
+} from "../../../types/core/branch";
+import type { UUID } from "../../../types/core/branch";
 
 interface BranchesPageProps {
   onBack?: () => void;
@@ -18,13 +22,13 @@ interface BranchesPageProps {
 const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const companyId = searchParams.get('companyId');
+  const companyId = searchParams.get("companyId");
 
   const [branches, setBranches] = useState<BranchListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [companyName, setCompanyName] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState(''); // Add search state
+  const [companyName, setCompanyName] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState(""); // Add search state
 
   useEffect(() => {
     if (companyId) {
@@ -41,15 +45,20 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
     }
 
     const lowercasedSearch = searchTerm.toLowerCase();
-    return branches.filter(branch => 
-      branch.name?.toLowerCase().includes(lowercasedSearch) ||
-      branch.nameAm?.toLowerCase().includes(lowercasedSearch) ||
-      branch.location?.toLowerCase().includes(lowercasedSearch) ||
-      branch.code?.toLowerCase().includes(lowercasedSearch) ||
-      // You can also search by manager name if available in your data
-      // branch.manager?.toLowerCase().includes(lowercasedSearch) ||
-      getBranchTypeText(branch.branchType)?.toLowerCase().includes(lowercasedSearch) ||
-      getStatusText(branch.branchStat)?.toLowerCase().includes(lowercasedSearch)
+    return branches.filter(
+      (branch) =>
+        branch.name?.toLowerCase().includes(lowercasedSearch) ||
+        branch.nameAm?.toLowerCase().includes(lowercasedSearch) ||
+        branch.location?.toLowerCase().includes(lowercasedSearch) ||
+        branch.code?.toLowerCase().includes(lowercasedSearch) ||
+        // You can also search by manager name if available in your data
+        // branch.manager?.toLowerCase().includes(lowercasedSearch) ||
+        getBranchTypeText(branch.branchType)
+          ?.toLowerCase()
+          .includes(lowercasedSearch) ||
+        getStatusText(branch.branchStat)
+          ?.toLowerCase()
+          .includes(lowercasedSearch)
     );
   }, [branches, searchTerm]);
 
@@ -60,10 +69,10 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       setBranches(allBranches);
       setError(null);
     } catch (err) {
-      const errorMessage = 'Failed to load branches. Please try again later.';
+      const errorMessage = "Failed to load branches. Please try again later.";
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error('Error loading branches:', err);
+      console.error("Error loading branches:", err);
     } finally {
       setLoading(false);
     }
@@ -72,22 +81,25 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const loadCompanyBranches = async (compId: string) => {
     try {
       setLoading(true);
-      const companyBranches = await branchService.getCompanyBranches(compId as UUID);
+      const companyBranches = await branchService.getCompanyBranches(
+        compId as UUID
+      );
       setBranches(companyBranches);
 
       if (companyBranches.length > 0) {
         const name = companyBranches[0].compAm || companyBranches[0].comp;
-        setCompanyName(name || 'this company');
+        setCompanyName(name || "this company");
       } else {
-        setCompanyName('this company');
+        setCompanyName("this company");
       }
 
       setError(null);
     } catch (err) {
-      const errorMessage = 'Failed to load company branches. Please try again later.';
+      const errorMessage =
+        "Failed to load company branches. Please try again later.";
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error('Error loading company branches:', err);
+      console.error("Error loading company branches:", err);
     } finally {
       setLoading(false);
     }
@@ -100,20 +112,29 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   // Helper functions for search (you might want to move these to a utils file)
   const getStatusText = (status: string): string => {
     switch (status) {
-      case '0': return 'Active';
-      case '1': return 'Inactive';
-      case '2': return 'Under Construction';
-      default: return status;
+      case "0":
+        return "Active";
+      case "1":
+        return "Inactive";
+      case "2":
+        return "Under Construction";
+      default:
+        return status;
     }
   };
 
   const getBranchTypeText = (branchType: string): string => {
     switch (branchType) {
-      case '0': return 'Head Office';
-      case '1': return 'Regional';
-      case '2': return 'Local';
-      case '3': return 'Virtual';
-      default: return branchType;
+      case "0":
+        return "Head Office";
+      case "1":
+        return "Regional";
+      case "2":
+        return "Local";
+      case "3":
+        return "Virtual";
+      default:
+        return branchType;
     }
   };
 
@@ -122,12 +143,12 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       const newBranch = await branchService.createBranch(branchData);
       setBranches([...branches, newBranch]);
       setError(null);
-      toast.success('Branch added successfully!');
+      toast.success("Branch added successfully!");
     } catch (err) {
-      const errorMessage = 'Failed to add branch. Please try again.';
+      const errorMessage = "Failed to add branch. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error('Error adding branch:', err);
+      console.error("Error adding branch:", err);
       throw err;
     }
   };
@@ -141,7 +162,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         code: updatedBranch.code,
         location: updatedBranch.location,
         dateOpened: new Date().toISOString(),
-        branchType: 'REGULAR',
+        branchType: "REGULAR",
         branchStat: updatedBranch.branchStat,
         compId: updatedBranch.comp as UUID,
         rowVersion: updatedBranch.rowVersion,
@@ -150,12 +171,12 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       const updated = await branchService.updateBranch(updateData);
       setBranches(branches.map((b) => (b.id === updated.id ? updated : b)));
       setError(null);
-      toast.success('Branch updated successfully!');
+      toast.success("Branch updated successfully!");
     } catch (err) {
-      const errorMessage = 'Failed to update branch. Please try again.';
+      const errorMessage = "Failed to update branch. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error('Error updating branch:', err);
+      console.error("Error updating branch:", err);
       throw err;
     }
   };
@@ -171,7 +192,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
           code: branch.code,
           location: branch.location,
           dateOpened: new Date().toISOString(),
-          branchType: 'REGULAR',
+          branchType: "REGULAR",
           branchStat: status,
           compId: branch.comp as UUID,
           rowVersion: branch.rowVersion,
@@ -183,10 +204,10 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         toast.success(`Branch status updated to ${status}`);
       }
     } catch (err) {
-      const errorMessage = 'Failed to update branch status. Please try again.';
+      const errorMessage = "Failed to update branch status. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error('Error updating branch status:', err);
+      console.error("Error updating branch status:", err);
     }
   };
 
@@ -195,12 +216,12 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       await branchService.deleteBranch(id as UUID);
       setBranches(branches.filter((b) => b.id !== id));
       setError(null);
-      toast.success('Branch deleted successfully!');
+      toast.success("Branch deleted successfully!");
     } catch (err) {
-      const errorMessage = 'Failed to delete branch. Please try again.';
+      const errorMessage = "Failed to delete branch. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error('Error deleting branch:', err);
+      console.error("Error deleting branch:", err);
     }
   };
 
@@ -213,13 +234,13 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   };
 
   const showAddBranchWarning = () => {
-    const warningMessage = 'Please select a company first';
+    const warningMessage = "Please select a company first";
     setError(warningMessage);
     toast(warningMessage, {
-      icon: '⚠️',
+      icon: "⚠️",
       style: {
-        background: '#ffcc00',
-        color: '#000',
+        background: "#ffcc00",
+        color: "#000",
       },
     });
   };
@@ -255,13 +276,18 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
             animate={{ opacity: 1, x: 0 }}
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
-            {companyId ? `Branches for ${companyName}` : 'Branches for All Companies'}
+            {companyId
+              ? `Branches for ${companyName}`
+              : "Branches for All Companies"}
           </motion.h1>
         </div>
 
         {/* Render Add Branch Modal button only if companyId is available */}
         {companyId ? (
-          <AddBranchModal onAddBranch={handleAddBranch} defaultCompanyId={companyId as UUID} />
+          <AddBranchModal
+            onAddBranch={handleAddBranch}
+            defaultCompanyId={companyId as UUID}
+          />
         ) : (
           <Button
             onClick={showAddBranchWarning}
@@ -274,10 +300,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       </motion.div>
 
       {/* Add the Search Component */}
-      <BranchSearch 
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-      />
+      <AddHeader searchTerm={searchTerm} onSearchChange={handleSearchChange} />
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
