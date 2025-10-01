@@ -2,10 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { Button } from "../../../components/ui/button";
-import { Plus } from "lucide-react";
 import BranchTable from "../../../components/core/branch/BranchTable";
-import AddBranchModal from "../../../components/core/branch/AddBranchModal";
 import AddHeader from "../../../components/core/branch/AddHeader";
 import { branchService } from "../../../services/core/branchservice";
 import type {
@@ -309,18 +306,6 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
       toast.error(errorMessage);
       console.error("Error deleting branch:", err);
     }
-  };
-
-  const showAddBranchWarning = () => {
-    const warningMessage = "Please select a company first";
-    setError(warningMessage);
-    toast(warningMessage, {
-      icon: "⚠️",
-      style: {
-        background: "#ffcc00",
-        color: "#000",
-      },
-    });
   };
 
   if (loading) {
