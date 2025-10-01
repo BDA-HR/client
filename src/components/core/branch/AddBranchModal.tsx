@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { X, BadgePlus } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Label } from '../../../components/ui/label';
-import { Input } from '../../../components/ui/input';
-import { amharicRegex } from '../../../utils/amharic-regex';
-import type { AddBranchDto, UUID } from '../../../types/core/branch';
-import { BranchType } from '../../../types/core/enum';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { X, BadgePlus } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import { Label } from "../../../components/ui/label";
+import { Input } from "../../../components/ui/input";
+import { amharicRegex } from "../../../utils/amharic-regex";
+import type { AddBranchDto, UUID } from "../../../types/core/branch";
+import { BranchType } from "../../../types/core/enum";
 
 interface AddBranchModalProps {
   onAddBranch: (branch: AddBranchDto) => void;
@@ -18,21 +18,23 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
   defaultCompanyId,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [branchName, setBranchName] = useState('');
-  const [branchNameAm, setBranchNameAm] = useState('');
-  const [branchCode, setBranchCode] = useState('');
-  const [branchLocation, setBranchLocation] = useState('');
-  const [dateOpened, setDateOpened] = useState(() => new Date().toISOString().split('T')[0]);
-  const [branchType, setBranchType] = useState<keyof typeof BranchType>('0');
+  const [branchName, setBranchName] = useState("");
+  const [branchNameAm, setBranchNameAm] = useState("");
+  const [branchCode, setBranchCode] = useState("");
+  const [branchLocation, setBranchLocation] = useState("");
+  const [dateOpened, setDateOpened] = useState(
+    () => new Date().toISOString().split("T")[0]
+  );
+  const [branchType, setBranchType] = useState<keyof typeof BranchType>("0");
 
   const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
     key,
-    value
+    value,
   }));
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === '' || amharicRegex.test(value)) {
+    if (value === "" || amharicRegex.test(value)) {
       setBranchNameAm(value);
     }
   };
@@ -53,12 +55,12 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     onAddBranch(newBranch);
 
     // Reset form
-    setBranchName('');
-    setBranchNameAm('');
-    setBranchCode('');
-    setBranchLocation('');
-    setDateOpened(new Date().toISOString().split('T')[0]);
-    setBranchType('0');
+    setBranchName("");
+    setBranchNameAm("");
+    setBranchCode("");
+    setBranchLocation("");
+    setDateOpened(new Date().toISOString().split("T")[0]);
+    setBranchType("0");
     setIsOpen(false);
   };
 
@@ -69,7 +71,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
   return (
     <>
       {/* Trigger Button */}
-      <Button 
+      <Button
         onClick={() => setIsOpen(true)}
         className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
       >
@@ -103,8 +105,11 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
               <div className="space-y-4">
                 {/* Branch Names */}
                 <div className="space-y-2">
-                  <Label htmlFor="branchNameAm" className="text-sm text-gray-500">
-                    የቅርንጫፍ ስም (አማርኛ) <span className='text-red-500'>*</span>
+                  <Label
+                    htmlFor="branchNameAm"
+                    className="text-sm text-gray-500"
+                  >
+                    የቅርንጫፍ ስም (አማርኛ) <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="branchNameAm"
@@ -117,7 +122,8 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
 
                 <div className="space-y-2">
                   <Label htmlFor="branchName" className="text-sm text-gray-500">
-                    Branch Name (English) <span className='text-red-500'>*</span>
+                    Branch Name (English){" "}
+                    <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="branchName"
@@ -132,8 +138,11 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 {/* Branch Code and Date Opened - Side by Side */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="branchCode" className="text-sm text-gray-500">
-                      Branch Code <span className='text-red-500'>*</span>
+                    <Label
+                      htmlFor="branchCode"
+                      className="text-sm text-gray-500"
+                    >
+                      Branch Code <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="branchCode"
@@ -145,7 +154,10 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="dateOpened" className="text-sm text-gray-500">
+                    <Label
+                      htmlFor="dateOpened"
+                      className="text-sm text-gray-500"
+                    >
                       Date Opened
                     </Label>
                     <Input
@@ -160,12 +172,14 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
 
                 <div className="space-y-2">
                   <Label htmlFor="branchType" className="text-sm text-gray-500">
-                    Branch Type <span className='text-red-500'>*</span>
+                    Branch Type <span className="text-red-500">*</span>
                   </Label>
                   <select
                     id="branchType"
                     value={branchType}
-                    onChange={(e) => setBranchType(e.target.value as keyof typeof BranchType)}
+                    onChange={(e) =>
+                      setBranchType(e.target.value as keyof typeof BranchType)
+                    }
                     className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                   >
                     {branchTypeOptions.map((option) => (
@@ -177,8 +191,11 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="branchLocation" className="text-sm text-gray-500">
-                    Location <span className='text-red-500'>*</span>
+                  <Label
+                    htmlFor="branchLocation"
+                    className="text-sm text-gray-500"
+                  >
+                    Location <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="branchLocation"
@@ -191,21 +208,23 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
               </div>
 
               {/* Action Buttons - Kept as is */}
-              <div className="border-t pt-6 flex justify-center gap-3">
-                <Button
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
-                  onClick={handleSubmit}
-                  disabled={!branchName.trim() || !defaultCompanyId}
-                >
-                  Save
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="cursor-pointer px-6"
-                  onClick={handleClose}
-                >
-                  Cancel
-                </Button>
+              <div className="border-t px-6 py-2">
+                <div className="mx-auto flex justify-center items-center gap-1.5">
+                  <Button
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
+                    onClick={handleSubmit}
+                    disabled={!branchName.trim() || !defaultCompanyId}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer px-6"
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>
