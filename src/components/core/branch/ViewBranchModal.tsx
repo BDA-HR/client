@@ -115,12 +115,12 @@ const ViewBranchModal: React.FC<ViewBranchModalProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
               <p className="text-sm text-gray-500 mb-1">
-                Created At:<span> {selectedBranch.createdAt} </span>
+                Created At:<span> {selectedBranch.createdAt} / <span>{selectedBranch.createdAtAm}</span></span>
               </p>
             </div>
             <div>
               <p className="text-sm text-gray-500 mb-1">
-                Modified At: <span>{selectedBranch.modifiedAt}</span>
+                Modified At: <span>{selectedBranch.modifiedAt} / <span>{selectedBranch.modifiedAtAm}</span></span>
               </p>
             </div>
           </div>
