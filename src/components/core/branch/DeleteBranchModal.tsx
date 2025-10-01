@@ -29,13 +29,9 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-md w-full"
-      >
+        className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center p-3 bg-red-100 rounded-full gap-2 text-red-600 mx-auto">
-            <AlertTriangle size={32} />
-          </div>
+          <div>
           </div>
           <button
             onClick={onClose}
@@ -47,6 +43,10 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
 
         <div className="p-6">
 <div className="py-4 text-center">
+              <div className="flex items-center justify-center p-3 bg-red-100 rounded-full gap-2 text-red-600 mx-auto">
+            <AlertTriangle size={32} />
+          </div>
+
             <p className="text-lg font-medium text-red-600 mt-4">
               Are you sure you want to delete this branch?
             </p>

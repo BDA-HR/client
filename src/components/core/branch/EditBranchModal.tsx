@@ -310,7 +310,6 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
             <Button 
               type="submit"
               className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer px-6 text-white"
-              disabled={!formData.name.trim() || !formData.code.trim() || !formData.location.trim() || !formData.compId}
             >
               Save Changes
             </Button>
