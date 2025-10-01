@@ -1,22 +1,27 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import DepartmentManagementHeader from '../../../components/core/department/DeptHeader';
-import DepartmentStatsCards from '../../../components/core/department/DeptStatusCards';
-import DepartmentSearchFilters from '../../../components/core/department/DeptSearchFilters';
-import DepartmentTable from '../../../components/core/department/DeptTable';
-import EditDeptModal from '../../../components/core/department/EditDeptModal';
-import type { AddDeptDto, EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
-import { departmentService } from '../../../services/core/deptservice';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import DepartmentManagementHeader from "../../../components/core/department/DeptHeader";
+import DepartmentSearchFilters from "../../../components/core/department/DeptSearchFilters";
+import DepartmentTable from "../../../components/core/department/DeptTable";
+import EditDeptModal from "../../../components/core/department/EditDeptModal";
+import type {
+  AddDeptDto,
+  EditDeptDto,
+  DeptListDto,
+  UUID,
+} from "../../../types/core/dept";
+import { departmentService } from "../../../services/core/deptservice";
 
 const DepartmentOverview = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    status: '',
-    location: '',
-    companyId: '',
+    status: "",
+    location: "",
+    companyId: "",
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingDepartment, setEditingDepartment] = useState<DeptListDto | null>(null);
+  const [editingDepartment, setEditingDepartment] =
+    useState<DeptListDto | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [departments, setDepartments] = useState<DeptListDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,8 +40,8 @@ const DepartmentOverview = () => {
       const data = await departmentService.getAllDepartments();
       setDepartments(data);
     } catch (err) {
-      console.error('Error loading departments:', err);
-      setError('Failed to load departments. Please try again.');
+      console.error("Error loading departments:", err);
+      setError("Failed to load departments. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -45,18 +50,22 @@ const DepartmentOverview = () => {
   const handleAddDepartment = async (newDepartment: AddDeptDto) => {
     try {
       setError(null);
-      const createdDept = await departmentService.createDepartment(newDepartment);
-      setDepartments(prev => [...prev, createdDept]);
+      const createdDept = await departmentService.createDepartment(
+        newDepartment
+      );
+      setDepartments((prev) => [...prev, createdDept]);
       setCurrentPage(1);
     } catch (err) {
-      console.error('Error creating department:', err);
-      setError('Failed to create department. Please try again.');
+      console.error("Error creating department:", err);
+      setError("Failed to create department. Please try again.");
       throw err;
     }
   };
 
   const handleEditClick = (department: EditDeptDto) => {
-    const departmentToEdit = departments.find(dept => dept.id === department.id);
+    const departmentToEdit = departments.find(
+      (dept) => dept.id === department.id
+    );
     if (departmentToEdit) {
       setEditingDepartment(departmentToEdit);
       setIsEditModalOpen(true);
@@ -66,40 +75,41 @@ const DepartmentOverview = () => {
   const handleUpdateDepartment = async (updatedDepartment: EditDeptDto) => {
     try {
       setError(null);
-      const updatedDept = await departmentService.updateDepartment(updatedDepartment);
-      setDepartments(prev =>
-        prev.map(dept =>
-          dept.id === updatedDept.id ? updatedDept : dept
-        )
+      const updatedDept = await departmentService.updateDepartment(
+        updatedDepartment
+      );
+      setDepartments((prev) =>
+        prev.map((dept) => (dept.id === updatedDept.id ? updatedDept : dept))
       );
       setIsEditModalOpen(false);
       setEditingDepartment(null);
     } catch (err) {
-      console.error('Error updating department:', err);
-      setError('Failed to update department. Please try again.');
+      console.error("Error updating department:", err);
+      setError("Failed to update department. Please try again.");
       throw err;
     }
   };
 
-  const handleDepartmentStatusChange = async (departmentId: string, newStatus: "active" | "inactive") => {
+  const handleDepartmentStatusChange = async (
+    departmentId: string,
+    newStatus: "active" | "inactive"
+  ) => {
     try {
       setError(null);
-      const department = departments.find(dept => dept.id === departmentId);
+      const department = departments.find((dept) => dept.id === departmentId);
       if (department) {
         const updatedDept = await departmentService.updateDepartment({
           ...department,
-          deptStat: newStatus === 'active' ? 'Active' : 'Inactive',
-          rowVersion: department.rowVersion
+          deptStat: newStatus === "active" ? "Active" : "Inactive",
+          rowVersion: department.rowVersion,
         });
-        setDepartments(prev =>
-          prev.map(dept =>
-            dept.id === updatedDept.id ? updatedDept : dept
-          )
+        setDepartments((prev) =>
+          prev.map((dept) => (dept.id === updatedDept.id ? updatedDept : dept))
         );
       }
     } catch (err) {
-      console.error('Error updating department status:', err);
-      setError('Failed to update department status. Please try again.');
+      console.error("Error updating department status:", err);
+      setError("Failed to update department status. Please try again.");
     }
   };
 
@@ -107,25 +117,32 @@ const DepartmentOverview = () => {
     try {
       setError(null);
       await departmentService.deleteDepartment(departmentId);
-      setDepartments(prev => prev.filter(dept => dept.id !== departmentId));
+      setDepartments((prev) => prev.filter((dept) => dept.id !== departmentId));
     } catch (err) {
-      console.error('Error deleting department:', err);
-      setError('Failed to delete department. Please try again.');
+      console.error("Error deleting department:", err);
+      setError("Failed to delete department. Please try again.");
       throw err;
     }
   };
 
   // Filter departments based on search and filters
-  const filteredDepartments = departments.filter(department => {
-    const matchesSearch = 
+  const filteredDepartments = departments.filter((department) => {
+    const matchesSearch =
       department.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       department.nameAm.toLowerCase().includes(searchTerm.toLowerCase()) ||
       department.branch.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filters.status ? 
-      (filters.status === 'active' ? department.deptStat === 'Active' : department.deptStat === 'Inactive') : true;
-    const matchesLocation = filters.location ? department.branch === filters.location : true;
-    const matchesCompany = filters.companyId ? department.branchId === filters.companyId : true;
+
+    const matchesStatus = filters.status
+      ? filters.status === "active"
+        ? department.deptStat === "Active"
+        : department.deptStat === "Inactive"
+      : true;
+    const matchesLocation = filters.location
+      ? department.branch === filters.location
+      : true;
+    const matchesCompany = filters.companyId
+      ? department.branchId === filters.companyId
+      : true;
 
     return matchesSearch && matchesStatus && matchesLocation && matchesCompany;
   });
@@ -138,28 +155,25 @@ const DepartmentOverview = () => {
   );
 
   // Get unique locations for filter dropdown
-  const locations = [...new Set(departments.map(dept => dept.branch))];
-
-  // Calculate stats for cards
-  const totalDepartments = departments.length;
-  const activeDepartments = departments.filter(d => d.deptStat === 'Active').length;
-  const employeeCount = 0; // This would need to come from your API
+  const locations = [...new Set(departments.map((dept) => dept.branch))];
 
   return (
     <>
-      <motion.div 
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className={`p-4 md:p-6 bg-gray-50 min-h-screen transition-all duration-300 ${isEditModalOpen ? 'blur-sm' : ''}`}
+        className={`p-4 md:p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
+          isEditModalOpen ? "blur-sm" : ""
+        }`}
       >
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-6">
-            <DepartmentManagementHeader                   
-            onAddDepartment={handleAddDepartment}
-              branchId={filters.companyId || ''} 
-             />
-            
+            <DepartmentManagementHeader
+              onAddDepartment={handleAddDepartment}
+              branchId={filters.companyId || ""}
+            />
+
             {/* Loading State - Under Header */}
             {loading && (
               <motion.div
@@ -175,37 +189,39 @@ const DepartmentOverview = () => {
             )}
 
             {/* Error State - Under Header when no data */}
-            {error && departments.length === 0 && !loading && (
-                      <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-6"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-red-700 mt-1">{error}</p>
+            {error && !loading && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-5 h-5 text-red-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
                       </div>
                     </div>
+                    <div className="ml-3">
+                      <p className="text-red-700 mt-1">{error}</p>
+                    </div>
                   </div>
-                </motion.div>
+                </div>
+              </motion.div>
             )}
 
-            {!loading && departments.length > 0 && (
+            {!loading && (
               <>
-                <DepartmentStatsCards 
-                  totalDepartments={totalDepartments}
-                  activeDepartments={activeDepartments}
-                  employeeCount={employeeCount}
-                />
-
                 {error && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -214,10 +230,10 @@ const DepartmentOverview = () => {
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-medium">
-                        {error.includes('load') ? (
+                        {error.includes("load") ? (
                           <>
                             Failed to load departments.{" "}
-                            <button 
+                            <button
                               onClick={loadDepartments}
                               className="underline hover:text-red-800 font-semibold focus:outline-none"
                             >
@@ -225,18 +241,18 @@ const DepartmentOverview = () => {
                             </button>{" "}
                             later.
                           </>
-                        ) : error.includes('create') ? (
+                        ) : error.includes("create") ? (
                           "Failed to create department. Please try again."
-                        ) : error.includes('update') ? (
+                        ) : error.includes("update") ? (
                           "Failed to update department. Please try again."
-                        ) : error.includes('delete') ? (
+                        ) : error.includes("delete") ? (
                           "Failed to delete department. Please try again."
                         ) : (
                           error
                         )}
                       </span>
-                      <button 
-                        onClick={() => setError(null)} 
+                      <button
+                        onClick={() => setError(null)}
                         className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
                       >
                         ×
@@ -245,17 +261,17 @@ const DepartmentOverview = () => {
                   </motion.div>
                 )}
 
-                <DepartmentSearchFilters 
+                <DepartmentSearchFilters
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                   filters={filters}
                   setFilters={setFilters}
                   locations={locations}
                   onAddDepartment={handleAddDepartment}
-                  selectedBranchId={filters.companyId || ''}
+                  selectedBranchId={filters.companyId || ""}
                 />
 
-                <DepartmentTable 
+                <DepartmentTable
                   departments={paginatedDepartments}
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -267,21 +283,6 @@ const DepartmentOverview = () => {
                 />
               </>
             )}
-
-            {/* Empty State - When loading is done but no departments */}
-            {!loading && departments.length === 0 && !error && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-center py-12"
-              >
-                <div className="bg-gray-100 border border-gray-300 text-gray-700 px-6 py-8 rounded-lg max-w-md mx-auto">
-                  <p className="font-medium text-lg mb-2">No departments found</p>
-                  <p className="text-gray-600 mb-4">Get started by creating your first department.</p>
-                </div>
-              </motion.div>
-            )}
           </div>
         </div>
       </motion.div>
@@ -291,7 +292,11 @@ const DepartmentOverview = () => {
         <EditDeptModal
           department={editingDepartment}
           branches={[
-            { id: editingDepartment.branchId, name: editingDepartment.branch, nameAm: editingDepartment.branchAm },
+            {
+              id: editingDepartment.branchId,
+              name: editingDepartment.branch,
+              nameAm: editingDepartment.branchAm,
+            },
           ]}
           onEditDepartment={handleUpdateDepartment}
           isOpen={isEditModalOpen}
@@ -308,13 +313,13 @@ const DepartmentOverview = () => {
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { 
+  visible: {
+    opacity: 1,
+    transition: {
       staggerChildren: 0.1,
-      when: "beforeChildren"
-    } 
-  }
+      when: "beforeChildren",
+    },
+  },
 };
 
 export default DepartmentOverview;
