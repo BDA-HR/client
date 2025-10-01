@@ -1,7 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { X, Eye } from 'lucide-react';
-import type { BranchListDto } from '../../../types/core/branch';
+import React from "react";
+import { motion } from "framer-motion";
+import { X, Eye } from "lucide-react";
+import type { BranchListDto } from "../../../types/core/branch";
 
 interface ViewBranchModalProps {
   selectedBranch: BranchListDto | null;
@@ -22,14 +22,14 @@ const ViewBranchModal: React.FC<ViewBranchModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <Eye size={20} />
             <h2 className="text-lg font-bold text-gray-800">Details</h2>
           </div>
@@ -41,77 +41,90 @@ const ViewBranchModal: React.FC<ViewBranchModalProps> = ({
           </button>
         </div>
 
-      <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="space-y-3">
-            {/* Name Section - Combined English and Amharic */}
-            <div>
-              <p className="text-sm text-gray-500 mb-2">Name</p>
+        <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="space-y-3">
+              {/* Name Section - Combined English and Amharic */}
               <div>
-                <p className="font-medium text-gray-900">{selectedBranch.name}</p>
-                <p className="font-medium text-gray-900">{selectedBranch.nameAm}</p>
+                <p className="text-sm text-gray-500 mb-2">Name</p>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {selectedBranch.name}
+                  </p>
+                  <p className="font-medium text-gray-900">
+                    {selectedBranch.nameAm}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Company Section - Combined English and Amharic */}
-            <div>
-              <p className="text-sm text-gray-500 mb-2">Company</p>
+              {/* Company Section - Combined English and Amharic */}
               <div>
-                <p className="font-medium text-gray-900">{selectedBranch.comp}</p>
-                <p className="font-medium text-gray-900">{selectedBranch.compAm}</p>
+                <p className="text-sm text-gray-500 mb-2">Company</p>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {selectedBranch.comp}
+                  </p>
+                  <p className="font-medium text-gray-900">
+                    {selectedBranch.compAm}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <p className="text-sm text-gray-500">Branch Code</p>
-              <p className="font-medium">{selectedBranch.code}</p>
-            </div>
+              <div>
+                <p className="text-sm text-gray-500">Branch Code</p>
+                <p className="font-medium">{selectedBranch.code}</p>
+              </div>
 
-            <div>
-              <p className="text-sm text-gray-500">Location</p>
-              <p className="font-medium">{selectedBranch.location}</p>
+              <div>
+                <p className="text-sm text-gray-500">Location</p>
+                <p className="font-medium">{selectedBranch.location}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-500">Status</p>
-              <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedBranch.branchStat)}`}>
-                {getStatusText(selectedBranch.branchStat)}
-              </span>
-            </div>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                <span
+                  className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                    selectedBranch.branchStat
+                  )}`}
+                >
+                  {getStatusText(selectedBranch.branchStat)}
+                </span>
+              </div>
 
-            <div>
-              <p className="text-sm text-gray-500">Type</p>
-              <p className="font-medium text-gray-900">
-                {getBranchTypeText(selectedBranch.branchType)}
-              </p>
-            </div>
+              <div>
+                <p className="text-sm text-gray-500">Type</p>
+                <p className="font-medium text-gray-900">
+                  {getBranchTypeText(selectedBranch.branchType)}
+                </p>
+              </div>
 
-            <div>
-              <p className="text-sm text-gray-500">Date Opened</p>
-              <p className="font-medium">{selectedBranch.dateOpened}</p>
+              <div>
+                <p className="text-sm text-gray-500">Date Opened</p>
+                <p className="font-medium">{selectedBranch.dateOpened}</p>
                 <p className="font-medium">{selectedBranch.dateOpenedAm}</p>
+              </div>
             </div>
-
-            
           </div>
         </div>
-      </div>
-
 
         <div className="border-t px-6 py-2">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Created At:<span> {selectedBranch.createdAt} </span></p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Modified At: <span>{selectedBranch.modifiedAt}</span></p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">
+                Created At:<span> {selectedBranch.createdAt} </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">
+                Modified At: <span>{selectedBranch.modifiedAt}</span>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
         {/* Close Button */}
         <div className="border-t p-2 flex justify-center">
