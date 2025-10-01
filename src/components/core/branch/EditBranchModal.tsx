@@ -63,9 +63,9 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         dateOpened: branch.dateOpened
           ? new Date(branch.dateOpened).toISOString().split('T')[0]
           : new Date().toISOString().split('T')[0],
-        branchType: branch.branchType || '0',
-        branchStat: branch.branchStat || '0',
-        compId: (defaultCompanyId || '') as UUID,
+        branchType: branch.branchType?.toString() || '0',
+        branchStat: branch.branchStat?.toString() || '0',
+        compId: (defaultCompanyId as UUID) || ('' as UUID),
         rowVersion: branch.rowVersion || '',
       });
     }
@@ -100,6 +100,13 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     if (!formData.dateOpened) {
       newErrors.dateOpened = 'Date opened is required';
     }
+    if (!formData.branchType || formData.branchType === '0') {
+      newErrors.branchType = 'Branch type is required';
+    }
+    if (!formData.branchStat || formData.branchStat === '0') {
+      newErrors.branchStat = 'Status is required';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -111,9 +118,9 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
       const submitData: EditBranchDto = {
         ...formData,
         dateOpened: new Date(formData.dateOpened).toISOString(),
+        // rowVersion is automatically included from formData
       };
       onSave(submitData);
-      handleClose();
     }
   };
 
@@ -122,15 +129,19 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     onClose();
   };
 
-  const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
-    key,
-    value
-  }));
+  const branchTypeOptions = Object.entries(BranchType)
+    .filter(([key]) => isNaN(Number(key)))
+    .map(([key, value]) => ({
+      key,
+      value: value.toString()
+    }));
 
-  const branchStatOptions = Object.entries(BranchStat).map(([key, value]) => ({
-    key,
-    value
-  }));
+  const branchStatOptions = Object.entries(BranchStat)
+    .filter(([key]) => isNaN(Number(key)))
+    .map(([key, value]) => ({
+      key,
+      value: value.toString()
+    }));
 
   const getDisplayValue = (currentKey: string, options: Array<{key: string, value: string}>) => {
     const option = options.find(opt => opt.key === currentKey);
@@ -147,6 +158,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
       >
+        {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <PenBox size={20} />
@@ -161,168 +173,173 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         </div>
 
         {defaultCompanyId && (
-          <div className="bg-blue-50 p-4 mx-6 mt-4 rounded-lg border border-blue-100 hidden">
+          <div className="bg-blue-50 p-4 mx-6 mt-4 rounded-lg border border-blue-100">
             <p className="text-sm text-blue-700 font-medium">
               Editing branch for: <span className="font-semibold">{companyName || `Company ID: ${defaultCompanyId}`}</span>
             </p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="space-y-4">
-            {/* Branch Names */}
-            <div className="space-y-2">
-              <Label htmlFor="branchNameAm" className="text-sm text-gray-500">
-                Branch Name (Amharic)
-              </Label>
-              <Input
-                id="branchNameAm"
-                type="text"
-                placeholder="የምዝግብ ስም አስገባ"
-                value={formData.nameAm}
-                onChange={handleAmharicChange}
-                className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              />
-              {errors.nameAm && <p className="text-red-500 text-sm">{errors.nameAm}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="branchName" className="text-sm text-gray-500">
-                Branch Name (English)
-              </Label>
-              <Input
-                id="branchName"
-                type="text"
-                placeholder="Enter branch name"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                required
-                className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-            </div>
-
-            {/* Branch Code and Date Opened - Side by Side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Body - Wrap content in form for proper submission */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit}>
+            <div className="py-4 space-y-4">
+              {/* Branch Names */}
               <div className="space-y-2">
-                <Label htmlFor="branchCode" className="text-sm text-gray-500">
-                  Branch Code
+                <Label htmlFor="branchNameAm" className="text-sm text-gray-500">
+                  Branch Name (Amharic)
                 </Label>
                 <Input
-                  id="branchCode"
+                  id="branchNameAm"
                   type="text"
-                  placeholder="Enter branch code"
-                  value={formData.code}
-                  onChange={(e) => handleInputChange('code', e.target.value)}
-                  required
+                  placeholder="የምዝግብ ስም አስገባ"
+                  value={formData.nameAm}
+                  onChange={handleAmharicChange}
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
-                {errors.code && <p className="text-red-500 text-sm">{errors.code}</p>}
+                {errors.nameAm && <p className="text-red-500 text-sm">{errors.nameAm}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dateOpened" className="text-sm text-gray-500">
-                  Date Opened
+                <Label htmlFor="branchName" className="text-sm text-gray-500">
+                  Branch Name (English)
                 </Label>
                 <Input
-                  id="dateOpened"
-                  type="date"
-                  value={formData.dateOpened}
-                  onChange={(e) => handleInputChange('dateOpened', e.target.value)}
+                  id="branchName"
+                  type="text"
+                  placeholder="Enter branch name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   required
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
-                {errors.dateOpened && <p className="text-red-500 text-sm">{errors.dateOpened}</p>}
+                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
-            </div>
 
-            {/* Location */}
-            <div className="space-y-2">
-              <Label htmlFor="branchLocation" className="text-sm text-gray-500">
-                Location
-              </Label>
-              <Input
-                id="branchLocation"
-                type="text"
-                placeholder="Enter location"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                required
-                className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              />
-              {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
-            </div>
+              {/* Branch Code and Date Opened - Side by Side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="branchCode" className="text-sm text-gray-500">
+                    Branch Code
+                  </Label>
+                  <Input
+                    id="branchCode"
+                    type="text"
+                    placeholder="Enter branch code"
+                    value={formData.code}
+                    onChange={(e) => handleInputChange('code', e.target.value)}
+                    required
+                    className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  {errors.code && <p className="text-red-500 text-sm">{errors.code}</p>}
+                </div>
 
-            {/* Status and Branch Type - Side by Side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dateOpened" className="text-sm text-gray-500">
+                    Date Opened
+                  </Label>
+                  <Input
+                    id="dateOpened"
+                    type="date"
+                    value={formData.dateOpened}
+                    onChange={(e) => handleInputChange('dateOpened', e.target.value)}
+                    required
+                    className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  {errors.dateOpened && <p className="text-red-500 text-sm">{errors.dateOpened}</p>}
+                </div>
+              </div>
+
+              {/* Location */}
               <div className="space-y-2">
-                <Label htmlFor="branchStat" className="text-sm text-gray-500">
-                  Status
+                <Label htmlFor="branchLocation" className="text-sm text-gray-500">
+                  Location
                 </Label>
-                <Select
-                  value={formData.branchStat}
-                  onValueChange={(value) => handleInputChange('branchStat', value)}
-                >
-                  <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                    <SelectValue>
-                      {getDisplayValue(formData.branchStat, branchStatOptions)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {branchStatOptions.map((option) => (
-                      <SelectItem key={option.key} value={option.key}>
-                        {option.value}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.branchStat && <p className="text-red-500 text-sm">{errors.branchStat}</p>}
+                <Input
+                  id="branchLocation"
+                  type="text"
+                  placeholder="Enter location"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  required
+                  className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                />
+                {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="branchType" className="text-sm text-gray-500">
-                  Branch Type
-                </Label>
-                <Select
-                  value={formData.branchType}
-                  onValueChange={(value) => handleInputChange('branchType', value)}
-                >
-                  <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                    <SelectValue>
-                      {getDisplayValue(formData.branchType, branchTypeOptions)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {branchTypeOptions.map((option) => (
-                      <SelectItem key={option.key} value={option.key}>
-                        {option.value}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.branchType && <p className="text-red-500 text-sm">{errors.branchType}</p>}
+              {/* Status and Branch Type - Side by Side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="branchStat" className="text-sm text-gray-500">
+                    Status
+                  </Label>
+                  <Select
+                    value={formData.branchStat}
+                    onValueChange={(value) => handleInputChange('branchStat', value)}
+                  >
+                    <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                      <SelectValue>
+                        {getDisplayValue(formData.branchStat, branchStatOptions)}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {branchStatOptions.map((option) => (
+                        <SelectItem key={option.key} value={option.key}>
+                          {option.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.branchStat && <p className="text-red-500 text-sm">{errors.branchStat}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="branchType" className="text-sm text-gray-500">
+                    Branch Type
+                  </Label>
+                  <Select
+                    value={formData.branchType}
+                    onValueChange={(value) => handleInputChange('branchType', value)}
+                  >
+                    <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                      <SelectValue>
+                        {getDisplayValue(formData.branchType, branchTypeOptions)}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {branchTypeOptions.map((option) => (
+                        <SelectItem key={option.key} value={option.key}>
+                          {option.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.branchType && <p className="text-red-500 text-sm">{errors.branchType}</p>}
+                </div>
               </div>
+
+              {/* Hidden rowVersion - automatically included in formData from useEffect */}
             </div>
-          </div>
 
-          {/* Action Buttons - Fixed structure */}
-          <div className="border-t pt-6 flex justify-center gap-3">
-            <Button 
-              type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer px-6 text-white"
-            >
-              Save Changes
-            </Button>
-            <Button 
-              type="button"
-              variant="outline" 
-              className="cursor-pointer px-6"
-              onClick={handleClose}
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+            {/* Action Buttons - Inside form for proper submission */}
+            <div className="border-t pt-6 flex justify-center gap-3">
+              <Button 
+                type="submit"
+                className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer px-6 text-white"
+              >
+                Save Changes
+              </Button>
+              <Button 
+                type="button"
+                variant="outline" 
+                className="cursor-pointer px-6"
+                onClick={handleClose}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
       </motion.div>
     </div>
   );

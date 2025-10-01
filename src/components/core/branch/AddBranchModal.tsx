@@ -88,6 +88,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
             exit={{ opacity: 0, scale: 0.9 }}
             className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
           >
+            {/* header */}
             <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
               <div className="flex items-center gap-2">
                 <BadgePlus size={20} />
@@ -100,9 +101,9 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 <X size={24} />
               </button>
             </div>
-
-            <div className="p-6 space-y-6">
-              <div className="space-y-4">
+            {/* body */}
+            <div className="p-6">
+              <div className="py-4">
                 {/* Branch Names */}
                 <div className="space-y-2">
                   <Label
@@ -206,8 +207,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                   />
                 </div>
               </div>
-
-              {/* Action Buttons - Kept as is */}
+              {/* footer */}
               <div className="border-t px-6 py-2">
                 <div className="mx-auto flex justify-center items-center gap-1.5">
                   <Button

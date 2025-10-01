@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { BranchListDto, UUID } from "../../../types/core/branch";
-import { Button } from "../../ui/button";
+import type { BranchListDto, UUID } from "../types/core/branch";
+import { Button } from "./ui/button";
 
 interface DeleteBranchModalProps {
   branch: BranchListDto | null;
@@ -11,7 +11,7 @@ interface DeleteBranchModalProps {
   onConfirm: (branchId: UUID) => void;
 }
 
-const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
+const Modal: React.FC<DeleteBranchModalProps> = ({
   branch,
   isOpen,
   onClose,
@@ -71,4 +71,4 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
   );
 };
 
-export default DeleteBranchModal;
+export default Modal

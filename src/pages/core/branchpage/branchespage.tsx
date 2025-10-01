@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -6,6 +6,7 @@ import { Button } from '../../../components/ui/button';
 import { Plus, ArrowLeft } from 'lucide-react';
 import BranchTable from '../../../components/core/branch/BranchTable';
 import AddBranchModal from '../../../components/core/branch/AddBranchModal';
+import { BranchSearch } from '../../../components/core/branch/BranchsSearch';
 import { branchService } from '../../../services/core/branchservice';
 import type { BranchListDto, AddBranchDto, EditBranchDto } from '../../../types/core/branch';
 import type { UUID } from '../../../types/core/branch';
@@ -23,6 +24,7 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState(''); // Add search state
 
   useEffect(() => {
     if (companyId) {
@@ -31,6 +33,25 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       loadAllBranches();
     }
   }, [companyId]);
+
+  // Filter branches based on search term
+  const filteredBranches = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return branches;
+    }
+
+    const lowercasedSearch = searchTerm.toLowerCase();
+    return branches.filter(branch => 
+      branch.name?.toLowerCase().includes(lowercasedSearch) ||
+      branch.nameAm?.toLowerCase().includes(lowercasedSearch) ||
+      branch.location?.toLowerCase().includes(lowercasedSearch) ||
+      branch.code?.toLowerCase().includes(lowercasedSearch) ||
+      // You can also search by manager name if available in your data
+      // branch.manager?.toLowerCase().includes(lowercasedSearch) ||
+      getBranchTypeText(branch.branchType)?.toLowerCase().includes(lowercasedSearch) ||
+      getStatusText(branch.branchStat)?.toLowerCase().includes(lowercasedSearch)
+    );
+  }, [branches, searchTerm]);
 
   const loadAllBranches = async () => {
     try {
@@ -69,6 +90,30 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
       console.error('Error loading company branches:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
+  // Helper functions for search (you might want to move these to a utils file)
+  const getStatusText = (status: string): string => {
+    switch (status) {
+      case '0': return 'Active';
+      case '1': return 'Inactive';
+      case '2': return 'Under Construction';
+      default: return status;
+    }
+  };
+
+  const getBranchTypeText = (branchType: string): string => {
+    switch (branchType) {
+      case '0': return 'Head Office';
+      case '1': return 'Regional';
+      case '2': return 'Local';
+      case '3': return 'Virtual';
+      default: return branchType;
     }
   };
 
@@ -228,6 +273,12 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         )}
       </motion.div>
 
+      {/* Add the Search Component */}
+      <BranchSearch 
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
           {error}
@@ -240,11 +291,12 @@ const BranchesPage: React.FC<BranchesPageProps> = ({ onBack }) => {
         </div>
       )}
 
+      {/* Pass filtered branches to the table */}
       <BranchTable
-        branches={branches}
+        branches={filteredBranches}
         currentPage={1}
         totalPages={1}
-        totalItems={branches.length}
+        totalItems={filteredBranches.length}
         onPageChange={() => {}}
         onBranchUpdate={handleBranchUpdate}
         onBranchStatusChange={handleBranchStatusChange}
