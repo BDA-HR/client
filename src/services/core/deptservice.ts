@@ -16,7 +16,7 @@ class DepartmentService {
 
   async getDepartmentById(id: UUID): Promise<DeptListDto> {
     try {
-      const response = await api.get(`${this.baseUrl}/GetDepartment/${id}`);
+      const response = await api.get(`${this.baseUrl}/GetDept/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching department:', error);
@@ -26,7 +26,7 @@ class DepartmentService {
 
   async createDepartment(department: AddDeptDto): Promise<DeptListDto> {
     try {
-      const response = await api.post(`${this.baseUrl}/AddDepartment`, department);
+      const response = await api.post(`${this.baseUrl}/AddDept`, department);
       return response.data;
     } catch (error) {
       console.error('Error creating department:', error);
@@ -36,7 +36,7 @@ class DepartmentService {
 
   async updateDepartment(updateData: EditDeptDto): Promise<DeptListDto> {
     try {
-      const response = await api.put(`${this.baseUrl}/ModDepartment/${updateData.id}`, updateData);
+      const response = await api.put(`${this.baseUrl}/ModDept/${updateData.id}`, updateData);
       return response.data;
     } catch (error) {
       console.error('Error updating department:', error);
@@ -46,7 +46,7 @@ class DepartmentService {
 
   async deleteDepartment(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/DelDepartment/${id}`);
+      await api.delete(`${this.baseUrl}/DelDept/${id}`);
     } catch (error) {
       console.error('Error deleting department:', error);
       throw error;
