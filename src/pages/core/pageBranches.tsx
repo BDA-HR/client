@@ -2,15 +2,15 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import BranchTable from "../../../components/core/branch/BranchTable";
-import AddHeader from "../../../components/core/branch/AddHeader";
-import { branchService } from "../../../services/core/branchservice";
+import BranchTable from "../../components/core/branch/BranchTable";
+import AddHeader from "../../components/core/branch/AddHeader";
+import { branchService } from "../../services/core/branchservice";
 import type {
   BranchListDto,
   AddBranchDto,
   EditBranchDto,
-} from "../../../types/core/branch";
-import type { UUID } from "../../../types/core/branch";
+} from "../../types/core/branch";
+import type { UUID } from "../../types/core/branch";
 
 interface BranchesPageProps {
   onBack?: () => void;

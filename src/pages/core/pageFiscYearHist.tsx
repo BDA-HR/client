@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiscalYearTable } from '../../../components/core/fiscalyear/FiscYearTable';
-import { FiscYearSearch } from '../../../components/core/fiscalyear/FiscYearSearch';
-import { ViewFiscModal } from '../../../components/core/fiscalyear/ViewFiscModal';
-import { EditFiscModal } from '../../../components/core/fiscalyear/EditFiscModal';
-import { DeleteFiscModal } from '../../../components/core/fiscalyear/DeleteFiscModal';
-import { fiscalYearService } from '../../../services/core/fiscservice';
-import type { FiscYearListDto, EditFiscYearDto, UUID } from '../../../types/core/fisc';
+import { FiscalYearTable } from '../../components/core/fiscalyear/FiscYearTable';
+import { FiscYearSearch } from '../../components/core/fiscalyear/FiscYearSearch';
+import { ViewFiscModal } from '../../components/core/fiscalyear/ViewFiscModal';
+import { EditFiscModal } from '../../components/core/fiscalyear/EditFiscModal';
+import { DeleteFiscModal } from '../../components/core/fiscalyear/DeleteFiscModal';
+import { fiscalYearService } from '../../services/core/fiscservice';
+import type { FiscYearListDto, EditFiscYearDto, UUID } from '../../types/core/fisc';
 import { motion } from 'framer-motion';
-import { Button } from '../../../components/ui/button';
+import { Button } from '../../components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
 interface FiscalYearHistoryProps {

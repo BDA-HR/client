@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import DepartmentManagementHeader from "../../../components/core/department/DeptHeader";
-import DepartmentSearchFilters from "../../../components/core/department/DeptSearchFilters";
-import DepartmentTable from "../../../components/core/department/DeptTable";
-import EditDeptModal from "../../../components/core/department/EditDeptModal";
+import DepartmentManagementHeader from "../../components/core/department/DeptHeader";
+import DepartmentSearchFilters from "../../components/core/department/DeptSearchFilters";
+import DepartmentTable from "../../components/core/department/DeptTable";
+import EditDeptModal from "../../components/core/department/EditDeptModal";
 import type {
   AddDeptDto,
   EditDeptDto,
   DeptListDto,
   UUID,
-} from "../../../types/core/dept";
-import { departmentService } from "../../../services/core/deptservice";
+} from "../../types/core/dept";
+import { departmentService } from "../../services/core/deptservice";
 
 const DepartmentOverview = () => {
   const [searchTerm, setSearchTerm] = useState("");

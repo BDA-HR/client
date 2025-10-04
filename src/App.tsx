@@ -29,14 +29,14 @@ import BudgetList from './pages/finance/budgetpage/BudgetList';
 import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
 import GlPage from './pages/finance/generalledgerpage/GlPage';
 // import BranchOverview from './pages/core/branchpage/BranchOverview';
-import FiscalYearOverview from './pages/core/fiscalyearpage/FiscalYearOverview';
+import FiscalYearOverview from './pages/core/pageFiscYear';
 // import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
-import UserOverview from './pages/core/usermanagementpage/UserOverview';
-import DepartmentOverview from './pages/core/departmentpage/DepartmentOverview';
-import CompanyBranchesPage from './pages/core/companypage/CompanyBranchPage';
+import UserOverview from './pages/core/pageUserManagement';
+import DepartmentOverview from './pages/core/pageDepartments';
+import CompanyBranchesPage from './pages/core/pageCompanies';
 import CompanyDetailsPage from './components/core/company/CompDetails';
-import BranchesPage from './pages/core/branchpage/branchespage';
-import FiscalYearHistory from './pages/core/fiscalyearpage/FiscalYearHistory';
+import BranchesPage from './pages/core/pageBranches';
+import FiscalYearHistory from './pages/core/pageFiscYearHist';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {

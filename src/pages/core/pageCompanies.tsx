@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import CompSection from '../../../components/core/company/CompSection';
-import AllBranchs from '../../../components/core/company/AllBranches';
+import CompSection from '../../components/core/company/CompSection';
+import AllBranchs from '../../components/core/company/AllBranches';
 const CompanyBranchesPage = () => {
 
 

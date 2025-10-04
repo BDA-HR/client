@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import List from '../../../components/List/list';
+import List from '../../components/List/list';
 import { 
   GENDER_OPTIONS, 
   REGION_OPTIONS, 
   STATUS_OPTIONS, 
-} from '../../../data/list/list';
-import type { ListItem, UUID } from '../../../types/List/list';
+} from '../../data/list/list';
+import type { ListItem, UUID } from '../../types/List/list';
 
 const UserOverview: React.FC = () => {
 
