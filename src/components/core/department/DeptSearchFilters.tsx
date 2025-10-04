@@ -5,17 +5,6 @@ import type { AddDeptDto } from "../../../types/core/dept";
 interface DepartmentSearchFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  filters: {
-    status: string;
-    location: string;
-    companyId: string;
-  };
-  setFilters: (filters: {
-    status: string;
-    location: string;
-    companyId: string;
-  }) => void;
-  locations: string[];
   onAddDepartment: (department: AddDeptDto) => void;
   selectedBranchId: string;
 }
@@ -23,11 +12,7 @@ interface DepartmentSearchFiltersProps {
 const DepartmentSearchFilters = ({
   searchTerm,
   setSearchTerm,
-  filters,
-  setFilters,
-  locations,
   onAddDepartment,
-  selectedBranchId,
 }: DepartmentSearchFiltersProps) => {
   const handleAddDepartment = (department: AddDeptDto) => {
     onAddDepartment(department);
@@ -43,7 +28,7 @@ const DepartmentSearchFilters = ({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
-            Search
+            Search departments
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -64,7 +49,7 @@ const DepartmentSearchFilters = ({
               name="search"
               type="text"
               placeholder="Search departments..."
-              className="block w-1/2 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+              className="block w-full md:w-1/2 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -74,7 +59,6 @@ const DepartmentSearchFilters = ({
         <div className="flex flex-col sm:flex-row gap-3">
           <AddDeptModal
             onAddDepartment={handleAddDepartment}
-            branchId={selectedBranchId}
           />
         </div>
       </div>

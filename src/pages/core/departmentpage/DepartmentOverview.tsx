@@ -14,14 +14,8 @@ import { departmentService } from "../../../services/core/deptservice";
 
 const DepartmentOverview = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({
-    status: "",
-    location: "",
-    companyId: "",
-  });
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingDepartment, setEditingDepartment] =
-    useState<DeptListDto | null>(null);
+  const [editingDepartment, setEditingDepartment] = useState<DeptListDto | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [departments, setDepartments] = useState<DeptListDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,26 +119,13 @@ const DepartmentOverview = () => {
     }
   };
 
-  // Filter departments based on search and filters
+  // Filter departments based on search term only
   const filteredDepartments = departments.filter((department) => {
-    const matchesSearch =
+    return (
       department.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       department.nameAm.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      department.branch.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = filters.status
-      ? filters.status === "active"
-        ? department.deptStat === "Active"
-        : department.deptStat === "Inactive"
-      : true;
-    const matchesLocation = filters.location
-      ? department.branch === filters.location
-      : true;
-    const matchesCompany = filters.companyId
-      ? department.branchId === filters.companyId
-      : true;
-
-    return matchesSearch && matchesStatus && matchesLocation && matchesCompany;
+      department.branch.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   });
 
   // Pagination logic
@@ -153,9 +134,6 @@ const DepartmentOverview = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  // Get unique locations for filter dropdown
-  const locations = [...new Set(departments.map((dept) => dept.branch))];
 
   return (
     <>
@@ -169,10 +147,7 @@ const DepartmentOverview = () => {
       >
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-6">
-            <DepartmentManagementHeader
-              onAddDepartment={handleAddDepartment}
-              branchId={filters.companyId || ""}
-            />
+            <DepartmentManagementHeader />
 
             {/* Loading State - Under Header */}
             {loading && (
@@ -264,11 +239,8 @@ const DepartmentOverview = () => {
                 <DepartmentSearchFilters
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
-                  filters={filters}
-                  setFilters={setFilters}
-                  locations={locations}
                   onAddDepartment={handleAddDepartment}
-                  selectedBranchId={filters.companyId || ""}
+                  selectedBranchId=""
                 />
 
                 <DepartmentTable

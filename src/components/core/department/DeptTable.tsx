@@ -3,9 +3,7 @@ import { motion } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
-  Building,
   MoreVertical,
-  X,
   Trash2,
   Eye,
   PenBox,
@@ -13,6 +11,7 @@ import {
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import EditDeptModal from './EditDeptModal';
 import DeleteDeptModal from './DeleteDeptModal';
+import ViewDeptModal from './ViewDeptModal';
 import type { EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
 
 interface DepartmentTableProps {
@@ -36,38 +35,41 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   onDepartmentDelete,
 }) => {
   const [selectedDepartment, setSelectedDepartment] = useState<DeptListDto | null>(null);
-  const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'delete' | null>(null);
+  const [activeModal, setActiveModal] = useState<'view' | 'edit' | 'delete' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleViewDetails = (department: DeptListDto) => {
     setSelectedDepartment(department);
-    setModalType('view');
+    setActiveModal('view');
     setPopoverOpen(null);
   };
 
   const handleEdit = (department: DeptListDto) => {
     setSelectedDepartment(department);
-    setIsEditModalOpen(true);
+    setActiveModal('edit');
     setPopoverOpen(null);
   };
 
   const handleDelete = (department: DeptListDto) => {
     setSelectedDepartment(department);
-    setIsDeleteModalOpen(true);
+    setActiveModal('delete');
     setPopoverOpen(null);
   };
 
   const handleConfirmDelete = (departmentId: UUID) => {
     onDepartmentDelete(departmentId);
-    setIsDeleteModalOpen(false);
+    setActiveModal(null);
     setSelectedDepartment(null);
   };
 
   const handleSaveChanges = (updatedDepartment: EditDeptDto) => {
     onEditDepartment(updatedDepartment);
-    setIsEditModalOpen(false);
+    setActiveModal(null);
+    setSelectedDepartment(null);
+  };
+
+  const handleCloseModal = () => {
+    setActiveModal(null);
     setSelectedDepartment(null);
   };
 
@@ -151,14 +153,13 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                             {department.name}
                           </div>
                           <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                            ID: {department.id}
+                            {department.nameAm}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                       <div className="flex items-center">
-                        <Building className="text-gray-400 mr-2 h-4 w-4" />
                         <span>{department.branch}</span>
                       </div>
                     </td>
@@ -218,7 +219,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
         </div>
 
         {/* Pagination */}
-        <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+        <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
               onClick={() => onPageChange(Math.max(1, currentPage - 1))}
@@ -280,114 +281,36 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
         </div>
       </motion.div>
 
+      {/* View Details Modal */}
+      {activeModal === 'view' && (
+        <ViewDeptModal
+          selectedDepartment={selectedDepartment}
+          onClose={handleCloseModal}
+          getStatusColor={getStatusColor}
+        />
+      )}
+
       {/* Edit Modal */}
-      {selectedDepartment && (
+      {activeModal === 'edit' && selectedDepartment && (
         <EditDeptModal
           department={selectedDepartment}
           branches={[
             { id: selectedDepartment.branchId, name: selectedDepartment.branch, nameAm: selectedDepartment.branchAm },
           ]}
           onEditDepartment={handleSaveChanges}
-          isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setSelectedDepartment(null);
-          }}
+          isOpen={true}
+          onClose={handleCloseModal}
         />
       )}
 
       {/* Delete Modal */}
-      <DeleteDeptModal
-        department={selectedDepartment}
-        isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedDepartment(null);
-        }}
-        onConfirm={handleConfirmDelete}
-      />
-
-      {/* View Details Modal */}
-      {selectedDepartment && modalType === 'view' && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-          >
-            <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white z-10">
-              <div>
-                <h2 className="text-2xl font-bold">{selectedDepartment.name}</h2>
-                <p className="text-gray-600">{selectedDepartment.branch}</p>
-              </div>
-              <button
-                onClick={() => {
-                  setModalType(null);
-                  setSelectedDepartment(null);
-                }}
-                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Department Information</h3>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">English Name</p>
-                    <p className="font-medium">{selectedDepartment.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Amharic Name</p>
-                    <p className="font-medium">{selectedDepartment.nameAm}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Branch</p>
-                    <p>{selectedDepartment.branch}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Status</p>
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedDepartment.deptStat)}`}>
-                      {selectedDepartment.deptStat}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Additional Details</h3>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Department ID</p>
-                    <p className="font-mono text-sm">{selectedDepartment.id}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Branch ID</p>
-                    <p className="font-mono text-sm">{selectedDepartment.branchId}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Row Version</p>
-                    <p className="font-mono text-sm">{selectedDepartment.rowVersion}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t p-4 flex justify-end">
-              <button
-                onClick={() => {
-                  setModalType(null);
-                  setSelectedDepartment(null);
-                }}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        </div>
+      {activeModal === 'delete' && (
+        <DeleteDeptModal
+          department={selectedDepartment}
+          isOpen={true}
+          onClose={handleCloseModal}
+          onConfirm={handleConfirmDelete}
+        />
       )}
     </>
   );

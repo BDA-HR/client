@@ -1,14 +1,6 @@
 import { motion } from "framer-motion";
-import type { AddDeptDto } from "../../../types/core/dept";
 
-interface DepartmentManagementHeaderProps {
-  onAddDepartment: (department: AddDeptDto) => void;
-  branchId: string;
-}
-
-const DepartmentManagementHeader: React.FC<
-  DepartmentManagementHeaderProps
-> = () => {
+const DepartmentManagementHeader = () => {
   return (
     <motion.div
       initial={{ y: -20, opacity: 0 }}
