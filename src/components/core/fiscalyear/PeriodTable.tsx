@@ -223,7 +223,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
         
         {/* Pagination */}
         {periods.length > 0 && (
-          <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+          <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}

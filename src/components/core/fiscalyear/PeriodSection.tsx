@@ -4,6 +4,7 @@ import { BadgePlus, XCircleIcon } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { AddPeriodModal } from './AddPeriodModal';
 import { PeriodTable } from './PeriodTable';
+import { ViewPeriodModal } from './ViewPeriodModal';
 import EditPeriodModal from './EditPeriodModal';
 import { DeletePeriodModal } from './DeletePeriodModal';
 import type { AddPeriodDto, PeriodListDto, EditPeriodDto, UUID } from '../../../types/core/period';
@@ -12,6 +13,7 @@ import toast from 'react-hot-toast';
 
 function PeriodSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,8 +21,8 @@ function PeriodSection() {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(null);
   const [periods, setPeriods] = useState<PeriodListDto[]>([]);
-  const [loading, setLoading] = useState(true); // Changed to true initially
-  const [error, setError] = useState<string | null>(null); // Added error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
     name: '',
@@ -39,11 +41,11 @@ function PeriodSection() {
   const fetchPeriods = async () => {
     try {
       setLoading(true);
-      setError(null); // Clear error on new fetch
+      setError(null);
       const periodsData = await periodService.getAllPeriods();
       setPeriods(periodsData);
       setTotalItems(periodsData.length);
-      setTotalPages(Math.ceil(periodsData.length / 10)); // Assuming 10 items per page
+      setTotalPages(Math.ceil(periodsData.length / 10));
     } catch (err) {
       console.error('Error fetching periods:', err);
       setError('Failed to load periods. Please try again later.');
@@ -55,7 +57,7 @@ function PeriodSection() {
   const handleAddPeriod = async () => {
     try {
       toast.loading('Adding period...');
-      setError(null); // Clear error before operation
+      setError(null);
       const createdPeriod = await periodService.createPeriod(newPeriod);
       setPeriods(prev => [createdPeriod, ...prev]);
       setNewPeriod({
@@ -81,7 +83,7 @@ function PeriodSection() {
   const handleEditPeriod = async (periodData: EditPeriodDto) => {
     try {
       toast.loading('Updating period...');
-      setError(null); // Clear error before operation
+      setError(null);
       const updatedPeriod = await periodService.updatePeriod(periodData);
       setPeriods(prev => prev.map(p => p.id === updatedPeriod.id ? updatedPeriod : p));
       setIsEditModalOpen(false);
@@ -99,7 +101,7 @@ function PeriodSection() {
   const handleDeletePeriod = async (periodId: UUID) => {
     try {
       toast.loading('Deleting period...');
-      setError(null); // Clear error before operation
+      setError(null);
       await periodService.deletePeriod(periodId);
       setPeriods(prev => prev.filter(p => p.id !== periodId));
       setIsDeleteModalOpen(false);
@@ -114,8 +116,8 @@ function PeriodSection() {
   };
 
   const handleViewDetails = (period: PeriodListDto) => {
-    console.log('View details:', period);
-    // You can implement a details view modal here if needed
+    setSelectedPeriod(period);
+    setIsViewModalOpen(true);
   };
 
   const handleEdit = (period: PeriodListDto) => {
@@ -188,7 +190,7 @@ function PeriodSection() {
         </div>
       )}
 
-      {/* No periods message - Show when not loading and periods array is empty */}
+      {/* No periods message */}
       {!loading && periods.length === 0 && !error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -207,10 +209,10 @@ function PeriodSection() {
         </motion.div>
       )}
 
-      {/* Periods Table - Show when not loading and periods exist */}
+      {/* Periods Table */}
       {!loading && periods.length > 0 && (
         <PeriodTable
-          periods={periods}
+          periods={periods.slice((currentPage - 1) * 10, currentPage * 10)}
           currentPage={currentPage}
           totalPages={totalPages}
           totalItems={totalItems}
@@ -229,6 +231,13 @@ function PeriodSection() {
         newPeriod={newPeriod}
         setNewPeriod={setNewPeriod}
         onAddPeriod={handleAddPeriod}
+      />
+
+      {/* View Period Modal */}
+      <ViewPeriodModal
+        period={selectedPeriod}
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
       />
 
       {/* Edit Period Modal */}
