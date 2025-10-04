@@ -138,7 +138,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                   animate="visible"
                   className="transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-1 whitespace-nowrap">
                     <div className="flex items-center">
                       <motion.div 
                         whileHover={{ rotate: 10 }}
@@ -156,28 +156,28 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900">
                     <div className="flex items-center">
                       <Clock className="text-gray-400 mr-2 h-4 w-4" />
                       <span>{getDuration(period.startDate, period.endDate)}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                  <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                       {period.quarter}
                     </span>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                  <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
                     <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
                       {period.fiscYear}
                     </span>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                  <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(period.isActive)}`}>
                       {period.isActive === "true" ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">
                     <Popover open={popoverOpen === period.id} onOpenChange={(open) => setPopoverOpen(open ? period.id : null)}>
                       <PopoverTrigger asChild>
                         <motion.button 

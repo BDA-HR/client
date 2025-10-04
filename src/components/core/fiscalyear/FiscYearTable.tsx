@@ -116,7 +116,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                 animate="visible"
                 className="transition-colors hover:bg-gray-50"
               >
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td className="px-4 py-1 whitespace-nowrap">
                   <div className="flex items-center">
                     <motion.div 
                       whileHover={{ rotate: 10 }}
@@ -131,17 +131,17 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-center">
+                <td className="px-4 py-1 whitespace-nowrap text-center">
                   <div className="text-sm font-medium text-gray-900">
                     {getDuration(year.startDate, year.endDate)}
                   </div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                   <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(year.isActive)}`}>
                     {year.isActive === "Yes" ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">
                   <Popover open={popoverOpen === year.id} onOpenChange={(open) => setPopoverOpen(open ? year.id : null)}>
                     <PopoverTrigger asChild>
                       <motion.button 

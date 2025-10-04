@@ -138,7 +138,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                     variants={rowVariants}
                     className="transition-colors hover:bg-gray-50"
                   >
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-1 whitespace-nowrap">
                       <div className="flex items-center">
                         <motion.div 
                           whileHover={{ rotate: 10 }}
@@ -158,22 +158,22 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                       <div className="flex items-center">
                         <span>{department.branch}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                       <div className="text-sm text-gray-900">
                         {department.nameAm}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(department.deptStat)}`}>
                         {department.deptStat}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">
                       <Popover open={popoverOpen === department.id} onOpenChange={(open) => setPopoverOpen(open ? department.id : null)}>
                         <PopoverTrigger asChild>
                           <motion.button 

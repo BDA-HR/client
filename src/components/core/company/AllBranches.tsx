@@ -160,7 +160,7 @@ const AllBranchs: React.FC = () => {
                     animate="visible"
                     className="transition-colors hover:bg-gray-50"
                   >
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-1 whitespace-nowrap">
                       <div className="flex items-center">
                         <motion.div 
                           whileHover={{ rotate: 10 }}
@@ -178,27 +178,27 @@ const AllBranchs: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(branch.branchType)}`}>
                         {getBranchTypeText(branch.branchType)}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
                         {getStatusText(branch.branchStat)}
                       </span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
                       <div className="flex items-center">
                         <span className="truncate max-w-[120px]">{branch.location}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                       <div className="flex items-center">
                         <span className="truncate max-w-[120px]">{branch.comp}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                       <div className="flex items-center">
                         <span>{branch.dateOpened}</span>
                       </div>
