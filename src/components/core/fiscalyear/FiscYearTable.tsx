@@ -107,7 +107,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
             </motion.tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {years.map((year, index) => ( // Changed back from tempYears to years
+            {years.map((year, index) => (
               <motion.tr 
                 key={year.id}
                 custom={index}
