@@ -47,7 +47,7 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg shadow-sm p-3 w-1/2"
+      className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg shadow-sm p-3 w-2/3"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -66,7 +66,9 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
         </div>
         
         <div className="text-right">
-          <div className="text-sm font-bold text-emerald-600">Current</div>
+          <div className="inline-block px-2 py-1 text-xs font-bold text-emerald-600 bg-emerald-100 rounded-full">
+            Current
+          </div>
           <div className="text-xs text-gray-500">FY</div>
         </div>
       </div>
@@ -74,13 +76,13 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
       <div className="mt-2 pt-2 border-t border-emerald-100">
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
-            <span className="text-gray-500">Start:</span>
+            <span className="text-gray-500">Start date:</span>
             <div className="font-medium text-gray-900 text-lg">
               {activeYear.startDate} / {activeYear.startDateAm}
             </div>
           </div>
           <div>
-            <span className="text-gray-500">End:</span>
+            <span className="text-gray-500">End date:</span>
             <div className="font-medium text-gray-900 text-lg">
               {activeYear.endDate} / {activeYear.endDateAm}
             </div>

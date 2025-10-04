@@ -1,13 +1,8 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogClose
-} from '../../../components/ui/dialog';
-import { Button } from '../../../components/ui/button';
-import { AlertTriangle, Calendar } from 'lucide-react';
-import type { FiscYearListDto, UUID } from '../../../types/core/fisc';
+import React from "react";
+import { motion } from "framer-motion";
+import { AlertTriangle } from "lucide-react";
+import type { FiscYearListDto, UUID } from "../../../types/core/fisc";
+import { Button } from "../../../components/ui/button";
 
 interface DeleteFiscModalProps {
   fiscalYear: FiscYearListDto | null;
@@ -22,56 +17,56 @@ export const DeleteFiscModal: React.FC<DeleteFiscModalProps> = ({
   onClose, 
   onConfirm 
 }) => {
+  if (!isOpen || !fiscalYear) return null;
+
   const handleConfirm = () => {
-    if (fiscalYear) {
-      onConfirm(fiscalYear.id);
-    }
+    onConfirm(fiscalYear.id);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]"
-      onInteractOutside={(e) => e.preventDefault()} >
-        <DialogHeader>
-          <div className="flex items-center justify-center p-2 bg-red-100 rounded-full gap-2 text-red-600 mx-auto">
-            <AlertTriangle size={24} />
-          </div>
-        </DialogHeader>
-        {fiscalYear && (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-white rounded-xl shadow-xl max-w-4xl w-1/3 max-h-[90vh] overflow-y-auto"
+      >
+        {/* Modal Body */}
+        <div className="p-6">
           <div className="py-4 text-center">
-            <div className="flex items-center justify-center mb-3">
-              <Calendar className="text-gray-600 mr-2" size={20} />
-              <p className="font-medium text-lg">{fiscalYear.name}</p>
+            <div className="flex items-center justify-center p-3 rounded-full gap-2 text-red-600 mx-auto">
+              <AlertTriangle size={50} />
             </div>
-            <p className="text-sm text-gray-600 mb-2">
-              {new Date(fiscalYear.dateStart).toLocaleDateString()} - {new Date(fiscalYear.dateEnd).toLocaleDateString()}
+
+            <p className="text-lg font-medium text-red-600 mt-4">
+              Are you sure you want to delete this fiscal year?
             </p>
-            <p className="text-sm text-gray-500">
-              Status: <span className={fiscalYear.isActive === 'Yes' ? 'text-green-600' : 'text-gray-600'}>
-                {fiscalYear.isActive === 'Yes' ? 'Active' : 'Inactive'}
-              </span>
-            </p>
-            <p className="text-sm text-red-600 mt-4 font-medium">
-              Are you sure you want to delete this fiscal year? This action cannot be undone.
+            <p className="text-sm text-red-600 mt-2">
+              This action cannot be undone.
             </p>
           </div>
-        )}
-        
-        <DialogFooter className="flex justify-center items-center gap-1.5 border-t pt-6">
-          <Button 
-            variant="destructive" 
-            onClick={handleConfirm}
-            className="cursor-pointer px-6"
-          >
-            Delete Fiscal Year
-          </Button>
-          <DialogClose asChild>
-            <Button variant="outline" className="cursor-pointer px-6">
+        </div>
+
+        {/* Modal Footer */}
+        <div className="border-t px-6 py-2">
+          <div className="mx-auto flex justify-center items-center gap-1.5">
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              className="cursor-pointer px-6"
+            >
+              Delete
+            </Button>
+            <Button
+              onClick={onClose}
+              variant="outline"
+              className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
+            >
               Cancel
             </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 };

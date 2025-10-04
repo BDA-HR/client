@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, Trash2, PenBox } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Eye, Trash2, PenBox } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { FiscYearListDto } from '../../../types/core/fisc';
 
@@ -95,19 +95,19 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                 Fiscal Year
               </th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                 Duration
               </th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell whitespace-nowrap">
                 Status
               </th>
-              <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                 Actions
               </th>
             </motion.tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {years.map((year, index) => (
+            {years.map((year, index) => ( // Changed back from tempYears to years
               <motion.tr 
                 key={year.id}
                 custom={index}
@@ -125,31 +125,15 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                       <Calendar className="text-emerald-600 h-5 w-5" />
                     </motion.div>
                     <div className="ml-3">
-                      <div className={`text-sm font-medium truncate max-w-[120px] md:max-w-none ${getYearColor(year.name)}`}>
+                      <div className={`text-md font-medium truncate max-w-[120px] md:max-w-none ${getYearColor(year.name)}`}>
                         {year.name}
-                      </div>
-                      <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                        {getDuration(year.startDate, year.endDate)}
                       </div>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <motion.div 
-                      whileHover={{ rotate: 10 }}
-                      className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
-                    >
-                      <Clock className="text-blue-600 h-5 w-5" />
-                    </motion.div>
-                    <div className="ml-3">
-                      <div className="text-sm font-medium truncate max-w-[120px] md:max-w-none text-gray-900">
-                        Duration
-                      </div>
-                      <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                        {getDuration(year.startDate, year.endDate)}
-                      </div>
-                    </div>
+                <td className="px-4 py-4 whitespace-nowrap text-center">
+                  <div className="text-sm font-medium text-gray-900">
+                    {getDuration(year.startDate, year.endDate)}
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
@@ -201,7 +185,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
         </table>
         
         {/* Pagination */}
-        <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+        <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
               onClick={() => onPageChange(Math.max(1, currentPage - 1))}

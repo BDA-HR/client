@@ -1,8 +1,8 @@
-import { BadgePlus } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '../../ui/dialog';
+import { motion } from 'framer-motion';
+import { X, BadgePlus } from 'lucide-react';
+import { Button } from '../../ui/button';
 import type { AddFiscYearDto } from '../../../types/core/fisc';
 import React from 'react';
-import { Button } from '../../ui/button';
 import toast from 'react-hot-toast';
 
 export const AddFiscalYearModal = ({
@@ -72,100 +72,117 @@ export const AddFiscalYearModal = ({
     onOpenChange(false);
   };
 
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl"
-      onInteractOutside={(e) => e.preventDefault()} 
-      >
-        <DialogHeader className='border-b pb-3 flex flex-row justify-between items-center'>
-          <div className="flex justify-between items-center">
-            <div>
-              <DialogTitle className='flex items-center gap-2'> <BadgePlus size={20} /> Add New</DialogTitle>
-              <DialogDescription className='hidden'>
-                Fill in the details below to create a new fiscal year period.
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-6 mt-4">
-            {/* Name */}
-            <div>
-              <label htmlFor="yearName" className="block text-sm font-medium text-gray-700 mb-1">
-                Fiscal Year Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="yearName"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                placeholder="e.g., FY 2025"
-                value={newYear.name}
-                onChange={(e) => setNewYear({ ...newYear, name: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              {/* Start Date */}
-              <div className='space-y-4'>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="startDate"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                  value={newYear.dateStart ? newYear.dateStart.split('T')[0] : newYear.dateStart}
-                  onChange={(e) => setNewYear({ 
-                    ...newYear, 
-                    dateStart: e.target.value
-                  })}
-                  required
-                />
+    <>
+      {/* Modal */}
+      {open && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            {/* header */}
+            <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
+              <div className="flex items-center gap-2">
+                <BadgePlus size={20} />
+                <h2 className="text-lg font-bold text-gray-800">Add New</h2>
               </div>
-
-              {/* End Date */}
-              <div className='space-y-4'>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="endDate"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                  value={newYear.dateEnd ? newYear.dateEnd.split('T')[0] : newYear.dateEnd}
-                  onChange={(e) => setNewYear({ 
-                    ...newYear, 
-                    dateEnd: e.target.value
-                  })}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex flex-row-reverse justify-center items-center gap-3 mt-4 border-t pt-2 pb-0" >
-            <DialogClose asChild>
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="cursor-pointer px-6"
-                onClick={handleCancel}
+              <button
+                onClick={handleClose}
+                className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
               >
-                Cancel
-              </Button>
-            </DialogClose>
-            <Button
-              type="submit"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white cursor-pointer"
-            >
-              Save
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* body */}
+            <div className="px-6">
+              <form onSubmit={handleSubmit}>
+                <div className="py-4 space-y-3">
+                  {/* Fiscal Year Name */}
+                  <div className="space-y-2">
+                    <label htmlFor="yearName" className="block text-sm font-medium text-gray-700">
+                      Fiscal Year Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="yearName"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="e.g., FY 2025"
+                      value={newYear.name}
+                      onChange={(e) => setNewYear({ ...newYear, name: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  {/* Start and End Dates - Side by Side */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                        Start Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        id="startDate"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                        value={newYear.dateStart ? newYear.dateStart.split('T')[0] : newYear.dateStart}
+                        onChange={(e) => setNewYear({ 
+                          ...newYear, 
+                          dateStart: e.target.value
+                        })}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+                        End Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        id="endDate"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                        value={newYear.dateEnd ? newYear.dateEnd.split('T')[0] : newYear.dateEnd}
+                        onChange={(e) => setNewYear({ 
+                          ...newYear, 
+                          dateEnd: e.target.value
+                        })}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* footer */}
+                <div className="border-t px-6 py-2">
+                  <div className="mx-auto flex justify-center items-center gap-1.5">
+                    <Button
+                      type="submit"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="cursor-pointer px-6"
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </>
   );
 };

@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../../../components/ui/dialog';
+import { motion } from 'framer-motion';
+import { X, PenBox } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
-import { PenBox } from 'lucide-react';
 import type { EditFiscYearDto, FiscYearListDto, UUID } from '../../../types/core/fisc';
 
 interface EditFiscModalProps {
@@ -103,7 +98,6 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
     if (validateForm()) {
       const submitData: EditFiscYearDto = {
         ...formData,
-        // Remove the Date conversion - send the string directly
         dateStart: formData.dateStart,
         dateEnd: formData.dateEnd,
       };
@@ -117,70 +111,83 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent 
-        className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto"
-        onInteractOutside={(e) => e.preventDefault()}
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-white rounded-xl shadow-xl max-w-2xl w-full"
       >
-        <DialogHeader className="border-b pb-3">
-          <DialogTitle className="flex items-center gap-2">
+        {/* Header */}
+        <div className="flex justify-between items-center border-b px-6 py-4">
+          <div className="flex items-center gap-2">
             <PenBox size={20} />
-            Edit Fiscal Year
-          </DialogTitle>
-        </DialogHeader>
+            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
+          </div>
+          <button
+            onClick={handleClose}
+            className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fiscalYearName" className="text-base font-medium">
-                Fiscal Year Name
-              </Label>
-              <Input
-                id="fiscalYearName"
-                type="text"
-                placeholder="e.g., FY 2025"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                required
-                className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+        {/* Body */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-4">
+              {/* Fiscal Year Name */}
               <div className="space-y-2">
-                <Label htmlFor="startDate" className="text-base font-medium">
-                  Start Date
+                <Label htmlFor="fiscalYearName" className="text-sm text-gray-500">
+                  Fiscal Year Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="startDate"
-                  type="date"
-                  value={formData.dateStart}
-                  onChange={(e) => handleInputChange('dateStart', e.target.value)}
-                  required
-                  className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  id="fiscalYearName"
+                  type="text"
+                  placeholder="e.g., FY 2025"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
-                {errors.dateStart && <p className="text-red-500 text-sm">{errors.dateStart}</p>}
+                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="endDate" className="text-base font-medium">
-                  End Date
-                </Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={formData.dateEnd}
-                  onChange={(e) => handleInputChange('dateEnd', e.target.value)}
-                  required
-                  className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-                />
-                {errors.dateEnd && <p className="text-red-500 text-sm">{errors.dateEnd}</p>}
-              </div>
-            </div>
+              {/* Date Range */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startDate" className="text-sm text-gray-500">
+                    Start Date <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={formData.dateStart}
+                    onChange={(e) => handleInputChange('dateStart', e.target.value)}
+                    className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  {errors.dateStart && <p className="text-red-500 text-sm">{errors.dateStart}</p>}
+                </div>
 
-            <div className="space-y-2">
+                <div className="space-y-2">
+                  <Label htmlFor="endDate" className="text-sm text-gray-500">
+                    End Date <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="endDate"
+                    type="date"
+                    value={formData.dateEnd}
+                    onChange={(e) => handleInputChange('dateEnd', e.target.value)}
+                    className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  {errors.dateEnd && <p className="text-red-500 text-sm">{errors.dateEnd}</p>}
+                </div>
+              </div>
+
+              {/* Status */}
+<div className="space-y-2">
               <Label htmlFor="status" className="text-base font-medium">
                 Status
               </Label>
@@ -198,27 +205,31 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
               </Select>
               {errors.isActive && <p className="text-red-500 text-sm">{errors.isActive}</p>}
             </div>
-          </div>
+            </div>
 
-          <div className="flex justify-center items-center gap-1.5 border-t pt-6">
-            <Button
-              type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer h-11 px-8 text-base focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              disabled={!formData.name.trim() || !formData.dateStart || !formData.dateEnd}
-            >
-              Save Changes
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="h-11 px-6 text-base cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            {/* Footer */}
+            <div className="border-t pt-4">
+              <div className="flex justify-center items-center gap-3">
+                <Button
+                  type="submit"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
+                  disabled={!formData.name.trim() || !formData.dateStart || !formData.dateEnd}
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  className="cursor-pointer px-6"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </motion.div>
+    </div>
   );
 };

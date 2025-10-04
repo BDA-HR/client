@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiscalYearTable } from '../../../components/core/fiscalyear/FiscYearTable';
+import { FiscYearSearch } from '../../../components/core/fiscalyear/FiscYearSearch';
 import { ViewFiscModal } from '../../../components/core/fiscalyear/ViewFiscModal';
 import { EditFiscModal } from '../../../components/core/fiscalyear/EditFiscModal';
 import { DeleteFiscModal } from '../../../components/core/fiscalyear/DeleteFiscModal';
@@ -20,19 +21,40 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<FiscYearListDto | null>(null);
 
   const itemsPerPage = 10;
-  const totalItems = years.length;
+
+  // Filter years based on search term
+  const filteredYears = useMemo(() => {
+    if (!searchTerm.trim()) return years;
+
+    const term = searchTerm.toLowerCase().trim();
+    return years.filter(year => 
+      year.name.toLowerCase().includes(term) ||
+      year.startDate.toLowerCase().includes(term) ||
+      year.endDate.toLowerCase().includes(term) ||
+      year.isActive.toLowerCase().includes(term) ||
+      (year.isActive === 'Yes' && 'active'.includes(term)) ||
+      (year.isActive === 'No' && 'inactive'.includes(term))
+    );
+  }, [years, searchTerm]);
+
+  const totalItems = filteredYears.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const paginatedYears = years.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginatedYears = filteredYears.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   useEffect(() => {
     loadFiscalYears();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const loadFiscalYears = async () => {
     try {
@@ -128,6 +150,10 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
     }
   };
 
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -148,9 +174,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
             </span>{" "}
             History
           </h1>
-                        <p className="text-sm text-gray-600">
-                {totalItems} fiscal year{totalItems !== 1 ? 's' : ''} found
-              </p>
         </div>
 
         {/* Error Message */}
@@ -187,6 +210,11 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
         {/* Content */}
         {!loading && !error && (
           <>
+            {/* Search Component */}
+            <FiscYearSearch 
+              searchTerm={searchTerm}
+              onSearchChange={handleSearchChange}
+            />
             <FiscalYearTable
               years={paginatedYears}
               currentPage={currentPage}
