@@ -76,6 +76,10 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     name: branch.name
   }));
 
+  // Find the selected branch name to display as placeholder
+  const selectedBranchItem = branches.find(branch => branch.id === selectedBranch);
+  const branchPlaceholder = selectedBranchItem ? selectedBranchItem.name : "Select a branch";
+
   const handleSelectBranch = (item: ListItem) => {
     setSelectedBranch(item.id);
     setEditedDepartment(prev => ({ ...prev, branchId: item.id }));
@@ -136,8 +140,8 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
                 items={branchListItems}
                 selectedValue={selectedBranch}
                 onSelect={handleSelectBranch}
-                label="Select Branch"
-                placeholder="Select a branch"
+                label= "Branch"
+                placeholder={branchPlaceholder}
                 required
                 disabled={loading}
               />
