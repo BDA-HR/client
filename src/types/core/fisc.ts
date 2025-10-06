@@ -3,16 +3,16 @@ import type { BaseDto } from './BaseDto';
 
 export type { UUID };
 
-
 export interface FiscYearListDto extends BaseDto {
   name: string;
-  isActive: string;
+  isActive: '0' | '1'; // Use string literals instead of YesNo type
   dateStart: string; 
   dateEnd: string;  
-  startDate: string;
-  startDateAm: string;
-  endDate: string;
-  endDateAm: string;
+  isActiveStr: string;
+  dateStartStr: string;
+  dateStartStrAm: string;
+  dateEndStr: string;
+  dateEndStrAm: string;
 }
 
 export interface AddFiscYearDto {
@@ -26,6 +26,6 @@ export interface EditFiscYearDto {
   name: string;
   dateStart: string;
   dateEnd: string;
-  isActive: string;
+  isActive: '0' | '1'; // Using string literals instead of YesNo type
   rowVersion: string;
 }

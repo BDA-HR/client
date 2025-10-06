@@ -69,7 +69,6 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
           <div className="inline-block px-2 py-1 text-xs font-bold text-emerald-600 bg-emerald-100 rounded-full">
             Current
           </div>
-          <div className="text-xs text-gray-500">FY</div>
         </div>
       </div>
       
@@ -78,13 +77,13 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
           <div>
             <span className="text-gray-500">Start date:</span>
             <div className="font-medium text-gray-900 text-lg">
-              {activeYear.startDate} / {activeYear.startDateAm}
+              {activeYear.dateStartStr} / {activeYear.dateStartStrAm}
             </div>
           </div>
           <div>
             <span className="text-gray-500">End date:</span>
             <div className="font-medium text-gray-900 text-lg">
-              {activeYear.endDate} / {activeYear.endDateAm}
+              {activeYear.dateEndStr} / {activeYear.dateEndStrAm}
             </div>
           </div>
         </div>

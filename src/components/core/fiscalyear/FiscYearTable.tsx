@@ -133,12 +133,12 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                 </td>
                 <td className="px-4 py-1 whitespace-nowrap text-center">
                   <div className="text-sm font-medium text-gray-900">
-                    {getDuration(year.startDate, year.endDate)}
+                    {getDuration(year.dateStartStr, year.dateStartStrAm)}
                   </div>
                 </td>
                 <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                   <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(year.isActive)}`}>
-                    {year.isActive === "Yes" ? "Active" : "Inactive"}
+                    {year.isActive === "0" ? "Active" : "Inactive"}
                   </span>
                 </td>
                 <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">

@@ -36,11 +36,13 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
     const term = searchTerm.toLowerCase().trim();
     return years.filter(year => 
       year.name.toLowerCase().includes(term) ||
-      year.startDate.toLowerCase().includes(term) ||
-      year.endDate.toLowerCase().includes(term) ||
-      year.isActive.toLowerCase().includes(term) ||
-      (year.isActive === 'Yes' && 'active'.includes(term)) ||
-      (year.isActive === 'No' && 'inactive'.includes(term))
+      year.dateStartStr.toLowerCase().includes(term) ||
+      year.dateEndStr.toLowerCase().includes(term) ||
+      year.isActiveStr.toLowerCase().includes(term) ||
+      (year.isActive === '0' && 'active'.includes(term)) ||
+      (year.isActive === '1' && 'inactive'.includes(term)) ||
+      year.dateStartStrAm.toLowerCase().includes(term) ||
+      year.dateEndStrAm.toLowerCase().includes(term)
     );
   }, [years, searchTerm]);
 
@@ -73,7 +75,10 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
   const handleYearUpdate = async (updatedYear: EditFiscYearDto) => {
     try {
       // Validate dates
-      if (updatedYear.dateStart >= updatedYear.dateEnd) {
+      const startDate = new Date(updatedYear.dateStart);
+      const endDate = new Date(updatedYear.dateEnd);
+      
+      if (endDate <= startDate) {
         setError('End date must be after start date');
         return;
       }
@@ -88,7 +93,8 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
     }
   };
 
-  const handleYearStatusChange = async (yearId: UUID, newStatus: string) => {
+  // FIXED: Change parameter type from string to '0' | '1'
+  const handleYearStatusChange = async (yearId: UUID, newStatus: '0' | '1') => {
     try {
       const year = years.find(y => y.id === yearId);
       if (!year) return;
@@ -98,7 +104,7 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
         name: year.name,
         dateStart: year.dateStart,
         dateEnd: year.dateEnd,
-        isActive: newStatus,
+        isActive: newStatus, // This is now the correct type
         rowVersion: year.rowVersion || '1'
       };
       
@@ -139,7 +145,8 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
   };
 
   const handleStatusChange = (year: FiscYearListDto) => {
-    handleYearStatusChange(year.id, year.isActive === 'Yes' ? 'No' : 'Yes');
+    const newStatus: '0' | '1' = year.isActive === '0' ? '1' : '0';
+    handleYearStatusChange(year.id, newStatus);
   };
 
   const handleBackToOverview = () => {

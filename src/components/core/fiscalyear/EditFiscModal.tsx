@@ -32,7 +32,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
     name: '',
     dateStart: '',
     dateEnd: '',
-    isActive: 'Yes',
+    isActive: '0', // Default to "0" (Yes/Active)
     rowVersion: '',
   });
 
@@ -51,7 +51,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
         name: fiscalYear.name || '',
         dateStart: formatDateForInput(fiscalYear.dateStart),
         dateEnd: formatDateForInput(fiscalYear.dateEnd),
-        isActive: fiscalYear.isActive || 'Yes',
+        isActive: fiscalYear.isActive || '0',
         rowVersion: fiscalYear.rowVersion || '',
       });
     }
@@ -187,24 +187,24 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
               </div>
 
               {/* Status */}
-<div className="space-y-2">
-              <Label htmlFor="status" className="text-base font-medium">
-                Status
-              </Label>
-              <Select
-                value={formData.isActive}
-                onValueChange={(value) => handleInputChange('isActive', value)}
-              >
-                <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Yes">Active</SelectItem>
-                  <SelectItem value="No">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.isActive && <p className="text-red-500 text-sm">{errors.isActive}</p>}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-base font-medium">
+                  Status
+                </Label>
+                <Select
+                  value={formData.isActive}
+                  onValueChange={(value) => handleInputChange('isActive', value)}
+                >
+                  <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Active</SelectItem>
+                    <SelectItem value="1">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.isActive && <p className="text-red-500 text-sm">{errors.isActive}</p>}
+              </div>
             </div>
 
             {/* Footer */}
