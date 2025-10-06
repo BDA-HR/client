@@ -37,7 +37,7 @@ export default function FiscalYearOverview() {
   const paginatedYears = years.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   // Get active fiscal year
-  const activeYear = years.find(year => year.isActive === 'Yes') || null;
+  const activeYear = years.find(year => year.isActive === '0') || null;
 
   // Load fiscal years from API
   useEffect(() => {
