@@ -44,8 +44,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     code: '',
     location: '',
     dateOpened: new Date().toISOString().split('T')[0],
-    branchType: '0',
-    branchStat: '0',
+    branchType: BranchType["0"],
+    branchStat: BranchStat["0"],
     compId: (defaultCompanyId || '') as UUID,
     rowVersion: '',
   });
@@ -60,11 +60,11 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         nameAm: branch.nameAm || '',
         code: branch.code || '',
         location: branch.location || '',
-        dateOpened: branch.dateOpened
-          ? new Date(branch.dateOpened).toISOString().split('T')[0]
+        dateOpened: branch.openDate
+          ? new Date(branch.openDate).toISOString().split('T')[0]
           : new Date().toISOString().split('T')[0],
-        branchType: branch.branchType?.toString() || '0',
-        branchStat: branch.branchStat?.toString() || '0',
+        branchType: branch.branchType || BranchType["0"],
+        branchStat: branch.branchStat || BranchStat["0"],
         compId: (defaultCompanyId as UUID) || ('' as UUID),
         rowVersion: branch.rowVersion || '',
       });
@@ -78,7 +78,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     }
   };
 
-  const handleInputChange = (field: keyof EditBranchDto, value: string) => {
+  const handleInputChange = (field: keyof EditBranchDto, value: string | BranchType | BranchStat) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -100,10 +100,10 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     if (!formData.dateOpened) {
       newErrors.dateOpened = 'Date opened is required';
     }
-    if (!formData.branchType || formData.branchType === '0') {
+    if (!formData.branchType) {
       newErrors.branchType = 'Branch type is required';
     }
-    if (!formData.branchStat || formData.branchStat === '0') {
+    if (!formData.branchStat) {
       newErrors.branchStat = 'Status is required';
     }
 
@@ -118,7 +118,6 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
       const submitData: EditBranchDto = {
         ...formData,
         dateOpened: new Date(formData.dateOpened).toISOString(),
-        // rowVersion is automatically included from formData
       };
       onSave(submitData);
     }
@@ -130,22 +129,22 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
   };
 
   const branchTypeOptions = Object.entries(BranchType)
-    .filter(([key]) => isNaN(Number(key)))
+    .filter(([key]) => !isNaN(Number(key)))
     .map(([key, value]) => ({
       key,
       value: value.toString()
     }));
 
   const branchStatOptions = Object.entries(BranchStat)
-    .filter(([key]) => isNaN(Number(key)))
+    .filter(([key]) => !isNaN(Number(key)))
     .map(([key, value]) => ({
       key,
       value: value.toString()
     }));
 
-  const getDisplayValue = (currentKey: string, options: Array<{key: string, value: string}>) => {
-    const option = options.find(opt => opt.key === currentKey);
-    return option ? option.value : currentKey;
+  const getDisplayValue = (currentValue: BranchType | BranchStat, options: Array<{key: string, value: string}>) => {
+    const option = options.find(opt => opt.key === currentValue.toString());
+    return option ? option.value : currentValue.toString();
   };
 
   if (!isOpen || !branch) return null;
@@ -274,8 +273,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                     Status
                   </Label>
                   <Select
-                    value={formData.branchStat}
-                    onValueChange={(value) => handleInputChange('branchStat', value)}
+                    value={formData.branchStat.toString()}
+                    onValueChange={(value) => handleInputChange('branchStat', value as BranchStat)}
                   >
                     <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                       <SelectValue>
@@ -298,8 +297,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                     Branch Type
                   </Label>
                   <Select
-                    value={formData.branchType}
-                    onValueChange={(value) => handleInputChange('branchType', value)}
+                    value={formData.branchType.toString()}
+                    onValueChange={(value) => handleInputChange('branchType', value as BranchType)}
                   >
                     <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                       <SelectValue>

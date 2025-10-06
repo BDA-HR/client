@@ -4,6 +4,13 @@ import { X, BadgePlus } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { amharicRegex } from "../../../utils/amharic-regex";
 import type { AddBranchDto, UUID } from "../../../types/core/branch";
 import { BranchType } from "../../../types/core/enum";
@@ -25,7 +32,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
   const [dateOpened, setDateOpened] = useState(
     () => new Date().toISOString().split("T")[0]
   );
-  const [branchType, setBranchType] = useState<keyof typeof BranchType>("0");
+  const [branchType, setBranchType] = useState<BranchType>(BranchType["0"]);
 
   const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
     key,
@@ -60,7 +67,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     setBranchCode("");
     setBranchLocation("");
     setDateOpened(new Date().toISOString().split("T")[0]);
-    setBranchType("0");
+    setBranchType(BranchType["0"]);
     setIsOpen(false);
   };
 
@@ -176,20 +183,24 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                   <Label htmlFor="branchType" className="text-sm text-gray-500">
                     Branch Type <span className="text-red-500">*</span>
                   </Label>
-                  <select
-                    id="branchType"
+                  <Select
                     value={branchType}
-                    onChange={(e) =>
-                      setBranchType(e.target.value as keyof typeof BranchType)
-                    }
-                    className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    onValueChange={(value: BranchType) => setBranchType(value)}
                   >
-                    {branchTypeOptions.map((option) => (
-                      <option key={option.key} value={option.key}>
-                        {option.value}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger 
+                      id="branchType"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <SelectValue placeholder="Select branch type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {branchTypeOptions.map((option) => (
+                        <SelectItem key={option.key} value={option.key}>
+                          {option.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
