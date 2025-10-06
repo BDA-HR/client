@@ -104,8 +104,8 @@ const ViewBranchModal: React.FC<ViewBranchModalProps> = ({
 
               <div>
                 <p className="text-sm text-gray-500">Date Opened</p>
-                <p className="font-medium">{selectedBranch.dateOpened}</p>
-                <p className="font-medium">{selectedBranch.dateOpenedAm}</p>
+                <p className="font-medium">{selectedBranch.openDateStr}</p>
+                <p className="font-medium">{selectedBranch.openDateStrAm}</p>
               </div>
             </div>
           </div>

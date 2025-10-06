@@ -88,7 +88,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
       ...updatedData,
       comp: selectedBranch!.comp,
       compAm: selectedBranch!.compAm,
-      dateOpenedAm: selectedBranch!.dateOpenedAm,
+      openDateStrAm: selectedBranch!.openDateStrAm,
       isDeleted: selectedBranch!.isDeleted,
       createdAt: selectedBranch!.createdAt,
     };
@@ -226,7 +226,7 @@ const BranchTable: React.FC<BranchTableProps> = ({
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
-                      <span>{branch.dateOpened}</span>
+                      <span>{branch.openDateStr}</span>
                     </div>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">
