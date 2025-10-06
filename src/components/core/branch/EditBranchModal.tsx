@@ -63,9 +63,9 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         dateOpened: branch.openDate
           ? new Date(branch.openDate).toISOString().split('T')[0]
           : new Date().toISOString().split('T')[0],
+        // FIX: Use the string values directly from the DTO
         branchType: branch.branchType || BranchType["0"],
         branchStat: branch.branchStat || BranchStat["0"],
-        // Fix: Use branch's compId if available, otherwise fall back to defaultCompanyId
         compId: (branch.compId ? branch.compId : (defaultCompanyId || '') as UUID),
         rowVersion: branch.rowVersion || '',
       });
@@ -129,26 +129,26 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     onClose();
   };
 
-  // Fixed branch type options - properly handle enum mapping
+  // Fixed branch type options - handle string values from DTO
   const branchTypeOptions = Object.entries(BranchType)
-    .filter(([key]) => isNaN(Number(key))) // Get the string keys
+    .filter(([key]) => isNaN(Number(key))) // Get string keys
     .map(([key, value]) => ({
-      key: value.toString(), // Use the numeric value as key
-      value: key // Use the string name as display value
+      key: value.toString(), // Numeric value as string "0" or "1"
+      value: key // Display name
     }));
 
-  // Fixed branch status options - properly handle enum mapping
+  // Fixed branch status options - handle string values from DTO
   const branchStatOptions = Object.entries(BranchStat)
-    .filter(([key]) => isNaN(Number(key))) // Get the string keys
+    .filter(([key]) => isNaN(Number(key))) // Get string keys
     .map(([key, value]) => ({
-      key: value.toString(), // Use the numeric value as key
-      value: key // Use the string name as display value
+      key: value.toString(), // Numeric value as string "0" or "1"
+      value: key // Display name
     }));
 
   // Helper function to get display value for Select components
-  const getDisplayValue = (currentValue: BranchType | BranchStat, options: Array<{key: string, value: string}>) => {
-    const option = options.find(opt => opt.key === currentValue.toString());
-    return option ? option.value : '';
+  const getDisplayValue = (currentValue: string, options: Array<{key: string, value: string}>) => {
+    const option = options.find(opt => opt.key === currentValue);
+    return option ? option.value : currentValue;
   };
 
   if (!isOpen || !branch) return null;
@@ -277,8 +277,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                     Status
                   </Label>
                   <Select
-                    value={formData.branchStat.toString()}
-                    onValueChange={(value) => handleInputChange('branchStat', value as BranchStat)}
+                    value={formData.branchStat} // This should now be the string value like "0" or "1"
+                    onValueChange={(value) => handleInputChange('branchStat', value)}
                   >
                     <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                       <SelectValue placeholder="Select status">
@@ -301,8 +301,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                     Branch Type
                   </Label>
                   <Select
-                    value={formData.branchType.toString()}
-                    onValueChange={(value) => handleInputChange('branchType', value as BranchType)}
+                    value={formData.branchType}
+                    onValueChange={(value) => handleInputChange('branchType', value)}
                   >
                     <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                       <SelectValue placeholder="Select branch type">
