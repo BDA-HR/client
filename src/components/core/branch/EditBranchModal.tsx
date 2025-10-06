@@ -46,7 +46,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     dateOpened: new Date().toISOString().split('T')[0],
     branchType: BranchType["0"],
     branchStat: BranchStat["0"],
-    compId: (defaultCompanyId || '') as UUID,
+    compId: (branch?.compId||defaultCompanyId || '') as UUID,
     rowVersion: '',
   });
 
