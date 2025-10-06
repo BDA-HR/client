@@ -8,9 +8,10 @@ export interface DeptListDto extends BaseDto {
   branchId: UUID;
   name: string;
   nameAm: string;
-  deptStat: string;
+  deptStat: '0' | '1';
   branch: string;
   branchAm: string;
+  deptStatStr: string;
 }
 
 export interface AddDeptDto {

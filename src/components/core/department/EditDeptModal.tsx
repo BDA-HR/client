@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, PenBox } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import List from '../../../components/List/list';
 import type { ListItem, UUID } from '../../../types/List/list';
 import type { EditDeptDto, DeptListDto } from '../../../types/core/dept';
@@ -87,8 +88,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     }
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as DeptStat;
+  const handleStatusChange = (value: string) => {
     setEditedDepartment((prev) => ({ ...prev, deptStat: value }));
   };
 
@@ -171,23 +171,26 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
               />
             </div>
 
-            {/* Status Selection */}
+            {/* Status Selection using Select Component */}
             <div className="space-y-2">
               <Label htmlFor="edit-deptStat" className="text-sm text-gray-500">
                 Status <span className="text-red-500">*</span>
               </Label>
-              <select
-                id="edit-deptStat"
+              <Select
                 value={editedDepartment.deptStat}
-                onChange={handleStatusChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                onValueChange={handleStatusChange}
               >
-                {deptStatusOptions.map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {deptStatusOptions.map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
