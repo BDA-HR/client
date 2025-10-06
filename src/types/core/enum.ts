@@ -1,12 +1,12 @@
 export const YesNoAm = {
-  Yes: 'አዎ',
-  No: 'አይ'
+  "0": 'አዎ',
+  "1": 'አይ'
 } as const;
 export type YesNoAm = typeof YesNoAm[keyof typeof YesNoAm];
 
 export const YesNo = {
-  Yes: 'Yes',
-  No: 'No'
+  "0": 'Yes',
+  "1": 'No'
 } as const;
 export type YesNo = typeof YesNo[keyof typeof YesNo];
 
@@ -31,14 +31,15 @@ export const DeptStat = {
 } as const;
 export type DeptStat = typeof DeptStat[keyof typeof DeptStat];
 
-export const FiscStat = {
-  "0": 'Active',
-  "1": 'Inactive'
-} as const;
-export type FiscStat = typeof FiscStat[keyof typeof FiscStat];
+// Remove FiscStat since we're using YesNo for fiscal year status
+// export const FiscStat = {
+//   "0": 'Active',
+//   "1": 'Inactive'
+// } as const;
+// export type FiscStat = typeof FiscStat[keyof typeof FiscStat];
 
 export const PeriodStat = {
   "0": 'Active',
   "1": 'Inactive'
 } as const;
-export type PeriodStat = typeof FiscStat[keyof typeof PeriodStat];
+export type PeriodStat = typeof PeriodStat[keyof typeof PeriodStat];

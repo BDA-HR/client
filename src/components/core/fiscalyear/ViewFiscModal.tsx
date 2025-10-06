@@ -65,7 +65,7 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
                 </p>
               </div>
               <span className={`ml-auto px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(fiscalYear.isActive)}`}>
-                {fiscalYear.isActive === 'Yes' ? 'Active' : 'Inactive'}
+                {fiscalYear.isActive === '0' ? 'Active' : 'Inactive'}
               </span>
             </div>
           </div>
@@ -83,7 +83,7 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Start Date</p>
                   <p className="font-medium text-gray-900 text-sm">{formatDate(fiscalYear.dateStart)}</p>
-                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.startDateAm || 'N/A'}</p>
+                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.dateStartStrAm || 'N/A'}</p>
                 </div>
               </div>
               
@@ -92,7 +92,7 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
                 <div>
                   <p className="text-xs text-gray-500 mb-1">End Date</p>
                   <p className="font-medium text-gray-900 text-sm">{formatDate(fiscalYear.dateEnd)}</p>
-                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.endDateAm || 'N/A'}</p>
+                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.dateEndStrAm || 'N/A'}</p>
                 </div>
               </div>
             </div>
