@@ -9,15 +9,12 @@ import {
   PenBox,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
-import EditDeptModal from './EditDeptModal';
 import DeleteDeptModal from './DeleteDeptModal';
 import ViewDeptModal from './ViewDeptModal';
 import type { EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
-import type { BranchCompListDto } from '../../../types/core/branch';
 
 interface DepartmentTableProps {
   departments: DeptListDto[];
-  branches: BranchCompListDto[];
   currentPage: number;
   totalPages: number;
   totalItems: number;
@@ -29,7 +26,6 @@ interface DepartmentTableProps {
 
 const DepartmentTable: React.FC<DepartmentTableProps> = ({
   departments,
-  branches,
   currentPage,
   totalPages,
   totalItems,
@@ -38,7 +34,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   onDepartmentDelete,
 }) => {
   const [selectedDepartment, setSelectedDepartment] = useState<DeptListDto | null>(null);
-  const [activeModal, setActiveModal] = useState<'view' | 'edit' | 'delete' | null>(null);
+  const [activeModal, setActiveModal] = useState<'view' | 'delete' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
   const handleViewDetails = (department: DeptListDto) => {
@@ -48,8 +44,15 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
   };
 
   const handleEdit = (department: DeptListDto) => {
-    setSelectedDepartment(department);
-    setActiveModal('edit');
+    // Call the parent's edit handler directly
+    onEditDepartment({
+      id: department.id,
+      name: department.name,
+      nameAm: department.nameAm,
+      deptStat: department.deptStat,
+      branchId: department.branchId,
+      rowVersion: department.rowVersion
+    });
     setPopoverOpen(null);
   };
 
@@ -61,12 +64,6 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
 
   const handleConfirmDelete = (departmentId: UUID) => {
     onDepartmentDelete(departmentId);
-    setActiveModal(null);
-    setSelectedDepartment(null);
-  };
-
-  const handleSaveChanges = (updatedDepartment: EditDeptDto) => {
-    onEditDepartment(updatedDepartment);
     setActiveModal(null);
     setSelectedDepartment(null);
   };
@@ -290,17 +287,6 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
           selectedDepartment={selectedDepartment}
           onClose={handleCloseModal}
           getStatusColor={getStatusColor}
-        />
-      )}
-
-      {/* Edit Modal */}
-      {activeModal === 'edit' && selectedDepartment && (
-        <EditDeptModal
-          department={selectedDepartment}
-          branches={branches} // Pass all branches instead of just one
-          onEditDepartment={handleSaveChanges}
-          isOpen={true}
-          onClose={handleCloseModal}
         />
       )}
 
