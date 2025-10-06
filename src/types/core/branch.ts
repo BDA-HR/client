@@ -5,6 +5,7 @@ import type { BranchType, BranchStat } from './enum';
 export type { UUID };
 
 export interface BranchListDto extends BaseDto {
+  compId: UUID; // Added missing property
   name: string;
   nameAm: string;
   code: string;
