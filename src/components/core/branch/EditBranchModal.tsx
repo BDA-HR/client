@@ -26,7 +26,6 @@ interface FormErrors {
   dateOpened?: string;
   branchType?: string;
   branchStat?: string;
-  rowVersion?: string;
 }
 
 export const EditBranchModal: React.FC<EditBranchModalProps> = ({
@@ -52,6 +51,13 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
 
   const [errors, setErrors] = useState<FormErrors>({});
 
+  // Format date for input field (YYYY-MM-DD)
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString) return new Date().toISOString().split('T')[0];
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
   useEffect(() => {
     if (branch) {
       setFormData({
@@ -60,12 +66,10 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         nameAm: branch.nameAm || '',
         code: branch.code || '',
         location: branch.location || '',
-        dateOpened: branch.openDate
-          ? new Date(branch.openDate).toISOString().split('T')[0]
-          : new Date().toISOString().split('T')[0],
+        dateOpened: formatDateForInput(branch.openDate),
         branchType: branch.branchType || BranchType["0"],
         branchStat: branch.branchStat || BranchStat["0"],
-        compId: (defaultCompanyId as UUID) || ('' as UUID),
+        compId: branch.compId || (defaultCompanyId as UUID) || ('' as UUID),
         rowVersion: branch.rowVersion || '',
       });
     }
@@ -73,15 +77,32 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (amharicRegex.test(value) || value === '') {
+    if (value === '' || amharicRegex.test(value)) {
       setFormData((prev) => ({ ...prev, nameAm: value }));
+    }
+    if (errors.nameAm) {
+      setErrors((prev) => ({ ...prev, nameAm: undefined }));
     }
   };
 
-  const handleInputChange = (field: keyof EditBranchDto, value: string | BranchType | BranchStat) => {
+  const handleInputChange = (field: keyof EditBranchDto, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleStatusChange = (value: BranchStat) => {
+    setFormData((prev) => ({ ...prev, branchStat: value }));
+    if (errors.branchStat) {
+      setErrors((prev) => ({ ...prev, branchStat: undefined }));
+    }
+  };
+
+  const handleTypeChange = (value: BranchType) => {
+    setFormData((prev) => ({ ...prev, branchType: value }));
+    if (errors.branchType) {
+      setErrors((prev) => ({ ...prev, branchType: undefined }));
     }
   };
 
@@ -91,6 +112,9 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     if (!formData.name.trim()) {
       newErrors.name = 'Branch name is required';
     }
+    if (!formData.nameAm.trim()) {
+      newErrors.nameAm = 'Amharic branch name is required';
+    }
     if (!formData.code.trim()) {
       newErrors.code = 'Branch code is required';
     }
@@ -99,12 +123,6 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     }
     if (!formData.dateOpened) {
       newErrors.dateOpened = 'Date opened is required';
-    }
-    if (!formData.branchType) {
-      newErrors.branchType = 'Branch type is required';
-    }
-    if (!formData.branchStat) {
-      newErrors.branchStat = 'Status is required';
     }
 
     setErrors(newErrors);
@@ -128,24 +146,17 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     onClose();
   };
 
-  const branchTypeOptions = Object.entries(BranchType)
-    .filter(([key]) => !isNaN(Number(key)))
-    .map(([key, value]) => ({
-      key,
-      value: value.toString()
-    }));
+  // Get branch type options - simplified like AddBranchModal
+  const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
+    key,
+    value,
+  }));
 
-  const branchStatOptions = Object.entries(BranchStat)
-    .filter(([key]) => !isNaN(Number(key)))
-    .map(([key, value]) => ({
-      key,
-      value: value.toString()
-    }));
-
-  const getDisplayValue = (currentValue: BranchType | BranchStat, options: Array<{key: string, value: string}>) => {
-    const option = options.find(opt => opt.key === currentValue.toString());
-    return option ? option.value : currentValue.toString();
-  };
+  // Get branch status options
+  const branchStatOptions = Object.entries(BranchStat).map(([key, value]) => ({
+    key,
+    value,
+  }));
 
   if (!isOpen || !branch) return null;
 
@@ -179,37 +190,34 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
           </div>
         )}
 
-        {/* Body - Wrap content in form for proper submission */}
+        {/* Body */}
         <div className="p-6">
           <form onSubmit={handleSubmit}>
-            <div className="py-4 space-y-4">
-              {/* Branch Names */}
+            <div className="space-y-4">
+              {/* Branch Names - Amharic first like AddBranchModal */}
               <div className="space-y-2">
-                <Label htmlFor="branchNameAm" className="text-sm text-gray-500">
-                  Branch Name (Amharic)
+                <Label htmlFor="edit-branchNameAm" className="text-sm text-gray-500">
+                  የቅርንጫፍ ስም (አማርኛ) <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="branchNameAm"
-                  type="text"
-                  placeholder="የምዝግብ ስም አስገባ"
+                  id="edit-branchNameAm"
                   value={formData.nameAm}
                   onChange={handleAmharicChange}
+                  placeholder="ምሳሌ፡ ቅርንጫፍ 1"
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
                 {errors.nameAm && <p className="text-red-500 text-sm">{errors.nameAm}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="branchName" className="text-sm text-gray-500">
-                  Branch Name (English)
+                <Label htmlFor="edit-branchName" className="text-sm text-gray-500">
+                  Branch Name (English) <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="branchName"
-                  type="text"
-                  placeholder="Enter branch name"
+                  id="edit-branchName"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  required
+                  placeholder="Eg. Branch 1"
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
@@ -218,31 +226,28 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
               {/* Branch Code and Date Opened - Side by Side */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="branchCode" className="text-sm text-gray-500">
-                    Branch Code
+                  <Label htmlFor="edit-branchCode" className="text-sm text-gray-500">
+                    Branch Code <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    id="branchCode"
-                    type="text"
-                    placeholder="Enter branch code"
+                    id="edit-branchCode"
                     value={formData.code}
                     onChange={(e) => handleInputChange('code', e.target.value)}
-                    required
+                    placeholder="Eg. BR-001"
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                   />
                   {errors.code && <p className="text-red-500 text-sm">{errors.code}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="dateOpened" className="text-sm text-gray-500">
-                    Date Opened
+                  <Label htmlFor="edit-dateOpened" className="text-sm text-gray-500">
+                    Date Opened <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    id="dateOpened"
+                    id="edit-dateOpened"
                     type="date"
                     value={formData.dateOpened}
                     onChange={(e) => handleInputChange('dateOpened', e.target.value)}
-                    required
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                   />
                   {errors.dateOpened && <p className="text-red-500 text-sm">{errors.dateOpened}</p>}
@@ -251,59 +256,34 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
 
               {/* Location */}
               <div className="space-y-2">
-                <Label htmlFor="branchLocation" className="text-sm text-gray-500">
-                  Location
+                <Label htmlFor="edit-branchLocation" className="text-sm text-gray-500">
+                  Location <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="branchLocation"
-                  type="text"
-                  placeholder="Enter location"
+                  id="edit-branchLocation"
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
-                  required
+                  placeholder="Eg. Addis Ababa"
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
                 {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
               </div>
 
-              {/* Status and Branch Type - Side by Side */}
+              {/* Branch Type and Status - Side by Side */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="branchStat" className="text-sm text-gray-500">
-                    Status
+                  <Label htmlFor="edit-branchType" className="text-sm text-gray-500">
+                    Branch Type <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    value={formData.branchStat.toString()}
-                    onValueChange={(value) => handleInputChange('branchStat', value as BranchStat)}
+                    value={formData.branchType}
+                    onValueChange={(value: BranchType) => handleTypeChange(value)}
                   >
-                    <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                      <SelectValue>
-                        {getDisplayValue(formData.branchStat, branchStatOptions)}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {branchStatOptions.map((option) => (
-                        <SelectItem key={option.key} value={option.key}>
-                          {option.value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.branchStat && <p className="text-red-500 text-sm">{errors.branchStat}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="branchType" className="text-sm text-gray-500">
-                    Branch Type
-                  </Label>
-                  <Select
-                    value={formData.branchType.toString()}
-                    onValueChange={(value) => handleInputChange('branchType', value as BranchType)}
-                  >
-                    <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                      <SelectValue>
-                        {getDisplayValue(formData.branchType, branchTypeOptions)}
-                      </SelectValue>
+                    <SelectTrigger 
+                      id="edit-branchType"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <SelectValue placeholder="Select branch type" />
                     </SelectTrigger>
                     <SelectContent>
                       {branchTypeOptions.map((option) => (
@@ -315,27 +295,53 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   </Select>
                   {errors.branchType && <p className="text-red-500 text-sm">{errors.branchType}</p>}
                 </div>
-              </div>
 
-              {/* Hidden rowVersion - automatically included in formData from useEffect */}
+                <div className="space-y-2">
+                  <Label htmlFor="edit-branchStat" className="text-sm text-gray-500">
+                    Status <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={formData.branchStat}
+                    onValueChange={(value: BranchStat) => handleStatusChange(value)}
+                  >
+                    <SelectTrigger 
+                      id="edit-branchStat"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {branchStatOptions.map((option) => (
+                        <SelectItem key={option.key} value={option.key}>
+                          {option.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.branchStat && <p className="text-red-500 text-sm">{errors.branchStat}</p>}
+                </div>
+              </div>
             </div>
 
-            {/* Action Buttons - Inside form for proper submission */}
-            <div className="border-t pt-6 flex justify-center gap-3">
-              <Button 
-                type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer px-6 text-white"
-              >
-                Save Changes
-              </Button>
-              <Button 
-                type="button"
-                variant="outline" 
-                className="cursor-pointer px-6"
-                onClick={handleClose}
-              >
-                Cancel
-              </Button>
+            {/* Footer */}
+            <div className="border-t pt-6 mt-6">
+              <div className="flex justify-center items-center gap-3">
+                <Button
+                  type="submit"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
+                  disabled={!formData.name.trim() || !formData.nameAm.trim() || !formData.code.trim() || !formData.location.trim()}
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="cursor-pointer px-6"
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </form>
         </div>
