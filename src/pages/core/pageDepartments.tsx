@@ -259,17 +259,10 @@ const DepartmentOverview = () => {
         </div>
       </motion.div>
 
-      {/* Edit Department Modal */}
+      {/* Edit Department Modal - Keep this in DepartmentOverview only */}
       {isEditModalOpen && editingDepartment && (
         <EditDeptModal
           department={editingDepartment}
-          branches={[
-            {
-              id: editingDepartment.branchId,
-              name: editingDepartment.branch,
-              nameAm: editingDepartment.branchAm,
-            },
-          ]}
           onEditDepartment={handleUpdateDepartment}
           isOpen={isEditModalOpen}
           onClose={() => {

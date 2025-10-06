@@ -3,16 +3,16 @@ import { motion } from 'framer-motion';
 import { X, PenBox } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
-import type { EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
+import List from '../../../components/List/list';
+import type { ListItem, UUID } from '../../../types/List/list';
+import type { EditDeptDto, DeptListDto } from '../../../types/core/dept';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import { DeptStat } from '../../../types/core/enum';
 import type { BranchCompListDto } from '../../../types/core/branch';
-
-
+import { branchService } from '../../../services/core/branchservice';
 
 interface EditDeptModalProps {
   department: DeptListDto;
-  branches: BranchCompListDto[];
   onEditDepartment: (department: EditDeptDto) => void;
   isOpen: boolean;
   onClose: () => void;
@@ -20,11 +20,13 @@ interface EditDeptModalProps {
 
 const EditDeptModal: React.FC<EditDeptModalProps> = ({ 
   department, 
-  branches, 
   onEditDepartment, 
   isOpen,
   onClose 
 }) => {
+  const [branches, setBranches] = useState<BranchCompListDto[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState<UUID | undefined>(department.branchId);
   const [editedDepartment, setEditedDepartment] = useState<EditDeptDto>({
     id: department.id,
     name: department.name,
@@ -33,7 +35,15 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     branchId: department.branchId,
     rowVersion: department.rowVersion
   });
-  const deptStatusOptions = Object.entries(DeptStat); 
+
+  const deptStatusOptions = Object.entries(DeptStat);
+
+  // Fetch branches when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchBranches();
+    }
+  }, [isOpen]);
 
   // Update form when department prop changes
   useEffect(() => {
@@ -45,18 +55,36 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
       branchId: department.branchId,
       rowVersion: department.rowVersion
     });
+    setSelectedBranch(department.branchId);
   }, [department]);
+
+  const fetchBranches = async () => {
+    try {
+      setLoading(true);
+      const branchesData = await branchService.getBranchCompanyList();
+      setBranches(branchesData);
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const branchListItems: ListItem[] = branches.map(branch => ({
+    id: branch.id,
+    name: branch.name
+  }));
+
+  const handleSelectBranch = (item: ListItem) => {
+    setSelectedBranch(item.id);
+    setEditedDepartment(prev => ({ ...prev, branchId: item.id }));
+  };
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === '' || amharicRegex.test(value)) {
       setEditedDepartment((prev) => ({ ...prev, nameAm: value }));
     }
-  };
-
-  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as UUID;
-    setEditedDepartment((prev) => ({ ...prev, branchId: value }));
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -102,6 +130,20 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
         {/* Body */}
         <div className="px-6">
           <div className="py-4 space-y-4">
+            {/* Branch Selection using List Component */}
+            <div className="space-y-2">
+              <List
+                items={branchListItems}
+                selectedValue={selectedBranch}
+                onSelect={handleSelectBranch}
+                label="Select Branch"
+                placeholder="Select a branch"
+                required
+                disabled={loading}
+              />
+              {loading && <p className="text-sm text-gray-500">Loading branches...</p>}
+            </div>
+
             {/* Department Names */}
             <div className="space-y-2">
               <Label htmlFor="edit-nameAm" className="text-sm text-gray-500">
@@ -127,26 +169,6 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
                 placeholder="Finance"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
               />
-            </div>
-
-            {/* Branch Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="edit-branchId" className="text-sm text-gray-500">
-                Branch <span className="text-red-500">*</span>
-              </Label>
-              <select
-                id="edit-branchId"
-                value={editedDepartment.branchId}
-                onChange={handleBranchChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              >
-                <option value="">Select a branch</option>
-                {branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>
-                    {branch.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {/* Status Selection */}
