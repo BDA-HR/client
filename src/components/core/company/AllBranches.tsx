@@ -179,9 +179,7 @@ const AllBranchs: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchTypeColor(branch.branchType)}`}>
                         {getBranchTypeText(branch.branchType)}
-                      </span>
                     </td>
                     <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
@@ -200,7 +198,7 @@ const AllBranchs: React.FC = () => {
                     </td>
                     <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                       <div className="flex items-center">
-                        <span>{branch.dateOpened}</span>
+                        <span>{branch.openDateStr}</span>
                       </div>
                     </td>
                   </motion.tr>
@@ -305,14 +303,5 @@ const getBranchTypeText = (branchType: string): string => {
   }
 };
 
-const getBranchTypeColor = (branchType: string): string => {
-  switch (branchType) {
-    case '0': return 'bg-purple-100 text-purple-800';
-    case '1': return 'bg-blue-100 text-blue-800';
-    case '2': return 'bg-green-100 text-green-800';
-    case '3': return 'bg-orange-100 text-orange-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
 
 export default AllBranchs;
