@@ -129,23 +129,26 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     onClose();
   };
 
+  // Fixed branch type options - properly handle enum mapping
   const branchTypeOptions = Object.entries(BranchType)
-    .filter(([key]) => !isNaN(Number(key)))
+    .filter(([key]) => isNaN(Number(key))) // Get the string keys
     .map(([key, value]) => ({
-      key,
-      value: value.toString()
+      key: value.toString(), // Use the numeric value as key
+      value: key // Use the string name as display value
     }));
 
+  // Fixed branch status options - properly handle enum mapping
   const branchStatOptions = Object.entries(BranchStat)
-    .filter(([key]) => !isNaN(Number(key)))
+    .filter(([key]) => isNaN(Number(key))) // Get the string keys
     .map(([key, value]) => ({
-      key,
-      value: value.toString()
+      key: value.toString(), // Use the numeric value as key
+      value: key // Use the string name as display value
     }));
 
+  // Helper function to get display value for Select components
   const getDisplayValue = (currentValue: BranchType | BranchStat, options: Array<{key: string, value: string}>) => {
     const option = options.find(opt => opt.key === currentValue.toString());
-    return option ? option.value : currentValue.toString();
+    return option ? option.value : '';
   };
 
   if (!isOpen || !branch) return null;
@@ -278,7 +281,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                     onValueChange={(value) => handleInputChange('branchStat', value as BranchStat)}
                   >
                     <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                      <SelectValue>
+                      <SelectValue placeholder="Select status">
                         {getDisplayValue(formData.branchStat, branchStatOptions)}
                       </SelectValue>
                     </SelectTrigger>
@@ -302,7 +305,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                     onValueChange={(value) => handleInputChange('branchType', value as BranchType)}
                   >
                     <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                      <SelectValue>
+                      <SelectValue placeholder="Select branch type">
                         {getDisplayValue(formData.branchType, branchTypeOptions)}
                       </SelectValue>
                     </SelectTrigger>
