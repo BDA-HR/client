@@ -13,9 +13,11 @@ import EditDeptModal from './EditDeptModal';
 import DeleteDeptModal from './DeleteDeptModal';
 import ViewDeptModal from './ViewDeptModal';
 import type { EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
+import type { BranchCompListDto } from '../../../types/core/branch';
 
 interface DepartmentTableProps {
   departments: DeptListDto[];
+  branches: BranchCompListDto[];
   currentPage: number;
   totalPages: number;
   totalItems: number;
@@ -27,6 +29,7 @@ interface DepartmentTableProps {
 
 const DepartmentTable: React.FC<DepartmentTableProps> = ({
   departments,
+  branches,
   currentPage,
   totalPages,
   totalItems,
@@ -294,9 +297,7 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
       {activeModal === 'edit' && selectedDepartment && (
         <EditDeptModal
           department={selectedDepartment}
-          branches={[
-            { id: selectedDepartment.branchId, name: selectedDepartment.branch, nameAm: selectedDepartment.branchAm },
-          ]}
+          branches={branches} // Pass all branches instead of just one
           onEditDepartment={handleSaveChanges}
           isOpen={true}
           onClose={handleCloseModal}

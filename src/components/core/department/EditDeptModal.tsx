@@ -6,16 +6,13 @@ import { Label } from '../../ui/label';
 import type { EditDeptDto, DeptListDto, UUID } from '../../../types/core/dept';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import { DeptStat } from '../../../types/core/enum';
+import type { BranchCompListDto } from '../../../types/core/branch';
 
-interface Branch {
-  id: UUID;
-  name: string;
-  nameAm: string;
-}
+
 
 interface EditDeptModalProps {
   department: DeptListDto;
-  branches: Branch[];
+  branches: BranchCompListDto[];
   onEditDepartment: (department: EditDeptDto) => void;
   isOpen: boolean;
   onClose: () => void;
