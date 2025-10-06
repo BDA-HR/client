@@ -248,7 +248,7 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
         dateOpened: new Date().toISOString(),
         branchType: updatedBranch.branchType || BranchType["0"],
         branchStat: updatedBranch.branchStat || BranchStat["0"],
-        compId: updatedBranch.comp as UUID,
+        compId: updatedBranch.compId as UUID,
         rowVersion: updatedBranch.rowVersion,
       };
 
@@ -278,7 +278,7 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
           dateOpened: new Date().toISOString(),
           branchType: branch.branchType || BranchType["0"],
           branchStat: status as BranchStat,
-          compId: branch.comp as UUID,
+          compId: branch.compId as UUID,
           rowVersion: branch.rowVersion,
         };
 
