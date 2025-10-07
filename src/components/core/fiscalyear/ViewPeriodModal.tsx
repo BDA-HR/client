@@ -103,17 +103,17 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-blue-900">Duration</p>
-                    <p className="text-xs text-blue-700">{getDurationInDays(period.startDate, period.endDate)} days</p>
+                    <p className="text-xs text-blue-700">{getDurationInDays(period.dateStartStr, period.dateEndStr)} days</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="text-center">
                     <p className="font-medium text-blue-900">Start / መጀመሪያ</p>
-                    <p className="text-blue-700">{formatDate(period.startDate)}</p>
+                    <p className="text-blue-700">{formatDate(period.dateStartStr)}</p>
                   </div>
                   <div className="text-center">
                     <p className="font-medium text-blue-900">End / መጨረሻ</p>
-                    <p className="text-blue-700">{formatDate(period.endDate)}</p>
+                    <p className="text-blue-700">{formatDate(period.dateEndStr)}</p>
                   </div>
                 </div>
               </motion.div>
@@ -187,7 +187,7 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-green-900">Start Date / የመጀመሪያ ቀን</p>
-                    <p className="text-sm text-green-700">{formatDate(period.startDate) || 'N/A'} / {period.startDateAm || 'N/A'}</p>
+                    <p className="text-sm text-green-700">{formatDate(period.dateStartStr) || 'N/A'} / {period.dateStartStrAm || 'N/A'}</p>
                   </div>
                 </div>
 
@@ -197,7 +197,7 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-orange-900">End Date / የመጨረሻ ቀን</p>
-                    <p className="text-sm text-orange-700">{formatDate(period.endDate) || 'N/A'} / {period.endDateAm  || 'N/A'}</p>
+                    <p className="text-sm text-orange-700">{formatDate(period.dateEndStr) || 'N/A'} / {period.dateEndStrAm  || 'N/A'}</p>
                   </div>
                 </div>
               </motion.div>

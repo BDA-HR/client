@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Clock, Eye, PenBox, Trash2, Loader } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Eye, PenBox, Trash2, Loader } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { PeriodListDto } from '../../../types/core/period';
 
@@ -158,19 +158,16 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900">
                     <div className="flex items-center">
-                      <Clock className="text-gray-400 mr-2 h-4 w-4" />
-                      <span>{getDuration(period.startDate, period.endDate)}</span>
+                      <span>{getDuration(period.dateStartStr, period.dateEndStr)}</span>
                     </div>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
-                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                       {period.quarter}
-                    </span>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                    
                       {period.fiscYear}
-                    </span>
+                    
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(period.isActive)}`}>
