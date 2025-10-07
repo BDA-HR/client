@@ -1,15 +1,20 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { BadgePlus, XCircleIcon } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { AddPeriodModal } from './AddPeriodModal';
-import { PeriodTable } from './PeriodTable';
-import { ViewPeriodModal } from './ViewPeriodModal';
-import EditPeriodModal from './EditPeriodModal';
-import { DeletePeriodModal } from './DeletePeriodModal';
-import type { AddPeriodDto, PeriodListDto, EditPeriodDto, UUID } from '../../../types/core/period';
-import { periodService } from '../../../services/core/periodservice';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { BadgePlus } from "lucide-react";
+import { Button } from "../../ui/button";
+import { AddPeriodModal } from "./AddPeriodModal";
+import { PeriodTable } from "./PeriodTable";
+import { ViewPeriodModal } from "./ViewPeriodModal";
+import EditPeriodModal from "./EditPeriodModal";
+import { DeletePeriodModal } from "./DeletePeriodModal";
+import type {
+  AddPeriodDto,
+  PeriodListDto,
+  EditPeriodDto,
+  UUID,
+} from "../../../types/core/period";
+import { periodService } from "../../../services/core/periodservice";
+import toast from "react-hot-toast";
 
 function PeriodSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,18 +24,22 @@ function PeriodSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(
+    null
+  );
   const [periods, setPeriods] = useState<PeriodListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
-    name: '',
-    dateStart: new Date().toISOString().split('T')[0],
-    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    isActive: '0',
-    quarterId: '' as UUID,
-    fiscalYearId: '' as UUID
+    name: "",
+    dateStart: new Date().toISOString().split("T")[0],
+    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
+    isActive: "true",
+    quarterId: "" as UUID,
+    fiscalYearId: "" as UUID,
   });
 
   // Fetch periods on component mount
@@ -47,8 +56,8 @@ function PeriodSection() {
       setTotalItems(periodsData.length);
       setTotalPages(Math.ceil(periodsData.length / 10));
     } catch (err) {
-      console.error('Error fetching periods:', err);
-      setError('Failed to load periods. Please try again later.');
+      console.error("Error fetching periods:", err);
+      setError("Failed to load periods. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -56,62 +65,66 @@ function PeriodSection() {
 
   const handleAddPeriod = async () => {
     try {
-      toast.loading('Adding period...');
+      toast.loading("Adding period...");
       setError(null);
       const createdPeriod = await periodService.createPeriod(newPeriod);
-      setPeriods(prev => [createdPeriod, ...prev]);
+      setPeriods((prev) => [createdPeriod, ...prev]);
       setNewPeriod({
-        name: '',
-        dateStart: new Date().toISOString().split('T')[0],
-        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        isActive: '0',
-        quarterId: '' as UUID,
-        fiscalYearId: '' as UUID
+        name: "",
+        dateStart: new Date().toISOString().split("T")[0],
+        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0],
+        isActive: "true",
+        quarterId: "" as UUID,
+        fiscalYearId: "" as UUID,
       });
       setIsModalOpen(false);
       toast.dismiss();
-      toast.success('Period added successfully!');
+      toast.success("Period added successfully!");
     } catch (err) {
-      console.error('Error adding period:', err);
+      console.error("Error adding period:", err);
       toast.dismiss();
-      toast.error('Failed to add period');
-      setError('Failed to add period. Please try again.');
+      toast.error("Failed to add period");
+      setError("Failed to add period. Please try again.");
       throw err;
     }
   };
 
   const handleEditPeriod = async (periodData: EditPeriodDto) => {
     try {
-      toast.loading('Updating period...');
+      toast.loading("Updating period...");
       setError(null);
       const updatedPeriod = await periodService.updatePeriod(periodData);
-      setPeriods(prev => prev.map(p => p.id === updatedPeriod.id ? updatedPeriod : p));
+      setPeriods((prev) =>
+        prev.map((p) => (p.id === updatedPeriod.id ? updatedPeriod : p))
+      );
       setIsEditModalOpen(false);
       toast.dismiss();
-      toast.success('Period updated successfully!');
+      toast.success("Period updated successfully!");
     } catch (err) {
-      console.error('Error updating period:', err);
+      console.error("Error updating period:", err);
       toast.dismiss();
-      toast.error('Failed to update period');
-      setError('Failed to update period. Please try again.');
+      toast.error("Failed to update period");
+      setError("Failed to update period. Please try again.");
       throw err;
     }
   };
 
   const handleDeletePeriod = async (periodId: UUID) => {
     try {
-      toast.loading('Deleting period...');
+      toast.loading("Deleting period...");
       setError(null);
       await periodService.deletePeriod(periodId);
-      setPeriods(prev => prev.filter(p => p.id !== periodId));
+      setPeriods((prev) => prev.filter((p) => p.id !== periodId));
       setIsDeleteModalOpen(false);
       toast.dismiss();
-      toast.success('Period deleted successfully!');
+      toast.success("Period deleted successfully!");
     } catch (err) {
-      console.error('Error deleting period:', err);
+      console.error("Error deleting period:", err);
       toast.dismiss();
-      toast.error('Failed to delete period');
-      setError('Failed to delete period. Please try again.');
+      toast.error("Failed to delete period");
+      setError("Failed to delete period. Please try again.");
     }
   };
 
@@ -135,22 +148,19 @@ function PeriodSection() {
   };
 
   return (
-    <div className='max-w-7xl mx-auto px-4 py-8 space-y-6'>
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
       {/* Header Section */}
       <div className="flex justify-between items-center">
         <div>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
           >
-            Period Management
+            Active Periods
           </motion.h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Manage your fiscal periods, quarters, and date ranges
-          </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setIsModalOpen(true)}
           className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 cursor-pointer"
         >
@@ -164,14 +174,22 @@ function PeriodSection() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-6"
+          className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-4"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="w-5 h-5 text-red-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               </div>
@@ -190,27 +208,8 @@ function PeriodSection() {
         </div>
       )}
 
-      {/* No periods message */}
-      {!loading && periods.length === 0 && !error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-6 mb-6"
-        >
-          <div className="flex items-center">
-            <XCircleIcon className="h-5 w-5 text-yellow-400 mr-3" />
-            <div>
-              <h3 className="text-yellow-800 font-medium">No Periods Found</h3>
-              <p className="text-yellow-700 text-sm mt-1">
-                There are currently no periods in the system. Please add a period to get started.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
       {/* Periods Table */}
-      {!loading && periods.length > 0 && (
+      {!loading && (
         <PeriodTable
           periods={periods.slice((currentPage - 1) * 10, currentPage * 10)}
           currentPage={currentPage}

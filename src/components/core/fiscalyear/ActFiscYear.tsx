@@ -27,7 +27,7 @@ export default function ActiveFisc({ activeYear, loading }: ActiveFiscProps) {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-3"
+        className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-6"
       >
         <div className="flex items-center">
           <XCircleIcon className="h-3 w-3 text-yellow-400 mr-2" />
