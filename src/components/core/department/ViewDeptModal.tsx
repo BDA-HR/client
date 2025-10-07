@@ -81,7 +81,7 @@ const ViewDeptModal: React.FC<ViewDeptModalProps> = ({
                     selectedDepartment.deptStat
                   )}`}
                 >
-                  {selectedDepartment.deptStat}
+                  {selectedDepartment.deptStatStr}
                 </span>
               </div>
             </div>
