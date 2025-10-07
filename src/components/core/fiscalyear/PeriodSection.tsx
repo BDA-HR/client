@@ -167,7 +167,7 @@ function PeriodSection() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+    <div className="w-full mx-auto px-2 py-4 space-y-6">
       {/* Header Section */}
       <div className="flex justify-between items-center">
         <div>

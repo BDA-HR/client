@@ -13,8 +13,8 @@ export const FiscalYearManagementHeader = ({
   totalItems: number;
 }) => {
   return (
-    <div className="p-6">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+    <div className="p-2">
+      <div className="w-full mx-auto flex justify-between items-center">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

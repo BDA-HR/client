@@ -141,7 +141,7 @@ const DepartmentOverview = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className={`p-4 md:p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
+        className={`p-2 bg-gray-50 min-h-screen transition-all duration-300 ${
           isEditModalOpen ? "blur-sm" : ""
         }`}
       >

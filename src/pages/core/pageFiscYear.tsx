@@ -123,7 +123,7 @@ export default function FiscalYearOverview() {
             totalItems={totalItems}
           />
           
-          <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="w-full mx-auto px-2 py-4">
             {/* Single Error Message - Shows instead of both ActiveFisc and Table */}
             {error && (
               <motion.div
