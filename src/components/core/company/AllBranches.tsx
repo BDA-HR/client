@@ -4,6 +4,7 @@ import { branchService } from '../../../services/core/branchservice';
 import type { BranchListDto } from '../../../types/core/branch';
 import { Button } from '../../../components/ui/button';
 import { RefreshCw, Building, ChevronRight, ChevronLeft} from 'lucide-react';
+
 const AllBranchs: React.FC = () => {
   const [branches, setBranches] = useState<BranchListDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,35 @@ const AllBranchs: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Helper functions moved inside component
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case '0': return 'bg-green-100 text-green-800 border border-green-200'; // Active - Green
+      case '1': return 'bg-red-100 text-red-800 border border-red-200';       // Inactive - Red
+      case '2': return 'bg-yellow-100 text-yellow-800 border border-yellow-200'; // Under Construction - Yellow
+      default: return 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
+  };
+
+  const getStatusText = (status: string): string => {
+    switch (status) {
+      case '0': return 'Active';
+      case '1': return 'Inactive';
+      case '2': return 'Under Construction';
+      default: return status;
+    }
+  };
+
+  const getBranchTypeText = (branchType: string): string => {
+    switch (branchType) {
+      case '0': return 'Head Office';
+      case '1': return 'Regional';
+      case '2': return 'Local';
+      case '3': return 'Virtual';
+      default: return branchType;
+    }
+  };
 
   return (
     <motion.div
@@ -273,35 +303,5 @@ const AllBranchs: React.FC = () => {
     </motion.div>
   );
 };
-
-// Helper functions
-const getStatusColor = (status: string): string => {
-  switch (status) {
-    case 'ACTIVE': return 'bg-emerald-100 text-emerald-800';
-    case 'INACTIVE': return 'bg-red-100 text-red-800';
-    case 'UNDER_CONSTRUCTION': return 'bg-yellow-100 text-yellow-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
-
-const getStatusText = (status: string): string => {
-  switch (status) {
-    case 'ACTIVE': return 'Active';
-    case 'INACTIVE': return 'Inactive';
-    case 'UNDER_CONSTRUCTION': return 'Under Construction';
-    default: return status;
-  }
-};
-
-const getBranchTypeText = (branchType: string): string => {
-  switch (branchType) {
-    case '0': return 'Head Office';
-    case '1': return 'Regional';
-    case '2': return 'Local';
-    case '3': return 'Virtual';
-    default: return branchType;
-  }
-};
-
 
 export default AllBranchs;

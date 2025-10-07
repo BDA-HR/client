@@ -85,8 +85,8 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header - Always rendered */}
-      <div className="flex justify-between items-center">
+      {/* Header - Moved up with negative margin */}
+      <div className="flex justify-between items-center -mt-4"> {/* Added negative margin-top */}
         <motion.h1 
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}

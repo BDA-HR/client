@@ -75,8 +75,8 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
 
   const getStatusColor = (status: string): string => {
     return status === "0" 
-      ? "bg-emerald-100 text-emerald-800" 
-      : "bg-gray-100 text-gray-800";
+      ? "bg-green-100 text-green-800 border border-green-200"  // Active - Green
+      : "bg-red-100 text-red-800 border border-red-200";       // Inactive - Red
   };
 
   // Animation variants for table rows
