@@ -59,7 +59,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
   };
 
   const getStatusColor = (status: string): string => {
-    return status === 'true' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+    return status === '0' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-gray-800';
   };
 
   const getPeriodColor = (name: string): string => {
@@ -171,7 +171,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(period.isActive)}`}>
-                      {period.isActive === "true" ? "Active" : "Inactive"}
+                      {period.isActive === "0" ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">
