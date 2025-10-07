@@ -163,7 +163,7 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="w-full mx-auto px-2 py-4">
         {/* Header */}
         <Button
           onClick={handleBackToOverview}
