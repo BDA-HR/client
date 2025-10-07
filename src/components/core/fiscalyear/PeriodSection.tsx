@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BadgePlus } from "lucide-react";
-import { Button } from "../../ui/button";
-import { AddPeriodModal } from "./AddPeriodModal";
+import PeriodSearchFilters from "./PeriodSearchFilters";
 import { PeriodTable } from "./PeriodTable";
 import { ViewPeriodModal } from "./ViewPeriodModal";
 import EditPeriodModal from "./EditPeriodModal";
 import { DeletePeriodModal } from "./DeletePeriodModal";
+import { AddPeriodModal } from "./AddPeriodModal";
 import type {
   AddPeriodDto,
   PeriodListDto,
@@ -24,10 +23,10 @@ function PeriodSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(
-    null
-  );
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(null);
   const [periods, setPeriods] = useState<PeriodListDto[]>([]);
+  const [filteredPeriods, setFilteredPeriods] = useState<PeriodListDto[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,14 +46,30 @@ function PeriodSection() {
     fetchPeriods();
   }, [currentPage]);
 
+  // Filter periods based on search term and update pagination
+  useEffect(() => {
+    let filtered = periods;
+    
+    if (searchTerm.trim() !== "") {
+      filtered = periods.filter(period =>
+        period.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        period.quarter.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        period.fiscYear.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    setFilteredPeriods(filtered);
+    setTotalItems(filtered.length);
+    setTotalPages(Math.ceil(filtered.length / 10));
+  }, [searchTerm, periods]);
+
   const fetchPeriods = async () => {
     try {
       setLoading(true);
       setError(null);
       const periodsData = await periodService.getAllPeriods();
       setPeriods(periodsData);
-      setTotalItems(periodsData.length);
-      setTotalPages(Math.ceil(periodsData.length / 10));
+      setFilteredPeriods(periodsData);
     } catch (err) {
       console.error("Error fetching periods:", err);
       setError("Failed to load periods. Please try again later.");
@@ -147,6 +162,10 @@ function PeriodSection() {
     setCurrentPage(page);
   };
 
+  const handleAddPeriodClick = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
       {/* Header Section */}
@@ -160,13 +179,6 @@ function PeriodSection() {
             Active Periods
           </motion.h2>
         </div>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 cursor-pointer"
-        >
-          <BadgePlus size={20} />
-          Add New Period
-        </Button>
       </div>
 
       {/* Error message for API errors */}
@@ -201,6 +213,13 @@ function PeriodSection() {
         </motion.div>
       )}
 
+      {/* Search Filters - Now positioned under the error */}
+      <PeriodSearchFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onAddPeriod={handleAddPeriodClick}
+      />
+
       {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-8">
@@ -211,7 +230,7 @@ function PeriodSection() {
       {/* Periods Table */}
       {!loading && (
         <PeriodTable
-          periods={periods.slice((currentPage - 1) * 10, currentPage * 10)}
+          periods={filteredPeriods.slice((currentPage - 1) * 10, currentPage * 10)}
           currentPage={currentPage}
           totalPages={totalPages}
           totalItems={totalItems}
