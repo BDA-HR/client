@@ -73,7 +73,7 @@ const AllBranchs: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-6"
+          className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-4"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -183,7 +183,7 @@ const AllBranchs: React.FC = () => {
                     </td>
                     <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
-                        {getStatusText(branch.branchStat)}
+                        {getStatusText(branch.branchStatStr)}
                       </span>
                     </td>
                     <td className="px-4 py-1 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
