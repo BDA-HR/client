@@ -31,6 +31,7 @@ function PeriodSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
     name: "",
@@ -55,7 +56,7 @@ function PeriodSection() {
     // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter(period => 
-        statusFilter === "active" ? period.isActive === "true" : period.isActive === "false"
+        statusFilter === "active" ? period.isActive === "0" : period.isActive === "1"
       );
     }
     
@@ -67,11 +68,8 @@ function PeriodSection() {
         period.quarter.toLowerCase().includes(term) ||
         period.fiscYear.toLowerCase().includes(term) ||
         // Search by status using keywords
-        (term === "active" && period.isActive === "true") ||
-        (term === "inactive" && period.isActive === "false") ||
-        (term === "true" && period.isActive === "true") ||
-        (term === "false" && period.isActive === "false")
-      );
+        (term === "active" && period.isActive === "0") ||
+        (term === "inactive" && period.isActive === "1")    );
     }
     
     setFilteredPeriods(filtered);
@@ -83,6 +81,7 @@ function PeriodSection() {
   const fetchPeriods = async () => {
     try {
       setLoading(true);
+      setError(null);
       
       // Use real API call
       const periodsData = await periodService.getAllPeriods();
@@ -90,6 +89,7 @@ function PeriodSection() {
       setPeriods(periodsData);
     } catch (err) {
       console.error("Error fetching periods:", err);
+      setError("Failed to load periods. Please try again later.");
       toast.error("Failed to load periods. Please try again later.");
     } finally {
       setLoading(false);
@@ -99,6 +99,7 @@ function PeriodSection() {
   const handleAddPeriod = async () => {
     try {
       toast.loading("Adding period...");
+      setError(null);
       const createdPeriod = await periodService.createPeriod(newPeriod);
       setPeriods((prev) => [createdPeriod, ...prev]);
       setNewPeriod({
@@ -117,6 +118,7 @@ function PeriodSection() {
     } catch (err) {
       console.error("Error adding period:", err);
       toast.dismiss();
+      setError("Failed to add period");
       toast.error("Failed to add period");
       throw err;
     }
@@ -125,6 +127,7 @@ function PeriodSection() {
   const handleEditPeriod = async (periodData: EditPeriodDto) => {
     try {
       toast.loading("Updating period...");
+      setError(null);
       const updatedPeriod = await periodService.updatePeriod(periodData);
       setPeriods((prev) =>
         prev.map((p) => (p.id === updatedPeriod.id ? updatedPeriod : p))
@@ -135,6 +138,7 @@ function PeriodSection() {
     } catch (err) {
       console.error("Error updating period:", err);
       toast.dismiss();
+      setError("Failed to update period");
       toast.error("Failed to update period");
       throw err;
     }
@@ -143,6 +147,7 @@ function PeriodSection() {
   const handleDeletePeriod = async (periodId: UUID) => {
     try {
       toast.loading("Deleting period...");
+      setError(null);
       await periodService.deletePeriod(periodId);
       setPeriods((prev) => prev.filter((p) => p.id !== periodId));
       setIsDeleteModalOpen(false);
@@ -151,6 +156,7 @@ function PeriodSection() {
     } catch (err) {
       console.error("Error deleting period:", err);
       toast.dismiss();
+      setError("Failed to delete period");
       toast.error("Failed to delete period");
     }
   };
@@ -215,6 +221,46 @@ function PeriodSection() {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load periods.{" "}
+                  <button
+                    onClick={fetchPeriods}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("add") ? (
+                "Failed to add period. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update period. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete period. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      )}
+
       {/* Search Filters */}
       <PeriodSearchFilters
         searchTerm={searchTerm}
@@ -228,7 +274,6 @@ function PeriodSection() {
         filteredItems={filteredPeriods.length}
       />
 
-      
       {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-8">
@@ -237,7 +282,7 @@ function PeriodSection() {
       )}
 
       {/* Active Periods Table */}
-      {!loading && (
+      {!loading && !error && (
         <ActPeriod
           periods={currentItems}
           currentPage={currentPage}
