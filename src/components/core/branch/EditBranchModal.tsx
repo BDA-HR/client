@@ -115,9 +115,6 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     if (!formData.nameAm.trim()) {
       newErrors.nameAm = 'Amharic branch name is required';
     }
-    if (!formData.code.trim()) {
-      newErrors.code = 'Branch code is required';
-    }
     if (!formData.location.trim()) {
       newErrors.location = 'Location is required';
     }
@@ -223,22 +220,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
 
-              {/* Branch Code and Date Opened - Side by Side */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-branchCode" className="text-sm text-gray-500">
-                    Branch Code <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="edit-branchCode"
-                    value={formData.code}
-                    onChange={(e) => handleInputChange('code', e.target.value)}
-                    placeholder="Eg. BR-001"
-                    className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-                  />
-                  {errors.code && <p className="text-red-500 text-sm">{errors.code}</p>}
-                </div>
-
+              {/*  and Date Opened - Side by Side */}
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-dateOpened" className="text-sm text-gray-500">
                     Date Opened <span className="text-red-500">*</span>
@@ -324,7 +307,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="border-t pt-6 mt-6">
+            <div className="border-t px-6 py-2">
               <div className="flex justify-center items-center gap-3">
                 <Button
                   type="submit"

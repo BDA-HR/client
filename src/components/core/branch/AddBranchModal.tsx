@@ -145,23 +145,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 </div>
 
                 {/* Branch Code and Date Opened - Side by Side */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="branchCode"
-                      className="text-sm text-gray-500"
-                    >
-                      Branch Code <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="branchCode"
-                      value={branchCode}
-                      onChange={(e) => setBranchCode(e.target.value)}
-                      placeholder="Eg. BR-001"
-                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                  </div>
-
+                <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <Label
                       htmlFor="dateOpened"
