@@ -161,6 +161,7 @@ export default function FiscalYearHistory() {
 
         {/* Error Message */}
         {error && (
+          <>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -181,6 +182,22 @@ export default function FiscalYearHistory() {
               </div>
             </div>
           </motion.div>
+                      <FiscYearSearch 
+              searchTerm={searchTerm}
+              onSearchChange={handleSearchChange}
+            />
+            <FiscalYearTable
+              years={paginatedYears}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              onPageChange={setCurrentPage}
+              onViewDetails={handleViewDetails}
+              onEdit={handleEdit}
+              onStatusChange={handleStatusChange}
+              onDelete={handleDelete}
+            />
+          </>
         )}
 
         {/* Loading State */}

@@ -188,7 +188,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         )}
 
         {/* Body */}
-        <div className="p-6">
+        <div className="p-6 pb-2"> {/* Reduced bottom padding from p-6 to pb-2 */}
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               {/* Branch Names - Amharic first like AddBranchModal */}
@@ -220,8 +220,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
 
-              {/*  and Date Opened - Side by Side */}
-              <div className="grid grid-cols-1 gap-4">
+              {/*Location and Date Opened - Side by Side */}
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-dateOpened" className="text-sm text-gray-500">
                     Date Opened <span className="text-red-500">*</span>
@@ -235,10 +235,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   />
                   {errors.dateOpened && <p className="text-red-500 text-sm">{errors.dateOpened}</p>}
                 </div>
-              </div>
-
-              {/* Location */}
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <Label htmlFor="edit-branchLocation" className="text-sm text-gray-500">
                   Location <span className="text-red-500">*</span>
                 </Label>
@@ -251,7 +248,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                 />
                 {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
               </div>
-
+            </div>
               {/* Branch Type and Status - Side by Side */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -306,8 +303,8 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="border-t px-6 py-2">
+            {/* Footer - Reduced padding */}
+            <div className="border-t px-6 py-1"> {/* Changed from py-2 to py-1 (4px) */}
               <div className="flex justify-center items-center gap-3">
                 <Button
                   type="submit"
