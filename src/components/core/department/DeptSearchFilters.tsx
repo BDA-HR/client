@@ -48,7 +48,7 @@ const DepartmentSearchFilters = ({
               id="search"
               name="search"
               type="text"
-              placeholder="Search departments..."
+              placeholder="Search departments by name, status..."
               className="block w-full md:w-1/2 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

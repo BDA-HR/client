@@ -119,13 +119,24 @@ const DepartmentOverview = () => {
     }
   };
 
-  // Filter departments based on search term only
+  // Enhanced filter function to include status search
   const filteredDepartments = departments.filter((department) => {
-    return (
-      department.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      department.nameAm.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      department.branch.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Basic text search
+    const basicMatch = 
+      department.name.toLowerCase().includes(searchLower) ||
+      department.nameAm.toLowerCase().includes(searchLower) ||
+      department.branch.toLowerCase().includes(searchLower);
+    
+    const statusMatch = 
+      (searchLower.includes('active') && department.deptStat === "0") ||
+      (searchLower.includes('inactive') && department.deptStat === "1") ||
+      (searchLower.includes('0') && department.deptStat === "0") ||
+      (searchLower.includes('1') && department.deptStat === "1") ||
+      department.deptStatStr.toLowerCase().includes(searchLower);
+    
+    return basicMatch || statusMatch;
   });
 
   // Pagination logic
