@@ -16,6 +16,7 @@ export default function PagePeriod() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -23,40 +24,47 @@ export default function PagePeriod() {
 
   const itemsPerPage = 10;
 
-  // Filter periods based on search term - shows ALL periods (active and inactive)
+  // Filter periods based on search term and status
   const filteredPeriods = useMemo(() => {
-    if (!searchTerm.trim()) return periods;
-
-    const term = searchTerm.toLowerCase().trim();
+    let filtered = periods;
     
-    const results = periods.filter(period => {
-      // Check regular fields
-      const regularMatch = 
-        period.name.toLowerCase().includes(term) ||
-        period.quarter.toLowerCase().includes(term) ||
-        period.fiscYear.toLowerCase().includes(term);
-      
-      // Check status fields - flexible matching
-      const statusMatch = 
-        period.isActiveStr.toLowerCase().includes(term) ||
-        (period.isActive === '0' && (
-          term === 'active' || 
-          term === 'act' || 
-          term === '0' ||
-          'active'.startsWith(term)
-        )) ||
-        (period.isActive === '1' && (
-          term === 'inactive' || 
-          term === 'inact' || 
-          term === '1' ||
-          'inactive'.startsWith(term)
-        ));
-      
-      return regularMatch || statusMatch;
-    });
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(period => 
+        statusFilter === "active" ? period.isActive === "0" : period.isActive === "1"
+      );
+    }
     
-    return results;
-  }, [periods, searchTerm]);
+    // Apply search term
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(period => {
+        const regularMatch = 
+          period.name.toLowerCase().includes(term) ||
+          period.quarter.toLowerCase().includes(term) ||
+          period.fiscYear.toLowerCase().includes(term);
+        
+        const statusMatch = 
+          period.isActiveStr.toLowerCase().includes(term) ||
+          (period.isActive === '0' && (
+            term === 'active' || 
+            term === 'act' || 
+            term === '0' ||
+            'active'.startsWith(term)
+          )) ||
+          (period.isActive === '1' && (
+            term === 'inactive' || 
+            term === 'inact' || 
+            term === '1' ||
+            'inactive'.startsWith(term)
+          ));
+        
+        return regularMatch || statusMatch;
+      });
+    }
+    
+    return filtered;
+  }, [periods, searchTerm, statusFilter]);
 
   const totalItems = filteredPeriods.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -68,7 +76,7 @@ export default function PagePeriod() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, statusFilter]);
 
   const loadPeriods = async () => {
     try {
@@ -132,6 +140,15 @@ export default function PagePeriod() {
     setSearchTerm(term);
   };
 
+  const handleStatusFilterChange = (status: "all" | "active" | "inactive") => {
+    setStatusFilter(status);
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('all');
+  };
+
   const handleAddPeriodClick = () => {
     navigate('/core/fiscal-year/overview');
   };
@@ -189,9 +206,13 @@ export default function PagePeriod() {
             <PeriodSearchFilters
               searchTerm={searchTerm}
               setSearchTerm={handleSearchChange}
+              statusFilter={statusFilter}
+              onStatusFilterChange={handleStatusFilterChange}
+              onClearFilters={handleClearFilters}
               onAddPeriod={handleAddPeriodClick}
               onViewHistory={() => {}} // Empty function since we're already in history view
               totalItems={periods.length}
+              filteredItems={filteredPeriods.length}
             />
 
             {/* Periods Table - Shows ALL periods (active and inactive) */}

@@ -208,6 +208,7 @@ function PeriodSection() {
         filteredItems={filteredPeriods.length}
       />
 
+      
       {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-8">
