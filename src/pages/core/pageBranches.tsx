@@ -178,10 +178,10 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   const loadAllBranches = async () => {
     try {
       setLoading(true);
+      setError(null);
       const allBranches = await branchService.getAllBranches();
       console.log("Loaded all branches:", allBranches);
       setBranches(allBranches);
-      setError(null);
     } catch (err) {
       const errorMessage = "Failed to load branches. Please try again later.";
       setError(errorMessage);
@@ -195,12 +195,12 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   const loadCompanyBranches = async (compId: string) => {
     try {
       setLoading(true);
+      setError(null);
       const companyBranches = await branchService.getCompanyBranches(
         compId as UUID
       );
       console.log("Loaded company branches:", companyBranches);
       setBranches(companyBranches);
-      setError(null);
     } catch (err) {
       const errorMessage =
         "Failed to load company branches. Please try again later.";
@@ -309,6 +309,14 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
     }
   };
 
+  const reloadBranches = () => {
+    if (companyId) {
+      loadCompanyBranches(companyId);
+    } else {
+      loadAllBranches();
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -343,16 +351,46 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
         defaultCompanyId={companyId as UUID}
       />
 
+      {/* Error Message */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-          {error}
-          <button
-            onClick={() => setError(null)}
-            className="absolute top-0 right-0 p-2 cursor-pointer"
-          >
-            <span className="text-2xl">&times;</span>
-          </button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load branches.{" "}
+                  <button
+                    onClick={reloadBranches}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("add") ? (
+                "Failed to add branch. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update branch. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete branch. Please try again."
+              ) : error.includes("status") ? (
+                "Failed to update branch status. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
       )}
 
       <BranchTable
