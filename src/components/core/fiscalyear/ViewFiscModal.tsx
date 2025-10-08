@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
-import { X, Calendar, Check, Eye } from 'lucide-react';
+import { X, Eye } from 'lucide-react';
 import type { FiscYearListDto } from '../../../types/core/fisc';
-import { Button } from '../../ui/button';
 
 interface ViewFiscModalProps {
   fiscalYear: FiscYearListDto | null;
@@ -23,7 +22,7 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
   };
 
   const getStatusColor = (status: string): string => {
-    return status === 'Yes' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800';
+    return status === '0' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
   };
 
   if (!isOpen || !fiscalYear) return null;
@@ -34,10 +33,10 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full"
+        className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4">
+        <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <Eye size={20} />
             <h2 className="text-lg font-bold text-gray-800">Details</h2>
@@ -51,91 +50,84 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-4">
-          {/* Header Info */}
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 rounded-full">
-                <Calendar className="text-emerald-600" size={20} />
-              </div>
+        <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              {/* Fiscal Year Name */}
               <div>
-                <h3 className="text-base font-semibold">{fiscalYear.name}</h3>
-                <p className="text-sm text-gray-600">
-                  {formatDate(fiscalYear.dateStart)} - {formatDate(fiscalYear.dateEnd)}
-                </p>
-              </div>
-              <span className={`ml-auto px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(fiscalYear.isActive)}`}>
-                {fiscalYear.isActive === '0' ? 'Active' : 'Inactive'}
-              </span>
-            </div>
-          </div>
-
-          {/* Fiscal Year Information */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-base flex items-center gap-2">
-              <Calendar size={16} className="text-emerald-500" />
-              Fiscal Year Information
-            </h4>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Start Date Column */}
-              <div className="space-y-2">
+                <p className="text-sm text-gray-500 mb-2">Fiscal Year Name</p>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Start Date</p>
-                  <p className="font-medium text-gray-900 text-sm">{formatDate(fiscalYear.dateStart)}</p>
-                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.dateStartStrAm || 'N/A'}</p>
+                  <p className="font-medium text-gray-900">
+                    {fiscalYear.name}
+                  </p>
                 </div>
               </div>
-              
-              {/* End Date Column */}
-              <div className="space-y-2">
+
+              {/* Duration - English */}
+              <div>
+                <p className="text-sm text-gray-500 mb-2">Duration</p>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">End Date</p>
-                  <p className="font-medium text-gray-900 text-sm">{formatDate(fiscalYear.dateEnd)}</p>
-                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.dateEndStrAm || 'N/A'}</p>
+                  <p className="font-medium text-gray-900">
+                    {fiscalYear.dateStartStr} - {fiscalYear.dateEndStr}
+                  </p>
+                </div>
+              </div>
+
+              {/* Duration - Amharic */}
+              <div>
+                <p className="text-sm text-gray-500 mb-2">የቆይታ ጊዜ</p>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {fiscalYear.dateStartStrAm} - {fiscalYear.dateEndStrAm}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* System Information */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-base flex items-center gap-2">
-              <Check size={16} className="text-blue-500" />
-              System Information
-            </h4>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Created At Column */}
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Created At</p>
-                  <p className="font-medium text-gray-900 text-sm">{formatDate(fiscalYear.createdAt)}</p>
-                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.createdAtAm || 'N/A'}</p>
-                </div>
-              </div>
-              
-              {/* Modified At Column */}
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Modified At</p>
-                  <p className="font-medium text-gray-900 text-sm">{formatDate(fiscalYear.modifiedAt)}</p>
-                  <p className="font-medium text-gray-900 text-sm">{fiscalYear.modifiedAtAm || 'N/A'}</p>
-                </div>
+          {/* Right Column */}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              {/* Status */}
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                <span
+                  className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                    fiscalYear.isActive
+                  )}`}
+                >
+                  {fiscalYear.isActive === "0" ? "Active" : "Inactive"}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t p-4 flex justify-center">
-          <Button
-            variant="outline"
+        {/* Dates Footer */}
+        <div className="border-t px-6 py-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">
+                Created At: <span>{formatDate(fiscalYear.createdAt)} / <span>{fiscalYear.createdAtAm || 'N/A'}</span></span>
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">
+                Modified At: <span>{formatDate(fiscalYear.modifiedAt)} / <span>{fiscalYear.modifiedAtAm || 'N/A'}</span></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Close Button */}
+        <div className="border-t p-2 flex justify-center">
+          <button
             onClick={onClose}
-            className="cursor-pointer px-8 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200"
           >
             Close
-          </Button>
+          </button>
         </div>
       </motion.div>
     </div>

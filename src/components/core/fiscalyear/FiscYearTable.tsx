@@ -58,7 +58,7 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
   };
 
   const getStatusColor = (status: string): string => {
-    return status === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+    return status === '0' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
   };
 
   const getYearColor = (year: string): string => {
@@ -98,6 +98,9 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
               <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                 Duration
               </th>
+              <th scope="col" className="px-4 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                የቆይታ ጊዜ
+              </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell whitespace-nowrap">
                 Status
               </th>
@@ -133,7 +136,12 @@ export const FiscalYearTable: React.FC<FiscalYearTableProps> = ({
                 </td>
                 <td className="px-4 py-1 whitespace-nowrap text-center">
                   <div className="text-sm font-medium text-gray-900">
-                    {getDuration(year.dateStartStr, year.dateStartStrAm)}
+                    {getDuration(year.dateStartStr, year.dateEndStr)}
+                  </div>
+                </td>
+                <td className="px-4 py-1 whitespace-nowrap text-center">
+                  <div className="text-sm font-medium text-gray-900">
+                    {getDuration(year.dateStartStrAm, year.dateEndStrAm)}
                   </div>
                 </td>
                 <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">

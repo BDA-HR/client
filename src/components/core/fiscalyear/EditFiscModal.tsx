@@ -188,28 +188,30 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
 
               {/* Status */}
               <div className="space-y-2">
-                <Label htmlFor="status" className="text-base font-medium">
+                <Label htmlFor="status" className="text-sm text-gray-500">
                   Status
                 </Label>
-                <Select
-                  value={formData.isActive}
-                  onValueChange={(value) => handleInputChange('isActive', value)}
-                >
-                  <SelectTrigger className="w-full h-12 text-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">Active</SelectItem>
-                    <SelectItem value="1">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="w-full md:w-1/2">
+                  <Select
+                    value={formData.isActive}
+                    onValueChange={(value) => handleInputChange('isActive', value)}
+                  >
+                    <SelectTrigger className="w-full h-12 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Active</SelectItem>
+                      <SelectItem value="1">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 {errors.isActive && <p className="text-red-500 text-sm">{errors.isActive}</p>}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="border-t pt-4">
-              <div className="flex justify-center items-center gap-3">
+            <div className="border-t px-6 py-2 -mb-4">
+              <div className="mx-auto flex justify-center items-center gap-1.5">
                 <Button
                   type="submit"
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"

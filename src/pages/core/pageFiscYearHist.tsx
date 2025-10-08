@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FiscalYearTable } from '../../components/core/fiscalyear/FiscYearTable';
 import { FiscYearSearch } from '../../components/core/fiscalyear/FiscYearSearch';
 import { ViewFiscModal } from '../../components/core/fiscalyear/ViewFiscModal';
@@ -8,15 +7,9 @@ import { DeleteFiscModal } from '../../components/core/fiscalyear/DeleteFiscModa
 import { fiscalYearService } from '../../services/core/fiscservice';
 import type { FiscYearListDto, EditFiscYearDto, UUID } from '../../types/core/fisc';
 import { motion } from 'framer-motion';
-import { Button } from '../../components/ui/button';
-import { ArrowLeft } from 'lucide-react';
 
-interface FiscalYearHistoryProps {
-  onBack?: () => void;
-}
 
-export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
-  const navigate = useNavigate();
+export default function FiscalYearHistory() {
   const [years, setYears] = useState<FiscYearListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -149,14 +142,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
     handleYearStatusChange(year.id, newStatus);
   };
 
-  const handleBackToOverview = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      navigate(-1);
-    }
-  };
-
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
   };
@@ -164,15 +149,6 @@ export default function FiscalYearHistory({ onBack }: FiscalYearHistoryProps) {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="w-full mx-auto px-2 py-4">
-        {/* Header */}
-        <Button
-          onClick={handleBackToOverview}
-          variant="outline"
-          className="cursor-pointer flex items-center gap-2 mb-3"
-        >
-          <ArrowLeft size={16} />
-          Back to Overview
-        </Button>
         
         <div className="mb-6">
           <h1 className="text-2xl font-bold">
