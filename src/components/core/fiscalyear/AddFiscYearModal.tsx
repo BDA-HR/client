@@ -36,10 +36,7 @@ export const AddFiscalYearModal = ({
       return;
     }
 
-    try {
-      // Show loading toast
-      toast.loading('Adding fiscal year...');
-      
+    try {      
       // Call the add function
       await onAddFiscalYear();
       
