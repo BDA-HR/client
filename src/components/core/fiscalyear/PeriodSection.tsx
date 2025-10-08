@@ -14,6 +14,7 @@ import type {
 } from "../../../types/core/period";
 import { periodService } from "../../../services/core/periodservice";
 import toast from "react-hot-toast";
+import { motion } from 'framer-motion';
 
 function PeriodSection() {
   const navigate = useNavigate();
@@ -195,6 +196,25 @@ function PeriodSection() {
 
   return (
     <div className="w-full mx-auto px-2 py-4 space-y-6">
+      {/* Header - Active Period */}
+      <div className="p-2">
+        <div className="w-full mx-auto">
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col space-y-2"
+          >
+            <h1 className="text-3xl font-bold">
+              <span className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent mr-2">
+                Active
+              </span>
+              Period
+            </h1>
+          </motion.div>
+        </div>
+      </div>
+
       {/* Search Filters */}
       <PeriodSearchFilters
         searchTerm={searchTerm}
