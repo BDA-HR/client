@@ -30,8 +30,8 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
     dateStart: period.dateStart,
     dateEnd: period.dateEnd,
     isActive: period.isActive,
-    quarterId: '' as UUID,
-    fiscalYearId: '' as UUID,
+    quarterId: period.quarterId || ('' as UUID),
+    fiscalYearId: period.fiscalYearId || ('' as UUID),
     rowVersion: period.rowVersion || ''
   });
 
@@ -45,14 +45,34 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      // Convert DateTime to YYYY-MM-DD format for input fields
+      const formatDateForInput = (dateString: string | Date): string => {
+        if (!dateString) return '';
+        
+        let date: Date;
+        if (typeof dateString === 'string') {
+          date = new Date(dateString);
+        } else {
+          date = dateString;
+        }
+        
+        if (isNaN(date.getTime())) return '';
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+      };
+
       setEditedPeriod({
         id: period.id,
         name: period.name,
-        dateStart: period.dateStart,
-        dateEnd: period.dateEnd,
+        dateStart: formatDateForInput(period.dateStart),
+        dateEnd: formatDateForInput(period.dateEnd),
         isActive: period.isActive,
-        quarterId: '' as UUID,
-        fiscalYearId: '' as UUID,
+        quarterId: period.quarterId || ('' as UUID),
+        fiscalYearId: period.fiscalYearId || ('' as UUID),
         rowVersion: period.rowVersion || ''
       });
       fetchFiscalYears();
@@ -142,7 +162,15 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
 
     try {
       setLoading(true);
-      await onEditPeriod(editedPeriod);
+      
+      // Convert dates back to DateTime format for backend
+      const payload: EditPeriodDto = {
+        ...editedPeriod,
+        dateStart: new Date(editedPeriod.dateStart).toISOString(),
+        dateEnd: new Date(editedPeriod.dateEnd).toISOString()
+      };
+      
+      await onEditPeriod(payload);
     } catch (error) {
       console.error('Error updating period:', error);
     } finally {

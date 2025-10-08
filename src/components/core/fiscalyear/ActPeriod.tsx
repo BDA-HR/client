@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Eye, PenBox, Trash2,
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { PeriodListDto } from '../../../types/core/period';
 
-interface PeriodTableProps {
+interface ActPeriodProps {
   periods: PeriodListDto[];
   currentPage: number;
   totalPages: number;
@@ -16,7 +16,7 @@ interface PeriodTableProps {
   loading?: boolean;
 }
 
-export const PeriodTable: React.FC<PeriodTableProps> = ({
+export const ActPeriod: React.FC<ActPeriodProps> = ({
   periods,
   currentPage,
   totalPages,
@@ -28,6 +28,9 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
   loading = false
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
+  
+  // Filter periods to show only active ones
+  const activePeriods = periods.filter(period => period.isActive === "true");
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -59,7 +62,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
   };
 
   const getStatusColor = (status: string): string => {
-    return status === '0' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-gray-800';
+    return status === 'true' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-800';
   };
 
   const getPeriodColor = (name: string): string => {
@@ -82,7 +85,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
     return (
       <div className="flex justify-center items-center py-12">
         <Loader className="h-8 w-8 animate-spin text-emerald-600" />
-        <span className="ml-2 text-gray-600">Loading periods...</span>
+        <span className="ml-2 text-gray-600">Loading active periods...</span>
       </div>
     );
   }
@@ -93,6 +96,22 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
       animate="visible"
       variants={containerVariants}
     >
+      {/* Active Periods Header */}
+      <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <h3 className="text-lg font-semibold text-green-800">Active Periods</h3>
+            <span className="bg-green-100 text-green-800 text-sm px-2 py-1 rounded-full">
+              {activePeriods.length} active
+            </span>
+          </div>
+          <div className="text-sm text-green-600">
+            Showing only currently active periods
+          </div>
+        </div>
+      </div>
+
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-white">
@@ -122,14 +141,22 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
             </motion.tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {periods.length === 0 ? (
+            {activePeriods.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                  No periods found. Click "Add New Period" to create one.
+                <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <Calendar className="h-12 w-12 text-gray-300" />
+                    <div>
+                      <p className="text-lg font-medium text-gray-600">No Active Periods</p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        There are currently no active periods in the system.
+                      </p>
+                    </div>
+                  </div>
                 </td>
               </tr>
             ) : (
-              periods.map((period, index) => (
+              activePeriods.map((period, index) => (
                 <motion.tr 
                   key={period.id}
                   custom={index}
@@ -142,15 +169,17 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                     <div className="flex items-center">
                       <motion.div 
                         whileHover={{ rotate: 10 }}
-                        className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
+                        className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center"
                       >
-                        <Calendar className="text-emerald-600 h-5 w-5" />
+                        <Calendar className="text-green-600 h-5 w-5" />
                       </motion.div>
                       <div className="ml-3">
                         <div className={`text-sm font-medium truncate max-w-[120px] md:max-w-none ${getPeriodColor(period.name)}`}>
                           {period.name}
                         </div>
-                       
+                        <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
+                          {period.quarter}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -163,13 +192,11 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                       {period.quarter}
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                    
                       {period.fiscYear}
-                    
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(period.isActive)}`}>
-                      {period.isActive === "0" ? "Active" : "Inactive"}
+                      {period.isActive === "true" ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">
@@ -216,8 +243,8 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
           </tbody>
         </table>
         
-        {/* Pagination */}
-        {periods.length > 0 && (
+        {/* Pagination - Only show if there are active periods */}
+        {activePeriods.length > 0 && (
           <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
@@ -240,7 +267,7 @@ export const PeriodTable: React.FC<PeriodTableProps> = ({
                 <p className="text-sm text-gray-700">
                   Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
                   <span className="font-medium">{Math.min(currentPage * 10, totalItems)}</span> of{' '}
-                  <span className="font-medium">{totalItems}</span> periods
+                  <span className="font-medium">{totalItems}</span> active periods
                 </p>
               </div>
               <div>

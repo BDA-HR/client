@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import PeriodSearchFilters from "./PeriodSearchFilters";
-import { PeriodTable } from "./PeriodTable";
+import { ActPeriod } from "./ActPeriod";
 import { ViewPeriodModal } from "./ViewPeriodModal";
 import EditPeriodModal from "./EditPeriodModal";
 import { DeletePeriodModal } from "./DeletePeriodModal";
@@ -16,6 +16,7 @@ import { periodService } from "../../../services/core/periodservice";
 import toast from "react-hot-toast";
 
 function PeriodSection() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -27,8 +28,8 @@ function PeriodSection() {
   const [periods, setPeriods] = useState<PeriodListDto[]>([]);
   const [filteredPeriods, setFilteredPeriods] = useState<PeriodListDto[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
     name: "",
@@ -44,35 +45,51 @@ function PeriodSection() {
   // Fetch periods on component mount
   useEffect(() => {
     fetchPeriods();
-  }, [currentPage]);
+  }, []);
 
-  // Filter periods based on search term and update pagination
+  // Filter periods based on search term and status
   useEffect(() => {
-    let filtered = periods;
+    let filtered = [...periods];
     
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(period => 
+        statusFilter === "active" ? period.isActive === "true" : period.isActive === "false"
+      );
+    }
+    
+    // Apply search term filter
     if (searchTerm.trim() !== "") {
-      filtered = periods.filter(period =>
-        period.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        period.quarter.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        period.fiscYear.toLowerCase().includes(searchTerm.toLowerCase())
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(period =>
+        period.name.toLowerCase().includes(term) ||
+        period.quarter.toLowerCase().includes(term) ||
+        period.fiscYear.toLowerCase().includes(term) ||
+        // Search by status using keywords
+        (term === "active" && period.isActive === "true") ||
+        (term === "inactive" && period.isActive === "false") ||
+        (term === "true" && period.isActive === "true") ||
+        (term === "false" && period.isActive === "false")
       );
     }
     
     setFilteredPeriods(filtered);
     setTotalItems(filtered.length);
     setTotalPages(Math.ceil(filtered.length / 10));
-  }, [searchTerm, periods]);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [searchTerm, statusFilter, periods]);
 
   const fetchPeriods = async () => {
     try {
       setLoading(true);
-      setError(null);
+      
+      // Use real API call
       const periodsData = await periodService.getAllPeriods();
+      
       setPeriods(periodsData);
-      setFilteredPeriods(periodsData);
     } catch (err) {
       console.error("Error fetching periods:", err);
-      setError("Failed to load periods. Please try again later.");
+      toast.error("Failed to load periods. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -81,7 +98,6 @@ function PeriodSection() {
   const handleAddPeriod = async () => {
     try {
       toast.loading("Adding period...");
-      setError(null);
       const createdPeriod = await periodService.createPeriod(newPeriod);
       setPeriods((prev) => [createdPeriod, ...prev]);
       setNewPeriod({
@@ -101,7 +117,6 @@ function PeriodSection() {
       console.error("Error adding period:", err);
       toast.dismiss();
       toast.error("Failed to add period");
-      setError("Failed to add period. Please try again.");
       throw err;
     }
   };
@@ -109,7 +124,6 @@ function PeriodSection() {
   const handleEditPeriod = async (periodData: EditPeriodDto) => {
     try {
       toast.loading("Updating period...");
-      setError(null);
       const updatedPeriod = await periodService.updatePeriod(periodData);
       setPeriods((prev) =>
         prev.map((p) => (p.id === updatedPeriod.id ? updatedPeriod : p))
@@ -121,7 +135,6 @@ function PeriodSection() {
       console.error("Error updating period:", err);
       toast.dismiss();
       toast.error("Failed to update period");
-      setError("Failed to update period. Please try again.");
       throw err;
     }
   };
@@ -129,7 +142,6 @@ function PeriodSection() {
   const handleDeletePeriod = async (periodId: UUID) => {
     try {
       toast.loading("Deleting period...");
-      setError(null);
       await periodService.deletePeriod(periodId);
       setPeriods((prev) => prev.filter((p) => p.id !== periodId));
       setIsDeleteModalOpen(false);
@@ -139,7 +151,6 @@ function PeriodSection() {
       console.error("Error deleting period:", err);
       toast.dismiss();
       toast.error("Failed to delete period");
-      setError("Failed to delete period. Please try again.");
     }
   };
 
@@ -166,58 +177,35 @@ function PeriodSection() {
     setIsModalOpen(true);
   };
 
+  const handleViewHistory = () => {
+    navigate('/core/fiscal-year/period-history');
+  };
+
+  const handleStatusFilterChange = (status: "all" | "active" | "inactive") => {
+    setStatusFilter(status);
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+  };
+
+  // Get current items for display
+  const currentItems = filteredPeriods.slice((currentPage - 1) * 10, currentPage * 10);
+
   return (
     <div className="w-full mx-auto px-2 py-4 space-y-6">
-      {/* Header Section */}
-      <div className="flex justify-between items-center">
-        <div>
-          <motion.h2
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
-          >
-            Active Periods
-          </motion.h2>
-        </div>
-      </div>
-
-      {/* Error message for API errors */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm p-4"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-red-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div className="ml-3">
-                <p className="text-red-700 mt-1">{error}</p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Search Filters - Now positioned under the error */}
+      {/* Search Filters */}
       <PeriodSearchFilters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+        onClearFilters={handleClearFilters}
         onAddPeriod={handleAddPeriodClick}
+        onViewHistory={handleViewHistory}
+        totalItems={periods.length}
+        filteredItems={filteredPeriods.length}
       />
 
       {/* Loading state */}
@@ -227,10 +215,10 @@ function PeriodSection() {
         </div>
       )}
 
-      {/* Periods Table */}
+      {/* Active Periods Table */}
       {!loading && (
-        <PeriodTable
-          periods={filteredPeriods.slice((currentPage - 1) * 10, currentPage * 10)}
+        <ActPeriod
+          periods={currentItems}
           currentPage={currentPage}
           totalPages={totalPages}
           totalItems={totalItems}

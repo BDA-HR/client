@@ -37,6 +37,7 @@ import CompanyBranchesPage from './pages/core/pageCompanies';
 import CompanyDetailsPage from './components/core/company/CompDetails';
 import BranchesPage from './pages/core/pageBranches';
 import FiscalYearHistory from './pages/core/pageFiscYearHist';
+import PagePeriod from './pages/core/pagePeriod';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -97,6 +98,7 @@ function App() {
             {/* <Route path='/core/branch' element={<BranchOverview />} /> */}
             <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
             <Route path="/core/fiscal-year/history" element={<FiscalYearHistory />} />
+            <Route path="/core/fiscal-year/period-history" element={<PagePeriod />} />
             {/* <Route path='/core/hierarchy' element={<HierarchyOverview />} /> */}
             <Route path='/core/users' element={<UserOverview />} />
             <Route path="/core/department" element={<DepartmentOverview />} />
