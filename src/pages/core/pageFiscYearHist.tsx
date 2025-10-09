@@ -148,7 +148,7 @@ export default function FiscalYearHistory() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="w-full mx-auto px-2 py-4">
+      <div className="w-full -mt-6 py-4 mx-auto">
         
         <div className="mb-6">
           <h1 className="text-2xl font-bold">
