@@ -111,7 +111,7 @@ const AllBranchs: React.FC = () => {
       className="space-y-6"
     >
       {/* Header - Always visible */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 -mt-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 -mt-2">
         <div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white">All Branches</h2>
         </div>

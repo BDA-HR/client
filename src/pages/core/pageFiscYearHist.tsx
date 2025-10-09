@@ -208,7 +208,7 @@ export default function FiscalYearHistory() {
 
         {/* Content */}
         {!loading && !error && (
-          <>
+          <div className="space-y-6">
             {/* Search Component */}
             <FiscYearSearch 
               searchTerm={searchTerm}
@@ -225,7 +225,7 @@ export default function FiscalYearHistory() {
               onStatusChange={handleStatusChange}
               onDelete={handleDelete}
             />
-          </>
+          </div>
         )}
 
         {/* View Modal */}
