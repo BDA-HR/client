@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PeriodTable } from '../../components/core/fiscalyear/PeriodTable';
-import { ViewPeriodModal } from '../../components/core/fiscalyear/ViewPeriodModal';
-import EditPeriodModal from '../../components/core/fiscalyear/EditPeriodModal';
-import { DeletePeriodModal } from '../../components/core/fiscalyear/DeletePeriodModal';
+import { PeriodTable } from '../../components/core/period/PeriodTable';
+import { ViewPeriodModal } from '../../components/core/period/ViewPeriodModal';
+import EditPeriodModal from '../../components/core/period/EditPeriodModal';
+import { DeletePeriodModal } from '../../components/core/period/DeletePeriodModal';
+import { AddPeriodModal } from '../../components/core/period/AddPeriodModal';
 import { periodService } from '../../services/core/periodservice';
-import type { PeriodListDto, EditPeriodDto, UUID } from '../../types/core/period';
+import type { PeriodListDto, EditPeriodDto, UUID, AddPeriodDto } from '../../types/core/period';
 import { motion } from 'framer-motion';
-import PeriodSearchFilters from '../../components/core/fiscalyear/PeriodSearchFilters';
+import PeriodSearchFilters from '../../components/core/period/PeriodSearchFilters';
+import toast from 'react-hot-toast';
 
 export default function PagePeriod() {
   const navigate = useNavigate();
@@ -16,55 +18,57 @@ export default function PagePeriod() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(null);
 
+  const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
+    name: "",
+    dateStart: new Date().toISOString().split('T')[0],
+    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    isActive: "0",
+    quarterId: "" as UUID,
+    fiscalYearId: "" as UUID,
+  });
+
   const itemsPerPage = 10;
 
-  // Filter periods based on search term and status
+  // Filter periods based on search term - shows ALL periods (active and inactive)
   const filteredPeriods = useMemo(() => {
-    let filtered = periods;
-    
-    // Apply status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(period => 
-        statusFilter === "active" ? period.isActive === "0" : period.isActive === "1"
-      );
+    if (!searchTerm.trim()) {
+      return periods;
     }
     
-    // Apply search term
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase().trim();
-      filtered = filtered.filter(period => {
-        const regularMatch = 
-          period.name.toLowerCase().includes(term) ||
-          period.quarter.toLowerCase().includes(term) ||
-          period.fiscYear.toLowerCase().includes(term);
-        
-        const statusMatch = 
-          period.isActiveStr.toLowerCase().includes(term) ||
-          (period.isActive === '0' && (
-            term === 'active' || 
-            term === 'act' || 
-            term === '0' ||
-            'active'.startsWith(term)
-          )) ||
-          (period.isActive === '1' && (
-            term === 'inactive' || 
-            term === 'inact' || 
-            term === '1' ||
-            'inactive'.startsWith(term)
-          ));
-        
-        return regularMatch || statusMatch;
-      });
-    }
-    
-    return filtered;
-  }, [periods, searchTerm, statusFilter]);
+    const term = searchTerm.toLowerCase().trim();
+    return periods.filter(period => {
+      // Direct field matches
+      if (period.name?.toLowerCase().includes(term)) return true;
+      if (period.quarter?.toLowerCase().includes(term)) return true;
+      if (period.fiscYear?.toLowerCase().includes(term)) return true;
+      if (period.isActiveStr?.toLowerCase().includes(term)) return true;
+      
+      // Status code matches
+      if (term === '0' && period.isActive === '0') return true;
+      if (term === '1' && period.isActive === '1') return true;
+      
+      // Status text matches (with partial matching)
+      if (period.isActive === '0') {
+        if (term === 'active') return true;
+        if (term === 'act') return true;
+        if ('active'.includes(term)) return true;
+      }
+      
+      if (period.isActive === '1') {
+        if (term === 'inactive') return true;
+        if (term === 'inact') return true;
+        if ('inactive'.includes(term)) return true;
+      }
+      
+      return false;
+    });
+  }, [periods, searchTerm]);
 
   const totalItems = filteredPeriods.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -76,21 +80,48 @@ export default function PagePeriod() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm]);
 
   const loadPeriods = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Use actual API call
       const periodsData = await periodService.getAllPeriods();
       setPeriods(periodsData);
     } catch (err) {
       setError('Failed to load periods');
       console.error('Error loading periods:', err);
+      setPeriods([]); // Ensure periods is empty array on error
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddPeriod = async () => {
+    try {
+      toast.loading("Adding period...");
+      setError(null);
+      
+      const createdPeriod = await periodService.createPeriod(newPeriod);
+      setPeriods((prev) => [createdPeriod, ...prev]);
+      setNewPeriod({
+        name: "",
+        dateStart: new Date().toISOString().split('T')[0],
+        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        isActive: "0",
+        quarterId: "" as UUID,
+        fiscalYearId: "" as UUID,
+      });
+      setIsModalOpen(false);
+      toast.dismiss();
+      toast.success("Period added successfully!");
+    } catch (err) {
+      console.error("Error adding period:", err);
+      toast.dismiss();
+      setError("Failed to add period");
+      toast.error("Failed to add period");
+      throw err;
     }
   };
 
@@ -140,22 +171,21 @@ export default function PagePeriod() {
     setSearchTerm(term);
   };
 
-  const handleStatusFilterChange = (status: "all" | "active" | "inactive") => {
-    setStatusFilter(status);
-  };
-
   const handleClearFilters = () => {
     setSearchTerm('');
-    setStatusFilter('all');
   };
 
   const handleAddPeriodClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleViewHistory = () => {
     navigate('/core/fiscal-year/overview');
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="w-full mx-auto px-2 py-4">
+      <div className="w-full -mt-4 mx-auto py-4">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold">
@@ -163,9 +193,6 @@ export default function PagePeriod() {
               Period History
             </span>
           </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Viewing all periods including active and inactive ones
-          </p>
         </div>
 
         {/* Error Message */}
@@ -214,35 +241,46 @@ export default function PagePeriod() {
         )}
 
         {/* Content */}
-        {!loading && !error && (
+        {!loading && (
           <>
             {/* Search Filters */}
             <PeriodSearchFilters
               searchTerm={searchTerm}
               setSearchTerm={handleSearchChange}
-              statusFilter={statusFilter}
-              onStatusFilterChange={handleStatusFilterChange}
               onClearFilters={handleClearFilters}
               onAddPeriod={handleAddPeriodClick}
-              onViewHistory={() => {}} // Empty function since we're already in history view
+              onViewHistory={handleViewHistory}
               totalItems={periods.length}
               filteredItems={filteredPeriods.length}
+              isHistoryView={true}
             />
 
-            {/* Periods Table - Shows ALL periods (active and inactive) */}
-            <PeriodTable
-              periods={paginatedPeriods}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              onPageChange={setCurrentPage}
-              onViewDetails={handleViewDetails}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              loading={loading}
-            />
+            {/* Add padding between search filters and table */}
+            <div className="mt-6">
+              {/* Periods Table - Shows ALL periods (active and inactive) */}
+              <PeriodTable
+                periods={paginatedPeriods}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                onPageChange={setCurrentPage}
+                onViewDetails={handleViewDetails}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                loading={loading}
+              />
+            </div>
           </>
         )}
+
+        {/* Add Period Modal */}
+        <AddPeriodModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          newPeriod={newPeriod}
+          setNewPeriod={setNewPeriod}
+          onAddPeriod={handleAddPeriod}
+        />
 
         {/* View Modal */}
         <ViewPeriodModal

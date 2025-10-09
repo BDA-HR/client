@@ -4,6 +4,13 @@ import { ChevronLeft, ChevronRight, Calendar, MoreVertical, Eye, PenBox, Trash2,
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { PeriodListDto } from '../../../types/core/period';
 
+// Define the period status enum to match your backend
+export const PeriodStat = {
+  "0": 'Active',
+  "1": 'Inactive'
+} as const;
+export type PeriodStat = typeof PeriodStat[keyof typeof PeriodStat];
+
 interface ActPeriodProps {
   periods: PeriodListDto[];
   currentPage: number;
@@ -29,8 +36,8 @@ export const ActPeriod: React.FC<ActPeriodProps> = ({
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
   
-  // Filter periods to show only active ones
-  const activePeriods = periods.filter(period => period.isActive === "true");
+  // Filter periods to show only active ones (IsActive === "0")
+  const activePeriods = periods.filter(period => period.isActive === "0");
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -62,7 +69,11 @@ export const ActPeriod: React.FC<ActPeriodProps> = ({
   };
 
   const getStatusColor = (status: string): string => {
-    return status === 'true' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-800';
+    return status === '0' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-800 border border-gray-200';
+  };
+
+  const getStatusText = (status: string): string => {
+    return status === '0' ? 'Active' : 'Inactive';
   };
 
   const getPeriodColor = (name: string): string => {
@@ -96,22 +107,6 @@ export const ActPeriod: React.FC<ActPeriodProps> = ({
       animate="visible"
       variants={containerVariants}
     >
-      {/* Active Periods Header */}
-      <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <h3 className="text-lg font-semibold text-green-800">Active Periods</h3>
-            <span className="bg-green-100 text-green-800 text-sm px-2 py-1 rounded-full">
-              {activePeriods.length} active
-            </span>
-          </div>
-          <div className="text-sm text-green-600">
-            Showing only currently active periods
-          </div>
-        </div>
-      </div>
-
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-white">
@@ -184,19 +179,22 @@ export const ActPeriod: React.FC<ActPeriodProps> = ({
                     </div>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center">
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500">Gregorian:</span>
                       <span>{getDuration(period.dateStartStr, period.dateEndStr)}</span>
+                      <span className="text-xs text-gray-500 mt-1">Ethiopian:</span>
+                      <span>{getDuration(period.dateStartStrAm, period.dateEndStrAm)}</span>
                     </div>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
-                      {period.quarter}
+                    {period.quarter}
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                      {period.fiscYear}
+                    {period.fiscYear}
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(period.isActive)}`}>
-                      {period.isActive === "true" ? "Active" : "Inactive"}
+                      {getStatusText(period.isActive)}
                     </span>
                   </td>
                   <td className="px-4 py-1 whitespace-nowrap text-right text-sm font-medium">

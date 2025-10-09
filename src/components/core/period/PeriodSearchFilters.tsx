@@ -5,13 +5,12 @@ import { Button } from "../../ui/button";
 interface PeriodSearchFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  statusFilter: "all" | "active" | "inactive";
-  onStatusFilterChange: (status: "all" | "active" | "inactive") => void;
   onClearFilters: () => void;
   onAddPeriod: () => void;
   onViewHistory: () => void;
   totalItems: number;
   filteredItems: number;
+  isHistoryView: boolean;
 }
 
 const PeriodSearchFilters = ({
@@ -19,7 +18,8 @@ const PeriodSearchFilters = ({
   setSearchTerm,
   onAddPeriod,
   onViewHistory,
-  totalItems,
+  
+  isHistoryView,
 }: PeriodSearchFiltersProps) => {
   return (
     <motion.div
@@ -51,32 +51,36 @@ const PeriodSearchFilters = ({
               id="search"
               name="search"
               type="text"
-              placeholder="Search periods by name, quarter, fiscal year, or status (active/inactive)..."
+              placeholder="Search periods by name, status..."
               className="block w-full md:w-1/2 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            onClick={onAddPeriod}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 cursor-pointer"
-          >
-            <BadgePlus size={20} />
-            Add New Period
-          </Button>
-          
-          <Button
-            onClick={onViewHistory}
-            variant="outline"
-            className="flex items-center gap-2 cursor-pointer border-emerald-200"
-          >
-            <History size={18} />
-            <span>View History ({totalItems})</span>
-          </Button>
-        </div>
+        {/* Only show buttons when NOT in history view */}
+        {!isHistoryView && (
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={onAddPeriod}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 cursor-pointer"
+            >
+              <BadgePlus size={20} />
+              Add New Period
+            </Button>
+            
+            <Button
+              onClick={onViewHistory}
+              variant="outline"
+              className="flex items-center gap-2 cursor-pointer border-emerald-200 hover:bg-gray-50"
+            >
+              <History size={18} />
+              <span>View History </span>
+            </Button>
+          </div>
+        )}
       </div>
     </motion.div>
   );

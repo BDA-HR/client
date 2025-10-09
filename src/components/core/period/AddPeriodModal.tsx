@@ -4,7 +4,7 @@ import { X, BadgePlus } from 'lucide-react';
 import { Button } from '../../ui/button';
 import type { AddPeriodDto, UUID } from '../../../types/core/period';
 import toast from 'react-hot-toast';
-import List from '../../../components/List/list';
+import List from '../../List/list';
 import type { ListItem } from '../../../types/List/list';
 import { listService } from '../../../services/List/listservice';
 import { fiscalYearService } from '../../../services/core/fiscservice';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { Button } from '../../ui/button';
 import type { PeriodListDto, UUID } from '../../../types/core/period';
 
 interface DeletePeriodModalProps {

@@ -8,7 +8,7 @@ import { EditFiscModal } from '../../components/core/fiscalyear/EditFiscModal';
 import { DeleteFiscModal } from '../../components/core/fiscalyear/DeleteFiscModal';
 import { fiscalYearService } from '../../services/core/fiscservice';
 import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../../types/core/fisc';
-import PeriodSection from '../../components/core/fiscalyear/PeriodSection';
+import PeriodSection from '../../components/core/period/PeriodSection';
 import ActiveFisc from '../../components/core/fiscalyear/ActFiscYear';
 import { motion } from 'framer-motion';
 

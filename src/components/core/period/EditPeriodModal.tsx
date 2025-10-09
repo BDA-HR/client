@@ -6,7 +6,7 @@ import { Label } from '../../ui/label';
 import type { EditPeriodDto, PeriodListDto, UUID } from '../../../types/core/period';
 import toast from 'react-hot-toast';
 import { PeriodStat } from '../../../types/core/enum';
-import List from '../../../components/List/list';
+import List from '../../List/list';
 import type { ListItem } from '../../../types/List/list';
 import { listService } from '../../../services/List/listservice';
 import { fiscalYearService } from '../../../services/core/fiscservice';
@@ -27,8 +27,8 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
   const [editedPeriod, setEditedPeriod] = useState<EditPeriodDto>({
     id: period.id,
     name: period.name,
-    dateStart: period.dateStart,
-    dateEnd: period.dateEnd,
+    dateStart: '',
+    dateEnd: '',
     isActive: period.isActive,
     quarterId: period.quarterId || ('' as UUID),
     fiscalYearId: period.fiscalYearId || ('' as UUID),
@@ -45,36 +45,52 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      // Convert DateTime to YYYY-MM-DD format for input fields
-      const formatDateForInput = (dateString: string | Date): string => {
-        if (!dateString) return '';
+      // Parse the display dates to get actual date values for the input fields
+      const parseDisplayDate = (displayDate: string): string => {
+        if (!displayDate) return '';
         
-        let date: Date;
-        if (typeof dateString === 'string') {
-          date = new Date(dateString);
-        } else {
-          date = dateString;
+        try {
+          // Try to parse the display date (e.g., "January 01, 2024")
+          const date = new Date(displayDate);
+          if (isNaN(date.getTime())) {
+            // If parsing fails, try alternative formats or return empty
+            console.warn('Could not parse date:', displayDate);
+            return '';
+          }
+          
+          // Format as YYYY-MM-DD for input[type="date"]
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          
+          return `${year}-${month}-${day}`;
+        } catch (error) {
+          console.error('Error parsing date:', displayDate, error);
+          return '';
         }
-        
-        if (isNaN(date.getTime())) return '';
-        
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        
-        return `${year}-${month}-${day}`;
       };
+
+      // If the period has raw date values, use them directly
+      // Otherwise, parse from the display strings
+      const dateStart = period.dateStart && typeof period.dateStart === 'string' && period.dateStart.includes('-') 
+        ? period.dateStart.split('T')[0] // Already in ISO format, extract date part
+        : parseDisplayDate(period.dateStartStr || '');
+
+      const dateEnd = period.dateEnd && typeof period.dateEnd === 'string' && period.dateEnd.includes('-')
+        ? period.dateEnd.split('T')[0] // Already in ISO format, extract date part
+        : parseDisplayDate(period.dateEndStr || '');
 
       setEditedPeriod({
         id: period.id,
         name: period.name,
-        dateStart: formatDateForInput(period.dateStart),
-        dateEnd: formatDateForInput(period.dateEnd),
+        dateStart: dateStart,
+        dateEnd: dateEnd,
         isActive: period.isActive,
         quarterId: period.quarterId || ('' as UUID),
         fiscalYearId: period.fiscalYearId || ('' as UUID),
         rowVersion: period.rowVersion || ''
       });
+      
       fetchFiscalYears();
       fetchQuarters();
     }
@@ -163,7 +179,7 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
     try {
       setLoading(true);
       
-      // Convert dates back to DateTime format for backend
+      // Convert dates to ISO format for backend
       const payload: EditPeriodDto = {
         ...editedPeriod,
         dateStart: new Date(editedPeriod.dateStart).toISOString(),
@@ -192,7 +208,7 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <PenBox size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
+            <h2 className="text-lg font-bold text-gray-800">Edit Period</h2>
           </div>
           <button
             onClick={onClose}

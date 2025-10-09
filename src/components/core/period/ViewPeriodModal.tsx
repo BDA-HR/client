@@ -17,11 +17,11 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
   if (!isOpen || !period) return null;
 
   const getStatusColor = (status: string): string => {
-    return status === 'true' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+    return status === '0' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
   };
 
   const getStatusText = (status: string): string => {
-    return status === 'true' ? 'Active' : 'Inactive';
+    return status === '0' ? 'Active' : 'Inactive';
   };
 
   return (
@@ -50,33 +50,51 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
         <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column */}
           <div className="space-y-4">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {/* Period Name */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">Period Name</p>
-                <p className="font-medium text-gray-900">{period.name}</p>
+                <p className="text-sm text-gray-500 mb-1">Period Name</p>
+                <p className="text-sm font-medium text-gray-900">{period.name}</p>
               </div>
 
-              {/* Quarter */}
+              {/* Start Date */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">Quarter</p>
-                <p className="font-medium text-gray-900">{period.quarter}</p>
+                <p className="text-sm text-gray-500 mb-1">Start Date</p>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{period.dateStartStr}</p>
+                  <p className="text-sm font-medium text-gray-900">{period.dateStartStrAm}</p>
+                </div>
               </div>
 
-              {/* Fiscal Year */}
+              {/* End Date */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">Fiscal Year</p>
-                <p className="font-medium text-gray-900">{period.fiscYear}</p>
+                <p className="text-sm text-gray-500 mb-1">End Date</p>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{period.dateEndStr}</p>
+                  <p className="text-sm font-medium text-gray-900">{period.dateEndStrAm}</p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Right Column */}
           <div className="space-y-4">
-            <div className="space-y-3">
+            <div className="space-y-2">
+              {/* Quarter */}
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Quarter</p>
+                <p className="text-sm font-medium text-gray-900">{period.quarter}</p>
+              </div>
+
+              {/* Fiscal Year */}
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Fiscal Year</p>
+                <p className="text-sm font-medium text-gray-900">{period.fiscYear}</p>
+              </div>
+
               {/* Status */}
               <div>
-                <p className="text-sm text-gray-500">Status</p>
+                <p className="text-sm text-gray-500 mb-1">Status</p>
                 <span
                   className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
                     period.isActive
@@ -84,24 +102,6 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
                 >
                   {getStatusText(period.isActive)}
                 </span>
-              </div>
-
-              {/* Start Date */}
-              <div>
-                <p className="text-sm text-gray-500 mb-2">Start Date</p>
-                <div>
-                  <p className="font-medium text-gray-900">{period.dateStartStr}</p>
-                  <p className="font-medium text-gray-900">{period.dateStartStrAm}</p>
-                </div>
-              </div>
-
-              {/* End Date */}
-              <div>
-                <p className="text-sm text-gray-500 mb-2">End Date</p>
-                <div>
-                  <p className="font-medium text-gray-900">{period.dateEndStr}</p>
-                  <p className="font-medium text-gray-900">{period.dateEndStrAm}</p>
-                </div>
               </div>
             </div>
           </div>
@@ -111,12 +111,12 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
         <div className="border-t px-6 py-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <p className="text-sm text-gray-500 mb-1">
+              <p className="text-sm text-gray-500">
                 Created At: <span className="font-medium">{period.createdAt} / {period.createdAtAm}</span>
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">
+              <p className="text-sm text-gray-500">
                 Modified At: <span className="font-medium">{period.modifiedAt} / {period.modifiedAtAm}</span>
               </p>
             </div>
