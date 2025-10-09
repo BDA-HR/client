@@ -6,7 +6,6 @@ import { Button } from '../../ui/button';
 export const FiscalYearManagementHeader = ({ 
   setDialogOpen, 
   onViewHistory,
-  totalItems 
 }: { 
   setDialogOpen: (open: boolean) => void;
   onViewHistory: () => void;
@@ -47,7 +46,7 @@ export const FiscalYearManagementHeader = ({
             className="flex items-center gap-2 cursor-pointer border-emerald-200"
           >
             <History size={18} />
-            <span>View History ({totalItems})</span>
+            <span>View History</span>
           </Button>
 
         </div>
