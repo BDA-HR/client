@@ -125,7 +125,7 @@ export default function FiscalYearOverview() {
 
   return (
     <>
-      <div className="bg-gray-50">
+      <div className="bg-gray-50 -mt-6 py-4 -mx-2">
         <Dialog>
           <FiscalYearManagementHeader 
             setDialogOpen={setAddModalOpen}

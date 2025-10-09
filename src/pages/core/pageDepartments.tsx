@@ -156,7 +156,7 @@ const DepartmentOverview = () => {
           isEditModalOpen ? "blur-sm" : ""
         }`}
       >
-        <div className="w-full mx-auto">
+        <div className="w-full -mt-6 py-4 mx-auto">
           <div className="flex flex-col space-y-6">
             <DepartmentManagementHeader />
 
