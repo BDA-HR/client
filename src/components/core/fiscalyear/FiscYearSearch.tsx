@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
-import { Input } from '../../ui/input';
 
 interface FiscYearSearchProps {
   searchTerm: string;
@@ -13,20 +12,31 @@ export const FiscYearSearch: React.FC<FiscYearSearchProps> = ({
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-      className="mb-6 bg-white p-3 rounded shadow-md"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="bg-white p-4 rounded-lg shadow-sm"
     >
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          type="text"
-          placeholder="Search fiscal years by name, duration, or status..."
-          className="pl-10 pr-4 py-2 w-1/2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex-1">
+          <label htmlFor="fiscal-year-search" className="sr-only">
+            Search fiscal years
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              id="fiscal-year-search"
+              name="fiscal-year-search"
+              type="text"
+              placeholder="Search fiscal years by name, duration, or status..."
+              className="block w-full md:w-1/2 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
     </motion.div>
   );
