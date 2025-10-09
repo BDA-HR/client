@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { X, Eye, Building } from "lucide-react";
+import { X, Eye } from "lucide-react";
 import type { DeptListDto } from "../../../types/core/dept";
 
 interface ViewDeptModalProps {
@@ -58,7 +58,7 @@ const ViewDeptModal: React.FC<ViewDeptModalProps> = ({
 
               {/* Branch Information */}
               <div>
-                <p className="text-sm text-gray-500 mb-2 flex gap-1 items-center"> <Building size={18} /> Branch</p>
+                <p className="text-sm text-gray-500 mb-2 flex gap-1 items-center">  Branch</p>
                 <div className="flex items-center gap-2">
                   <div className="space-y-1">
                     <p className="font-medium text-gray-900">
@@ -88,34 +88,6 @@ const ViewDeptModal: React.FC<ViewDeptModalProps> = ({
           </div>
 
           {/* Right Column - Additional Details */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Additional Details</h3>
-            <div className="space-y-3">
-              {/* Un comment if needed to add it
-              <div>
-                <p className="text-sm text-gray-500">Department ID</p>
-                <p className="font-medium text-gray-900">{selectedDepartment.id}</p>
-              </div>
-              
-              <div>
-                <p className="text-sm text-gray-500">Branch ID</p>
-                <p className="font-medium text-gray-900">{selectedDepartment.branchId}</p>
-              </div> */}
-
-              {/* Add more department-specific fields here as needed */}
-              {/* For example:
-              <div>
-                <p className="text-sm text-gray-500">Manager</p>
-                <p className="font-medium text-gray-900">John Doe</p>
-              </div>
-              
-              <div>
-                <p className="text-sm text-gray-500">Employee Count</p>
-                <p className="font-medium text-gray-900">15 employees</p>
-              </div>
-              */}
-            </div>
-          </div>
         </div>
 
         {/* Footer with Timestamps (if available in your DeptListDto) */}
