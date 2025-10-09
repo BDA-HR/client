@@ -21,7 +21,7 @@ export const FiscalYearManagementHeader = ({
           transition={{ duration: 0.4 }}
           className="flex flex-col space-y-2"
         >
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-2xl font-bold">
             <span className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent mr-2">
               Fiscal 
             </span>

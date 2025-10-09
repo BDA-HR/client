@@ -90,7 +90,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
         <motion.h1 
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
+          className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white"
         >
           Companies
         </motion.h1>
