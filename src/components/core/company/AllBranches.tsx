@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { branchService } from '../../../services/core/branchservice';
 import type { BranchListDto } from '../../../types/core/branch';
-import { Button } from '../../../components/ui/button';
-import { RefreshCw, Building, ChevronRight, ChevronLeft} from 'lucide-react';
+import { Building, ChevronRight, ChevronLeft} from 'lucide-react';
+import { BranchSearch } from '../branch/BranchsSearch'; 
 
 const AllBranchs: React.FC = () => {
   const [branches, setBranches] = useState<BranchListDto[]>([]);
+  const [filteredBranches, setFilteredBranches] = useState<BranchListDto[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,6 +23,7 @@ const AllBranchs: React.FC = () => {
       const allBranches = await branchService.getAllBranches();
       
       setBranches(allBranches);
+      setFilteredBranches(allBranches);
       setTotalItems(allBranches.length);
       setTotalPages(Math.ceil(allBranches.length / itemsPerPage));
     } catch (err) {
@@ -35,11 +38,38 @@ const AllBranchs: React.FC = () => {
     fetchBranches();
   }, []);
 
+  // Filter branches based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredBranches(branches);
+    } else {
+      const lowercasedSearch = searchTerm.toLowerCase();
+      const filtered = branches.filter(branch =>
+        branch.name?.toLowerCase().includes(lowercasedSearch) ||
+        branch.location?.toLowerCase().includes(lowercasedSearch) ||
+        branch.code?.toLowerCase().includes(lowercasedSearch) ||
+        branch.comp?.toLowerCase().includes(lowercasedSearch)
+      );
+      setFilteredBranches(filtered);
+    }
+    setCurrentPage(1); // Reset to first page when search changes
+  }, [searchTerm, branches]);
+
+  // Update pagination when filtered branches change
+  useEffect(() => {
+    setTotalItems(filteredBranches.length);
+    setTotalPages(Math.ceil(filteredBranches.length / itemsPerPage));
+  }, [filteredBranches]);
+
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const paginatedBranches = branches.slice(
+  const paginatedBranches = filteredBranches.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -85,19 +115,14 @@ const AllBranchs: React.FC = () => {
         <div>
           <h2 className="text-xl font-semibold">All Branches</h2>
         </div>
-        
-        <div className="flex gap-3">
-          <Button
-            onClick={fetchBranches}
-            variant="outline"
-            className="flex items-center gap-2 cursor-pointer"
-            disabled={loading}
-          >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </Button>
-        </div>
       </div>
+
+  <BranchSearch 
+    searchTerm={searchTerm}
+    onSearchChange={handleSearchChange}
+    onRefresh={fetchBranches}
+    loading={loading}
+  />
 
       {/* Error message for API errors */}
       {error && (
@@ -193,122 +218,132 @@ const AllBranchs: React.FC = () => {
                 </motion.tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedBranches.map((branch, index) => (
-                  <motion.tr 
-                    key={branch.id}
-                    custom={index}
-                    initial="hidden"
-                    animate="visible"
-                    className="transition-colors hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-1 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <motion.div 
-                          whileHover={{ rotate: 10 }}
-                          className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
-                        >
-                          <Building className="text-emerald-600 h-5 w-5" />
-                        </motion.div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
-                            {branch.name}
-                          </div>
-                          <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                            {branch.code}
+                {paginatedBranches.length > 0 ? (
+                  paginatedBranches.map((branch, index) => (
+                    <motion.tr 
+                      key={branch.id}
+                      custom={index}
+                      initial="hidden"
+                      animate="visible"
+                      className="transition-colors hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-1 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <motion.div 
+                            whileHover={{ rotate: 10 }}
+                            className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
+                          >
+                            <Building className="text-emerald-600 h-5 w-5" />
+                          </motion.div>
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
+                              {branch.name}
+                            </div>
+                            <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
+                              {branch.code}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </td>
+                      <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                          {getBranchTypeText(branch.branchType)}
+                      </td>
+                      <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
+                          {getStatusText(branch.branchStatStr)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-1 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
+                        <div className="flex items-center">
+                          <span className="truncate max-w-[120px]">{branch.location}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                        <div className="flex items-center">
+                          <span className="truncate max-w-[120px]">{branch.comp}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                        <div className="flex items-center">
+                          <span>{branch.openDateStr}</span>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                      No branches found matching your search criteria.
                     </td>
-                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                        {getBranchTypeText(branch.branchType)}
-                    </td>
-                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
-                        {getStatusText(branch.branchStatStr)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-1 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
-                      <div className="flex items-center">
-                        <span className="truncate max-w-[120px]">{branch.location}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                      <div className="flex items-center">
-                        <span className="truncate max-w-[120px]">{branch.comp}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                      <div className="flex items-center">
-                        <span>{branch.openDateStr}</span>
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))}
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination */}
-          <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Next
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
-                  <span className="font-medium">{Math.min(currentPage * 10, totalItems)}</span> of{' '}
-                  <span className="font-medium">{totalItems}</span> branches
-                </p>
+          {/* Pagination - Only show if there are results */}
+          {paginatedBranches.length > 0 && (
+            <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Next
+                </button>
               </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  <button
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  >
-                    <span className="sr-only">Previous</span>
-                    <ChevronLeft size={16} />
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
+                    <span className="font-medium">{Math.min(currentPage * 10, totalItems)}</span> of{' '}
+                    <span className="font-medium">{totalItems}</span> branches
+                  </p>
+                </div>
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                     <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === page
-                          ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                     >
-                      {page}
+                      <span className="sr-only">Previous</span>
+                      <ChevronLeft size={16} />
                     </button>
-                  ))}
-                  <button
-                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  >
-                    <span className="sr-only">Next</span>
-                    <ChevronRight size={16} />
-                  </button>
-                </nav>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === page
+                            ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                    >
+                      <span className="sr-only">Next</span>
+                      <ChevronRight size={16} />
+                    </button>
+                  </nav>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </motion.div>
       )}
     </motion.div>
