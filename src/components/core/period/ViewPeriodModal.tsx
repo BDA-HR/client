@@ -53,13 +53,13 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
             <div className="space-y-2">
               {/* Period Name */}
               <div>
-                <p className="text-sm text-gray-500 mb-1">Period Name</p>
+                <p className="text-sm text-gray-500">Period Name</p>
                 <p className="text-sm font-medium text-gray-900">{period.name}</p>
               </div>
 
               {/* Start Date */}
               <div>
-                <p className="text-sm text-gray-500 mb-1">Start Date</p>
+                <p className="text-sm text-gray-500">Start Date</p>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{period.dateStartStr}</p>
                   <p className="text-sm font-medium text-gray-900">{period.dateStartStrAm}</p>
@@ -68,7 +68,7 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
 
               {/* End Date */}
               <div>
-                <p className="text-sm text-gray-500 mb-1">End Date</p>
+                <p className="text-sm text-gray-500">End Date</p>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{period.dateEndStr}</p>
                   <p className="text-sm font-medium text-gray-900">{period.dateEndStrAm}</p>
@@ -82,19 +82,19 @@ export const ViewPeriodModal: React.FC<ViewPeriodModalProps> = ({
             <div className="space-y-2">
               {/* Quarter */}
               <div>
-                <p className="text-sm text-gray-500 mb-1">Quarter</p>
+                <p className="text-sm text-gray-500">Quarter</p>
                 <p className="text-sm font-medium text-gray-900">{period.quarter}</p>
               </div>
 
               {/* Fiscal Year */}
               <div>
-                <p className="text-sm text-gray-500 mb-1">Fiscal Year</p>
+                <p className="text-sm text-gray-500">Fiscal Year</p>
                 <p className="text-sm font-medium text-gray-900">{period.fiscYear}</p>
               </div>
 
               {/* Status */}
               <div>
-                <p className="text-sm text-gray-500 mb-1">Status</p>
+                <p className="text-sm text-gray-500">Status</p>
                 <span
                   className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
                     period.isActive
