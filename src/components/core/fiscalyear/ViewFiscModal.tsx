@@ -56,7 +56,7 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
             <div className="space-y-3">
               {/* Fiscal Year Name */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">Fiscal Year Name</p>
+                <p className="text-sm text-gray-500">Fiscal Year Name</p>
                 <div>
                   <p className="font-medium text-gray-900">
                     {fiscalYear.name}
@@ -66,7 +66,7 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
 
               {/* Duration - English */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">Duration</p>
+                <p className="text-sm text-gray-500">Duration</p>
                 <div>
                   <p className="font-medium text-gray-900">
                     {fiscalYear.dateStartStr} - {fiscalYear.dateEndStr}
@@ -76,7 +76,7 @@ export const ViewFiscModal: React.FC<ViewFiscModalProps> = ({
 
               {/* Duration - Amharic */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">የቆይታ ጊዜ</p>
+                <p className="text-sm text-gray-500">የቆይታ ጊዜ</p>
                 <div>
                   <p className="font-medium text-gray-900">
                     {fiscalYear.dateStartStrAm} - {fiscalYear.dateEndStrAm}

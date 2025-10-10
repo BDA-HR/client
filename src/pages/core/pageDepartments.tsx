@@ -148,97 +148,102 @@ const DepartmentOverview = () => {
 
   return (
     <>
-      <motion.div
+      <motion.section
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className={`p-2 bg-gray-50 min-h-screen transition-all duration-300 ${
+        className={`w-full h-full flex flex-col space-y-6 ${
           isEditModalOpen ? "blur-sm" : ""
         }`}
       >
-        <div className="w-full -mt-6 py-4 mx-auto">
-          <div className="flex flex-col space-y-6">
-            <DepartmentManagementHeader />
-
-            {/* Loading State - Under Header */}
-            {loading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="flex justify-center items-center py-12"
-              >
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-                </div>
-              </motion.div>
-            )}
-
-            {!loading && (
-              <>
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">
-                        {error.includes("load") ? (
-                          <>
-                            Failed to load departments.{" "}
-                            <button
-                              onClick={loadDepartments}
-                              className="underline hover:text-red-800 font-semibold focus:outline-none"
-                            >
-                              Try again
-                            </button>{" "}
-                            later.
-                          </>
-                        ) : error.includes("create") ? (
-                          "Failed to create department. Please try again."
-                        ) : error.includes("update") ? (
-                          "Failed to update department. Please try again."
-                        ) : error.includes("delete") ? (
-                          "Failed to delete department. Please try again."
-                        ) : (
-                          error
-                        )}
-                      </span>
-                      <button
-                        onClick={() => setError(null)}
-                        className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                <DepartmentSearchFilters
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  onAddDepartment={handleAddDepartment}
-                  selectedBranchId=""
-                />
-
-                <DepartmentTable
-                  departments={paginatedDepartments}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  totalItems={filteredDepartments.length}
-                  onPageChange={setCurrentPage}
-                  onEditDepartment={handleEditClick}
-                  onDepartmentStatusChange={handleDepartmentStatusChange}
-                  onDepartmentDelete={handleDepartmentDelete}
-                />
-              </>
-            )}
-          </div>
+        {/* Header with border and padding */}
+        <div className="flex justify-between items-center">
+          <DepartmentManagementHeader />
         </div>
-      </motion.div>
 
-      {/* Edit Department Modal - Keep this in DepartmentOverview only */}
+        {/* Main content area with consistent padding */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Loading State */}
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex justify-center items-center py-12"
+            >
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+              </div>
+            </motion.div>
+          )}
+
+          {!loading && (
+            <div className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">
+                      {error.includes("load") ? (
+                        <>
+                          Failed to load departments.{" "}
+                          <button
+                            onClick={loadDepartments}
+                            className="underline hover:text-red-800 font-semibold focus:outline-none"
+                          >
+                            Try again
+                          </button>{" "}
+                          later.
+                        </>
+                      ) : error.includes("create") ? (
+                        "Failed to create department. Please try again."
+                      ) : error.includes("update") ? (
+                        "Failed to update department. Please try again."
+                      ) : error.includes("delete") ? (
+                        "Failed to delete department. Please try again."
+                      ) : (
+                        error
+                      )}
+                    </span>
+                    <button
+                      onClick={() => setError(null)}
+                      className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Search Filters */}
+              <DepartmentSearchFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                onAddDepartment={handleAddDepartment}
+                selectedBranchId=""
+              />
+
+              {/* Department Table */}
+              <DepartmentTable
+                departments={paginatedDepartments}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredDepartments.length}
+                onPageChange={setCurrentPage}
+                onEditDepartment={handleEditClick}
+                onDepartmentStatusChange={handleDepartmentStatusChange}
+                onDepartmentDelete={handleDepartmentDelete}
+              />
+            </div>
+          )}
+        </div>
+      </motion.section>
+
+      {/* Edit Department Modal */}
       {isEditModalOpen && editingDepartment && (
         <EditDeptModal
           department={editingDepartment}

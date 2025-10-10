@@ -1,82 +1,90 @@
-import React, { useState } from 'react';
-import List from '../../components/List/list';
-import { 
-  GENDER_OPTIONS, 
-  REGION_OPTIONS, 
-  STATUS_OPTIONS, 
-} from '../../data/list/list';
-import type { ListItem, UUID } from '../../types/List/list';
+import { BranchSearch } from "../../components/core/branch/BranchsSearch";
+import CompSection from "../../components/core/company/CompSection";
+import { motion } from "motion/react";
+import { Card }from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { MoreVertical, PenBox, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,} from "../../components/ui/dropdown-menu";
 
 const UserOverview: React.FC = () => {
-
-  const [selectedGender, setSelectedGender] = useState<UUID | undefined>(undefined);
-  const [selectedRegion, setSelectedRegion] = useState<UUID | undefined>(undefined);
-  const [selectedStatus, setSelectedStatus] = useState<UUID | undefined>(undefined);
-
-
-  const handleSelect = (setter: React.Dispatch<React.SetStateAction<UUID | undefined>>) => (item: ListItem) => {
-    setter(item.id);
-  };
-
-  const getSelectedName = (items: ListItem[], id: UUID | undefined) => {
-    return items.find(item => item.id === id)?.name || 'Not selected';
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-6 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-800">Reusable List Component</h1>
-          </div>
-          
-          <div className="space-y-6">
-            <List
-              items={GENDER_OPTIONS}
-              selectedValue={selectedGender}
-              onSelect={handleSelect(setSelectedGender)}
-              label="Gender"
-              placeholder="Select your gender"
-              required
-            />
-            
-            <List
-              items={REGION_OPTIONS}
-              selectedValue={selectedRegion}
-              onSelect={handleSelect(setSelectedRegion)}
-              label="Region"
-              placeholder="Select your region"
-            />
-            
-            <List
-              items={STATUS_OPTIONS}
-              selectedValue={selectedStatus}
-              onSelect={handleSelect(setSelectedStatus)}
-              label="Account Status"
-              placeholder="Select status"
-            />
-          </div>
-          
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h2 className="text-lg font-semibold text-gray-700 mb-3">Selected Values</h2>
-            <div className="grid grid-cols-1 gap-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Gender:</span>
-                <span className="font-medium">{getSelectedName(GENDER_OPTIONS, selectedGender)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Region:</span>
-                <span className="font-medium">{getSelectedName(REGION_OPTIONS, selectedRegion)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Status:</span>
-                <span className="font-medium">{getSelectedName(STATUS_OPTIONS, selectedStatus)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <section className="w-full h-full flex flex-col border border-gray-200 rounded-lg bg-white shadow-sm space-y-6">
+      <div className="flex justify-between items-center border-b">
+        <h1>Title</h1>
+        <button className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition">
+          Action
+        </button>
       </div>
-    </div>
+      <CompSection />
+      <BranchSearch />
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.05 },
+              },
+            }}
+          >
+
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                <Card className="relative rounded-xl border border-gray-200 shadow-sm p-4 space-y-3 transition hover:shadow-md">
+                  <div>
+                    <h4 className="text-md font-semibold text-black ">nameam</h4>
+                    <p className="text-sm text-gray-600 ">name</p>
+                    <p className="text-xs text-gray-500 mt-1">branches</p>
+                  </div>
+      
+                  <div className="flex justify-between items-center">
+                    <Button
+                      className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 cursor-pointer"
+                      size="sm"
+                    >
+                      View Branches
+                    </Button>
+                  </div>
+      
+                  <div className="absolute top-2 right-2 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <MoreVertical className="w-4 h-4 text-gray-500" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className='flex items-center gap-2'>
+                            <PenBox size={16}/>
+                          Edit
+                        </DropdownMenuItem>
+       <DropdownMenuItem
+        className="flex items-center gap-2 text-red-600 data-[highlighted]:!bg-red-50 data-[highlighted]:text-red-700"
+      >
+        <Trash2 size={16} className="text-red-600" />
+        <p className="text-red-600">Delete</p>
+      </DropdownMenuItem>
+      
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </Card>
+              </motion.div>
+
+          </motion.div>
+    </section>
+    
   );
 };
 export default UserOverview;

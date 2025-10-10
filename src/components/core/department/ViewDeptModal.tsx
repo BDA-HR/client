@@ -45,8 +45,8 @@ const ViewDeptModal: React.FC<ViewDeptModalProps> = ({
             <div className="space-y-3">
               {/* Department Name Section */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">Department Name</p>
-                <div className="space-y-1">
+                <p className="text-sm text-gray-500">Department Name</p>
+                <div>
                   <p className="font-medium text-gray-900">
                     {selectedDepartment.name}
                   </p>
@@ -58,7 +58,7 @@ const ViewDeptModal: React.FC<ViewDeptModalProps> = ({
 
               {/* Branch Information */}
               <div>
-                <p className="text-sm text-gray-500 mb-2 flex gap-1 items-center">  Branch</p>
+                <p className="text-sm text-gray-500 flex gap-1 items-center">  Branch</p>
                 <div className="flex items-center gap-2">
                   <div className="space-y-1">
                     <p className="font-medium text-gray-900">
