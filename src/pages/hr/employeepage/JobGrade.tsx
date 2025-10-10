@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, BookOpen, Briefcase, Layers, TrendingUp, Award, ShieldCheck } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
-import JobGradeHeader from '../../../components/hr/JobGradeHeader';
-import JobGradeCard from '../../../components/hr/JobGradeCard';
-import JobGradeAnalytics from '../../../components/hr/JobGradeAnalytics';
-import { generateJobGrades } from '../../../components/hr/JobGradeData';
-import AddJobGradeModal from '../../../components/hr/AddJobGrade';
-import JobGradeSearchFilters from '../../../components/hr/JobGradeSearchFilters';
+import JobGradeHeader from '../../../components/hr/jobgrade/JobGradeHeader';
+import JobGradeCard from '../../../components/hr/jobgrade/JobGradeCard';
+import JobGradeAnalytics from '../../../components/hr/jobgrade/JobGradeAnalytics';
+import { generateJobGrades } from '../../../components/hr/jobgrade/JobGradeData';
+import AddJobGradeModal from '../../../components/hr/jobgrade/AddJobGrade';
+import JobGradeSearchFilters from '../../../components/hr/jobgrade/JobGradeSearchFilters';
 import type { JobGrade } from '../../../types/jobgrade';
 import type { LucideIcon } from 'lucide-react';
 

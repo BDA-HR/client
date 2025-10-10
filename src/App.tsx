@@ -24,7 +24,7 @@ import AttendanceList from './pages/hr/attendancepage/AttendanceList';
 import ShiftScheduler from './pages/hr/attendancepage/ShiftScheduler';
 import TimeClock from './pages/hr/attendancepage/TimeClock';
 import TimeClockFormContainer from './pages/hr/attendancepage/TimeClockFormContainer';
-import EmployeeDetailsPage from './components/hr/EmployeeDetailsPage';
+import EmployeeDetailsPage from './components/hr/employee/EmployeeDetailsPage';
 import BudgetList from './pages/finance/budgetpage/BudgetList';
 import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
 import GlPage from './pages/finance/generalledgerpage/GlPage';
@@ -38,6 +38,7 @@ import CompanyDetailsPage from './components/core/company/CompDetails';
 import BranchesPage from './pages/core/pageBranches';
 import FiscalYearHistory from './pages/core/pageFiscYearHist';
 import PagePeriod from './pages/core/pagePeriod';
+import PageSettings from './pages/hr/pageSettings';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -62,36 +63,44 @@ function App() {
           {/* Protected layout routes */}
           <Route
             path="/"
-            element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
-          >
-            <Route path="/dashboard" element={<Dashboard />} />
+            element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
+
+            {/* START MENU ROUTES */}
+            <Route path="/hr" element={<Dashboard />} />
             <Route path='/inventory' element={<InventoryDashboard />} />
             <Route path='/core' element={<CoreDashboard />} />
             <Route path='/crm' element={<CRMDashboard />} />          
             <Route path='/finance' element={<Finance />} />
             <Route path='/procurement' element={<Procurement />} />
-            <Route path='/employees/record' element={<EmployeeManagementPage />} />
-            <Route path="/employees/:id" element={<EmployeeDetailsPage />} />
-            <Route path='/employees/jobgrade' element={<JobGrade />} />
-            <Route path='/employees/termination' element={<Termination />} />
-            <Route path='/recruitment/pipeline' element={<CandidatePipeline />} />
-            <Route path='/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />
-            <Route path='/recruitment/onboarding' element={<OnBoarding />} />
-            <Route path='/recruitment/list' element={<RecruitmentList />} />
-            <Route path='/leave/list' element={<LeaveList />} />
-            <Route path='/leave/form' element={<LeaveRequestForm />} />
-            <Route path='/leave/entitlement' element={<LeaveEntitlementPage />} />
-            <Route path='/attendance/list' element={<AttendanceList />} />
-            <Route path='/shift-scheduler' element={<ShiftScheduler />} />
-            <Route path='/time-clock' element={<TimeClock />} />
-            <Route path="/attendance/form" element={<TimeClockFormContainer />} />
-            
-            <Route path='/training' element={<Training />} />
+            {/* End MENU ROUTES */}
+
+            {/* START HR ROUTES */}
+            <Route path='/hr/employees/record' element={<EmployeeManagementPage />} />
+            <Route path="/hr/employees/:id" element={<EmployeeDetailsPage />} />
+            <Route path='/hr/settings/jobgrade' element={<JobGrade />} />
+            <Route path='/hr/employees/termination' element={<Termination />} />
+            <Route path='/hr/recruitment/pipeline' element={<CandidatePipeline />} />
+            <Route path='/hr/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />
+            <Route path='/hr/recruitment/onboarding' element={<OnBoarding />} />
+            <Route path='/hr/recruitment/list' element={<RecruitmentList />} />
+            <Route path='/hr/leave/list' element={<LeaveList />} />
+            <Route path='/hr/leave/form' element={<LeaveRequestForm />} />
+            <Route path='/hr/leave/entitlement' element={<LeaveEntitlementPage />} />
+            <Route path='/hr/attendance/list' element={<AttendanceList />} />
+            <Route path='/hr/shift-scheduler' element={<ShiftScheduler />} />
+            <Route path='/hr/time-clock' element={<TimeClock />} />
+            <Route path="/hr/attendance/form" element={<TimeClockFormContainer />} />
+            <Route path='/hr/settings' element={<PageSettings />} />
+            <Route path='/hr/training' element={<Training />} />
+            {/* END HR ROUTES */}
+
+            {/* START FINANCE ROUTES */}
             <Route path='/finance/gl' element={<GlPage />} />
             <Route path='/finance/budget-list' element ={<BudgetList />} />
             <Route path='/finance/budget-create' element ={<BudgetCreate />} />
+            {/* End FINANCE ROUTES */}
             
-            {/* Core routes */}
+            {/*sTART CORE ROUTES */}
             <Route path='/core/company/:companyId/branches' element={<CompanyBranchesPage />} />
                     <Route path="/branches" element={<BranchesPage />} />
             <Route path='/core/company' element={<CompanyBranchesPage />} />
@@ -104,6 +113,7 @@ function App() {
             <Route path="/core/department" element={<DepartmentOverview />} />
             <Route path="/core/company/:id" element={<CompanyDetailsPage />} />
           </Route>
+          {/* END CORE ROUTES */}
 
           {/* Modules route at /menu */}
           <Route

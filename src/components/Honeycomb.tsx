@@ -3,7 +3,7 @@ import './Honeycomb.css';
 import { useModule } from '../ModuleContext';
 
 const modules = [
-  { label: "HR", color: "group-hover:from-green-400 group-hover:to-green-600", path: "/dashboard" },
+  { label: "HR", color: "group-hover:from-green-400 group-hover:to-green-600", path: "/hr" },
   { label: "CRM", color: "group-hover:from-orange-300 group-hover:to-orange-500", path: "/crm" },
   { label: "File", color: "group-hover:from-emerald-300 group-hover:to-emerald-500", path: "/file" },
   { label: "Inventory", color: "group-hover:from-yellow-300 group-hover:to-yellow-500", path: "/inventory" },

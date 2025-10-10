@@ -60,14 +60,6 @@ interface TrainingBudget {
   utilization: number;
 }
 
-interface Enrollment {
-  id: number;
-  employeeId: number;
-  courseId: number;
-  enrollmentDate: string;
-  status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
-}
-
 interface Employee {
   id: number;
   name: string;

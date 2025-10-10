@@ -1,8 +1,8 @@
 import { Button } from '../../components/ui/button'
-import StatsCards from '../../components/hr/StatsCards'
-import UpcomingEvents from '../../components/hr/UpcomingEvents'
-import RecentActivity from '../../components/hr/RecentActivity'
-import PendingActivity from '../../components/hr/PendingActivity'
+import StatsCards from '../../components/hr/dashboard/StatsCards'
+import UpcomingEvents from '../../components/hr/dashboard/UpcomingEvents'
+import RecentActivity from '../../components/hr/dashboard/RecentActivity'
+import PendingActivity from '../../components/hr/dashboard/PendingActivity'
 import { dashboardMetrics, timeOffRequests, attendanceApprovals, recentActivities, upcomingEvents } from '../../data/data'
 import { motion } from 'framer-motion';
 import { RefreshCw, FileDown } from 'lucide-react';

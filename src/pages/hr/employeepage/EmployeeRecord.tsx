@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import EmployeeManagementHeader from '../../../components/hr/EmployeeManagementHeader';
-import EmployeeStatsCards from '../../../components/hr/EmployeeStatsCards';
-import EmployeeSearchFilters from '../../../components/hr/EmployeeSearchFilters';
-import EmployeeTable from '../../../components/hr/EmployeeTable';
+import EmployeeManagementHeader from '../../../components/hr/employee/EmployeeManagementHeader';
+import EmployeeStatsCards from '../../../components/hr/employee/EmployeeStatsCards';
+import EmployeeSearchFilters from '../../../components/hr/employee/EmployeeSearchFilters';
+import EmployeeTable from '../../../components/hr/employee/EmployeeTable';
 import type { Employee } from '../../../types/employee';
 import { initialEmployees } from '../../../data/employee';
 

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-import CandidateMetrics from "../../../components/hr/CandidateMetrics";
-import CandidateDetail from "../../../components/hr/CandidateDetail";
-import CandidateStageChart from "../../../components/hr/CandidateStageChart";
-import DepartmentApplicationChart from "../../../components/hr/DepartmentApplicationChart";
-import CandidateTable from "../../../components/hr/CandidateTable";
+import CandidateMetrics from "../../../components/hr/recrutement/CandidateMetrics";
+import CandidateDetail from "../../../components/hr/recrutement/CandidateDetail";
+import CandidateStageChart from "../../../components/hr/recrutement/CandidateStageChart";
+import DepartmentApplicationChart from "../../../components/hr/recrutement/DepartmentApplicationChart";
+import CandidateTable from "../../../components/hr/recrutement/CandidateTable";
 import { Users, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useModule } from "../../../ModuleContext";
 import type { Candidate } from '../../../types/candidate';
@@ -226,7 +226,7 @@ const CandidatePipeline = () => {
     // Store candidate data and module context before opening new tab
     sessionStorage.setItem('selectedCandidate', JSON.stringify(candidate));
     sessionStorage.setItem('currentModule', 'HR');
-    window.open(`/recruitment/candidates/${candidate.id}`, '_blank');
+    window.open(`/hr/recruitment/candidates/${candidate.id}`, '_blank');
   };
 
   const handleStageChange = (candidateId: string, newStage: string) => {

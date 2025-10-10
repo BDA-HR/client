@@ -25,6 +25,7 @@ import {
   LineChart,
   Building,
   Network,
+  Circle,
 } from 'lucide-react';
 import { useModule } from '../ModuleContext';
 
@@ -37,6 +38,7 @@ interface NavItemProps {
   textColor: string;
   hoverBg: string;
   matchPaths?: string[]; // New prop to specify which paths should activate this item
+  isChild?: boolean; // New prop to identify child items for bullet points
 }
 
 const NavItem: React.FC<NavItemProps> = ({ 
@@ -47,7 +49,8 @@ const NavItem: React.FC<NavItemProps> = ({
   activeBg, 
   textColor, 
   hoverBg,
-  matchPaths = [] // Array of paths that should activate this item
+  matchPaths = [],
+  isChild = false // Default to false
 }) => {
   const location = useLocation();
   
@@ -84,7 +87,15 @@ const NavItem: React.FC<NavItemProps> = ({
         }`;
       }}
     >
-      {icon && <span className="mr-3">{icon}</span>}
+      {icon && (
+        <span className="mr-3">
+          {isChild ? (
+            <Circle size={8} className="text-gray-900" />
+          ) : (
+            icon
+          )}
+        </span>
+      )}
       {label}
     </NavLink>
   );
@@ -189,7 +200,7 @@ const Sidebar: React.FC = () => {
             to={
               activeModule === 'Inventory' ? '/inventory' :
               activeModule === 'Core' ? '/core' :
-              activeModule === 'HR' ? '/dashboard' :
+              activeModule === 'HR' ? '/hr' :
               activeModule === 'CRM' ? '/crm' :
               activeModule === 'Finance' ? '/finance' :
               activeModule === 'Procurement' ? '/procurement' :
@@ -210,8 +221,8 @@ const Sidebar: React.FC = () => {
                 onToggle={() => toggleGroup('Employees')} 
                 hoverBg={theme.hoverBg}
               >
-                <NavItem to="/employees/record" icon={<Users size={18} />} label="Employee Record" {...theme} />
-                <NavItem to="/employees/jobgrade" icon={<Trophy size={18} />} label="Job Grade" {...theme} />
+                <NavItem to="/hr/employees/record" icon={<Users size={18} />} label="Employee Record" {...theme} isChild />
+                <NavItem to="/hr/settings/jobgrade" icon={<Trophy size={18} />} label="Job Grade" {...theme} isChild />
               </NavGroup>
 
               <NavGroup 
@@ -221,9 +232,9 @@ const Sidebar: React.FC = () => {
                 onToggle={() => toggleGroup('Recruitment')} 
                 hoverBg={theme.hoverBg}
               >
-                <NavItem to="/recruitment/list" icon={<Building2 size={18} />} label="Recruitment List" {...theme} />
-                <NavItem to="/recruitment/pipeline" icon={<Building2 size={18} />} label="Candidate Pipeline" {...theme} />
-                <NavItem to="/recruitment/onboarding" icon={<Users size={18} />} label="On Boarding" {...theme} />
+                <NavItem to="/hr/recruitment/list" icon={<Building2 size={18} />} label="Recruitment List" {...theme} isChild />
+                <NavItem to="/hr/recruitment/pipeline" icon={<Building2 size={18} />} label="Candidate Pipeline" {...theme} isChild />
+                <NavItem to="/hr/recruitment/onboarding" icon={<Users size={18} />} label="On Boarding" {...theme} isChild />
               </NavGroup>
               
               <NavGroup 
@@ -233,9 +244,9 @@ const Sidebar: React.FC = () => {
                 onToggle={() => toggleGroup('Leave')} 
                 hoverBg={theme.hoverBg}
               >
-                <NavItem to="/leave/list" icon={<Building2 size={18} />} label="Leave List" {...theme} />
-                <NavItem to="/leave/form" icon={<Building2 size={18} />} label="Leave Request" {...theme} />
-                <NavItem to="/leave/Entitlement" icon={<Users size={18} />} label="Leave Entitlement" {...theme} />
+                <NavItem to="/hr/leave/list" icon={<Building2 size={18} />} label="Leave List" {...theme} isChild />
+                <NavItem to="/hr/leave/form" icon={<Building2 size={18} />} label="Leave Request" {...theme} isChild />
+                <NavItem to="/hr/leave/Entitlement" icon={<Users size={18} />} label="Leave Entitlement" {...theme} isChild />
               </NavGroup>
 
               <NavGroup 
@@ -245,14 +256,15 @@ const Sidebar: React.FC = () => {
                 onToggle={() => toggleGroup('Attendance')} 
                 hoverBg={theme.hoverBg}
               >
-                <NavItem to="/attendance/list" icon={<Building2 size={18} />} label="Attendance List" {...theme} />
-                <NavItem to="/shift-scheduler" icon={<Building2 size={18} />} label="Shift Schedule" {...theme} />
-                <NavItem to="/time-clock" icon={<Users size={18} />} label="Time clock" {...theme} />
-                <NavItem to="/attendance/form" icon={<Users size={18} />} label="Attendance Form" {...theme} />
+                <NavItem to="/hr/attendance/list" icon={<Building2 size={18} />} label="Attendance List" {...theme} isChild />
+                <NavItem to="/hr/shift-scheduler" icon={<Building2 size={18} />} label="Shift Schedule" {...theme} isChild />
+                <NavItem to="/hr/time-clock" icon={<Users size={18} />} label="Time clock" {...theme} isChild />
+                <NavItem to="/hr/attendance/form" icon={<Users size={18} />} label="Attendance Form" {...theme} isChild />
               </NavGroup>
               
-              <NavItem to="/training" icon={<GraduationCap size={18} />} label="Training" {...theme} />
-              <NavItem to="/reports" icon={<FileSpreadsheet size={18} />} label="Reports" {...theme} />
+              <NavItem to="/hr/training" icon={<GraduationCap size={18} />} label="Training" {...theme} />
+              <NavItem to="/hr/reports" icon={<FileSpreadsheet size={18} />} label="Reports" {...theme} />
+              <NavItem to="/hr/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
             </>
           )}
 
