@@ -100,8 +100,7 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
           <Button
             onClick={onAddClick}
             size="sm"
-            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
-          >
+            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer">
             <BadgePlus className="h-4 w-4" />
             Add Job Grade
           </Button>

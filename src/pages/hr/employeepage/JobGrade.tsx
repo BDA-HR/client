@@ -8,19 +8,19 @@ import JobGradeAnalytics from '../../../components/hr/jobgrade/JobGradeAnalytics
 import AddJobGradeModal from '../../../components/hr/jobgrade/AddJobGrade';
 import EditJobGradeModal from '../../../components/hr/jobgrade/EditJobGradeModal';
 import DeleteJobGradeModal from '../../../components/hr/jobgrade/DeleteJobGradeModal';
+
 import JobGradeSearchFilters from '../../../components/hr/jobgrade/JobGradeSearchFilters';
 import { jobGradeMockData } from '../../../components/hr/jobgrade/JobGradeData';
 import type { JobGradeListDto, JobGradeAddDto, JobGradeModDto } from '../../../types/hr/jobgrade';
 import type { UUID } from 'crypto';
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 9; // Good for grid layout (3x3)
 
 const JobGradePage = () => {
   const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
   const [filteredGrades, setFilteredGrades] = useState<JobGradeListDto[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ 
     category: '',
@@ -35,9 +35,6 @@ const JobGradePage = () => {
   const [deletingGrade, setDeletingGrade] = useState<JobGradeListDto | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
-  // Check if any modal is open
-  const isAnyModalOpen = isAddModalOpen || isEditModalOpen || isDeleteModalOpen;
-
   // Calculate pagination values
   const totalItems = filteredGrades.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
@@ -46,25 +43,14 @@ const JobGradePage = () => {
   const currentGrades = filteredGrades.slice(startIndex, endIndex);
 
   useEffect(() => {
-    loadJobGrades();
-  }, []);
-
-  const loadJobGrades = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      // Simulate API call
-      setTimeout(() => {
-        setJobGrades(jobGradeMockData);
-        setFilteredGrades(jobGradeMockData);
-        setLoading(false);
-      }, 1000);
-    } catch (err) {
-      console.error("Error loading job grades:", err);
-      setError("Failed to load job grades. Please try again.");
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setJobGrades(jobGradeMockData);
+      setFilteredGrades(jobGradeMockData);
       setLoading(false);
-    }
-  };
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     let results = jobGrades;
@@ -163,9 +149,7 @@ const JobGradePage = () => {
 
   return (
     <motion.section 
-      className={`min-h-screen bg-gray-50 space-y-6 transition-all duration-200 ${
-        isAnyModalOpen ? "blur-sm" : ""
-      }`}
+      className="min-h-screen bg-gray-50 space-y-6" 
       initial="hidden" 
       animate="visible" 
       variants={{
@@ -228,260 +212,215 @@ const JobGradePage = () => {
         </motion.div>
       )}
 
-      {!loading && (
-        <div className="space-y-6">
-          {/* Error Message */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
-            >
-              <div className="flex justify-between items-center">
-                <span className="font-medium">
-                  {error.includes("load") ? (
-                    <>
-                      Failed to load job grades.{" "}
-                      <button
-                        onClick={loadJobGrades}
-                        className="underline hover:text-red-800 font-semibold focus:outline-none"
-                      >
-                        Try again
-                      </button>{" "}
-                      later.
-                    </>
-                  ) : (
-                    error
-                  )}
-                </span>
-                <button
-                  onClick={() => setError(null)}
-                  className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+      {!loading && currentGrades.length ? (
+        <>
+          <motion.div 
+            className={
+              viewMode === 'grid'
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                : "space-y-4"
+            }
+          >
+            <AnimatePresence>
+              {currentGrades.map(grade => (
+                <JobGradeCard
+                  key={grade.id}
+                  jobGrade={grade}
+                  expanded={expandedCard === grade.id}
+                  onToggleExpand={() => setExpandedCard(prev => prev === grade.id ? null : grade.id)}
+                  viewMode={viewMode}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-center mt-6">
+              <nav className="flex items-center gap-1 flex-wrap justify-center">
+                {/* Prev Button */}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 >
-                  ×
-                </button>
-              </div>
-            </motion.div>
-          )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                  >
+                    <ChevronLeft size={16} />
+                    <span className="md:hidden">Previous</span>
+                  </Button>
+                </motion.div>
 
-          <div className="mb-4 flex justify-between items-center">
-            <p className="text-sm text-gray-600">
-              Showing {startIndex + 1} to {endIndex} of {totalItems} job grades
-              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
-            </p>
-          </div>
+                {/* Page Numbers with Ellipsis */}
+                {(() => {
+                  const pageButtons: React.JSX.Element[] = [];
+                  const start = Math.max(1, currentPage - 2);
+                  const end = Math.min(totalPages, currentPage + 2);
 
-          {currentGrades.length ? (
-            <>
-              <motion.div 
-                className={
-                  viewMode === 'grid'
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                    : "space-y-4"
-                }
-              >
-                <AnimatePresence>
-                  {currentGrades.map(grade => (
-                    <JobGradeCard
-                      key={grade.id}
-                      jobGrade={grade}
-                      expanded={expandedCard === grade.id}
-                      onToggleExpand={() => setExpandedCard(prev => prev === grade.id ? null : grade.id)}
-                      viewMode={viewMode}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                    />
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-center mt-6">
-                  <nav className="flex items-center gap-1 flex-wrap justify-center">
-                    {/* Prev Button */}
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                    >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                  // Always show first page
+                  if (start > 1) {
+                    pageButtons.push(
+                      <motion.div
+                        key={1}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
                       >
-                        <ChevronLeft size={16} />
-                        <span className="md:hidden">Previous</span>
-                      </Button>
-                    </motion.div>
+                        <Button
+                          variant={currentPage === 1 ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handlePageChange(1)}
+                          className={`
+                            ${currentPage === 1
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
+                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
+                            transition-all duration-200 min-w-[38px] relative overflow-hidden
+                          `}
+                        >
+                          {1}
+                        </Button>
+                      </motion.div>
+                    );
+                    if (start > 2) {
+                      pageButtons.push(
+                        <motion.span 
+                          key="start-ellipsis" 
+                          className="px-2 text-gray-500"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          ...
+                        </motion.span>
+                      );
+                    }
+                  }
 
-                    {/* Page Numbers with Ellipsis */}
-                    {(() => {
-                      const pageButtons: React.JSX.Element[] = [];
-                      const start = Math.max(1, currentPage - 2);
-                      const end = Math.min(totalPages, currentPage + 2);
-
-                      // Always show first page
-                      if (start > 1) {
-                        pageButtons.push(
-                          <motion.div
-                            key={1}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                          >
-                            <Button
-                              variant={currentPage === 1 ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => handlePageChange(1)}
-                              className={`
-                                ${currentPage === 1
-                                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
-                                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
-                                transition-all duration-200 min-w-[38px] relative overflow-hidden
-                              `}
-                            >
-                              {1}
-                            </Button>
-                          </motion.div>
-                        );
-                        if (start > 2) {
-                          pageButtons.push(
-                            <motion.span 
-                              key="start-ellipsis" 
-                              className="px-2 text-gray-500"
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              ...
-                            </motion.span>
-                          );
-                        }
-                      }
-
-                      // Middle pages
-                      for (let i = start; i <= end; i++) {
-                        pageButtons.push(
-                          <motion.div
-                            key={i}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                          >
-                            <Button
-                              variant={currentPage === i ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => handlePageChange(i)}
-                              className={`
-                                ${currentPage === i
-                                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
-                                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
-                                transition-all duration-200 min-w-[38px] relative overflow-hidden
-                              `}
-                            >
-                              <motion.span
-                                key={currentPage === i ? 'active' : 'inactive'}
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                {i}
-                              </motion.span>
-                            </Button>
-                          </motion.div>
-                        );
-                      }
-
-                      // Always show last page
-                      if (end < totalPages) {
-                        if (end < totalPages - 1) {
-                          pageButtons.push(
-                            <motion.span 
-                              key="end-ellipsis" 
-                              className="px-2 text-gray-500"
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              ...
-                            </motion.span>
-                          );
-                        }
-                        pageButtons.push(
-                          <motion.div
-                            key={totalPages}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                          >
-                            <Button
-                              variant={currentPage === totalPages ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => handlePageChange(totalPages)}
-                              className={`
-                                ${currentPage === totalPages
-                                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
-                                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
-                                transition-all duration-200 min-w-[38px] relative overflow-hidden
-                              `}
-                            >
-                              {totalPages}
-                            </Button>
-                          </motion.div>
-                        );
-                      }
-
-                      return pageButtons;
-                    })()}
-
-                    {/* Next Button */}
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                    >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                  // Middle pages
+                  for (let i = start; i <= end; i++) {
+                    pageButtons.push(
+                      <motion.div
+                        key={i}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
                       >
-                        <span className="md:hidden">Next</span>
-                        <ChevronRight size={16} />
-                      </Button>
-                    </motion.div>
-                  </nav>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-green-100">
-              <BookOpen className="h-10 w-10 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900">No job grades found</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Try adjusting your search or filters
-              </p>
-              <Button
-                variant="ghost"
-                className="mt-4 text-green-600 hover:bg-green-50"
-                onClick={() => {
-                  setSearchTerm('');
-                  setFilters({ category: '', minSalary: '', maxSalary: '' });
-                }}
-              >
-                Reset filters
-              </Button>
+                        <Button
+                          variant={currentPage === i ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handlePageChange(i)}
+                          className={`
+                            ${currentPage === i
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
+                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
+                            transition-all duration-200 min-w-[38px] relative overflow-hidden
+                          `}
+                        >
+                          <motion.span
+                            key={currentPage === i ? 'active' : 'inactive'}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            {i}
+                          </motion.span>
+                        </Button>
+                      </motion.div>
+                    );
+                  }
+
+                  // Always show last page
+                  if (end < totalPages) {
+                    if (end < totalPages - 1) {
+                      pageButtons.push(
+                        <motion.span 
+                          key="end-ellipsis" 
+                          className="px-2 text-gray-500"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          ...
+                        </motion.span>
+                      );
+                    }
+                    pageButtons.push(
+                      <motion.div
+                        key={totalPages}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                      >
+                        <Button
+                          variant={currentPage === totalPages ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handlePageChange(totalPages)}
+                          className={`
+                            ${currentPage === totalPages
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
+                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
+                            transition-all duration-200 min-w-[38px] relative overflow-hidden
+                          `}
+                        >
+                          {totalPages}
+                        </Button>
+                      </motion.div>
+                    );
+                  }
+
+                  return pageButtons;
+                })()}
+
+                {/* Next Button */}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                  >
+                    <span className="md:hidden">Next</span>
+                    <ChevronRight size={16} />
+                  </Button>
+                </motion.div>
+              </nav>
             </div>
           )}
-
-          {filteredGrades.length > 0 && (
-            <JobGradeAnalytics jobGrades={jobGrades} filteredGrades={filteredGrades} />
-          )}
+        </>
+      ) : !loading && (
+        <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-green-100">
+          <BookOpen className="h-10 w-10 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900">No job grades found</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Try adjusting your search or filters
+          </p>
+          <Button
+            variant="ghost"
+            className="mt-4 text-green-600 hover:bg-green-50"
+            onClick={() => {
+              setSearchTerm('');
+              setFilters({ category: '', minSalary: '', maxSalary: '' });
+            }}
+          >
+            Reset filters
+          </Button>
         </div>
+      )}
+
+      {!loading && filteredGrades.length > 0 && (
+        <JobGradeAnalytics jobGrades={jobGrades} filteredGrades={filteredGrades} />
       )}
     </motion.section>
   );

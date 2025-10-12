@@ -25,7 +25,7 @@ const itemVariants = {
 };
 
 const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({ 
-  jobGrades, 
+  // jobGrades, 
   viewMode, 
   setViewMode,
 }) => {
@@ -43,14 +43,14 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
             </span> Framework
           </motion.span>
         </h1>
-        <motion.p
+        {/* <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           className="mt-2 text-sm text-gray-600"
         >
           Comprehensive job classification with {jobGrades.length} grades and detailed role descriptions
-        </motion.p>
+        </motion.p> */}
       </div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}

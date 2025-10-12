@@ -192,10 +192,10 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
                 <span className="font-medium">Range:</span>{' '}
                 {formatSalary(jobGrade.maxSalary - jobGrade.startSalary)}
               </div>
-              <div>
+              {/* <div>
                 <span className="font-medium">Spread:</span>{' '}
                 {((jobGrade.maxSalary - jobGrade.startSalary) / jobGrade.startSalary * 100).toFixed(1)}%
-              </div>
+              </div> */}
             </div>
           </div>
 
