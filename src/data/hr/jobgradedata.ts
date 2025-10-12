@@ -1,5 +1,5 @@
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
 import type { UUID } from 'crypto';
+import type { JobGradeListDto } from '../../types/hr/jobgrade';
 
 // Function to generate UUID (simplified for mock data)
 const generateUUID = (): UUID => {
@@ -124,3 +124,15 @@ export const searchGradesByName = (searchTerm: string): JobGradeListDto[] => {
     grade.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 };
+
+// Sample usage and verification
+console.log('Generated Job Grade Statistics:');
+console.log(`Total Grades: ${jobGradeSalaryStats.totalGrades}`);
+console.log(`Salary Range: $${jobGradeSalaryStats.lowestSalary.toLocaleString()} - $${jobGradeSalaryStats.highestSalary.toLocaleString()}`);
+console.log(`Average Start: $${jobGradeSalaryStats.averageStartSalary.toLocaleString()}`);
+console.log(`Average Max: $${jobGradeSalaryStats.averageMaxSalary.toLocaleString()}`);
+
+console.log('\nSample Grades:');
+jobGradeMockData.slice(0, 5).forEach(grade => {
+  console.log(`${grade.name}: $${grade.startSalary.toLocaleString()} - $${grade.maxSalary.toLocaleString()}`);
+});

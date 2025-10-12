@@ -1,27 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, BadgePlus } from 'lucide-react';
+import { X, Edit } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
-import type { JobGradeAddDto } from '../../../types/hr/jobgrade';
+import type { JobGradeListDto, JobGradeModDto } from '../../../types/hr/jobgrade';
+import type { UUID } from 'crypto';
 
-interface AddJobGradeModalProps {
+interface EditJobGradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddGrade: (grade: JobGradeAddDto) => void;
+  onSave: (grade: JobGradeModDto) => void;
+  jobGrade: JobGradeListDto | null;
 }
 
-const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
+const EditJobGradeModal: React.FC<EditJobGradeModalProps> = ({
   isOpen,
   onClose,
-  onAddGrade,
+  onSave,
+  jobGrade
 }) => {
-  const [formData, setFormData] = useState<JobGradeAddDto>({
+  const [formData, setFormData] = useState<JobGradeModDto>({
+    id: '' as UUID,
     name: '',
     startSalary: 0,
     maxSalary: 0,
+    rowVersion: ''
   });
+
+  // Initialize form when jobGrade changes
+  useEffect(() => {
+    if (jobGrade) {
+      setFormData({
+        id: jobGrade.id,
+        name: jobGrade.name,
+        startSalary: jobGrade.startSalary,
+        maxSalary: jobGrade.maxSalary,
+        rowVersion: jobGrade.rowVersion
+      });
+    }
+  }, [jobGrade]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -34,16 +52,11 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
   };
 
   const handleSubmit = () => {
-    if (!formData.name.trim() || formData.startSalary <= 0 || formData.maxSalary <= formData.startSalary) return;
+    if (!formData.name.trim() || formData.startSalary <= 0 || formData.maxSalary <= formData.startSalary) {
+      return;
+    }
 
-    onAddGrade(formData);
-
-    // Reset form
-    setFormData({
-      name: '',
-      startSalary: 0,
-      maxSalary: 0,
-    });
+    onSave(formData);
     onClose();
   };
 
@@ -59,7 +72,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
   const midpointSalary = formData.startSalary && formData.maxSalary ? 
     (formData.startSalary + formData.maxSalary) / 2 : 0;
 
-  if (!isOpen) return null;
+  if (!isOpen || !jobGrade) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
@@ -67,13 +80,13 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <BadgePlus size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Add New</h2>
+            <Edit size={20} />
+            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
           </div>
           <button
             onClick={onClose}
@@ -168,6 +181,23 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
                 </div>
               </div>
             )}
+
+            {/* Original Values for Reference */}
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-sm text-gray-600 font-medium mb-2">Original Values:</p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-500">Name</p>
+                  <p className="font-medium">{jobGrade.name}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Salary Range</p>
+                  <p className="font-medium">
+                    {formatSalary(jobGrade.startSalary)} - {formatSalary(jobGrade.maxSalary)}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -179,7 +209,7 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
               onClick={handleSubmit}
               disabled={!formData.name.trim() || formData.startSalary <= 0 || formData.maxSalary <= formData.startSalary}
             >
-              Save
+              Save Changes
             </Button>
             <Button
               variant="outline"
@@ -195,4 +225,4 @@ const AddJobGradeModal: React.FC<AddJobGradeModalProps> = ({
   );
 };
 
-export default AddJobGradeModal;
+export default EditJobGradeModal;

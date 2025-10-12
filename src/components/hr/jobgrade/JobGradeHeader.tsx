@@ -1,20 +1,33 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '../../ui/button';
+import { Button } from '../../../components/ui/button';
 import { Grid, List } from 'lucide-react';
+import type { JobGradeListDto } from '../../../types/hr/jobgrade';
 
 interface JobGradeHeaderProps {
-  jobGrades: JobGrade[];
+  jobGrades: JobGradeListDto[];
   viewMode: 'grid' | 'list';
   setViewMode: (mode: 'grid' | 'list') => void;
-  onAddClick: () => void;
 }
+
+// Define variants with proper TypeScript types
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { 
+      type: 'spring' as const, 
+      stiffness: 100, 
+      damping: 15 
+    }
+  }
+};
 
 const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({ 
   jobGrades, 
   viewMode, 
   setViewMode,
-  onAddClick 
 }) => {
   return (
     <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
@@ -70,50 +83,9 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
         >
           Export Data
         </Button>
-         <Button
-          size="sm"
-          className="bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm cursor-pointer"
-          onClick={onAddClick}
-        >
-          Add New Grade
-        </Button>
       </motion.div>
     </motion.div>
   );
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { type: 'spring', stiffness: 100, damping: 15 }
-  }
-};
-
-type JobGrade = {
-  id: string;
-  grade: string;
-  title: string;
-  experience: string;
-  roles: string[];
-  salary: SalaryRange;
-  skill: string;
-  icon: React.ElementType;
-  descriptions: JobDescription[];
-  department?: string;
-  category?: string;
-};
-
-type SalaryRange = {
-  min: string;
-  mid: string;
-  max: string;
-};
-
-type JobDescription = {
-  id: number;
-  text: string;
 };
 
 export default JobGradeHeader;
