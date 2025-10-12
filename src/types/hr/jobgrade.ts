@@ -1,6 +1,7 @@
 import type { UUID } from 'crypto';
 import type { BaseDto } from '../core/BaseDto';
 
+export type { UUID };
 export interface JobGradeListDto extends BaseDto {
   name: string;
   startSalary: number;
