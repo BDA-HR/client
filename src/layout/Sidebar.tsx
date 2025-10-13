@@ -214,7 +214,7 @@ const Sidebar: React.FC = () => {
 
           {activeModule === 'HR' && (
             <>
-            <NavItem to="/hr/employees/record" icon={<Users size={18} />} label="Employee Record" {...theme} />
+            <NavItem to="/hr/employees/record" icon={<Users size={18} />} label="Employees" {...theme} />
             
               <NavGroup 
                 icon={<Building2 size={18} />} 
@@ -321,9 +321,9 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-4 border-t border-gray-200">
-        <NavItem to="/hr/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
-      </div>
+{activeModule === 'HR' && (      <div className="p-4 border-t border-gray-200">
+        <NavItem to="/hr/settings" icon={<Settings size={18} />} label="Settings" {...theme} /> 
+      </div>)}
     </div>
   );
 };
