@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Building
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import SettingsHeader from '../../components/hr/settings components/SettingsHeader'
 
 // Animation variants
@@ -77,9 +78,10 @@ const settingsCards = [
 ]
 
 function PageSettings() {
+  const navigate = useNavigate()
+
   const handleCardClick = (href: string) => {
-    // Navigate to the respective settings page
-    window.location.href = href
+    navigate(href)
   }
 
   return (
