@@ -119,7 +119,7 @@ function App() {
 
           {/* Modules route at /menu */}
           <Route
-            path="/menu"
+            path="/modules"
             element={isAuthenticated ? <Modules /> : <Navigate to="/login" />}
           />
 

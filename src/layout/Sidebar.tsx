@@ -177,7 +177,7 @@ const Sidebar: React.FC = () => {
     <div className="w-56 bg-white h-screen flex flex-col">
       <div className="mb-1/2 p-2 flex items-center gap-2 mx-auto">
         <button
-          onClick={() => navigate('/menu')}
+          onClick={() => navigate('/modules')}
           className="focus:outline-none cursor-pointer"
         >
           <img
@@ -264,7 +264,6 @@ const Sidebar: React.FC = () => {
               
               <NavItem to="/hr/training" icon={<GraduationCap size={18} />} label="Training" {...theme} />
               <NavItem to="/hr/reports" icon={<FileSpreadsheet size={18} />} label="Reports" {...theme} />
-              <NavItem to="/hr/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
             </>
           )}
 
@@ -332,7 +331,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       <div className="p-4 border-t border-gray-200">
-        <NavItem to="/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
+        <NavItem to="/hr/settings" icon={<Settings size={18} />} label="Settings" {...theme} />
       </div>
     </div>
   );
