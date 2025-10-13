@@ -39,6 +39,7 @@ import BranchesPage from './pages/core/pageBranches';
 import FiscalYearHistory from './pages/core/pageFiscYearHist';
 import PagePeriod from './pages/core/pagePeriod';
 import PageSettings from './pages/hr/pageSettings';
+import JobGradeSubgrades from './pages/hr/employeepage/JobGradeSubGrades';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -78,6 +79,7 @@ function App() {
             <Route path='/hr/employees/record' element={<EmployeeManagementPage />} />
             <Route path="/hr/employees/:id" element={<EmployeeDetailsPage />} />
             <Route path='/hr/settings/jobgrade' element={<JobGrade />} />
+            <Route path='/hr/settings/jobgrade/:gradeId/steps' element={<JobGradeSubgrades />} />
             <Route path='/hr/employees/termination' element={<Termination />} />
             <Route path='/hr/recruitment/pipeline' element={<CandidatePipeline />} />
             <Route path='/hr/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />

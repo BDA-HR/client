@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Briefcase, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { JobGradeListDto } from '../../../types/hr/jobgrade';
+import { useNavigate } from 'react-router-dom';
 
 interface JobGradeCardProps {
   jobGrade: JobGradeListDto;
@@ -43,19 +44,20 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  // Convert salary to display format
+  // Convert salary to ETB display format
   const formatSalary = (salary: number): string => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-ET', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'ETB',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(salary);
   };
 
   // Calculate midpoint salary
-  const midpointSalary = (jobGrade.startSalary + jobGrade.maxSalary) / 2;
+  // const midpointSalary = (jobGrade.startSalary + jobGrade.maxSalary) / 2;
 
   // Close menu when clicking outside
   React.useEffect(() => {
@@ -77,6 +79,13 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
   const handleDelete = () => {
     setShowMenu(false);
     onDelete(jobGrade);
+  };
+
+  // Navigate to subgrades page when title is clicked
+  const handleTitleClick = () => {
+    navigate(`/hr/settings/jobgrade/${jobGrade.id}/steps`, {
+      state: { jobGrade }
+    });
   };
 
   return (
@@ -133,7 +142,13 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
               <Briefcase className="text-green-600" size={24} />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-black mb-1">{jobGrade.name}</h3>
+              {/* Clickable Title */}
+              <button
+                onClick={handleTitleClick}
+                className="text-lg font-bold text-black mb-1 hover:text-green-700 hover:underline cursor-pointer text-left w-full"
+              >
+                {jobGrade.name}
+              </button>
               <div className="flex justify-between items-center">
                 {/* Grade ID and Department commented out for future use */}
                 {/* <div>
@@ -179,19 +194,19 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
                   <span className="text-gray-600">Maximum:</span>
                   <span className="font-semibold">{formatSalary(jobGrade.maxSalary)}</span>
                 </div>
-                <div className="flex justify-between border-t border-green-200 pt-1 mt-1">
+                {/* <div className="flex justify-between border-t border-green-200 pt-1 mt-1">
                   <span className="text-gray-600 font-medium">Midpoint:</span>
                   <span className="font-bold text-green-700">{formatSalary(midpointSalary)}</span>
-                </div>
+                </div> */}
               </div>
             </div>
             
             {/* Additional info */}
             <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-              <div>
+              {/* <div>
                 <span className="font-medium">Range:</span>{' '}
                 {formatSalary(jobGrade.maxSalary - jobGrade.startSalary)}
-              </div>
+              </div> */}
               {/* <div>
                 <span className="font-medium">Spread:</span>{' '}
                 {((jobGrade.maxSalary - jobGrade.startSalary) / jobGrade.startSalary * 100).toFixed(1)}%
@@ -234,7 +249,13 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-black">{jobGrade.name}</h3>
+                {/* Clickable Title */}
+                <button
+                  onClick={handleTitleClick}
+                  className="font-bold text-black hover:text-green-700 hover:underline cursor-pointer text-left"
+                >
+                  {jobGrade.name}
+                </button>
                 {/* Grade ID and Category commented out for future use */}
                 {/* <p className="text-sm text-gray-500">Grade {jobGrade.id.slice(0, 8)} • {category}</p> */}
               </div>
@@ -262,7 +283,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
               </Button> */}
             </div>
             
-            <div className="grid grid-cols-3 gap-4 mt-3 text-sm text-gray-700">
+            <div className="grid grid-cols-2 gap-4 mt-3 text-sm text-gray-700">
               <div>
                 <p className="text-xs text-gray-500">Start Salary</p>
                 <p className="font-semibold">{formatSalary(jobGrade.startSalary)}</p>
@@ -271,10 +292,10 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
                 <p className="text-xs text-gray-500">Max Salary</p>
                 <p className="font-semibold">{formatSalary(jobGrade.maxSalary)}</p>
               </div>
-              <div>
+              {/* <div>
                 <p className="text-xs text-gray-500">Midpoint</p>
                 <p className="font-semibold text-green-700">{formatSalary(midpointSalary)}</p>
-              </div>
+              </div> */}
               {/* Department commented out for future use */}
               {/* <div>
                 <p className="text-xs text-gray-500">Department</p>

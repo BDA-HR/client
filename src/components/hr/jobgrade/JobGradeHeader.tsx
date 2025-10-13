@@ -32,15 +32,15 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
   return (
     <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
       <div>
-        <h1 className="text-3xl font-bold text-black">
+        <h1 className="text-2xl font-bold text-black">
           <motion.span
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="inline-block"
           >
             <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              Job Grade
-            </span> Framework
+              Job 
+            </span> Grades
           </motion.span>
         </h1>
         {/* <motion.p
@@ -75,13 +75,6 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
               Grid View
             </>
           )}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
-        >
-          Export Data
         </Button>
       </motion.div>
     </motion.div>

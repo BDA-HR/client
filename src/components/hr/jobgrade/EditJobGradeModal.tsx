@@ -60,10 +60,11 @@ const EditJobGradeModal: React.FC<EditJobGradeModalProps> = ({
     onClose();
   };
 
+  // Convert salary to ETB display format
   const formatSalary = (salary: number): string => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-ET', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'ETB',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(salary);
@@ -174,10 +175,10 @@ const EditJobGradeModal: React.FC<EditJobGradeModalProps> = ({
                     <span className="font-medium">Range:</span>{' '}
                     {formatSalary(formData.maxSalary - formData.startSalary)}
                   </div>
-                  <div>
+                  {/* <div>
                     <span className="font-medium">Spread:</span>{' '}
                     {((formData.maxSalary - formData.startSalary) / formData.startSalary * 100).toFixed(1)}%
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}

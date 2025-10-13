@@ -4,7 +4,7 @@ import { BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import JobGradeHeader from '../../../components/hr/jobgrade/JobGradeHeader';
 import JobGradeCard from '../../../components/hr/jobgrade/JobGradeCard';
-import JobGradeAnalytics from '../../../components/hr/jobgrade/JobGradeAnalytics';
+// import JobGradeAnalytics from '../../../components/hr/jobgrade/JobGradeAnalytics';
 import AddJobGradeModal from '../../../components/hr/jobgrade/AddJobGrade';
 import EditJobGradeModal from '../../../components/hr/jobgrade/EditJobGradeModal';
 import DeleteJobGradeModal from '../../../components/hr/jobgrade/DeleteJobGradeModal';
@@ -419,9 +419,9 @@ const JobGradePage = () => {
         </div>
       )}
 
-      {!loading && filteredGrades.length > 0 && (
+      {/* {!loading && filteredGrades.length > 0 && (
         <JobGradeAnalytics jobGrades={jobGrades} filteredGrades={filteredGrades} />
-      )}
+      )} */}
     </motion.section>
   );
 };
