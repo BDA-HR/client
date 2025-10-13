@@ -57,7 +57,7 @@ const settingsCards = [
   },
   {
     id: 3,
-    title: "JobGrade",
+    title: "Job Grade",
     description: "Set up job grades, levels, and career progression frameworks",
     icon: Building,
     href: "/hr/settings/jobgrade",

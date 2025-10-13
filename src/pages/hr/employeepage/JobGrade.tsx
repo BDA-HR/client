@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import JobGradeHeader from '../../../components/hr/jobgrade/JobGradeHeader';
 import JobGradeCard from '../../../components/hr/jobgrade/JobGradeCard';
@@ -14,7 +14,7 @@ import { jobGradeMockData } from '../../../components/hr/jobgrade/JobGradeData';
 import type { JobGradeListDto, JobGradeAddDto, JobGradeModDto } from '../../../types/hr/jobgrade';
 import type { UUID } from 'crypto';
 
-const ITEMS_PER_PAGE = 9; // Good for grid layout (3x3)
+const ITEMS_PER_PAGE = 20; // Good for grid layout (3x3)
 
 const JobGradePage = () => {
   const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
@@ -37,7 +37,7 @@ const JobGradePage = () => {
 
   // Calculate pagination values
   const totalItems = filteredGrades.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  // const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
   const currentGrades = filteredGrades.slice(startIndex, endIndex);
@@ -91,11 +91,11 @@ const JobGradePage = () => {
     setCurrentPage(1); // Reset to first page when filters change
   }, [searchTerm, filters, jobGrades]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // Scroll to top when page changes
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // const handlePageChange = (page: number) => {
+  //   setCurrentPage(page);
+  //   // Scroll to top when page changes
+  //   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // };
 
   const handleAddGrade = (newGrade: JobGradeAddDto) => {
     const gradeWithId: JobGradeListDto = {
@@ -236,12 +236,12 @@ const JobGradePage = () => {
             </AnimatePresence>
           </motion.div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {/* Pagination - Commented Out */}
+          {/* {totalPages > 1 && (
             <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-center mt-6">
               <nav className="flex items-center gap-1 flex-wrap justify-center">
                 {/* Prev Button */}
-                <motion.div
+                {/* <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -256,10 +256,10 @@ const JobGradePage = () => {
                     <ChevronLeft size={16} />
                     <span className="md:hidden">Previous</span>
                   </Button>
-                </motion.div>
+                </motion.div> */}
 
                 {/* Page Numbers with Ellipsis */}
-                {(() => {
+                {/* {(() => {
                   const pageButtons: React.JSX.Element[] = [];
                   const start = Math.max(1, currentPage - 2);
                   const end = Math.min(totalPages, currentPage + 2);
@@ -379,7 +379,7 @@ const JobGradePage = () => {
                 })()}
 
                 {/* Next Button */}
-                <motion.div
+                {/* <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -397,7 +397,7 @@ const JobGradePage = () => {
                 </motion.div>
               </nav>
             </div>
-          )}
+          )} */}
         </>
       ) : !loading && (
         <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-green-100">

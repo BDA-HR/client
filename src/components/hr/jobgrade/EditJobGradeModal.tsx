@@ -61,14 +61,15 @@ const EditJobGradeModal: React.FC<EditJobGradeModalProps> = ({
   };
 
   // Convert salary to ETB display format
-  const formatSalary = (salary: number): string => {
-    return new Intl.NumberFormat('en-ET', {
-      style: 'currency',
-      currency: 'ETB',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(salary);
-  };
+// Convert salary to display format with ETB after the amount
+const formatSalary = (salary: number): string => {
+  const formattedAmount = new Intl.NumberFormat('en-ET', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(salary);
+  
+  return `${formattedAmount} ETB`;
+};
 
   const midpointSalary = formData.startSalary && formData.maxSalary ? 
     (formData.startSalary + formData.maxSalary) / 2 : 0;

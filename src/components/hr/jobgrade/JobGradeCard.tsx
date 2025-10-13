@@ -46,14 +46,14 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Convert salary to ETB display format
+  // Convert salary to display format with ETB after the amount
   const formatSalary = (salary: number): string => {
-    return new Intl.NumberFormat('en-ET', {
-      style: 'currency',
-      currency: 'ETB',
+    const formattedAmount = new Intl.NumberFormat('en-ET', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(salary);
+    
+    return `${formattedAmount} ETB`;
   };
 
   // Calculate midpoint salary
@@ -71,21 +71,28 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleEdit = () => {
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when editing
     setShowMenu(false);
     onEdit(jobGrade);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when deleting
     setShowMenu(false);
     onDelete(jobGrade);
   };
 
-  // Navigate to subgrades page when title is clicked
-  const handleTitleClick = () => {
+  // Navigate to subgrades page when card is clicked
+  const handleCardClick = () => {
     navigate(`/hr/settings/jobgrade/${jobGrade.id}/steps`, {
       state: { jobGrade }
     });
+  };
+
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when opening menu
+    setShowMenu(!showMenu);
   };
 
   return (
@@ -95,7 +102,8 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
       initial="hidden"
       animate="visible"
       whileHover="hover"
-      className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative ${
+      onClick={handleCardClick}
+      className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer ${
         viewMode === 'grid' ? 'p-5' : 'p-4 flex items-start'
       }`}
     >
@@ -105,7 +113,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
           variant="ghost"
           size="sm"
           className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
-          onClick={() => setShowMenu(!showMenu)}
+          onClick={handleMenuClick}
         >
           <MoreVertical className="h-4 w-4" />
         </Button>
@@ -142,13 +150,10 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
               <Briefcase className="text-green-600" size={24} />
             </div>
             <div className="flex-1">
-              {/* Clickable Title */}
-              <button
-                onClick={handleTitleClick}
-                className="text-lg font-bold text-black mb-1 hover:text-green-700 hover:underline cursor-pointer text-left w-full"
-              >
+              {/* Title - no longer clickable individually since entire card is clickable */}
+              <h3 className="text-lg font-bold text-black mb-1">
                 {jobGrade.name}
-              </button>
+              </h3>
               <div className="flex justify-between items-center">
                 {/* Grade ID and Department commented out for future use */}
                 {/* <div>
@@ -249,13 +254,10 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div>
-                {/* Clickable Title */}
-                <button
-                  onClick={handleTitleClick}
-                  className="font-bold text-black hover:text-green-700 hover:underline cursor-pointer text-left"
-                >
+                {/* Title - no longer clickable individually since entire card is clickable */}
+                <h3 className="font-bold text-black">
                   {jobGrade.name}
-                </button>
+                </h3>
                 {/* Grade ID and Category commented out for future use */}
                 {/* <p className="text-sm text-gray-500">Grade {jobGrade.id.slice(0, 8)} • {category}</p> */}
               </div>
