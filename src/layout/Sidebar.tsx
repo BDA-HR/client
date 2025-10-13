@@ -214,17 +214,8 @@ const Sidebar: React.FC = () => {
 
           {activeModule === 'HR' && (
             <>
-              <NavGroup 
-                icon={<Users size={18} />} 
-                label="Employees" 
-                isOpen={openGroup === 'Employees'} 
-                onToggle={() => toggleGroup('Employees')} 
-                hoverBg={theme.hoverBg}
-              >
-                <NavItem to="/hr/employees/record" icon={<Users size={18} />} label="Employee Record" {...theme} isChild />
-                <NavItem to="/hr/settings/jobgrade" icon={<Trophy size={18} />} label="Job Grade" {...theme} isChild />
-              </NavGroup>
-
+            <NavItem to="/hr/employees/record" icon={<Users size={18} />} label="Employee Record" {...theme} />
+            
               <NavGroup 
                 icon={<Building2 size={18} />} 
                 label="Recruitment" 
