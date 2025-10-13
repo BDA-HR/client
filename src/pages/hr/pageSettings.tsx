@@ -95,9 +95,9 @@ function PageSettings() {
         <SettingsHeader />
         
         {/* Main Content */}
-        <div className="max-w-6xl mx-auto w-full">
+        <div className="mx-auto w-full">
           {/* Settings Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {settingsCards.map((card, index) => (
               <motion.div
                 key={card.id}
