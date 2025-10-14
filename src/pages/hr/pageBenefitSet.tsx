@@ -6,7 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import BenefitSetHeader from '../../components/hr/settings/BenefitSetHeader';
 import BenefitSetCard from '../../components/hr/settings/BenefitSetCard';
 import BenefitSearchFilters from '../../components/hr/settings/BenefitSearchFilter';
-import AddBenefitModal from '../../components/hr/settings/AddBenfitModal'; // Add this import
+import AddBenefitModal from '../../components/hr/settings/AddBenfitModal';
+import EditBenefitSetModal from '../../components/hr/settings/EditBenefitSetModal';
+import DeleteBenefitModal from '../../components/hr/settings/DeleteBenefitModal';
 
 // Types based on your DTOs
 interface BenefitSetListDto {
@@ -105,6 +107,7 @@ const PageBenefitSet: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingBenefitSet, setEditingBenefitSet] = useState<BenefitSetListDto | null>(null);
+  const [deletingBenefitSet, setDeletingBenefitSet] = useState<BenefitSetListDto | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -148,18 +151,21 @@ const PageBenefitSet: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this benefit set?')) return;
-    
+  const handleDeleteConfirm = async (benefitSet: BenefitSetListDto) => {
     try {
-      setDeletingId(id);
-      await benefitSetService.deleteBenefitSet(id);
-      setBenefitSets(prev => prev.filter(set => set.id !== id));
+      setDeletingId(benefitSet.id);
+      await benefitSetService.deleteBenefitSet(benefitSet.id);
+      setBenefitSets(prev => prev.filter(set => set.id !== benefitSet.id));
+      setDeletingBenefitSet(null);
     } catch (err) {
       console.error('Error deleting benefit set:', err);
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const handleDeleteClick = (benefitSet: BenefitSetListDto) => {
+    setDeletingBenefitSet(benefitSet);
   };
 
   // Filter benefit sets based on search term
@@ -219,7 +225,7 @@ const PageBenefitSet: React.FC = () => {
             key={benefitSet.id}
             benefitSet={benefitSet}
             onEdit={() => setEditingBenefitSet(benefitSet)}
-            onDelete={() => handleDelete(benefitSet.id)}
+            onDelete={() => handleDeleteClick(benefitSet)}
             isDeleting={deletingId === benefitSet.id}
             viewMode={viewMode}
           />
@@ -259,117 +265,22 @@ const PageBenefitSet: React.FC = () => {
         onAddBenefit={handleAddSubmit}
       />
 
-      {/* Edit Modal (keep your existing edit modal) */}
-      {editingBenefitSet && (
-        <BenefitSetModal
-          isOpen={!!editingBenefitSet}
-          onClose={() => setEditingBenefitSet(null)}
-          onSubmit={handleEditSubmit}
-          title="Edit Benefit Set"
-          initialData={{
-            id: editingBenefitSet.id,
-            name: editingBenefitSet.name,
-            benefitValue: editingBenefitSet.benefit,
-            rowVersion: editingBenefitSet.rowVersion || ''
-          }}
-        />
-      )}
+      {/* Edit Benefit Set Modal */}
+      <EditBenefitSetModal
+        isOpen={!!editingBenefitSet}
+        onClose={() => setEditingBenefitSet(null)}
+        onSave={handleEditSubmit}
+        benefitSet={editingBenefitSet}
+      />
+
+      {/* Delete Benefit Set Modal */}
+      <DeleteBenefitModal
+        isOpen={!!deletingBenefitSet}
+        onClose={() => setDeletingBenefitSet(null)}
+        onConfirm={handleDeleteConfirm}
+        benefitSet={deletingBenefitSet}
+      />
     </motion.section>
-  );
-};
-
-// Keep your existing BenefitSetModal for editing
-interface BenefitSetModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-  title: string;
-  initialData?: BenefitSetModDto;
-}
-
-const BenefitSetModal: React.FC<BenefitSetModalProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  title,
-  initialData
-}) => {
-  const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    benefitValue: initialData?.benefitValue || 0
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (initialData) {
-      onSubmit({
-        ...formData,
-        id: initialData.id,
-        rowVersion: initialData.rowVersion
-      });
-    } else {
-      onSubmit(formData);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 w-full max-w-md"
-      >
-        <h2 className="text-lg font-semibold mb-4">{title}</h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              type="text"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Benefit Value (ETB)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-              value={formData.benefitValue}
-              onChange={(e) => setFormData({ ...formData, benefitValue: parseFloat(e.target.value) || 0 })}
-            />
-          </div>
-          
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="cursor-pointer"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white cursor-pointer"
-            >
-              {initialData ? 'Update' : 'Add'} Benefit Set
-            </Button>
-          </div>
-        </form>
-      </motion.div>
-    </div>
   );
 };
 

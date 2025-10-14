@@ -45,14 +45,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
     onClose();
   };
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
+
 
   if (!isOpen) return null;
 
@@ -68,7 +61,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <BadgePlus size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Add Benefit Set</h2>
+            <h2 className="text-lg font-bold text-gray-800">Add New</h2>
           </div>
           <button
             onClick={onClose}
@@ -113,35 +106,10 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
                 className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 required
               />
-              {formData.benefitValue > 0 && (
-                <p className="text-sm text-gray-600">
-                  Value: <span className="font-semibold text-green-700">{formatCurrency(formData.benefitValue)}</span>
-                </p>
-              )}
+              
             </div>
 
-            {/* Benefit Preview */}
-            {formData.name.trim() && formData.benefitValue > 0 && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <p className="text-sm text-green-800 font-medium mb-2">Benefit Preview:</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Name:</span>
-                    <span className="font-semibold text-green-700">{formData.name}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Annual Value:</span>
-                    <span className="font-semibold text-green-700">{formatCurrency(formData.benefitValue)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Monthly Value:</span>
-                    <span className="font-semibold text-green-700">
-                      {formatCurrency(formData.benefitValue / 12)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
+            
           </div>
         </div>
 
@@ -153,7 +121,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
               onClick={handleSubmit}
               disabled={!formData.name.trim() || formData.benefitValue <= 0}
             >
-              Save Benefit Set
+              Save 
             </Button>
             <Button
               variant="outline"
