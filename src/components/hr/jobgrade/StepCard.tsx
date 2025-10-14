@@ -8,8 +8,8 @@ interface StepCardProps {
   step: JgStepListDto;
   index: number;
   totalSteps: number;
-  onEdit: (stepId: string) => void;
-  onDelete: (stepId: string) => void;
+  onEdit: (step: JgStepListDto) => void;
+  onDelete: (step: JgStepListDto) => void;
   isDeleting: boolean;
   viewMode: 'grid' | 'list';
 }
@@ -69,13 +69,13 @@ const StepCard: React.FC<StepCardProps> = ({
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(false);
-    onEdit(step.id);
+    onEdit(step);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(false);
-    onDelete(step.id);
+    onDelete(step);
   };
 
   const handleMenuClick = (e: React.MouseEvent) => {
@@ -156,7 +156,7 @@ const StepCard: React.FC<StepCardProps> = ({
             </h3>
           </div>
         </div>
-        <div className="flex items-center gap-4 mr-8"> {/* Added mr-8 for spacing */}
+        <div className="flex items-center gap-4 mr-8">
           <div className="text-right">
             <p className="font-semibold text-gray-900">
               {formatSalary(step.salary)}

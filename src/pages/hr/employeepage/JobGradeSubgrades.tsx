@@ -4,9 +4,12 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Briefcase, Plus } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import JobGradeSubgradesHeader from '../../../components/hr/jobgrade/JobGradeSubgradesHeader';
+import AddJgStepModal from '../../../components/hr/jobgrade/AddJgStepModal';
+import EditJgStepModal from '../../../components/hr/jobgrade/EditJgStepModal';
+import DeleteJgStepModal from '../../../components/hr/jobgrade/DeleteJgStepModal';
 import StepCard from '../../../components/hr/jobgrade/StepCard';
 import type { JobGradeListDto } from '../../../types/hr/jobgrade';
-import type { JgStepListDto, JgStepAddDto } from '../../../types/hr/JgStep';
+import type { JgStepListDto, JgStepAddDto, JgStepModDto, UUID } from '../../../types/hr/JgStep';
 
 // Mock API service - replace with actual API calls
 const jobGradeStepService = {
@@ -16,37 +19,40 @@ const jobGradeStepService = {
       setTimeout(() => {
         const mockSteps: JgStepListDto[] = [
           {
-            id: '1',
+            id: '1' as UUID,
             name: 'Junior Level',
             salary: 15000,
-            jobGradeId: jobGradeId,
+            jobGradeId: jobGradeId as UUID,
             jobGrade: 'Grade A',
             createdAt: new Date().toISOString(),
             createdBy: 'system',
             updatedAt: new Date().toISOString(),
-            updatedBy: 'system'
+            updatedBy: 'system',
+            rowVersion: '1'
           },
           {
-            id: '2',
+            id: '2' as UUID,
             name: 'Intermediate Level',
             salary: 25000,
-            jobGradeId: jobGradeId,
+            jobGradeId: jobGradeId as UUID,
             jobGrade: 'Grade A',
             createdAt: new Date().toISOString(),
             createdBy: 'system',
             updatedAt: new Date().toISOString(),
-            updatedBy: 'system'
+            updatedBy: 'system',
+            rowVersion: '1'
           },
           {
-            id: '3',
+            id: '3' as UUID,
             name: 'Senior Level',
             salary: 35000,
-            jobGradeId: jobGradeId,
+            jobGradeId: jobGradeId as UUID,
             jobGrade: 'Grade A',
             createdAt: new Date().toISOString(),
             createdBy: 'system',
             updatedAt: new Date().toISOString(),
-            updatedBy: 'system'
+            updatedBy: 'system',
+            rowVersion: '1'
           }
         ];
         resolve(mockSteps);
@@ -65,9 +71,27 @@ const jobGradeStepService = {
           createdAt: new Date().toISOString(),
           createdBy: 'user',
           updatedAt: new Date().toISOString(),
-          updatedBy: 'user'
+          updatedBy: 'user',
+          rowVersion: '1'
         };
         resolve(newStep);
+      }, 500);
+    });
+  },
+
+  update: async (stepData: JgStepModDto): Promise<JgStepListDto> => {
+    // Simulate API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const updatedStep: JgStepListDto = {
+          ...stepData,
+          jobGrade: 'Grade A',
+          updatedAt: new Date().toISOString(),
+          updatedBy: 'user',
+          createdAt: new Date().toISOString(), // These would come from server in real app
+          createdBy: 'system'
+        };
+        resolve(updatedStep);
       }, 500);
     });
   },
@@ -92,6 +116,11 @@ const JobGradeSubgrades: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editingStep, setEditingStep] = useState<JgStepListDto | null>(null);
+  const [deletingStep, setDeletingStep] = useState<JgStepListDto | null>(null);
 
   useEffect(() => {
     loadJobGradeAndSteps();
@@ -124,35 +153,66 @@ const JobGradeSubgrades: React.FC = () => {
     navigate('/hr/settings/jobgrade');
   };
 
-  const handleAddStep = async () => {
+  const handleOpenAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const handleOpenEditModal = (step: JgStepListDto) => {
+    setEditingStep(step);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingStep(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleOpenDeleteModal = (step: JgStepListDto) => {
+    setDeletingStep(step);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeletingStep(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleAddStep = async (stepData: JgStepAddDto) => {
     if (!gradeId) return;
 
     try {
-      const newStepData: JgStepAddDto = {
-        name: `Step ${steps.length + 1}`,
-        salary: jobGrade ? (jobGrade.startSalary + (steps.length * 5000)) : 20000,
-        jobGradeId: gradeId
-      };
-
-      const newStep = await jobGradeStepService.create(newStepData);
+      const newStep = await jobGradeStepService.create(stepData);
       setSteps(prev => [...prev, newStep]);
+      handleCloseAddModal();
     } catch (err) {
       setError('Failed to create step');
       console.error('Error creating step:', err);
     }
   };
 
-  const handleEditStep = (stepId: string) => {
-    console.log('Edit step:', stepId);
+  const handleEditStep = async (stepData: JgStepModDto) => {
+    try {
+      const updatedStep = await jobGradeStepService.update(stepData);
+      setSteps(prev => prev.map(step => 
+        step.id === updatedStep.id ? updatedStep : step
+      ));
+      handleCloseEditModal();
+    } catch (err) {
+      setError('Failed to update step');
+      console.error('Error updating step:', err);
+    }
   };
 
-  const handleDeleteStep = async (stepId: string) => {
-    if (!window.confirm('Are you sure you want to delete this step?')) return;
-    
+  const handleDeleteStep = async (step: JgStepListDto) => {
     try {
-      setDeletingId(stepId);
-      await jobGradeStepService.delete(stepId);
-      setSteps(prev => prev.filter(step => step.id !== stepId));
+      setDeletingId(step.id);
+      await jobGradeStepService.delete(step.id);
+      setSteps(prev => prev.filter(s => s.id !== step.id));
+      handleCloseDeleteModal();
     } catch (err) {
       setError('Failed to delete step');
       console.error('Error deleting step:', err);
@@ -214,7 +274,7 @@ const JobGradeSubgrades: React.FC = () => {
         jobGrade={jobGrade}
         viewMode={viewMode}
         setViewMode={setViewMode}
-        onAddStep={handleAddStep}
+        onAddStep={handleOpenAddModal}
       />
 
       {/* Job Grade Info Card */}
@@ -268,8 +328,8 @@ const JobGradeSubgrades: React.FC = () => {
             step={step}
             index={index}
             totalSteps={steps.length}
-            onEdit={handleEditStep}
-            onDelete={handleDeleteStep}
+            onEdit={handleOpenEditModal}
+            onDelete={handleOpenDeleteModal}
             isDeleting={deletingId === step.id}
             viewMode={viewMode}
           />
@@ -291,7 +351,7 @@ const JobGradeSubgrades: React.FC = () => {
             Get started by creating the first step for this job grade.
           </p>
           <Button
-            onClick={handleAddStep}
+            onClick={handleOpenAddModal}
             className="bg-green-600 hover:bg-green-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -299,6 +359,30 @@ const JobGradeSubgrades: React.FC = () => {
           </Button>
         </motion.div>
       )}
+
+      {/* Add Step Modal */}
+      <AddJgStepModal
+        isOpen={isAddModalOpen}
+        onClose={handleCloseAddModal}
+        onAddStep={handleAddStep}
+        jobGradeId={gradeId as UUID || ''}
+      />
+
+      {/* Edit Step Modal */}
+      <EditJgStepModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSave={handleEditStep}
+        step={editingStep}
+      />
+
+      {/* Delete Step Modal */}
+      <DeleteJgStepModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleDeleteStep}
+        step={deletingStep}
+      />
     </motion.section>
   );
 };

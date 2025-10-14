@@ -1,30 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, BadgePlus } from 'lucide-react';
+import { X, Edit } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
-import type { JgStepAddDto } from '../../../types/hr/JgStep';
-import type { UUID } from '../../../types/hr/jobgrade';
+import type { JgStepListDto, JgStepModDto } from '../../../types/hr/JgStep';
+import type { UUID } from 'crypto';
 
-interface AddJgStepModalProps {
+interface EditJgStepModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddStep: (step: JgStepAddDto) => void;
-  jobGradeId: UUID;
+  onSave: (step: JgStepModDto) => void;
+  step: JgStepListDto | null;
 }
 
-const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
+const EditJgStepModal: React.FC<EditJgStepModalProps> = ({
   isOpen,
   onClose,
-  onAddStep,
-  jobGradeId,
+  onSave,
+  step
 }) => {
-  const [formData, setFormData] = useState<JgStepAddDto>({
+  const [formData, setFormData] = useState<JgStepModDto>({
+    id: '' as UUID,
     name: '',
     salary: 0,
-    jobGradeId: jobGradeId,
+    jobGradeId: '' as UUID,
+    rowVersion: ''
   });
+
+  // Initialize form when step changes
+  useEffect(() => {
+    if (step) {
+      setFormData({
+        id: step.id,
+        name: step.name,
+        salary: step.salary,
+        jobGradeId: step.jobGradeId,
+        rowVersion: step.rowVersion || ''
+      });
+    }
+  }, [step]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -37,32 +52,25 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
   };
 
   const handleSubmit = () => {
-    if (!formData.name.trim() || formData.salary <= 0) return;
+    if (!formData.name.trim() || formData.salary <= 0) {
+      return;
+    }
 
-    onAddStep({
-      ...formData,
-      jobGradeId: jobGradeId,
-    });
-
-    // Reset form
-    setFormData({
-      name: '',
-      salary: 0,
-      jobGradeId: jobGradeId,
-    });
+    onSave(formData);
     onClose();
   };
 
+  // Convert salary to display format with ETB after the amount
   const formatSalary = (salary: number): string => {
-    return new Intl.NumberFormat('en-ET', {
-      style: 'currency',
-      currency: 'ETB',
+    const formattedAmount = new Intl.NumberFormat('en-ET', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(salary);
+    
+    return `${formattedAmount} ETB`;
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !step) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
@@ -70,13 +78,13 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" // Changed from max-w-md to max-w-2xl
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <BadgePlus size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Add New</h2>
+            <Edit size={20} />
+            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
           </div>
           <button
             onClick={onClose}
@@ -92,7 +100,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
             {/* Step Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm text-gray-500">
-                Step Name <span className="text-red-500">*</span>
+                Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="name"
@@ -108,7 +116,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
             {/* Salary */}
             <div className="space-y-2">
               <Label htmlFor="salary" className="text-sm text-gray-500">
-                Step Salary <span className="text-red-500">*</span>
+                Salary <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="salary"
@@ -137,6 +145,25 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
                 </div>
               </div>
             )}
+
+            {/* Original Values for Reference */}
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-sm text-gray-600 font-medium mb-2">Original Values:</p>
+              <div className="grid grid-cols-2 gap-4 text-sm"> {/* Changed to 2 columns */}
+                <div>
+                  <p className="text-gray-500">Step Name</p>
+                  <p className="font-medium">{step.name}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Salary</p>
+                  <p className="font-medium">{formatSalary(step.salary)}</p>
+                </div>
+                <div className="col-span-2"> {/* Span full width for job grade */}
+                  <p className="text-gray-500">Job Grade</p>
+                  <p className="font-medium">{step.jobGrade}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -148,7 +175,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
               onClick={handleSubmit}
               disabled={!formData.name.trim() || formData.salary <= 0}
             >
-              Save Step
+              Save Changes
             </Button>
             <Button
               variant="outline"
@@ -164,4 +191,4 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
   );
 };
 
-export default AddJgStepModal;
+export default EditJgStepModal;

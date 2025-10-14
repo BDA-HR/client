@@ -2,6 +2,7 @@
 import type { UUID } from 'crypto';
 import type { BaseDto } from '../core/BaseDto';
 
+export type { UUID };
 export interface JgStepListDto extends BaseDto {
   jobGradeId: UUID;
   name: string;
