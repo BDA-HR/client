@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type ModuleContextType = {
   activeModule: string;
@@ -11,8 +11,22 @@ const ModuleContext = createContext<ModuleContextType>({
 });
 
 export const ModuleProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const [activeModule, setActiveModule] = useState('Core');
-  
+  // Get initial module from localStorage or default to 'Core'
+  const [activeModule, setActiveModule] = useState(() => {
+    // Check if we're in a browser environment
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('activeModule') || 'Core';
+    }
+    return 'Core';
+  });
+
+  // Persist to localStorage whenever activeModule changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('activeModule', activeModule);
+    }
+  }, [activeModule]);
+
   return (
     <ModuleContext.Provider value={{ activeModule, setActiveModule }}>
       {children}
