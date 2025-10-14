@@ -3,7 +3,6 @@ import {
   GraduationCap, 
   Users, 
   Award,
-  ChevronRight,
   Building
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -118,8 +117,6 @@ function PageSettings() {
                     <div className={`p-3 rounded-xl ${card.bgColor}`}>
                       <card.icon className={`w-6 h-6 ${card.iconColor}`} />
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 
-                                           group-hover:translate-x-1 transition-transform" />
                   </div>
                   
                   <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-gray-700">
