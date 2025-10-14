@@ -13,14 +13,6 @@ const EmployeeManagementHeader = () => {
       >
          <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Employee</span> Management
       </motion.h1>
-      <motion.p 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="text-gray-600"
-      >
-        View and manage employee records
-      </motion.p>
     </motion.div>
   );
 };
