@@ -39,7 +39,7 @@ import BranchesPage from './pages/core/pageBranches';
 import FiscalYearHistory from './pages/core/pageFiscYearHist';
 import PagePeriod from './pages/core/pagePeriod';
 import PageSettings from './pages/hr/pageSettings';
-import JobGradeSubgrades from './pages/hr/employeepage/JobGradeSubGrades';
+import JobGradeSubgrades from './pages/hr/employeepage/JobGradeSubgrades';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
