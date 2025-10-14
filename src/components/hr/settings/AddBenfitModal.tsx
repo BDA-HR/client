@@ -45,13 +45,13 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
     onClose();
   };
 
-  const formatBenefit = (value: number): string => {
+  const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
-    }).format(value);
+    }).format(amount);
   };
 
   if (!isOpen) return null;
@@ -68,7 +68,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <BadgePlus size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Add New Benefit</h2>
+            <h2 className="text-lg font-bold text-gray-800">Add Benefit Set</h2>
           </div>
           <button
             onClick={onClose}
@@ -80,18 +80,18 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
 
         {/* Body */}
         <div className="px-6">
-          <div className="py-4 space-y-3">
-            {/* Benefit Name */}
+          <div className="py-4 space-y-4">
+            {/* Benefit Set Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm text-gray-500">
-                Benefit Name <span className="text-red-500">*</span>
+                Benefit Set Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Eg. Health Insurance, Retirement Plan, etc."
+                placeholder="Eg. Health Insurance, Transport Allowance"
                 className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 required
               />
@@ -110,28 +110,34 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
                 onChange={handleChange}
                 placeholder="5000"
                 min="0"
-                step="0.01"
                 className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 required
               />
+              {formData.benefitValue > 0 && (
+                <p className="text-sm text-gray-600">
+                  Value: <span className="font-semibold text-green-700">{formatCurrency(formData.benefitValue)}</span>
+                </p>
+              )}
             </div>
 
             {/* Benefit Preview */}
-            {formData.benefitValue > 0 && (
+            {formData.name.trim() && formData.benefitValue > 0 && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                 <p className="text-sm text-green-800 font-medium mb-2">Benefit Preview:</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm">Annual Value</p>
-                    <p className="font-semibold text-green-700 text-lg">
-                      {formatBenefit(formData.benefitValue)}
-                    </p>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Name:</span>
+                    <span className="font-semibold text-green-700">{formData.name}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-gray-600 text-sm">Monthly Value</p>
-                    <p className="font-semibold text-green-700">
-                      {formatBenefit(formData.benefitValue / 12)}
-                    </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Annual Value:</span>
+                    <span className="font-semibold text-green-700">{formatCurrency(formData.benefitValue)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Monthly Value:</span>
+                    <span className="font-semibold text-green-700">
+                      {formatCurrency(formData.benefitValue / 12)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -147,7 +153,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
               onClick={handleSubmit}
               disabled={!formData.name.trim() || formData.benefitValue <= 0}
             >
-              Save
+              Save Benefit Set
             </Button>
             <Button
               variant="outline"

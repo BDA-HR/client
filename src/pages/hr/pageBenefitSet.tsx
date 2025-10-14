@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import BenefitSetHeader from '../../components/hr/settings/BenefitSetHeader';
 import BenefitSetCard from '../../components/hr/settings/BenefitSetCard';
 import BenefitSearchFilters from '../../components/hr/settings/BenefitSearchFilter';
+import AddBenefitModal from '../../components/hr/settings/AddBenfitModal'; // Add this import
+
 // Types based on your DTOs
 interface BenefitSetListDto {
   id: string;
@@ -250,17 +252,14 @@ const PageBenefitSet: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Add Modal */}
-      {isAddModalOpen && (
-        <BenefitSetModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onSubmit={handleAddSubmit}
-          title="Add Benefit Set"
-        />
-      )}
+      {/* Add Benefit Modal */}
+      <AddBenefitModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAddBenefit={handleAddSubmit}
+      />
 
-      {/* Edit Modal */}
+      {/* Edit Modal (keep your existing edit modal) */}
       {editingBenefitSet && (
         <BenefitSetModal
           isOpen={!!editingBenefitSet}
@@ -279,7 +278,7 @@ const PageBenefitSet: React.FC = () => {
   );
 };
 
-// Modal Component for Add/Edit
+// Keep your existing BenefitSetModal for editing
 interface BenefitSetModalProps {
   isOpen: boolean;
   onClose: () => void;
