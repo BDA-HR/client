@@ -61,31 +61,40 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
     };
   }, [isMenuOpen]);
 
+  // List View
   if (viewMode === 'list') {
     return (
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow relative"
+        className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-green-200 relative group"
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 rounded-full bg-green-50">
+          <div className="flex items-center space-x-4 flex-1">
+            <div className="p-3 rounded-full bg-green-50 group-hover:bg-green-100 transition-colors">
               <DollarSign className="text-green-600" size={20} />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900 truncate">
                 {benefitSet.name}
               </h3>
-              <p className="text-2xl font-bold text-green-600 mt-1">
-                {benefitSet.benefitStr} ETB
+              <p className="text-sm text-gray-500 mt-1">
+                Annual benefit value
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-green-600">
+                {benefitSet.benefitStr}
+              </p>
+              <p className="text-sm text-gray-500">
+                ETB
               </p>
             </div>
           </div>
           
-          {/* Three dots menu for list view */}
-          <div className="relative">
+          {/* Action Menu for List View */}
+          <div className="relative ml-4">
             <Button
               variant="ghost"
               size="sm"
@@ -103,7 +112,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
               >
                 <button
                   onClick={handleEdit}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
                 >
                   <Edit className="h-3 w-3" />
                   Edit
@@ -111,7 +120,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <Trash2 className="h-3 w-3" />
                   {isDeleting ? 'Deleting...' : 'Delete'}
@@ -127,12 +136,12 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
   // Grid View
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow relative"
+      className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-green-200 relative group"
     >
-      {/* Three dots menu for grid view */}
+      {/* Action Menu for Grid View */}
       <div className="absolute top-4 right-4">
         <Button
           variant="ghost"
@@ -151,7 +160,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
           >
             <button
               onClick={handleEdit}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
             >
               <Edit className="h-3 w-3" />
               Edit
@@ -159,7 +168,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
+              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors disabled:opacity-50"
             >
               <Trash2 className="h-3 w-3" />
               {isDeleting ? 'Deleting...' : 'Delete'}
@@ -168,23 +177,28 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
         )}
       </div>
 
+      {/* Grid Content */}
       <div className="flex items-center space-x-3 mb-4">
-        <div className="p-2 rounded-full bg-green-50">
+        <div className="p-2 rounded-full bg-green-50 group-hover:bg-green-100 transition-colors">
           <DollarSign className="text-green-600" size={18} />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 truncate pr-8">
+        <h3 className="text-lg font-semibold text-gray-900 truncate flex-1">
           {benefitSet.name}
         </h3>
       </div>
       
-      <div className="mb-4">
+      <div className="mb-2">
         <p className="text-3xl font-bold text-green-600">
-          {benefitSet.benefitStr} ETB
+          {benefitSet.benefitStr}
         </p>
-        <p className="text-sm text-gray-500 mt-1">Monthly Benefit</p>
+        <p className="text-sm text-gray-500 mt-1">ETB</p>
       </div>
 
-      
+      <div className="pt-3 border-t border-gray-100">
+        <p className="text-xs text-gray-500">
+          Annual benefit value
+        </p>
+      </div>
     </motion.div>
   );
 };

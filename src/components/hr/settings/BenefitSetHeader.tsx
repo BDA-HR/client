@@ -1,122 +1,91 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, Plus, RefreshCw } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { Grid, List, DollarSign } from 'lucide-react';
+import type { BenefitSetListDto } from '../../../types/hr/benefit';
 
 interface BenefitSetHeaderProps {
-  searchTerm: string;
-  onSearchChange: (term: string) => void;
+  benefitSets: BenefitSetListDto[];
   viewMode: 'grid' | 'list';
-  onViewModeChange: (mode: 'grid' | 'list') => void;
-  onRefresh: () => void;
-  onAddBenefitSet: () => void;
-  loading?: boolean;
+  setViewMode: (mode: 'grid' | 'list') => void;
 }
 
-const BenefitSetHeader: React.FC<BenefitSetHeaderProps> = ({
-  searchTerm,
-  onSearchChange,
-  viewMode,
-  onViewModeChange,
-  onRefresh,
-  onAddBenefitSet,
-  loading = false
+// Define variants with proper TypeScript types
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { 
+      type: 'spring' as const, 
+      stiffness: 100, 
+      damping: 15 
+    }
+  }
+};
+
+const BenefitSetHeader: React.FC<BenefitSetHeaderProps> = ({ 
+  // benefitSets, 
+  viewMode, 
+  setViewMode,
 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-lg shadow-sm border border-green-100 p-6"
-    >
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="flex items-center">
-          <div className="p-3 rounded-full bg-green-50 mr-4">
-            <DollarSign className="text-green-600" size={24} />
-          </div>
-           <h1 className="text-2xl font-bold text-green-600">Benefit Sets</h1>
-
-        </div>
-        
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* Search Input */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search benefit sets..."
-              className="pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-
-          {/* View Mode Toggle */}
-          <div className="flex border border-gray-300 rounded-lg p-1 bg-white">
-            <button
-              onClick={() => onViewModeChange('grid')}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-green-500 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+    <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
+      <div className="flex items-center gap-3">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center gap-2"
+        >
+          <DollarSign className="w-6 h-6 text-green-600" />
+          <h1 className="text-2xl font-bold text-black">
+            <motion.span
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="inline-block"
             >
-              Grid
-            </button>
-            <button
-              onClick={() => onViewModeChange('list')}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-green-500 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              List
-            </button>
-          </div>
-
-          {/* Refresh Button */}
-          <Button
-            onClick={onRefresh}
-            variant="outline"
-            className="flex items-center gap-2 cursor-pointer"
-            disabled={loading}
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-
-          <Button
-            onClick={onAddBenefitSet}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white cursor-pointer hover:from-green-600 hover:to-emerald-600 shadow-sm flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add Benefit Set
-          </Button>
-        </div>
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                Benefit 
+              </span> Sets
+            </motion.span>
+          </h1>
+        </motion.div>
       </div>
+      {/* <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="mt-2 text-sm text-gray-600"
+      >
+        Comprehensive benefit packages with {benefitSets.length} sets and detailed coverage
+      </motion.p> */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="flex space-x-3 mt-4 sm:mt-0"
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
+          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+        >
+          {viewMode === 'grid' ? (
+            <>
+              <List className="h-4 w-4" />
+              List View
+            </>
+          ) : (
+            <>
+              <Grid className="h-4 w-4" />
+              Grid View
+            </>
+          )}
+        </Button>
+      </motion.div>
     </motion.div>
   );
 };
-
-// Search icon component
-const Search: React.FC<{ className?: string }> = ({ className }) => (
-  <svg 
-    className={className} 
-    fill="none" 
-    stroke="currentColor" 
-    viewBox="0 0 24 24" 
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      strokeWidth={2} 
-      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-    />
-  </svg>
-);
 
 export default BenefitSetHeader;

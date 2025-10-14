@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, DollarSign, Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import BenefitSetHeader from '../../components/hr/settings/BenefitSetHeader';
 import BenefitSetCard from '../../components/hr/settings/BenefitSetCard';
-
+import BenefitSearchFilters from '../../components/hr/settings/BenefitSearchFilter';
 // Types based on your DTOs
 interface BenefitSetListDto {
   id: string;
@@ -179,7 +179,7 @@ const PageBenefitSet: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-50 space-y-6 p-6"
+      className="bg-gray-50 space-y-6"
     >
       {/* Back Button */}
       <Button
@@ -193,13 +193,17 @@ const PageBenefitSet: React.FC = () => {
 
       {/* Header Component */}
       <BenefitSetHeader
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
+        benefitSets={benefitSets}
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onRefresh={loadBenefitSets}
-        onAddBenefitSet={() => setIsAddModalOpen(true)}
-        loading={loading}
+        setViewMode={setViewMode}
+      />
+
+      {/* Search Filters Component */}
+      <BenefitSearchFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        benefitSets={benefitSets}
+        onAddClick={() => setIsAddModalOpen(true)}
       />
 
       {/* Benefit Sets Grid/List */}
@@ -369,40 +373,5 @@ const BenefitSetModal: React.FC<BenefitSetModalProps> = ({
     </div>
   );
 };
-
-// Add missing icons
-const DollarSign: React.FC<{ className?: string }> = ({ className }) => (
-  <svg 
-    className={className} 
-    fill="none" 
-    stroke="currentColor" 
-    viewBox="0 0 24 24" 
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      strokeWidth={2} 
-      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" 
-    />
-  </svg>
-);
-
-const Plus: React.FC<{ className?: string }> = ({ className }) => (
-  <svg 
-    className={className} 
-    fill="none" 
-    stroke="currentColor" 
-    viewBox="0 0 24 24" 
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      strokeWidth={2} 
-      d="M12 4v16m8-8H4" 
-    />
-  </svg>
-);
 
 export default PageBenefitSet;
