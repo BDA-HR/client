@@ -92,7 +92,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
             {/* Step Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm text-gray-500">
-                Step Name <span className="text-red-500">*</span>
+                Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="name"
@@ -108,7 +108,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
             {/* Salary */}
             <div className="space-y-2">
               <Label htmlFor="salary" className="text-sm text-gray-500">
-                Step Salary <span className="text-red-500">*</span>
+                Salary <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="salary"
