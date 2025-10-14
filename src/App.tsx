@@ -40,6 +40,8 @@ import FiscalYearHistory from './pages/core/pageFiscYearHist';
 import PagePeriod from './pages/core/pagePeriod';
 import PageSettings from './pages/hr/pageSettings';
 import JobGradeSubgrades from './pages/hr/employeepage/JobGradeSubgrades';
+import PageBenefitSet from './pages/hr/pageBenefitSet';
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -93,6 +95,7 @@ function App() {
             <Route path='/hr/time-clock' element={<TimeClock />} />
             <Route path="/hr/attendance/form" element={<TimeClockFormContainer />} />
             <Route path='/hr/settings' element={<PageSettings />} />
+            <Route path="/hr/settings/benefitset" element={<PageBenefitSet />} />
             <Route path='/hr/training' element={<Training />} />
             {/* END HR ROUTES */}
 
