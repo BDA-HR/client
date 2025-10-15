@@ -57,7 +57,7 @@ const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> 
                 id="educationalqual-search"
                 name="educationalqual-search"
                 placeholder="Search educational qualifications by name..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                className="block w-full md:w-2/3 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
