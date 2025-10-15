@@ -89,7 +89,7 @@ function PageEducationalQual() {
 
   return (
     <motion.section 
-      className="min-h-screen bg-gray-50 space-y-6" 
+      className="bg-gray-50 space-y-6" 
       initial="hidden" 
       animate="visible" 
       variants={{
