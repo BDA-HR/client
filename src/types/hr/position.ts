@@ -3,6 +3,35 @@ import type { BaseDto } from './BaseDto';
 
 export type { UUID };
 
+// Main Position Types
+export interface PositionListDto extends BaseDto {
+  departmentId: UUID;
+  isVacant: string; // enum.YesNo (0/1)
+  name: string;
+  nameAm: string;
+  noOfPosition: number;
+  isVacantStr: string;
+  department: string;
+}
+
+export interface PositionAddDto {
+  name: string;
+  nameAm: string;
+  noOfPosition: number;
+  isVacant: string; // enum.YesNo (0/1)
+  departmentId: UUID;
+}
+
+export interface PositionModDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+  noOfPosition: number;
+  isVacant: string; // enum.YesNo (0/1)
+  departmentId: UUID;
+  rowVersion: string;
+}
+
 // Position Experience Types
 export interface PositionExpListDto extends BaseDto {
   positionId: UUID;
@@ -113,7 +142,6 @@ export interface PositionReqModDto {
   rowVersion: string;
 }
 
-
 // Optional: Combined types for forms or specific use cases
 export type PositionSettingType = 
   | 'experience' 
@@ -125,4 +153,22 @@ export interface PositionSettingTab {
   id: PositionSettingType;
   label: string;
   description: string;
+}
+
+// Type for position details page that combines all position data
+export interface PositionDetailsData {
+  position: PositionListDto;
+  experience?: PositionExpListDto[];
+  benefits?: PositionBenefitListDto[];
+  education?: PositionEduListDto[];
+  requirements?: PositionReqListDto[];
+}
+
+// Search and filter types
+export interface PositionFilters {
+  searchTerm: string;
+  departmentId?: UUID;
+
+  minPositions?: number;
+  maxPositions?: number;
 }
