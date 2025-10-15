@@ -37,14 +37,14 @@ const PositionHeader: React.FC<PositionHeaderProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           className="flex items-center gap-2"
         >
-          <Users className="w-6 h-6 text-blue-600" />
+          <Users className="w-6 h-6 text-green-600" />
           <h1 className="text-2xl font-bold text-black">
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               className="inline-block"
             >
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
                 Position
               </span> Settings
             </motion.span>
@@ -68,7 +68,7 @@ const PositionHeader: React.FC<PositionHeaderProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 cursor-pointer border-blue-300 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
+          className="gap-2 cursor-pointer border-blue-300 text-green-700 hover:bg-blue-100 hover:text-green-800"
           onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
         >
           {viewMode === 'grid' ? (
