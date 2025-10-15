@@ -42,6 +42,7 @@ import PageSettings from './pages/hr/pageSettings';
 import JobGradeSubgrades from './pages/hr/employeepage/JobGradeSubgrades';
 import PageBenefitSet from './pages/hr/pageBenefitSet';
 import PageEducationalQual from './pages/hr/pageEducationalQual';
+import PagePosition from './pages/hr/pagePosition';
 
 
 function App() {
@@ -98,6 +99,7 @@ function App() {
             <Route path='/hr/settings' element={<PageSettings />} />
             <Route path="/hr/settings/benefitset" element={<PageBenefitSet />} />
             <Route path="/hr/settings/educationqual" element={<PageEducationalQual />} />
+            <Route path="/hr/settings/position" element={<PagePosition />} />
             <Route path='/hr/training' element={<Training />} />
             {/* END HR ROUTES */}
 
