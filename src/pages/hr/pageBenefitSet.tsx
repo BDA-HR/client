@@ -3,16 +3,17 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, DollarSign, Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import BenefitSetHeader from '../../components/hr/settings/BenefitSetHeader';
-import BenefitSetCard from '../../components/hr/settings/BenefitSetCard';
-import BenefitSearchFilters from '../../components/hr/settings/BenefitSearchFilter';
-import AddBenefitModal from '../../components/hr/settings/AddBenfitModal';
-import EditBenefitSetModal from '../../components/hr/settings/EditBenefitSetModal';
-import DeleteBenefitModal from '../../components/hr/settings/DeleteBenefitModal';
+import BenefitSetHeader from '../../components/hr/benefit/BenefitSetHeader';
+import BenefitSetCard from '../../components/hr/benefit/BenefitSetCard';
+import BenefitSearchFilters from '../../components/hr/benefit/BenefitSearchFilter';
+import AddBenefitModal from '../../components/hr/benefit/AddBenfitModal';
+import EditBenefitSetModal from '../../components/hr/benefit/EditBenefitSetModal';
+import DeleteBenefitModal from '../../components/hr/benefit/DeleteBenefitModal';
+import type { UUID } from '../../types/hr/benefit';
 
 // Types based on your DTOs
 interface BenefitSetListDto {
-  id: string;
+  id: UUID;
   name: string;
   benefit: number;
   benefitStr: string;
@@ -25,7 +26,7 @@ interface BenefitSetAddDto {
 }
 
 interface BenefitSetModDto {
-  id: string;
+  id: UUID;
   name: string;
   benefitValue: number;
   rowVersion: string;
@@ -38,21 +39,21 @@ const benefitSetService = {
       setTimeout(() => {
         resolve([
           {
-            id: '1',
+            id: '1' as UUID,
             name: 'Health Insurance',
             benefit: 5000,
             benefitStr: '5,000',
             rowVersion: '1'
           },
           {
-            id: '2',
+            id: '2' as UUID,
             name: 'Transport Allowance',
             benefit: 2000,
             benefitStr: '2,000',
             rowVersion: '1'
           },
           {
-            id: '3',
+            id: '3' as UUID,
             name: 'Housing Allowance',
             benefit: 8000,
             benefitStr: '8,000',
@@ -67,7 +68,7 @@ const benefitSetService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
-          id: Math.random().toString(36).substr(2, 9),
+          id: Math.random().toString(36).substr(2, 9) as UUID,
           name: data.name,
           benefit: data.benefitValue,
           benefitStr: data.benefitValue.toLocaleString(),

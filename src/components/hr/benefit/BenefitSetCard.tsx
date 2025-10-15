@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { DollarSign, Edit, Trash2, MoreVertical } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { Button } from '../../ui/button';
 
 // Types based on your DTOs
 interface BenefitSetListDto {

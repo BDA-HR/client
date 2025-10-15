@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, BadgePlus } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { Button } from '../../ui/button';
 import type { BenefitSetListDto } from '../../../types/hr/benefit';
 
 interface BenefitSearchFiltersProps {
