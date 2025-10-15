@@ -4,12 +4,15 @@ import PositionHeader from '../../components/hr/position/PositionHeader';
 import PositionSearchFilters from '../../components/hr/position/PositonSearchFilter';
 import PositionCard from '../../components/hr/position/PositionCard';
 import AddPositionModal from '../../components/hr/position/AddPositionModal';
-import type { PositionListDto, UUID, PositionAddDto } from '../../types/hr/position';
+import EditPositionModal from '../../components/hr/position/EditPositionModal';
+import type { PositionListDto, UUID, PositionAddDto, PositionModDto } from '../../types/hr/position';
 
 function PagePosition() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState<PositionListDto | null>(null);
   
   // Mock data using PositionListDto - in real app, this would come from API
   const [positionData, setPositionData] = useState<PositionListDto[]>([
@@ -49,7 +52,6 @@ function PagePosition() {
     console.log('Adding new position:', newPositionData);
     
     // Create a new position with mock ID and additional fields
-    // In a real app, this would come from your API response
     const newPosition: PositionListDto = {
       id: `position-${Date.now()}` as UUID,
       departmentId: newPositionData.departmentId,
@@ -66,38 +68,50 @@ function PagePosition() {
 
     // Update the positions state with the new position
     setPositionData(prev => [...prev, newPosition]);
-    
-    // In a real app, you would call your position service here:
-    // positionService.createPosition(newPositionData)
-    //   .then(createdPosition => {
-    //     setPositionData(prev => [...prev, createdPosition]);
-    //   })
-    //   .catch(error => {
-    //     console.error('Error creating position:', error);
-    //   });
   };
 
   const handleEdit = (position: PositionListDto) => {
     console.log('Edit position:', position);
-    // Handle edit logic - you can create an EditPositionModal similar to AddPositionModal
+    setSelectedPosition(position);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSavePosition = (updatedPosition: PositionModDto) => {
+    console.log('Saving updated position:', updatedPosition);
+    
+    // Update the position in the state
+    setPositionData(prev => 
+      prev.map(position => 
+        position.id === updatedPosition.id 
+          ? { 
+              ...position, 
+              name: updatedPosition.name,
+              nameAm: updatedPosition.nameAm,
+              noOfPosition: updatedPosition.noOfPosition,
+              isVacant: updatedPosition.isVacant,
+              isVacantStr: updatedPosition.isVacant === '1' ? 'Yes' : 'No',
+              updatedAt: new Date().toISOString()
+            }
+          : position
+      )
+    );
+    
+    setIsEditModalOpen(false);
+    setSelectedPosition(null);
   };
 
   const handleDelete = (position: PositionListDto) => {
     console.log('Delete position:', position);
     // Handle delete logic - show confirmation dialog and call API
     if (window.confirm(`Are you sure you want to delete "${position.name}"?`)) {
-      // In a real app, you would call your position service here:
-      // positionService.deletePosition(position.id)
-      //   .then(() => {
-      //     setPositionData(prev => prev.filter(p => p.id !== position.id));
-      //   })
-      //   .catch(error => {
-      //     console.error('Error deleting position:', error);
-      //   });
-      
       // For now, just update the state
       setPositionData(prev => prev.filter(p => p.id !== position.id));
     }
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedPosition(null);
   };
 
   const filteredData = positionData.filter(item =>
@@ -169,6 +183,14 @@ function PagePosition() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddPosition={handleAddPosition}
+      />
+
+      {/* Edit Position Modal */}
+      <EditPositionModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSave={handleSavePosition}
+        position={selectedPosition}
       />
     </div>
   );
