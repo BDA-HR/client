@@ -5,6 +5,7 @@ import PositionSearchFilters from '../../components/hr/position/PositonSearchFil
 import PositionCard from '../../components/hr/position/PositionCard';
 import AddPositionModal from '../../components/hr/position/AddPositionModal';
 import EditPositionModal from '../../components/hr/position/EditPositionModal';
+import DeletePositionModal from '../../components/hr/position/DeletePositionModal';
 import type { PositionListDto, UUID, PositionAddDto, PositionModDto } from '../../types/hr/position';
 
 function PagePosition() {
@@ -12,7 +13,9 @@ function PagePosition() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<PositionListDto | null>(null);
+  const [positionToDelete, setPositionToDelete] = useState<PositionListDto | null>(null);
   
   // Mock data using PositionListDto - in real app, this would come from API
   const [positionData, setPositionData] = useState<PositionListDto[]>([
@@ -76,6 +79,25 @@ function PagePosition() {
     setIsEditModalOpen(true);
   };
 
+  const handleDelete = (position: PositionListDto) => {
+    console.log('Request to delete position:', position);
+    setPositionToDelete(position);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = (position: PositionListDto) => {
+    console.log('Confirming delete for position:', position);
+    // Remove the position from the state
+    setPositionData(prev => prev.filter(p => p.id !== position.id));
+    setIsDeleteModalOpen(false);
+    setPositionToDelete(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setPositionToDelete(null);
+  };
+
   const handleSavePosition = (updatedPosition: PositionModDto) => {
     console.log('Saving updated position:', updatedPosition);
     
@@ -98,15 +120,6 @@ function PagePosition() {
     
     setIsEditModalOpen(false);
     setSelectedPosition(null);
-  };
-
-  const handleDelete = (position: PositionListDto) => {
-    console.log('Delete position:', position);
-    // Handle delete logic - show confirmation dialog and call API
-    if (window.confirm(`Are you sure you want to delete "${position.name}"?`)) {
-      // For now, just update the state
-      setPositionData(prev => prev.filter(p => p.id !== position.id));
-    }
   };
 
   const handleCloseEditModal = () => {
@@ -191,6 +204,14 @@ function PagePosition() {
         onClose={handleCloseEditModal}
         onSave={handleSavePosition}
         position={selectedPosition}
+      />
+
+      {/* Delete Position Modal */}
+      <DeletePositionModal
+        position={positionToDelete}
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );
