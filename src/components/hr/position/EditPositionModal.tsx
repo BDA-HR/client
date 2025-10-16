@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { X, Edit } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { Input } from '../../ui/input';
+import List from '../../List/list';
 import type { PositionListDto, PositionModDto } from '../../../types/hr/position';
-import type { UUID } from 'crypto';
+import type { NameListDto, UUID } from '../../../types/hr/NameListDto';
+import type { ListItem } from '../../../types/List/list';
+import { departmentService } from '../../../services/core/deptservice';
+import { amharicRegex } from '../../../utils/amharic-regex';
 
 interface EditPositionModalProps {
   isOpen: boolean;
@@ -30,6 +34,34 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
     rowVersion: ''
   });
 
+  const [departments, setDepartments] = useState<NameListDto[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState<UUID | undefined>(undefined);
+
+  // Create a proper close handler
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  // Fetch departments when modal opens
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      if (!isOpen) return;
+      
+      setLoading(true);
+      try {
+        const depts = await departmentService.getAllDepartments();
+        setDepartments(depts);
+      } catch (err) {
+        console.error('Error fetching departments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDepartments();
+  }, [isOpen]);
+
   // Initialize form when position changes
   useEffect(() => {
     if (position) {
@@ -42,8 +74,27 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
         departmentId: position.departmentId,
         rowVersion: position.rowVersion || ''
       });
+      setSelectedDepartment(position.departmentId);
     }
   }, [position]);
+
+  // Convert departments to ListItem format
+  const departmentListItems: ListItem[] = departments.map(dept => ({
+    id: dept.id,
+    name: dept.name
+  }));
+
+  const handleSelectDepartment = (item: ListItem) => {
+    setSelectedDepartment(item.id);
+    setFormData(prev => ({ ...prev, departmentId: item.id }));
+  };
+
+  const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || amharicRegex.test(value)) {
+      setFormData(prev => ({ ...prev, nameAm: value }));
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -57,54 +108,50 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.nameAm.trim() || formData.noOfPosition <= 0) {
+    if (!formData.name.trim() || !formData.nameAm.trim() || formData.noOfPosition <= 0 || !formData.departmentId) {
       return;
     }
 
     onSave(formData);
-    onClose();
+    handleClose();
   };
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  // REMOVED: handleBackdropClick function
 
   // Add escape key to close
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        handleClose();
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   if (!isOpen || !position) return null;
 
   return (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen"
-      onClick={handleBackdropClick}
+      // REMOVED: onClick={handleBackdropClick}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
+        // REMOVED: onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <Edit size={20} className="" />
-            <h2 className="text-lg font-bold text-gray-800">Edit </h2>
+            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
           >
             <X size={20} />
@@ -115,6 +162,25 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
         <form onSubmit={handleSubmit}>
           <div className="px-6">
             <div className="py-4 space-y-4">
+              {/* Department Selection using List Component */}
+              <div className="space-y-2">
+                <List
+                  items={departmentListItems}
+                  selectedValue={selectedDepartment}
+                  onSelect={handleSelectDepartment}
+                  label="Select Department"
+                  placeholder="Select a department"
+                  required
+                  disabled={loading}
+                />
+                {loading && <p className="text-sm text-gray-500">Loading departments...</p>}
+                {selectedDepartment && (
+                  <p className="text-sm text-green-600">
+                    Currently selected: {departments.find(d => d.id === selectedDepartment)?.name}
+                  </p>
+                )}
+              </div>
+
               {/* Position Name (English) */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm text-gray-700 font-medium">
@@ -140,7 +206,7 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                   id="nameAm"
                   name="nameAm"
                   value={formData.nameAm}
-                  onChange={handleChange}
+                  onChange={handleAmharicChange}
                   placeholder="Eg. ሶፍትዌር ኢንጂነር"
                   className="w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   required
@@ -184,25 +250,6 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                 </div>
               </div>
 
-              {/* Department Selection - COMMENTED OUT */}
-              {/*
-              <div className="space-y-2">
-                <Label htmlFor="departmentId" className="text-sm text-gray-700 font-medium">
-                  Department <span className="text-red-500">*</span>
-                </Label>
-                <select
-                  id="departmentId"
-                  name="departmentId"
-                  value={formData.departmentId}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  required
-                >
-                  <option value="">Select a department</option>
-                </select>
-              </div>
-              */}
-
               {/* Position Preview */}
               {(formData.name || formData.nameAm) && (
                 <div className="p-4 bg-green-50 rounded-lg border border-green-100">
@@ -219,6 +266,15 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                     <div className="flex justify-between">
                       <span className="text-gray-600">Positions:</span>
                       <span className="font-semibold">{formData.noOfPosition}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Department:</span>
+                      <span className="font-semibold">
+                        {selectedDepartment ? 
+                          departments.find(d => d.id === selectedDepartment)?.name || 'Not set' 
+                          : 'Not set'
+                        }
+                      </span>
                     </div>
                     <div className="flex justify-between border-t border-green-200 pt-2 mt-2">
                       <span className="text-gray-600 font-medium">Status:</span>
@@ -250,25 +306,22 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                     <p className="text-gray-500">Vacancy Status</p>
                     <p className="font-medium">{position.isVacantStr}</p>
                   </div>
-                  {/* Original Department - COMMENTED OUT */}
-                  {/*
                   <div>
                     <p className="text-gray-500">Department</p>
                     <p className="font-medium">{position.department}</p>
                   </div>
-                  */}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 bg-gray-50 rounded-b-xl">
+          <div className="border-t px-6 py-2 rounded-b-xl">
             <div className="flex flex-row-reverse justify-center items-center gap-3">
               <Button
                 variant="outline"
                 className="cursor-pointer px-6 border-gray-300 hover:bg-gray-100"
-                onClick={onClose}
+                onClick={handleClose}
                 type="button"
               >
                 Cancel
@@ -279,7 +332,8 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                 disabled={
                   !formData.name.trim() || 
                   !formData.nameAm.trim() || 
-                  formData.noOfPosition <= 0
+                  formData.noOfPosition <= 0 ||
+                  !formData.departmentId
                 }
               >
                 Save Changes

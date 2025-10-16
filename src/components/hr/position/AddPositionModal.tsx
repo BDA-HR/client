@@ -9,6 +9,7 @@ import type { PositionAddDto } from '../../../types/hr/position';
 import type { NameListDto, UUID } from '../../../types/hr/NameListDto';
 import type { ListItem } from '../../../types/List/list';
 import { departmentService } from '../../../services/core/deptservice';
+import { amharicRegex } from '../../../utils/amharic-regex';
 
 interface AddPositionModalProps {
   isOpen: boolean;
@@ -94,6 +95,16 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
   const handleSelectDepartment = (item: ListItem) => {
     setSelectedDepartment(item.id);
     setFormData(prev => ({ ...prev, departmentId: item.id }));
+  };
+
+  const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || amharicRegex.test(value)) {
+      setFormData((prev) => ({ 
+        ...prev, 
+        nameAm: value 
+      }));
+    }
   };
 
   const handleInputChange = (
@@ -194,7 +205,7 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                   id="nameAm"
                   name="nameAm"
                   value={formData.nameAm}
-                  onChange={handleInputChange}
+                  onChange={handleAmharicChange}
                   placeholder="Eg. ሶፍትዌር ኢንጂነር"
                   className="w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   required
