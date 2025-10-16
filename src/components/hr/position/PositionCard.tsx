@@ -99,7 +99,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
       animate="visible"
       whileHover="hover"
       onClick={handleCardClick}
-      className={`bg-white border border-blue-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer group ${
+      className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer group ${
         viewMode === 'grid' ? 'p-5' : 'p-4 flex items-start'
       }`}
     >
@@ -108,8 +108,8 @@ const PositionCard: React.FC<PositionCardProps> = ({
           {/* Header Section with proper spacing */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-start flex-1 min-w-0">
-              <div className="p-3 rounded-full bg-blue-50 mr-4 flex-shrink-0">
-                <Users className="text-blue-600" size={24} />
+              <div className="p-3 rounded-full bg-green-50 mr-4 flex-shrink-0">
+                <Users className="text-green-600" size={24} />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-lg font-bold text-black truncate">
@@ -172,8 +172,8 @@ const PositionCard: React.FC<PositionCardProps> = ({
           
           {/* Position Information */}
           <div className="space-y-3 text-sm">
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="font-medium text-blue-800 mb-2">Position Details</p>
+            <div className="bg-green-50 p-3 rounded-lg">
+              <p className="font-medium text-green-800 mb-2">Position Details</p>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Number of Positions:</span>
@@ -183,7 +183,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
                   <span className="text-gray-600">Department:</span>
                   <span className="font-semibold text-sm truncate max-w-[120px]">{position.department}</span>
                 </div>
-                <div className="flex justify-between border-t border-blue-200 pt-2 mt-2">
+                <div className="flex justify-between border-t border-green-200 pt-2 mt-2">
                   <span className="text-gray-600 font-medium">Status:</span>
                   <span className={`font-bold ${position.isVacant === '1' ? 'text-green-600' : 'text-gray-600'}`}>
                     {position.isVacantStr}
@@ -196,8 +196,8 @@ const PositionCard: React.FC<PositionCardProps> = ({
       ) : (
         // List View
         <>
-          <div className="p-2 rounded-md bg-blue-50 mr-4 flex-shrink-0">
-            <Users className="text-blue-600" size={20} />
+          <div className="p-2 rounded-md bg-green-50 mr-4 flex-shrink-0">
+            <Users className="text-green-600" size={20} />
           </div>
           <div className="flex-1 min-w-0">
             {/* Header for list view */}
@@ -260,7 +260,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
                   )}
                 </div>
                 
-                <ArrowRight className="h-4 w-4 text-blue-500 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 text-green-500 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
             
@@ -283,7 +283,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
 
             {/* Navigation Hint for List View */}
             <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-xs text-blue-600">
+              <p className="text-xs text-green-600">
                 Click to manage experience, benefits, education, and requirements
               </p>
             </div>

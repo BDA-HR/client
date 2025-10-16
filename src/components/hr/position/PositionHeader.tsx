@@ -68,7 +68,7 @@ const PositionHeader: React.FC<PositionHeaderProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 cursor-pointer border-blue-300 text-green-700 hover:bg-blue-100 hover:text-green-800"
+          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
           onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
         >
           {viewMode === 'grid' ? (

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { X, Loader2, BadgePlus } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
+import List from '../../../components/List/list';
 import type { PositionAddDto } from '../../../types/hr/position';
 import type { NameListDto, UUID } from '../../../types/hr/NameListDto';
+import type { ListItem } from '../../../types/List/list';
 import { departmentService } from '../../../services/core/deptservice';
 
 interface AddPositionModalProps {
@@ -29,6 +31,20 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
 
   const [departments, setDepartments] = useState<NameListDto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState<UUID | undefined>(undefined);
+
+  // Wrap handleClose in useCallback to prevent unnecessary re-renders
+  const handleClose = useCallback(() => {
+    setFormData({
+      name: '',
+      nameAm: '',
+      noOfPosition: 1,
+      isVacant: '1',
+      departmentId: '' as UUID,
+    });
+    setSelectedDepartment(undefined);
+    onClose();
+  }, [onClose]);
 
   // Fetch departments when modal opens
   useEffect(() => {
@@ -40,7 +56,9 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
         const depts = await departmentService.getAllDepartments();
         setDepartments(depts);
         
-        if (depts.length > 0 && !formData.departmentId) {
+        // Set first department as default if none selected
+        if (depts.length > 0 && !selectedDepartment) {
+          setSelectedDepartment(depts[0].id);
           setFormData(prev => ({ ...prev, departmentId: depts[0].id }));
         }
       } catch (err) {
@@ -51,7 +69,7 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
     };
 
     fetchDepartments();
-  }, [isOpen]);
+  }, [isOpen, selectedDepartment]);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -63,8 +81,20 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
         isVacant: '1',
         departmentId: departments.length > 0 ? departments[0].id : '' as UUID,
       });
+      setSelectedDepartment(departments.length > 0 ? departments[0].id : undefined);
     }
   }, [isOpen, departments]);
+
+  // Convert departments to ListItem format
+  const departmentListItems: ListItem[] = departments.map(dept => ({
+    id: dept.id,
+    name: dept.name
+  }));
+
+  const handleSelectDepartment = (item: ListItem) => {
+    setSelectedDepartment(item.id);
+    setFormData(prev => ({ ...prev, departmentId: item.id }));
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -78,28 +108,10 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission
-    if (!formData.name.trim() || !formData.nameAm.trim() || formData.noOfPosition <= 0) return;
+    if (!formData.name.trim() || !formData.nameAm.trim() || formData.noOfPosition <= 0 || !formData.departmentId) return;
 
     onAddPosition(formData);
-    onClose();
-  };
-
-  const handleClose = () => {
-    setFormData({
-      name: '',
-      nameAm: '',
-      noOfPosition: 1,
-      isVacant: '1',
-      departmentId: '' as UUID,
-    });
-    onClose();
-  };
-
-  // Add click outside to close
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
+    handleClose();
   };
 
   // Add escape key to close
@@ -112,32 +124,28 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, handleClose]);
+  }, [isOpen, handleClose]); // Now handleClose is stable due to useCallback
 
-  if (!isOpen) return null; // UNCOMMENTED THIS LINE
+  if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen"
-      onClick={handleBackdropClick} // Added backdrop click
-    >
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <BadgePlus className="h-5 w-5" />
-            <h2 className="text-lg font-bold text-gray-800">Add New Position</h2>
+            <h2 className="text-lg font-bold text-gray-800">Add New</h2>
           </div>
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
-            type="button" // Explicitly set button type
+            type="button"
           >
             <X size={20} />
           </button>
@@ -147,6 +155,20 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
         <form onSubmit={handleSubmit}>
           <div className="px-6">
             <div className="py-4 space-y-4">
+              {/* Department Selection using List Component */}
+              <div className="space-y-2">
+                <List
+                  items={departmentListItems}
+                  selectedValue={selectedDepartment}
+                  onSelect={handleSelectDepartment}
+                  label="Select Department"
+                  placeholder="Select a department"
+                  required
+                  disabled={loading}
+                />
+                {loading && <p className="text-sm text-gray-500">Loading departments...</p>}
+              </div>
+
               {/* Position Name (English) */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm text-gray-700 font-medium">
@@ -217,7 +239,7 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
               </div>
 
               {/* Position Preview */}
-              {(formData.name || formData.nameAm) && (
+              {/* {(formData.name || formData.nameAm) && (
                 <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                   <p className="text-sm text-green-800 font-medium mb-2">Position Preview:</p>
                   <div className="space-y-2 text-sm">
@@ -233,6 +255,15 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                       <span className="text-gray-600">Positions:</span>
                       <span className="font-semibold">{formData.noOfPosition}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Department:</span>
+                      <span className="font-semibold">
+                        {selectedDepartment ? 
+                          departments.find(d => d.id === selectedDepartment)?.name || 'Not set' 
+                          : 'Not set'
+                        }
+                      </span>
+                    </div>
                     <div className="flex justify-between border-t border-green-200 pt-2 mt-2">
                       <span className="text-gray-600 font-medium">Status:</span>
                       <span className={`font-bold ${formData.isVacant === '1' ? 'text-green-600' : 'text-gray-600'}`}>
@@ -241,7 +272,7 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                     </div>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
 
@@ -252,17 +283,18 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                 variant="outline"
                 className="cursor-pointer px-6 border-gray-300 hover:bg-gray-100"
                 onClick={handleClose}
-                type="button" // Explicitly set button type
+                type="button"
               >
                 Cancel
               </Button>
               <Button
                 className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
-                type="submit" // Use submit type for form
+                type="submit"
                 disabled={
                   !formData.name.trim() || 
                   !formData.nameAm.trim() || 
-                  formData.noOfPosition <= 0
+                  formData.noOfPosition <= 0 ||
+                  !formData.departmentId
                 }
               >
                 {loading ? (

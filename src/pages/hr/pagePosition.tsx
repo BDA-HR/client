@@ -134,7 +134,7 @@ function PagePosition() {
   );
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="mx-auto space-y-6">
       <PositionHeader 
         positionData={positionData}
         viewMode={viewMode}
@@ -148,7 +148,7 @@ function PagePosition() {
         onAddClick={handleAddPositionClick}
       />
 
-      <div className="mt-6">
+      <div>
         {filteredData.length === 0 ? (
           <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
             <div className="text-gray-400 mb-4">

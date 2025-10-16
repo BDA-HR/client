@@ -46,7 +46,7 @@ const DeletePositionModal: React.FC<DeletePositionModalProps> = ({
             </p>
             
             {/* Position details for confirmation */}
-            {position && (
+            {/* {position && (
               <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
                 <p className="font-semibold text-gray-900">{position.name}</p>
                 {position.department && (
@@ -57,7 +57,7 @@ const DeletePositionModal: React.FC<DeletePositionModalProps> = ({
                 )}
                 <p className="text-sm text-gray-600">Vacant: {position.isVacantStr}</p>
               </div>
-            )}
+            )} */}
 
           </div>
         </div>
