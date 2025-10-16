@@ -288,7 +288,7 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 rounded-b-xl">
+          <div className="border-t px-6 py-2 rounded-b-xl">
             <div className="flex flex-row-reverse justify-center items-center gap-3">
               <Button
                 variant="outline"
