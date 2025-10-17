@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, BadgePlus } from 'lucide-react';
+import { Search, BadgePlus, Grid, List } from 'lucide-react';
 import { Button } from '../../ui/button';
 import type { BenefitSetListDto } from '../../../types/hr/benefit';
 
@@ -9,16 +9,22 @@ interface BenefitSearchFiltersProps {
   setSearchTerm: (term: string) => void;
   benefitSets: BenefitSetListDto[];
   onAddClick: () => void;
+  viewMode: 'grid' | 'list';
+  setViewMode: (mode: 'grid' | 'list') => void;
 }
 
 const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
   searchTerm,
   setSearchTerm,
   onAddClick,
+  viewMode,
+  setViewMode,
 }) => {
   const clearFilters = () => {
     setSearchTerm('');
   };
+
+  const hasActiveFilters = searchTerm !== '';
 
   return (
     <motion.div
@@ -45,23 +51,50 @@ const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {searchTerm && (
-              <button
-                onClick={clearFilters}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-              >
-                ×
-              </button>
-            )}
           </div>
         </div>
 
-        {/* ➕ Add Benefit Set Button */}
-        <div className="flex w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
+          {/* Filters + View Mode */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            {/* View Mode Toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800 whitespace-nowrap"
+              onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+            >
+              {viewMode === 'grid' ? (
+                <>
+                  <List className="h-4 w-4" />
+                  List View
+                </>
+              ) : (
+                <>
+                  <Grid className="h-4 w-4" />
+                  Grid View
+                </>
+              )}
+            </Button>
+
+            {/* Clear Filters Button */}
+            {hasActiveFilters && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="whitespace-nowrap"
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
+
+          {/* ➕ Add Benefit Set Button */}
           <Button
             onClick={onAddClick}
             size="sm"
-            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full lg:w-auto cursor-pointer"
+            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
           >
             <BadgePlus className="h-4 w-4" />
             Add Benefit Set

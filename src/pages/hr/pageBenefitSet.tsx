@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, DollarSign, Plus } from 'lucide-react';
+import { DollarSign, Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import BenefitSetHeader from '../../components/hr/benefit/BenefitSetHeader';
 import BenefitSetCard from '../../components/hr/benefit/BenefitSetCard';
 import BenefitSearchFilters from '../../components/hr/benefit/BenefitSearchFilter';
@@ -103,7 +102,6 @@ const benefitSetService = {
 };
 
 const PageBenefitSet: React.FC = () => {
-  const navigate = useNavigate();
   const [benefitSets, setBenefitSets] = useState<BenefitSetListDto[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -190,21 +188,10 @@ const PageBenefitSet: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="bg-gray-50 space-y-6"
     >
-      {/* Back Button */}
-      <Button
-        variant="outline"
-        onClick={() => navigate(-1)}
-        className="cursor-pointer"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back
-      </Button>
 
       {/* Header Component */}
       <BenefitSetHeader
         benefitSets={benefitSets}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
       />
 
       {/* Search Filters Component */}
@@ -213,6 +200,8 @@ const PageBenefitSet: React.FC = () => {
         setSearchTerm={setSearchTerm}
         benefitSets={benefitSets}
         onAddClick={() => setIsAddModalOpen(true)}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
 
       {/* Benefit Sets Grid/List */}
