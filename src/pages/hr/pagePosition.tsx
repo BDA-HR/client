@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Users } from 'lucide-react';
 import PositionHeader from '../../components/hr/position/PositionHeader';
 import PositionSearchFilters from '../../components/hr/position/PositonSearchFilter';
@@ -135,17 +135,15 @@ function PagePosition() {
 
   return (
     <div className="mx-auto space-y-6">
-      <PositionHeader 
-        positionData={positionData}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
+      <PositionHeader />
 
       <PositionSearchFilters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         positionData={positionData}
         onAddClick={handleAddPositionClick}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
 
       <div>
@@ -160,12 +158,6 @@ function PagePosition() {
             <p className="text-gray-500 mb-4">
               {searchTerm ? `No positions match your search for "${searchTerm}"` : 'Get started by adding your first position'}
             </p>
-            <button 
-              onClick={handleAddPositionClick}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium"
-            >
-              Add Position
-            </button>
           </div>
         ) : (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>

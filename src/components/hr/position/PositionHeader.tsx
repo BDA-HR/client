@@ -1,14 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Button } from "../../../components/ui/button";
-import { Grid, List, Users } from "lucide-react";
-import type { PositionExpListDto } from "../../../types/hr/position";
+import { Users } from "lucide-react";
 
-interface PositionHeaderProps {
-  positionData: PositionExpListDto[];
-  viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "list") => void;
-}
 
 // Define variants with proper TypeScript types
 const itemVariants = {
@@ -24,11 +17,7 @@ const itemVariants = {
   },
 };
 
-const PositionHeader: React.FC<PositionHeaderProps> = ({
-  // positionData,
-  viewMode,
-  setViewMode,
-}) => {
+const PositionHeader = () => {
   return (
     <motion.div
       variants={itemVariants}
@@ -55,39 +44,6 @@ const PositionHeader: React.FC<PositionHeaderProps> = ({
           </h1>
         </motion.div>
       </div>
-      {/* <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="mt-2 text-sm text-gray-600"
-      >
-        Manage position requirements, benefits, and qualifications across {positionData.length} positions
-      </motion.p> */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex space-x-3 mt-4 sm:mt-0"
-      >
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
-          onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-        >
-          {viewMode === "grid" ? (
-            <>
-              <List className="h-4 w-4" />
-              List View
-            </>
-          ) : (
-            <>
-              <Grid className="h-4 w-4" />
-              Grid View
-            </>
-          )}
-        </Button>
-      </motion.div>
     </motion.div>
   );
 };

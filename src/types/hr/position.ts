@@ -6,7 +6,7 @@ export type { UUID };
 // Main Position Types
 export interface PositionListDto extends BaseDto {
   departmentId: UUID;
-  isVacant: string; // enum.YesNo (0/1)
+  isVacant: '0' | '1';
   name: string;
   nameAm: string;
   noOfPosition: number;
@@ -18,7 +18,7 @@ export interface PositionAddDto {
   name: string;
   nameAm: string;
   noOfPosition: number;
-  isVacant: string; // enum.YesNo (0/1)
+  isVacant: '0' | '1';
   departmentId: UUID;
 }
 
@@ -27,7 +27,7 @@ export interface PositionModDto {
   name: string;
   nameAm: string;
   noOfPosition: number;
-  isVacant: string; // enum.YesNo (0/1)
+  isVacant: '0' | '1';
   departmentId: UUID;
   rowVersion: string;
 }
@@ -110,9 +110,9 @@ export interface PositionEduModDto {
 export interface PositionReqListDto extends BaseDto {
   professionTypeId: UUID;
   positionId: UUID;
-  gender: string; // enum.PositionGender (0/1)
-  saturdayWorkOption: string; // enum.WorkOption (0/1)
-  sundayWorkOption: string; // enum.WorkOption (0/1)
+  gender: '0' | '1' | '2';
+  saturdayWorkOption: '0' | '1' | '2';
+  sundayWorkOption: '0' | '1' | '2';
   workingHours: number;
   genderStr: string;
   saturdayWorkOptionStr: string;
@@ -123,9 +123,9 @@ export interface PositionReqListDto extends BaseDto {
 }
 
 export interface PositionReqAddDto {
-  gender: string; // enum.PositionGender (0/1)
-  saturdayWorkOption: string; // enum.WorkOption (0/1)
-  sundayWorkOption: string; // enum.WorkOption (0/1)
+  gender: '0' | '1' | '2';
+  saturdayWorkOption: '0' | '1' | '2';
+  sundayWorkOption: '0' | '1' | '2';
   workingHours: number;
   professionTypeId: UUID;
   positionId: UUID;
@@ -133,9 +133,9 @@ export interface PositionReqAddDto {
 
 export interface PositionReqModDto {
   id: UUID;
-  gender: string; // enum.PositionGender (0/1)
-  saturdayWorkOption: string; // enum.WorkOption (0/1)
-  sundayWorkOption: string; // enum.WorkOption (0/1)
+  gender: '0' | '1' | '2';
+  saturdayWorkOption: '0' | '1' | '2';
+  sundayWorkOption: '0' | '1' | '2';
   workingHours: number;
   professionTypeId: UUID;
   positionId: UUID;
@@ -168,7 +168,6 @@ export interface PositionDetailsData {
 export interface PositionFilters {
   searchTerm: string;
   departmentId?: UUID;
-
   minPositions?: number;
   maxPositions?: number;
 }
