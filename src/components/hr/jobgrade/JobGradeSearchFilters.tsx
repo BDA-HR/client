@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, BadgePlus } from 'lucide-react';
+import { Search, BadgePlus, Grid, List } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { JobGradeListDto } from '../../../types/hr/jobgrade';
 
@@ -14,6 +14,8 @@ interface JobGradeSearchFiltersProps {
   setFilters: (filters: any) => void;
   jobGrades: JobGradeListDto[];
   onAddClick: () => void;
+  viewMode: 'grid' | 'list';
+  setViewMode: (mode: 'grid' | 'list') => void;
 }
 
 const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
@@ -22,6 +24,8 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
   filters,
   setFilters,
   onAddClick,
+  viewMode,
+  setViewMode,
 }) => {
   const handleSalaryFilterChange = (field: 'minSalary' | 'maxSalary', value: string) => {
     setFilters({
@@ -37,6 +41,8 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
     });
     setSearchTerm('');
   };
+
+  const hasActiveFilters = searchTerm !== '' || filters.minSalary !== '' || filters.maxSalary !== '';
 
   return (
     <motion.div
@@ -67,40 +73,67 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
         </div>
 
         {/* 🎚 Filters + Add Button */}
-        <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
-          {/* Salary Filters */}
+        <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto items-center justify-end">
+          {/* Salary Filters + View Mode */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-            <input
-              type="number"
-              placeholder="Min Salary"
-              className="flex-1 text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500"
-              value={filters.minSalary}
-              onChange={(e) => handleSalaryFilterChange('minSalary', e.target.value)}
-            />
-            <span className="hidden sm:block text-gray-400">–</span>
-            <input
-              type="number"
-              placeholder="Max Salary"
-              className="flex-1 text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500"
-              value={filters.maxSalary}
-              onChange={(e) => handleSalaryFilterChange('maxSalary', e.target.value)}
-            />
+            {/* Salary Filters */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              <input
+                type="number"
+                placeholder="Min Salary"
+                className="flex-1 text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500"
+                value={filters.minSalary}
+                onChange={(e) => handleSalaryFilterChange('minSalary', e.target.value)}
+              />
+              <span className="hidden sm:block text-gray-400">–</span>
+              <input
+                type="number"
+                placeholder="Max Salary"
+                className="flex-1 text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500"
+                value={filters.maxSalary}
+                onChange={(e) => handleSalaryFilterChange('maxSalary', e.target.value)}
+              />
+            </div>
 
+            {/* View Mode Toggle */}
             <Button
               variant="outline"
               size="sm"
-              className="whitespace-nowrap mt-2 sm:mt-0"
-              onClick={clearFilters}
+              className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800 whitespace-nowrap"
+              onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             >
-              Clear Filters
+              {viewMode === 'grid' ? (
+                <>
+                  <List className="h-4 w-4" />
+                  List View
+                </>
+              ) : (
+                <>
+                  <Grid className="h-4 w-4" />
+                  Grid View
+                </>
+              )}
             </Button>
+
+            {/* Clear Filters Button */}
+            {hasActiveFilters && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="whitespace-nowrap"
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </Button>
+            )}
           </div>
 
           {/* ➕ Add Job Grade Button */}
           <Button
             onClick={onAddClick}
             size="sm"
-            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer">
+            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
+          >
             <BadgePlus className="h-4 w-4" />
             Add Job Grade
           </Button>

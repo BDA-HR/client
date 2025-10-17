@@ -4,12 +4,10 @@ import { BookOpen } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import JobGradeHeader from '../../../components/hr/jobgrade/JobGradeHeader';
 import JobGradeCard from '../../../components/hr/jobgrade/JobGradeCard';
-// import JobGradeAnalytics from '../../../components/hr/jobgrade/JobGradeAnalytics';
+import JobGradeSearchFilters from '../../../components/hr/jobgrade/JobGradeSearchFilters';
 import AddJobGradeModal from '../../../components/hr/jobgrade/AddJobGrade';
 import EditJobGradeModal from '../../../components/hr/jobgrade/EditJobGradeModal';
 import DeleteJobGradeModal from '../../../components/hr/jobgrade/DeleteJobGradeModal';
-
-import JobGradeSearchFilters from '../../../components/hr/jobgrade/JobGradeSearchFilters';
 import { jobGradeMockData } from '../../../components/hr/jobgrade/JobGradeData';
 import type { JobGradeListDto, JobGradeAddDto, JobGradeModDto } from '../../../types/hr/jobgrade';
 import type { UUID } from 'crypto';
@@ -23,7 +21,6 @@ const JobGradePage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ 
-    category: '',
     minSalary: '' as number | '',
     maxSalary: '' as number | '',
   });
@@ -37,7 +34,6 @@ const JobGradePage = () => {
 
   // Calculate pagination values
   const totalItems = filteredGrades.length;
-  // const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
   const currentGrades = filteredGrades.slice(startIndex, endIndex);
@@ -63,22 +59,6 @@ const JobGradePage = () => {
       );
     }
     
-    // Category filter
-    if (filters.category) {
-      results = results.filter(grade => {
-        const name = grade.name.toLowerCase();
-        if (filters.category === 'Entry Level') return name.includes('entry');
-        if (filters.category === 'Junior') return name.includes('junior');
-        if (filters.category === 'Mid Level') return name.includes('mid');
-        if (filters.category === 'Senior') return name.includes('senior');
-        if (filters.category === 'Lead') return name.includes('lead');
-        if (filters.category === 'Principal') return name.includes('principal');
-        if (filters.category === 'Director') return name.includes('director');
-        if (filters.category === 'Executive') return name.includes('executive');
-        return true;
-      });
-    }
-    
     // Salary filters - Fixed type comparison
     if (filters.minSalary !== '') {
       results = results.filter(grade => grade.startSalary >= Number(filters.minSalary));
@@ -90,12 +70,6 @@ const JobGradePage = () => {
     setFilteredGrades(results);
     setCurrentPage(1); // Reset to first page when filters change
   }, [searchTerm, filters, jobGrades]);
-
-  // const handlePageChange = (page: number) => {
-  //   setCurrentPage(page);
-  //   // Scroll to top when page changes
-  //   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // };
 
   const handleAddGrade = (newGrade: JobGradeAddDto) => {
     const gradeWithId: JobGradeListDto = {
@@ -159,8 +133,6 @@ const JobGradePage = () => {
     >
       <JobGradeHeader
         jobGrades={jobGrades}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
       />
 
       <JobGradeSearchFilters
@@ -170,6 +142,8 @@ const JobGradePage = () => {
         setFilters={setFilters}
         jobGrades={jobGrades}
         onAddClick={() => setIsAddModalOpen(true)}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
 
       <AddJobGradeModal
@@ -235,169 +209,6 @@ const JobGradePage = () => {
               ))}
             </AnimatePresence>
           </motion.div>
-
-          {/* Pagination - Commented Out */}
-          {/* {totalPages > 1 && (
-            <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-center mt-6">
-              <nav className="flex items-center gap-1 flex-wrap justify-center">
-                {/* Prev Button */}
-                {/* <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-                  >
-                    <ChevronLeft size={16} />
-                    <span className="md:hidden">Previous</span>
-                  </Button>
-                </motion.div> */}
-
-                {/* Page Numbers with Ellipsis */}
-                {/* {(() => {
-                  const pageButtons: React.JSX.Element[] = [];
-                  const start = Math.max(1, currentPage - 2);
-                  const end = Math.min(totalPages, currentPage + 2);
-
-                  // Always show first page
-                  if (start > 1) {
-                    pageButtons.push(
-                      <motion.div
-                        key={1}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                      >
-                        <Button
-                          variant={currentPage === 1 ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => handlePageChange(1)}
-                          className={`
-                            ${currentPage === 1
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
-                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
-                            transition-all duration-200 min-w-[38px] relative overflow-hidden
-                          `}
-                        >
-                          {1}
-                        </Button>
-                      </motion.div>
-                    );
-                    if (start > 2) {
-                      pageButtons.push(
-                        <motion.span 
-                          key="start-ellipsis" 
-                          className="px-2 text-gray-500"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          ...
-                        </motion.span>
-                      );
-                    }
-                  }
-
-                  // Middle pages
-                  for (let i = start; i <= end; i++) {
-                    pageButtons.push(
-                      <motion.div
-                        key={i}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                      >
-                        <Button
-                          variant={currentPage === i ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => handlePageChange(i)}
-                          className={`
-                            ${currentPage === i
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
-                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
-                            transition-all duration-200 min-w-[38px] relative overflow-hidden
-                          `}
-                        >
-                          <motion.span
-                            key={currentPage === i ? 'active' : 'inactive'}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            {i}
-                          </motion.span>
-                        </Button>
-                      </motion.div>
-                    );
-                  }
-
-                  // Always show last page
-                  if (end < totalPages) {
-                    if (end < totalPages - 1) {
-                      pageButtons.push(
-                        <motion.span 
-                          key="end-ellipsis" 
-                          className="px-2 text-gray-500"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          ...
-                        </motion.span>
-                      );
-                    }
-                    pageButtons.push(
-                      <motion.div
-                        key={totalPages}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                      >
-                        <Button
-                          variant={currentPage === totalPages ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => handlePageChange(totalPages)}
-                          className={`
-                            ${currentPage === totalPages
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md border-transparent'
-                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
-                            transition-all duration-200 min-w-[38px] relative overflow-hidden
-                          `}
-                        >
-                          {totalPages}
-                        </Button>
-                      </motion.div>
-                    );
-                  }
-
-                  return pageButtons;
-                })()}
-
-                {/* Next Button */}
-                {/* <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-                  >
-                    <span className="md:hidden">Next</span>
-                    <ChevronRight size={16} />
-                  </Button>
-                </motion.div>
-              </nav>
-            </div>
-          )} */}
         </>
       ) : !loading && (
         <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-green-100">
@@ -411,7 +222,7 @@ const JobGradePage = () => {
             className="mt-4 text-green-600 hover:bg-green-50"
             onClick={() => {
               setSearchTerm('');
-              setFilters({ category: '', minSalary: '', maxSalary: '' });
+              setFilters({ minSalary: '', maxSalary: '' });
             }}
           >
             Reset filters

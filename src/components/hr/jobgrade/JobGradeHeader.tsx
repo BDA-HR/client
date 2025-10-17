@@ -1,13 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '../../../components/ui/button';
-import { Grid, List, Briefcase } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
 import type { JobGradeListDto } from '../../../types/hr/jobgrade';
 
 interface JobGradeHeaderProps {
   jobGrades: JobGradeListDto[];
-  viewMode: 'grid' | 'list';
-  setViewMode: (mode: 'grid' | 'list') => void;
 }
 
 // Define variants with proper TypeScript types
@@ -24,11 +21,8 @@ const itemVariants = {
   }
 };
 
-const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({ 
-  // jobGrades, 
-  viewMode, 
-  setViewMode,
-}) => {
+const JobGradeHeader: React.FC<JobGradeHeaderProps> = () => {
+
   return (
     <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
       <div className="flex items-center gap-3">
@@ -51,39 +45,6 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = ({
           </h1>
         </motion.div>
       </div>
-      {/* <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="mt-2 text-sm text-gray-600"
-      >
-        Comprehensive job classification with {jobGrades.length} grades and detailed role descriptions
-      </motion.p> */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex space-x-3 mt-4 sm:mt-0"
-      >
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
-          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-        >
-          {viewMode === 'grid' ? (
-            <>
-              <List className="h-4 w-4" />
-              List View
-            </>
-          ) : (
-            <>
-              <Grid className="h-4 w-4" />
-              Grid View
-            </>
-          )}
-        </Button>
-      </motion.div>
     </motion.div>
   );
 };
