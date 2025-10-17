@@ -1,13 +1,13 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '../../../components/ui/button';
-import { Grid, List, Users } from 'lucide-react';
-import type { PositionExpListDto } from '../../../types/hr/position';
+import React from "react";
+import { motion } from "framer-motion";
+import { Button } from "../../../components/ui/button";
+import { Grid, List, Users } from "lucide-react";
+import type { PositionExpListDto } from "../../../types/hr/position";
 
 interface PositionHeaderProps {
   positionData: PositionExpListDto[];
-  viewMode: 'grid' | 'list';
-  setViewMode: (mode: 'grid' | 'list') => void;
+  viewMode: "grid" | "list";
+  setViewMode: (mode: "grid" | "list") => void;
 }
 
 // Define variants with proper TypeScript types
@@ -16,21 +16,24 @@ const itemVariants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: { 
-      type: 'spring' as const, 
-      stiffness: 100, 
-      damping: 15 
-    }
-  }
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15,
+    },
+  },
 };
 
-const PositionHeader: React.FC<PositionHeaderProps> = ({ 
-  // positionData, 
-  viewMode, 
+const PositionHeader: React.FC<PositionHeaderProps> = ({
+  // positionData,
+  viewMode,
   setViewMode,
 }) => {
   return (
-    <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
+    <motion.div
+      variants={itemVariants}
+      className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
+    >
       <div className="flex items-center gap-3">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -46,7 +49,8 @@ const PositionHeader: React.FC<PositionHeaderProps> = ({
             >
               <span className="bg-gradient-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
                 Position
-              </span> Settings
+              </span>{" "}
+              Settings
             </motion.span>
           </h1>
         </motion.div>
@@ -69,9 +73,9 @@ const PositionHeader: React.FC<PositionHeaderProps> = ({
           variant="outline"
           size="sm"
           className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
-          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+          onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
         >
-          {viewMode === 'grid' ? (
+          {viewMode === "grid" ? (
             <>
               <List className="h-4 w-4" />
               List View

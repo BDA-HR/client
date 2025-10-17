@@ -1,8 +1,8 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Search, BadgePlus } from 'lucide-react';
-import { Button } from '../../ui/button';
-import type { PositionExpListDto } from '../../../types/hr/position';
+import React from "react";
+import { motion } from "framer-motion";
+import { Search, BadgePlus } from "lucide-react";
+import { Button } from "../../ui/button";
+import type { PositionExpListDto } from "../../../types/hr/position";
 
 interface PositionSearchFiltersProps {
   searchTerm: string;
@@ -17,7 +17,7 @@ const PositionSearchFilters: React.FC<PositionSearchFiltersProps> = ({
   onAddClick,
 }) => {
   const clearFilters = () => {
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
   return (

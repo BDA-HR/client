@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { DollarSign, Edit, Trash2, MoreVertical } from 'lucide-react';
-import { Button } from '../../ui/button';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { DollarSign, Edit, Trash2, MoreVertical } from "lucide-react";
+import { Button } from "../../ui/button";
 
 // Types based on your DTOs
 interface BenefitSetListDto {
@@ -17,7 +17,7 @@ interface BenefitSetCardProps {
   onEdit: () => void;
   onDelete: () => void;
   isDeleting: boolean;
-  viewMode: 'grid' | 'list';
+  viewMode: "grid" | "list";
 }
 
 const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
@@ -25,7 +25,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
   onEdit,
   onDelete,
   isDeleting,
-  viewMode
+  viewMode,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -53,16 +53,16 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
     };
 
     if (isMenuOpen) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [isMenuOpen]);
 
   // List View
-  if (viewMode === 'list') {
+  if (viewMode === "list") {
     return (
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -79,20 +79,15 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
               <h3 className="text-lg font-semibold text-gray-900 truncate">
                 {benefitSet.name}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Annual benefit value
-              </p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-green-600">
                 {benefitSet.benefitStr}
               </p>
-              <p className="text-sm text-gray-500">
-                ETB
-              </p>
+              <p className="text-sm text-gray-500">ETB</p>
             </div>
           </div>
-          
+
           {/* Action Menu for List View */}
           <div className="relative ml-4">
             <Button
@@ -103,7 +98,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
             >
               <MoreVertical className="h-4 w-4" />
             </Button>
-            
+
             {isMenuOpen && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -123,7 +118,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
                   className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <Trash2 className="h-3 w-3" />
-                  {isDeleting ? 'Deleting...' : 'Delete'}
+                  {isDeleting ? "Deleting..." : "Delete"}
                 </button>
               </motion.div>
             )}
@@ -151,7 +146,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
         >
           <MoreVertical className="h-4 w-4" />
         </Button>
-        
+
         {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -171,7 +166,7 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
               className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors disabled:opacity-50"
             >
               <Trash2 className="h-3 w-3" />
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? "Deleting..." : "Delete"}
             </button>
           </motion.div>
         )}
@@ -186,18 +181,12 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
           {benefitSet.name}
         </h3>
       </div>
-      
+
       <div className="mb-2">
         <p className="text-3xl font-bold text-green-600">
           {benefitSet.benefitStr}
         </p>
         <p className="text-sm text-gray-500 mt-1">ETB</p>
-      </div>
-
-      <div className="pt-3 border-t border-gray-100">
-        <p className="text-xs text-gray-500">
-          Annual benefit value
-        </p>
       </div>
     </motion.div>
   );
