@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, Edit } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Label } from '../../../components/ui/label';
-import { Input } from '../../../components/ui/input';
-import type { JobGradeListDto, JobGradeModDto } from '../../../types/hr/jobgrade';
-import type { UUID } from 'crypto';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { X, Edit } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import { Label } from "../../../components/ui/label";
+import { Input } from "../../../components/ui/input";
+import type {
+  JobGradeListDto,
+  JobGradeModDto,
+} from "../../../types/hr/jobgrade";
+import type { UUID } from "crypto";
 
 interface EditJobGradeModalProps {
   isOpen: boolean;
@@ -18,14 +21,14 @@ const EditJobGradeModal: React.FC<EditJobGradeModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  jobGrade
+  jobGrade,
 }) => {
   const [formData, setFormData] = useState<JobGradeModDto>({
-    id: '' as UUID,
-    name: '',
+    id: "" as UUID,
+    name: "",
     startSalary: 0,
     maxSalary: 0,
-    rowVersion: ''
+    rowVersion: "",
   });
 
   // Initialize form when jobGrade changes
@@ -36,23 +39,29 @@ const EditJobGradeModal: React.FC<EditJobGradeModalProps> = ({
         name: jobGrade.name,
         startSalary: jobGrade.startSalary,
         maxSalary: jobGrade.maxSalary,
-        rowVersion: jobGrade.rowVersion
+        rowVersion: jobGrade.rowVersion,
       });
     }
   }, [jobGrade]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: name.includes('Salary') ? Number(value) : value 
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name.includes("Salary") ? Number(value) : value,
     }));
   };
 
   const handleSubmit = () => {
-    if (!formData.name.trim() || formData.startSalary <= 0 || formData.maxSalary <= formData.startSalary) {
+    if (
+      !formData.name.trim() ||
+      formData.startSalary <= 0 ||
+      formData.maxSalary <= formData.startSalary
+    ) {
       return;
     }
 
@@ -61,18 +70,15 @@ const EditJobGradeModal: React.FC<EditJobGradeModalProps> = ({
   };
 
   // Convert salary to ETB display format
-// Convert salary to display format with ETB after the amount
-const formatSalary = (salary: number): string => {
-  const formattedAmount = new Intl.NumberFormat('en-ET', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(salary);
-  
-  return `${formattedAmount} ETB`;
-};
+  // Convert salary to display format with ETB after the amount
+  const formatSalary = (salary: number): string => {
+    const formattedAmount = new Intl.NumberFormat("en-ET", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(salary);
 
-  const midpointSalary = formData.startSalary && formData.maxSalary ? 
-    (formData.startSalary + formData.maxSalary) / 2 : 0;
+    return `${formattedAmount} ETB`;
+  };
 
   if (!isOpen || !jobGrade) return null;
 
@@ -127,7 +133,7 @@ const formatSalary = (salary: number): string => {
                   id="startSalary"
                   name="startSalary"
                   type="number"
-                  value={formData.startSalary || ''}
+                  value={formData.startSalary || ""}
                   onChange={handleChange}
                   placeholder="50000"
                   min="0"
@@ -143,7 +149,7 @@ const formatSalary = (salary: number): string => {
                   id="maxSalary"
                   name="maxSalary"
                   type="number"
-                  value={formData.maxSalary || ''}
+                  value={formData.maxSalary || ""}
                   onChange={handleChange}
                   placeholder="80000"
                   min={formData.startSalary + 1}
@@ -153,7 +159,7 @@ const formatSalary = (salary: number): string => {
               </div>
             </div>
 
-            {/* Salary Preview */}
+            {/* Salary Preview
             {formData.startSalary > 0 && formData.maxSalary > formData.startSalary && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                 <p className="text-sm text-green-800 font-medium mb-2">Salary Preview:</p>
@@ -176,17 +182,15 @@ const formatSalary = (salary: number): string => {
                     <span className="font-medium">Range:</span>{' '}
                     {formatSalary(formData.maxSalary - formData.startSalary)}
                   </div>
-                  {/* <div>
-                    <span className="font-medium">Spread:</span>{' '}
-                    {((formData.maxSalary - formData.startSalary) / formData.startSalary * 100).toFixed(1)}%
-                  </div> */}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Original Values for Reference */}
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-sm text-gray-600 font-medium mb-2">Original Values:</p>
+              <p className="text-sm text-gray-600 font-medium mb-2">
+                Original Values:
+              </p>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500">Name</p>
@@ -195,7 +199,8 @@ const formatSalary = (salary: number): string => {
                 <div>
                   <p className="text-gray-500">Salary Range</p>
                   <p className="font-medium">
-                    {formatSalary(jobGrade.startSalary)} - {formatSalary(jobGrade.maxSalary)}
+                    {formatSalary(jobGrade.startSalary)} -{" "}
+                    {formatSalary(jobGrade.maxSalary)}
                   </p>
                 </div>
               </div>
@@ -209,7 +214,11 @@ const formatSalary = (salary: number): string => {
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!formData.name.trim() || formData.startSalary <= 0 || formData.maxSalary <= formData.startSalary}
+              disabled={
+                !formData.name.trim() ||
+                formData.startSalary <= 0 ||
+                formData.maxSalary <= formData.startSalary
+              }
             >
               Save Changes
             </Button>

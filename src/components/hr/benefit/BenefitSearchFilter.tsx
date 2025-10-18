@@ -1,16 +1,16 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Search, BadgePlus, Grid, List } from 'lucide-react';
-import { Button } from '../../ui/button';
-import type { BenefitSetListDto } from '../../../types/hr/benefit';
+import React from "react";
+import { motion } from "framer-motion";
+import { Search, BadgePlus, Grid, List } from "lucide-react";
+import { Button } from "../../ui/button";
+import type { BenefitSetListDto } from "../../../types/hr/benefit";
 
 interface BenefitSearchFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   benefitSets: BenefitSetListDto[];
   onAddClick: () => void;
-  viewMode: 'grid' | 'list';
-  setViewMode: (mode: 'grid' | 'list') => void;
+  viewMode: "grid" | "list";
+  setViewMode: (mode: "grid" | "list") => void;
 }
 
 const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
@@ -21,10 +21,10 @@ const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
   setViewMode,
 }) => {
   const clearFilters = () => {
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
-  const hasActiveFilters = searchTerm !== '';
+  const hasActiveFilters = searchTerm !== "";
 
   return (
     <motion.div
@@ -33,11 +33,11 @@ const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
       transition={{ duration: 0.4 }}
       className="bg-white p-4 rounded-lg shadow-sm"
     >
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 flex-wrap">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 flex-w">
         {/* 🔍 Search Input */}
         <div className="w-full lg:flex-1">
           <label htmlFor="benefit-search" className="sr-only">
-            Search benefit sets
+            Search Benefit settings
           </label>
           <div className="relative w-full">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -46,7 +46,7 @@ const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
             <input
               id="benefit-search"
               name="benefit-search"
-              placeholder="Search benefit sets by name..."
+              placeholder="Search Benefit setttings"
               className="block w-1/2 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -62,9 +62,9 @@ const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
               variant="outline"
               size="sm"
               className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800 whitespace-nowrap"
-              onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
             >
-              {viewMode === 'grid' ? (
+              {viewMode === "grid" ? (
                 <>
                   <List className="h-4 w-4" />
                   List View
@@ -97,7 +97,7 @@ const BenefitSearchFilters: React.FC<BenefitSearchFiltersProps> = ({
             className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
           >
             <BadgePlus className="h-4 w-4" />
-            Add Benefit Set
+            Add New
           </Button>
         </div>
       </div>

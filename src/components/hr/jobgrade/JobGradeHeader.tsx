@@ -1,7 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Briefcase } from 'lucide-react';
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
+import React from "react";
+import { motion } from "framer-motion";
+import { Briefcase } from "lucide-react";
+import type { JobGradeListDto } from "../../../types/hr/jobgrade";
 
 interface JobGradeHeaderProps {
   jobGrades: JobGradeListDto[];
@@ -13,18 +13,20 @@ const itemVariants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: { 
-      type: 'spring' as const, 
-      stiffness: 100, 
-      damping: 15 
-    }
-  }
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15,
+    },
+  },
 };
 
 const JobGradeHeader: React.FC<JobGradeHeaderProps> = () => {
-
   return (
-    <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
+    <motion.div
+      variants={itemVariants}
+      className="mb-4 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
+    >
       <div className="flex items-center gap-3">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -39,8 +41,9 @@ const JobGradeHeader: React.FC<JobGradeHeaderProps> = () => {
               className="inline-block"
             >
               <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                Job 
-              </span> Grades
+                Job
+              </span>{" "}
+              Grades
             </motion.span>
           </h1>
         </motion.div>

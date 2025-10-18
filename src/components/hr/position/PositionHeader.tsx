@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 
-
 // Define variants with proper TypeScript types
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -21,7 +20,7 @@ const PositionHeader = () => {
   return (
     <motion.div
       variants={itemVariants}
-      className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
+      className="mb-4 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
     >
       <div className="flex items-center gap-3">
         <motion.div

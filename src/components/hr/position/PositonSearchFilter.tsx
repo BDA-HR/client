@@ -24,7 +24,7 @@ const PositionSearchFilters: React.FC<PositionSearchFiltersProps> = ({
     setSearchTerm("");
   };
 
-  const hasActiveFilters = searchTerm !== '';
+  const hasActiveFilters = searchTerm !== "";
 
   return (
     <motion.div
@@ -38,7 +38,7 @@ const PositionSearchFilters: React.FC<PositionSearchFiltersProps> = ({
         <div className="w-full lg:flex-1">
           <div className="relative w-full max-w-md">
             <label htmlFor="position-search" className="sr-only">
-              Search positions
+              Search Positions
             </label>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
@@ -46,7 +46,7 @@ const PositionSearchFilters: React.FC<PositionSearchFiltersProps> = ({
             <input
               id="position-search"
               name="position-search"
-              placeholder="Search positions by name..."
+              placeholder="Search Positions"
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -98,7 +98,7 @@ const PositionSearchFilters: React.FC<PositionSearchFiltersProps> = ({
             className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
           >
             <BadgePlus className="h-4 w-4" />
-            Add Position
+            Add New
           </Button>
         </div>
       </div>
