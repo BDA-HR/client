@@ -72,7 +72,7 @@ function PositionEducation({ positionId }: PositionEducationProps) {
   const handleConfirmDelete = async (education: PositionEduListDto) => {
     try {
       await positionService.deletePositionEdu(education.id);
-      await fetchEducations();
+      await fetchData();
       setIsModalOpen(false);
       setDeletingEducation(null);
     } catch (error) {
@@ -130,8 +130,7 @@ function PositionEducation({ positionId }: PositionEducationProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleEdit(education)}
-                    className="flex items-center gap-1"
-                  >
+className="flex items-center gap-1 border-green-300 text-green-700 hover:bg-green-50"                  >
                     <Edit className="h-3 w-3" />
                     Edit
                   </Button>
