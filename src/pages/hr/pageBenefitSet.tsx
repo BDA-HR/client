@@ -7,16 +7,7 @@ import BenefitSearchFilters from "../../components/hr/benefit/BenefitSearchFilte
 import AddBenefitModal from "../../components/hr/benefit/AddBenfitModal";
 import EditBenefitSetModal from "../../components/hr/benefit/EditBenefitSetModal";
 import DeleteBenefitModal from "../../components/hr/benefit/DeleteBenefitModal";
-import type { UUID } from "../../types/hr/benefit";
-
-// Types based on your DTOs
-interface BenefitSetListDto {
-  id: UUID;
-  name: string;
-  benefit: number;
-  benefitStr: string;
-  rowVersion?: string;
-}
+import type { UUID, BenefitSetListDto } from "../../types/hr/benefit";
 
 interface BenefitSetAddDto {
   name: string;
@@ -42,6 +33,11 @@ const benefitSetService = {
             benefit: 5000,
             benefitStr: "5,000",
             rowVersion: "1",
+            isDeleted: false,
+            createdAt: new Date().toISOString(),
+            createdAtAm: new Date().toISOString(),
+            modifiedAt: new Date().toISOString(),
+            modifiedAtAm: new Date().toISOString(),
           },
           {
             id: "2" as UUID,
@@ -49,6 +45,11 @@ const benefitSetService = {
             benefit: 2000,
             benefitStr: "2,000",
             rowVersion: "1",
+            isDeleted: false,
+            createdAt: new Date().toISOString(),
+            createdAtAm: new Date().toISOString(),
+            modifiedAt: new Date().toISOString(),
+            modifiedAtAm: new Date().toISOString(),
           },
           {
             id: "3" as UUID,
@@ -56,6 +57,11 @@ const benefitSetService = {
             benefit: 8000,
             benefitStr: "8,000",
             rowVersion: "1",
+            isDeleted: false,
+            createdAt: new Date().toISOString(),
+            createdAtAm: new Date().toISOString(),
+            modifiedAt: new Date().toISOString(),
+            modifiedAtAm: new Date().toISOString(),
           },
         ]);
       }, 500);
@@ -73,6 +79,11 @@ const benefitSetService = {
           benefit: data.benefitValue,
           benefitStr: data.benefitValue.toLocaleString(),
           rowVersion: "1",
+          isDeleted: false,
+          createdAt: new Date().toISOString(),
+          createdAtAm: new Date().toISOString(),
+          modifiedAt: new Date().toISOString(),
+          modifiedAtAm: new Date().toISOString(),
         });
       }, 500);
     });
@@ -89,6 +100,11 @@ const benefitSetService = {
           benefit: data.benefitValue,
           benefitStr: data.benefitValue.toLocaleString(),
           rowVersion: data.rowVersion,
+          isDeleted: false,
+          createdAt: new Date().toISOString(),
+          createdAtAm: new Date().toISOString(),
+          modifiedAt: new Date().toISOString(),
+          modifiedAtAm: new Date().toISOString(),
         });
       }, 500);
     });
@@ -197,7 +213,7 @@ const PageBenefitSet: React.FC = () => {
       className="bg-gray-50 space-y-6"
     >
       {/* Header Component */}
-      <BenefitSetHeader benefitSets={benefitSets} />
+      <BenefitSetHeader />
 
       {/* Search Filters Component */}
       <BenefitSearchFilters

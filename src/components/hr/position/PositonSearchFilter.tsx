@@ -2,12 +2,12 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Search, BadgePlus, Grid, List } from "lucide-react";
 import { Button } from "../../ui/button";
-import type { PositionExpListDto } from "../../../types/hr/position";
+import type { PositionListDto  } from "../../../types/hr/position";
 
 interface PositionSearchFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  positionData: PositionExpListDto[];
+  positionData: PositionListDto [];
   onAddClick: () => void;
   viewMode: "grid" | "list";
   setViewMode: (mode: "grid" | "list") => void;

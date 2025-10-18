@@ -1,11 +1,7 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { DollarSign } from "lucide-react";
-import type { BenefitSetListDto } from "../../../types/hr/benefit";
 
-interface BenefitSetHeaderProps {
-  benefitSets: BenefitSetListDto[];
-}
+
 
 // Define variants with proper TypeScript types
 const itemVariants = {
@@ -21,7 +17,7 @@ const itemVariants = {
   },
 };
 
-const BenefitSetHeader: React.FC<BenefitSetHeaderProps> = () => {
+const BenefitSetHeader = () => {
   return (
     <motion.div
       variants={itemVariants}

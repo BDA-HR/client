@@ -75,7 +75,12 @@ const JobGradePage = () => {
     const gradeWithId: JobGradeListDto = {
       ...newGrade,
       id: generateUUID() as UUID,
-      rowVersion: '1'
+      rowVersion: '1',
+      isDeleted: false,
+      createdAt: new Date().toISOString(),
+      createdAtAm: new Date().toISOString(),
+      modifiedAt: new Date().toISOString(),
+      modifiedAtAm: new Date().toISOString()
     };
 
     setJobGrades(prev => [gradeWithId, ...prev]);
@@ -102,11 +107,26 @@ const JobGradePage = () => {
   };
 
   const handleSaveEdit = (updatedGrade: JobGradeModDto) => {
+    const currentTime = new Date().toISOString();
     setJobGrades(prev => prev.map(grade => 
-      grade.id === updatedGrade.id ? { ...grade, ...updatedGrade } : grade
+      grade.id === updatedGrade.id 
+        ? { 
+            ...grade, 
+            ...updatedGrade,
+            modifiedAt: currentTime,
+            modifiedAtAm: currentTime
+          } 
+        : grade
     ));
     setFilteredGrades(prev => prev.map(grade => 
-      grade.id === updatedGrade.id ? { ...grade, ...updatedGrade } : grade
+      grade.id === updatedGrade.id 
+        ? { 
+            ...grade, 
+            ...updatedGrade,
+            modifiedAt: currentTime,
+            modifiedAtAm: currentTime
+          } 
+        : grade
     ));
     setIsEditModalOpen(false);
     setEditingGrade(null);

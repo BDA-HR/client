@@ -24,7 +24,6 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
   benefitSet,
   onEdit,
   onDelete,
-  isDeleting,
   viewMode,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -101,27 +100,27 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
 
             {isMenuOpen && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute right-0 top-10 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-10 min-w-[120px]"
-              >
-                <button
-                  onClick={handleEdit}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
-                >
-                  <Edit className="h-3 w-3" />
-                  Edit
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors disabled:opacity-50"
-                >
-                  <Trash2 className="h-3 w-3" />
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </button>
-              </motion.div>
-            )}
+                          initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                          className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1"
+                        >
+                          <button
+                            className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                            onClick={handleEdit}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </button>
+                          <button
+                            className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                            onClick={handleDelete}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </button>
+                        </motion.div>
+                      )}
           </div>
         </div>
       </motion.div>
@@ -149,24 +148,24 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
 
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="absolute right-0 top-10 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-10 min-w-[120px]"
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1"
           >
             <button
+              className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
               onClick={handleEdit}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
             >
-              <Edit className="h-3 w-3" />
+              <Edit className="h-4 w-4 mr-2" />
               Edit
             </button>
             <button
+              className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
               onClick={handleDelete}
-              disabled={isDeleting}
-              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors disabled:opacity-50"
             >
-              <Trash2 className="h-3 w-3" />
-              {isDeleting ? "Deleting..." : "Delete"}
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
             </button>
           </motion.div>
         )}
