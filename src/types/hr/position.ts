@@ -142,7 +142,26 @@ export interface PositionReqModDto {
   rowVersion: string;
 }
 
-// Optional: Combined types for forms or specific use cases
+// Service response types
+export interface EducationLevelDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+}
+
+export interface ProfessionTypeDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+}
+
+export interface BenefitSettingDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+}
+
+// Combined types
 export type PositionSettingType = 
   | 'experience' 
   | 'benefit' 
@@ -155,7 +174,6 @@ export interface PositionSettingTab {
   description: string;
 }
 
-// Type for position details page that combines all position data
 export interface PositionDetailsData {
   position: PositionListDto;
   experience?: PositionExpListDto[];
@@ -164,7 +182,6 @@ export interface PositionDetailsData {
   requirements?: PositionReqListDto[];
 }
 
-// Search and filter types
 export interface PositionFilters {
   searchTerm: string;
   departmentId?: UUID;

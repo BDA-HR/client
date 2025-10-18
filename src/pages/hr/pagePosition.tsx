@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import PositionHeader from '../../components/hr/position/PositionHeader';
 import PositionSearchFilters from '../../components/hr/position/PositonSearchFilter';
@@ -6,7 +6,8 @@ import PositionCard from '../../components/hr/position/PositionCard';
 import AddPositionModal from '../../components/hr/position/AddPositionModal';
 import EditPositionModal from '../../components/hr/position/EditPositionModal';
 import DeletePositionModal from '../../components/hr/position/DeletePositionModal';
-import type { PositionListDto, UUID, PositionAddDto, PositionModDto } from '../../types/hr/position';
+import type { PositionListDto, PositionAddDto, PositionModDto } from '../../types/hr/position';
+import { positionService } from '../../services/hr/positionService';
 
 function PagePosition() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -16,81 +17,78 @@ function PagePosition() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<PositionListDto | null>(null);
   const [positionToDelete, setPositionToDelete] = useState<PositionListDto | null>(null);
-  
-  // Mock data using PositionListDto - in real app, this would come from API
-  const [positionData, setPositionData] = useState<PositionListDto[]>([
-    {
-      id: '1' as UUID,
-      departmentId: 'dept-1' as UUID,
-      isVacant: '1',
-      name: 'Software Engineer',
-      nameAm: 'ሶፍትዌር ኢንጂነር',
-      noOfPosition: 5,
-      isVacantStr: 'Yes',
-      department: 'IT Department',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      rowVersion: '1'
-    },
-    {
-      id: '2' as UUID,
-      departmentId: 'dept-2' as UUID,
-      isVacant: '0',
-      name: 'HR Manager',
-      nameAm: 'ሰው ሀብት አስተዳዳሪ',
-      noOfPosition: 1,
-      isVacantStr: 'No',
-      department: 'Human Resources',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      rowVersion: '1'
+  const [positionData, setPositionData] = useState<PositionListDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch positions on component mount
+  useEffect(() => {
+    fetchPositions();
+  }, []);
+
+  const fetchPositions = async () => {
+    try {
+      setLoading(true);
+      // Commented out service call - using dummy data directly
+      // const positions = await positionService.getAllPositions();
+      // setPositionData(positions);
+      
+      // Using dummy data directly for testing
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading
+      const positions = await positionService.getAllPositions(); // This now returns dummy data
+      setPositionData(positions);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch positions');
+      console.error('Error fetching positions:', err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   const handleAddPositionClick = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleAddPosition = (newPositionData: PositionAddDto) => {
-    console.log('Adding new position:', newPositionData);
-    
-    // Create a new position with mock ID and additional fields
-    const newPosition: PositionListDto = {
-      id: `position-${Date.now()}` as UUID,
-      departmentId: newPositionData.departmentId,
-      isVacant: newPositionData.isVacant,
-      name: newPositionData.name,
-      nameAm: newPositionData.nameAm,
-      noOfPosition: newPositionData.noOfPosition,
-      isVacantStr: newPositionData.isVacant === '1' ? 'Yes' : 'No',
-      department: 'New Department', // This would come from department service
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      rowVersion: '1'
-    };
-
-    // Update the positions state with the new position
-    setPositionData(prev => [...prev, newPosition]);
+  const handleAddPosition = async (newPositionData: PositionAddDto) => {
+    try {
+      // Commented out service call - using dummy data directly
+      // await positionService.addPosition(newPositionData);
+      
+      // Using dummy data directly for testing
+      await positionService.addPosition(newPositionData); // This now uses dummy data
+      await fetchPositions(); // Refresh the list
+      setIsAddModalOpen(false);
+    } catch (err) {
+      setError('Failed to add position');
+      console.error('Error adding position:', err);
+    }
   };
 
   const handleEdit = (position: PositionListDto) => {
-    console.log('Edit position:', position);
     setSelectedPosition(position);
     setIsEditModalOpen(true);
   };
 
   const handleDelete = (position: PositionListDto) => {
-    console.log('Request to delete position:', position);
     setPositionToDelete(position);
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = (position: PositionListDto) => {
-    console.log('Confirming delete for position:', position);
-    // Remove the position from the state
-    setPositionData(prev => prev.filter(p => p.id !== position.id));
-    setIsDeleteModalOpen(false);
-    setPositionToDelete(null);
+  const handleConfirmDelete = async (position: PositionListDto) => {
+    try {
+      // Commented out service call - using dummy data directly
+      // await positionService.deletePosition(position.id);
+      
+      // Using dummy data directly for testing
+      await positionService.deletePosition(position.id); // This now uses dummy data
+      await fetchPositions(); // Refresh the list
+      setIsDeleteModalOpen(false);
+      setPositionToDelete(null);
+    } catch (err) {
+      setError('Failed to delete position');
+      console.error('Error deleting position:', err);
+    }
   };
 
   const handleCloseDeleteModal = () => {
@@ -98,28 +96,20 @@ function PagePosition() {
     setPositionToDelete(null);
   };
 
-  const handleSavePosition = (updatedPosition: PositionModDto) => {
-    console.log('Saving updated position:', updatedPosition);
-    
-    // Update the position in the state
-    setPositionData(prev => 
-      prev.map(position => 
-        position.id === updatedPosition.id 
-          ? { 
-              ...position, 
-              name: updatedPosition.name,
-              nameAm: updatedPosition.nameAm,
-              noOfPosition: updatedPosition.noOfPosition,
-              isVacant: updatedPosition.isVacant,
-              isVacantStr: updatedPosition.isVacant === '1' ? 'Yes' : 'No',
-              updatedAt: new Date().toISOString()
-            }
-          : position
-      )
-    );
-    
-    setIsEditModalOpen(false);
-    setSelectedPosition(null);
+  const handleSavePosition = async (updatedPosition: PositionModDto) => {
+    try {
+      // Commented out service call - using dummy data directly
+      // await positionService.updatePosition(updatedPosition.id, updatedPosition);
+      
+      // Using dummy data directly for testing
+      await positionService.updatePosition(updatedPosition.id, updatedPosition); // This now uses dummy data
+      await fetchPositions(); // Refresh the list
+      setIsEditModalOpen(false);
+      setSelectedPosition(null);
+    } catch (err) {
+      setError('Failed to update position');
+      console.error('Error updating position:', err);
+    }
   };
 
   const handleCloseEditModal = () => {
@@ -132,6 +122,28 @@ function PagePosition() {
     item.nameAm.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.department.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+        <p className="text-red-600">{error}</p>
+        <button 
+          onClick={fetchPositions}
+          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto space-y-6">
