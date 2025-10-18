@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, Edit } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Label } from '../../ui/label';
-import { Input } from '../../ui/input';
-import type { BenefitSetListDto, BenefitSetModDto } from '../../../types/hr/benefit';
-import type { UUID } from 'crypto';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { X, Edit } from "lucide-react";
+import { Button } from "../../ui/button";
+import { Label } from "../../ui/label";
+import { Input } from "../../ui/input";
+import type {
+  BenefitSetListDto,
+  BenefitSetModDto,
+} from "../../../types/hr/benefit";
+import type { UUID } from "crypto";
 
 interface EditBenefitSetModalProps {
   isOpen: boolean;
@@ -18,13 +21,13 @@ const EditBenefitSetModal: React.FC<EditBenefitSetModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  benefitSet
+  benefitSet,
 }) => {
   const [formData, setFormData] = useState<BenefitSetModDto>({
-    id: '' as UUID,
-    name: '',
+    id: "" as UUID,
+    name: "",
     benefitValue: 0,
-    rowVersion: ''
+    rowVersion: "",
   });
 
   // Initialize form when benefitSet changes
@@ -34,18 +37,20 @@ const EditBenefitSetModal: React.FC<EditBenefitSetModalProps> = ({
         id: benefitSet.id,
         name: benefitSet.name,
         benefitValue: benefitSet.benefit,
-        rowVersion: benefitSet.rowVersion || ''
+        rowVersion: benefitSet.rowVersion || "",
       });
     }
   }, [benefitSet]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: name === 'benefitValue' ? Number(value) : value 
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "benefitValue" ? Number(value) : value,
     }));
   };
 
@@ -60,11 +65,11 @@ const EditBenefitSetModal: React.FC<EditBenefitSetModalProps> = ({
 
   // Convert benefit to display format with ETB after the amount
   const formatBenefit = (benefit: number): string => {
-    const formattedAmount = new Intl.NumberFormat('en-ET', {
+    const formattedAmount = new Intl.NumberFormat("en-ET", {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(benefit);
-    
+
     return `${formattedAmount} ETB`;
   };
 
@@ -101,7 +106,7 @@ const EditBenefitSetModal: React.FC<EditBenefitSetModalProps> = ({
             {/* Benefit Set Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm text-gray-500">
-                Benefit Set Name <span className="text-red-500">*</span>
+                Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="name"
@@ -117,13 +122,13 @@ const EditBenefitSetModal: React.FC<EditBenefitSetModalProps> = ({
             {/* Benefit Value */}
             <div className="space-y-2">
               <Label htmlFor="benefitValue" className="text-sm text-gray-500">
-                Annual Benefit Value <span className="text-red-500">*</span>
+                Value (Amount) <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="benefitValue"
                 name="benefitValue"
                 type="number"
-                value={formData.benefitValue || ''}
+                value={formData.benefitValue || ""}
                 onChange={handleChange}
                 placeholder="50000"
                 min="0"
@@ -133,40 +138,44 @@ const EditBenefitSetModal: React.FC<EditBenefitSetModalProps> = ({
               />
             </div>
 
-            {/* Benefit Preview */}
+            {/* Benefit Preview
             {formData.benefitValue > 0 && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <p className="text-sm text-green-800 font-medium mb-2">Benefit Preview:</p>
+                <p className="text-sm text-green-800 font-medium mb-2">
+                  Benefit Preview:
+                </p>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600">Annual</p>
-                    <p className="font-semibold">{formatBenefit(formData.benefitValue)}</p>
+                    <p className="font-semibold">
+                      {formatBenefit(formData.benefitValue)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-gray-600">Monthly</p>
-                    <p className="font-semibold">{formatBenefit(monthlyBenefit)}</p>
-                  </div>
-                </div>
-                <div className="mt-2 text-xs text-gray-600">
-                  <div>
-                    <span className="font-medium">Breakdown:</span>{' '}
-                    {formatBenefit(formData.benefitValue)} per year / {formatBenefit(monthlyBenefit)} per month
+                    <p className="font-semibold">
+                      {formatBenefit(monthlyBenefit)}
+                    </p>
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Original Values for Reference */}
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-sm text-gray-600 font-medium mb-2">Original Values:</p>
+              <p className="text-sm text-gray-600 font-medium mb-2">
+                Original Values:
+              </p>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-gray-500">Name</p>
                   <p className="font-medium">{benefitSet.name}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Annual Benefit Value</p>
-                  <p className="font-medium">{formatBenefit(benefitSet.benefit)}</p>
+                  <p className="text-gray-500">Value (Amount)</p>
+                  <p className="font-medium">
+                    {formatBenefit(benefitSet.benefit)}
+                  </p>
                 </div>
               </div>
             </div>

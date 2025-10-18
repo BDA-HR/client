@@ -82,9 +82,9 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-green-600">
-                {benefitSet.benefitStr}
+                {benefitSet.benefitStr}{" "}
+                <span className="text-sm text-gray-500">ETB</span>
               </p>
-              <p className="text-sm text-gray-500">ETB</p>
             </div>
           </div>
 
@@ -184,9 +184,9 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
 
       <div className="mb-2">
         <p className="text-3xl font-bold text-green-600">
-          {benefitSet.benefitStr}
+          {benefitSet.benefitStr}{" "}
+          <span className="text-sm text-gray-500">ETB</span>
         </p>
-        <p className="text-sm text-gray-500 mt-1">ETB</p>
       </div>
     </motion.div>
   );

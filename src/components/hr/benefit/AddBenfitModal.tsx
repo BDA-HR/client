@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { X, BadgePlus } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Label } from '../../ui/label';
-import { Input } from '../../ui/input';
-import type { BenefitSetAddDto } from '../../../types/hr/benefit';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { X, BadgePlus } from "lucide-react";
+import { Button } from "../../ui/button";
+import { Label } from "../../ui/label";
+import { Input } from "../../ui/input";
+import type { BenefitSetAddDto } from "../../../types/hr/benefit";
 
 interface AddBenefitModalProps {
   isOpen: boolean;
@@ -18,17 +18,19 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
   onAddBenefit,
 }) => {
   const [formData, setFormData] = useState<BenefitSetAddDto>({
-    name: '',
+    name: "",
     benefitValue: 0,
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: name === 'benefitValue' ? Number(value) : value 
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "benefitValue" ? Number(value) : value,
     }));
   };
 
@@ -39,13 +41,11 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
 
     // Reset form
     setFormData({
-      name: '',
+      name: "",
       benefitValue: 0,
     });
     onClose();
   };
-
-
 
   if (!isOpen) return null;
 
@@ -77,7 +77,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
             {/* Benefit Set Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm text-gray-500">
-                Benefit Set Name <span className="text-red-500">*</span>
+                Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="name"
@@ -93,23 +93,20 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
             {/* Benefit Value */}
             <div className="space-y-2">
               <Label htmlFor="benefitValue" className="text-sm text-gray-500">
-                Benefit Value <span className="text-red-500">*</span>
+                Value (Amount) <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="benefitValue"
                 name="benefitValue"
                 type="number"
-                value={formData.benefitValue || ''}
+                value={formData.benefitValue || ""}
                 onChange={handleChange}
                 placeholder="5000"
                 min="0"
                 className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 required
               />
-              
             </div>
-
-            
           </div>
         </div>
 
@@ -121,7 +118,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
               onClick={handleSubmit}
               disabled={!formData.name.trim() || formData.benefitValue <= 0}
             >
-              Save 
+              Save
             </Button>
             <Button
               variant="outline"

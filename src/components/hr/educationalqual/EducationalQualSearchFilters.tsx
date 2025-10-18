@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, BadgePlus } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import AddEducationalQualModal from './AddEducationalQualModal';
-import type { EducationQualAddDto } from '../../../types/hr/educationalqual';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Search, BadgePlus } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import AddEducationalQualModal from "./AddEducationalQualModal";
+import type { EducationQualAddDto } from "../../../types/hr/educationalqual";
 
 interface EducationalQualSearchFiltersProps {
   searchTerm: string;
@@ -11,15 +11,13 @@ interface EducationalQualSearchFiltersProps {
   onAddEducationalQual: (educationalQual: EducationQualAddDto) => void;
 }
 
-const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> = ({
-  searchTerm,
-  setSearchTerm,
-  onAddEducationalQual,
-}) => {
+const EducationalQualSearchFilters: React.FC<
+  EducationalQualSearchFiltersProps
+> = ({ searchTerm, setSearchTerm, onAddEducationalQual }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const clearFilters = () => {
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
   const handleAddClick = () => {
@@ -47,7 +45,7 @@ const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> 
           {/* 🔍 Search Input */}
           <div className="w-full lg:flex-1">
             <label htmlFor="educationalqual-search" className="sr-only">
-              Search educational qualifications
+              Search Educational Qualifications
             </label>
             <div className="relative w-full">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -56,7 +54,7 @@ const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> 
               <input
                 id="educationalqual-search"
                 name="educationalqual-search"
-                placeholder="Search educational qualifications by name..."
+                placeholder="Search Educational Qualifications"
                 className="block w-full md:w-2/3 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -66,7 +64,7 @@ const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> 
 
           {/* 🎚 Filters + Add Button */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
-            {/* Clear Filter Button */}
+            {/* Clear Filter Button
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
@@ -77,7 +75,7 @@ const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> 
               >
                 Clear Search
               </Button>
-            </div>
+            </div> */}
 
             {/* ➕ Add Educational Qualification Button */}
             <Button
@@ -86,7 +84,7 @@ const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> 
               className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
             >
               <BadgePlus className="h-4 w-4" />
-              Add Educational Qualification
+              Add New
             </Button>
           </div>
         </div>
@@ -94,7 +92,7 @@ const EducationalQualSearchFilters: React.FC<EducationalQualSearchFiltersProps> 
 
       {/* Add Educational Qualification Modal */}
       {isAddModalOpen && (
-        <AddEducationalQualModal 
+        <AddEducationalQualModal
           onAddEducationalQual={handleAddEducationalQual}
           onClose={handleCloseModal}
         />
