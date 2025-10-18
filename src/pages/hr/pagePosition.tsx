@@ -8,6 +8,7 @@ import EditPositionModal from '../../components/hr/position/EditPositionModal';
 import DeletePositionModal from '../../components/hr/position/DeletePositionModal';
 import type { PositionListDto, PositionAddDto, PositionModDto } from '../../types/hr/position';
 import { positionService } from '../../services/hr/positionService';
+import { motion } from 'framer-motion';
 
 function PagePosition() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -133,15 +134,42 @@ function PagePosition() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-        <p className="text-red-600">{error}</p>
-        <button 
-          onClick={fetchPositions}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+      <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
         >
-          Retry
-        </button>
-      </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load Positions.{" "}
+                  <button
+                    onClick={fetchPositions}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("create") ? (
+                "Failed to create company. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update company. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete company. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
     );
   }
 
