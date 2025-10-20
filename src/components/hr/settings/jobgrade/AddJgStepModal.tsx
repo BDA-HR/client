@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, BadgePlus } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Label } from '../../../components/ui/label';
-import { Input } from '../../../components/ui/input';
-import type { JgStepAddDto } from '../../../types/hr/JgStep';
-import type { UUID } from '../../../types/hr/jobgrade';
+import { Button } from '../../../ui/button';
+import { Label } from '../../../ui/label';
+import { Input } from '../../../ui/input';
+import type { JgStepAddDto } from '../../../../types/hr/JgStep';
+import type { UUID } from '../../../../types/hr/jobgrade';
 
 interface AddJgStepModalProps {
   isOpen: boolean;

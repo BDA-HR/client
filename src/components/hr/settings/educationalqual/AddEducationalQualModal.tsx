@@ -1,55 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, PenBox } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Label } from '../../../components/ui/label';
-import { Input } from '../../../components/ui/input';
-import type { EducationQualModDto, UUID } from '../../../types/hr/educationalqual';
+import { X, BadgePlus } from 'lucide-react';
+import { Button } from '../../../ui/button';
+import { Label } from '../../../ui/label';
+import { Input } from '../../../ui/input';
+import type { EducationQualAddDto } from '../../../../types/hr/educationalqual';
 
-interface EditEducationalQualModalProps {
-  educationalQual: EducationQualModDto | null;
-  onEditEducationalQual: (educationalQual: EducationQualModDto) => void;
+interface AddEducationalQualModalProps {
+  onAddEducationalQual: (educationalQual: EducationQualAddDto) => void;
   onClose: () => void;
+  isOpen?: boolean; // Optional prop if you want to control it from parent
 }
 
-const EditEducationalQualModal: React.FC<EditEducationalQualModalProps> = ({ 
-  educationalQual,
-  onEditEducationalQual,
+const AddEducationalQualModal: React.FC<AddEducationalQualModalProps> = ({ 
+  onAddEducationalQual,
   onClose
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [editedEducationalQual, setEditedEducationalQual] = useState<EducationQualModDto>({
-    id: '' as UUID,
-    name: '',
-    rowVersion: ''
-  });
-
-  useEffect(() => {
-    if (educationalQual) {
-      setEditedEducationalQual(educationalQual);
-      setIsOpen(true);
-    }
-  }, [educationalQual]);
+  const [newEducationalQual, setNewEducationalQual] = useState({ name: '' });
 
   const handleSubmit = () => {
-    if (!editedEducationalQual.name.trim()) return;
+    if (!newEducationalQual.name.trim()) return;
 
-    onEditEducationalQual({
-      ...editedEducationalQual,
-      name: editedEducationalQual.name.trim(),
+    onAddEducationalQual({
+      name: newEducationalQual.name.trim(),
     });
 
-    handleClose();
+    setNewEducationalQual({ name: '' });
+    onClose();
   };
 
   const handleClose = () => {
-    setIsOpen(false);
-    setEditedEducationalQual({ id: '' as UUID, name: '', rowVersion: '' });
+    setNewEducationalQual({ name: '' });
     onClose();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && editedEducationalQual.name.trim()) {
+    if (e.key === 'Enter' && newEducationalQual.name.trim()) {
       handleSubmit();
     }
     if (e.key === 'Escape') {
@@ -57,10 +43,8 @@ const EditEducationalQualModal: React.FC<EditEducationalQualModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -70,8 +54,8 @@ const EditEducationalQualModal: React.FC<EditEducationalQualModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <PenBox size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
+            <BadgePlus size={20} />
+            <h2 className="text-lg font-bold text-gray-800">Add New</h2>
           </div>
           <button
             onClick={handleClose}
@@ -91,12 +75,9 @@ const EditEducationalQualModal: React.FC<EditEducationalQualModalProps> = ({
               </Label>
               <Input
                 id="educationalQualName"
-                value={editedEducationalQual.name}
+                value={newEducationalQual.name}
                 onChange={(e) =>
-                  setEditedEducationalQual(prev => ({ 
-                    ...prev, 
-                    name: e.target.value 
-                  }))
+                  setNewEducationalQual((prev) => ({ ...prev, name: e.target.value }))
                 }
                 onKeyDown={handleKeyPress}
                 placeholder="Eg. Bachelor's Degree, Master's Degree, PhD"
@@ -105,8 +86,7 @@ const EditEducationalQualModal: React.FC<EditEducationalQualModalProps> = ({
                 autoFocus
               />
             </div>
-
-       </div>
+          </div>
         </div>
 
         {/* Footer */}
@@ -115,9 +95,9 @@ const EditEducationalQualModal: React.FC<EditEducationalQualModalProps> = ({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!editedEducationalQual.name.trim()}
+              disabled={!newEducationalQual.name.trim()}
             >
-              Update
+              Save
             </Button>
             <Button
               variant="outline"
@@ -133,4 +113,4 @@ const EditEducationalQualModal: React.FC<EditEducationalQualModalProps> = ({
   );
 };
 
-export default EditEducationalQualModal;
+export default AddEducationalQualModal;

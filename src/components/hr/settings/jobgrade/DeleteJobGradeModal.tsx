@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { JobGradeListDto } from "../../../types/hr/jobgrade";
-import { Button } from "../../ui/button";
+import type { JobGradeListDto } from "../../../../types/hr/jobgrade";
+import { Button } from "../../../ui/button";
 
 interface DeleteJobGradeModalProps {
   jobGrade: JobGradeListDto | null;

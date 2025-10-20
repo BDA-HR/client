@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Edit } from "lucide-react";
-import { Button } from "../../ui/button";
-import { Label } from "../../ui/label";
-import { Input } from "../../ui/input";
+import { Button } from "../../../ui/button";
+import { Label } from "../../../ui/label";
+import { Input } from "../../../ui/input";
 import type {
   BenefitSetListDto,
   BenefitSetModDto,
-} from "../../../types/hr/benefit";
+} from "../../../../types/hr/benefit";
 import type { UUID } from "crypto";
 
 interface EditBenefitSetModalProps {

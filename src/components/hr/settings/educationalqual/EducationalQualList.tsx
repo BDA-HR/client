@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { GraduationCap, Trash2, MoreVertical, PenBox } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { Button } from '../../../ui/button';
 import { useRef, useState, useEffect } from 'react';
-import type { EducationQualListDto } from '../../../types/hr/educationalqual';
+import type { EducationQualListDto } from '../../../../types/hr/educationalqual';
 
 interface EducationalQualListProps {
   educationalQuals: EducationQualListDto[];

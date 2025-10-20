@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
+import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
 
 interface JobGradeSubgradesHeaderProps {
   jobGrade: JobGradeListDto | null;

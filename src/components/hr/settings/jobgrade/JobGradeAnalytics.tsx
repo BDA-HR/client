@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
+import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
 
 interface JobGradeAnalyticsProps {
   jobGrades: JobGradeListDto[];

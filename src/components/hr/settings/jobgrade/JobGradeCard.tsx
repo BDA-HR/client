@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
+import { Button } from '../../../ui/button';
+import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 

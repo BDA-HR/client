@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { EducationQualListDto } from "../../../types/hr/educationalqual";
-import { Button } from "../../ui/button";
+import type { EducationQualListDto } from "../../../../types/hr/educationalqual";
+import { Button } from "../../../ui/button";
 
 interface DeleteEducationalQualModalProps {
   educationalQual: EducationQualListDto | null;

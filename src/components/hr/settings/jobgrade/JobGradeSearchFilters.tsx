@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, BadgePlus, Grid, List, X } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
+import { Button } from '../../../ui/button';
+import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
 
 interface JobGradeSearchFiltersProps {
   searchTerm: string;

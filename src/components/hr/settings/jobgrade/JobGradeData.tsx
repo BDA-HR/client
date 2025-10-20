@@ -1,4 +1,4 @@
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
+import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
 import type { UUID } from 'crypto';
 
 // Function to generate UUID (simplified for mock data)

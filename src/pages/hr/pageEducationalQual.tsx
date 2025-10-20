@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import EducationalQualHeader from "../../components/hr/educationalqual/EducationalQualHeader";
-import EducationalQualSearchFilters from "../../components/hr/educationalqual/EducationalQualSearchFilters";
-import EditEducationalQualModal from "../../components/hr/educationalqual/EditEducationalQualModal";
-import DeleteEducationalQualModal from "../../components/hr/educationalqual/DeleteEducationalQualModal";
-import EducationalQualList from "../../components/hr/educationalqual/EducationalQualList";
+import EducationalQualHeader from "../../components/hr/settings/educationalqual/EducationalQualHeader";
+import EducationalQualSearchFilters from "../../components/hr/settings/educationalqual/EducationalQualSearchFilters";
+import EditEducationalQualModal from "../../components/hr/settings/educationalqual/EditEducationalQualModal";
+import DeleteEducationalQualModal from "../../components/hr/settings/educationalqual/DeleteEducationalQualModal";
+import EducationalQualList from "../../components/hr/settings/educationalqual/EducationalQualList";
 import { useState, useMemo, useEffect } from "react";
 import { educationQualService } from "../../services/hr/EducationQualService";
 import type {

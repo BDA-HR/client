@@ -1,27 +1,28 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { JgStepListDto } from "../../../types/hr/JgStep";
-import { Button } from "../../ui/button";
+import type { BenefitSetListDto } from "../../../../types/hr/benefit";
+import { Button } from "../../../ui/button";
 
-interface DeleteJgStepModalProps {
-  step: JgStepListDto | null;
+interface DeleteBenefitModalProps {
+  benefitSet: BenefitSetListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (step: JgStepListDto) => void;
+  onConfirm: (benefitSet: BenefitSetListDto) => void;
 }
 
-const DeleteJgStepModal: React.FC<DeleteJgStepModalProps> = ({
-  step,
+const DeleteBenefitModal: React.FC<DeleteBenefitModalProps> = ({
+  benefitSet,
   isOpen,
   onClose,
   onConfirm,
 }) => {
-  if (!isOpen || !step) return null;
+  if (!isOpen || !benefitSet) return null;
 
   const handleConfirm = () => {
-    onConfirm(step);
+    onConfirm(benefitSet);
   };
+
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
@@ -39,12 +40,13 @@ const DeleteJgStepModal: React.FC<DeleteJgStepModalProps> = ({
             </div>
 
             <p className="text-lg font-medium text-red-600 mt-4">
-              Are you sure you want to delete this job step?
+              Are you sure you want to delete this benefit set?
             </p>
             <p className="text-sm text-red-600 mt-2">
               This action cannot be undone.
             </p>
             
+
           </div>
         </div>
 
@@ -72,4 +74,4 @@ const DeleteJgStepModal: React.FC<DeleteJgStepModalProps> = ({
   );
 };
 
-export default DeleteJgStepModal;
+export default DeleteBenefitModal;

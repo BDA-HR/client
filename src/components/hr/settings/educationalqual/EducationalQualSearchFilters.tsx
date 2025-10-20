@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, BadgePlus, X } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "../../../ui/button";
 import AddEducationalQualModal from "./AddEducationalQualModal";
-import type { EducationQualAddDto } from "../../../types/hr/educationalqual";
+import type { EducationQualAddDto } from "../../../../types/hr/educationalqual";
 
 interface EducationalQualSearchFiltersProps {
   searchTerm: string;

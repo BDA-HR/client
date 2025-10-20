@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import type { JgStepListDto } from '../../../types/hr/JgStep';
+import { Button } from '../../../ui/button';
+import type { JgStepListDto } from '../../../../types/hr/JgStep';
 import { createPortal } from 'react-dom';
 
 interface StepCardProps {

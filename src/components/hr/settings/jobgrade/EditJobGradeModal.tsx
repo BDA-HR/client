@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Edit } from "lucide-react";
-import { Button } from "../../../components/ui/button";
-import { Label } from "../../../components/ui/label";
-import { Input } from "../../../components/ui/input";
+import { Button } from "../../../ui/button";
+import { Label } from "../../../ui/label";
+import { Input } from "../../../ui/input";
 import type {
   JobGradeListDto,
   JobGradeModDto,
-} from "../../../types/hr/jobgrade";
+} from "../../../../types/hr/jobgrade";
 import type { UUID } from "crypto";
 
 interface EditJobGradeModalProps {

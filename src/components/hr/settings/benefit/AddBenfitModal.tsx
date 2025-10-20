@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X, BadgePlus } from "lucide-react";
-import { Button } from "../../ui/button";
-import { Label } from "../../ui/label";
-import { Input } from "../../ui/input";
-import type { BenefitSetAddDto } from "../../../types/hr/benefit";
+import { Button } from "../../../ui/button";
+import { Label } from "../../../ui/label";
+import { Input } from "../../../ui/input";
+import type { BenefitSetAddDto } from "../../../../types/hr/benefit";
 
 interface AddBenefitModalProps {
   isOpen: boolean;
