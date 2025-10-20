@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Edit, Trash2, BadgePlus, Settings } from 'lucide-react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Edit, Trash2, Settings } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import PositionRequirementsModal from './PositionRequirementsModal';
 import DeletePositionRequirementsModal from './DeletePositionRequirementsModal';
@@ -9,15 +9,16 @@ import { PositionGender, WorkOption } from '../../../../types/hr/enum';
 
 interface PositionRequirementsProps {
   positionId: UUID;
+  onEdit?: (requirement: PositionReqListDto) => void;
+  onRequirementAdded?: () => void;
+  onRequirementDeleted?: () => void;
 }
 
-function PositionRequirements({ positionId }: PositionRequirementsProps) {
+const PositionRequirements = forwardRef(({ positionId, onEdit, onRequirementAdded, onRequirementDeleted }: PositionRequirementsProps, ref) => {
   const [requirements, setRequirements] = useState<PositionReqListDto[]>([]);
   const [professionTypes, setProfessionTypes] = useState<ProfessionTypeDto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [editingRequirement, setEditingRequirement] = useState<PositionReqListDto | null>(null);
   const [deletingRequirement, setDeletingRequirement] = useState<PositionReqListDto | null>(null);
 
   useEffect(() => {
@@ -35,6 +36,11 @@ function PositionRequirements({ positionId }: PositionRequirementsProps) {
       const positionRequirements = requirementsData.filter(req => req.positionId === positionId);
       setRequirements(positionRequirements);
       setProfessionTypes(professionTypesData);
+
+      // Notify parent about requirement status
+      if (positionRequirements.length > 0 && onRequirementAdded) {
+        onRequirementAdded();
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -42,27 +48,10 @@ function PositionRequirements({ positionId }: PositionRequirementsProps) {
     }
   };
 
-  const handleSave = async (data: PositionReqAddDto | PositionReqModDto) => {
-    try {
-      if ('id' in data) {
-        await positionService.updatePositionReq(data.id, data);
-      } else {
-        await positionService.addPositionReq(data);
-      }
-      await fetchData();
-    } catch (error) {
-      console.error('Error saving requirement:', error);
-    }
-  };
-
-  const handleAdd = () => {
-    setEditingRequirement(null);
-    setIsModalOpen(true);
-  };
-
   const handleEdit = (requirement: PositionReqListDto) => {
-    setEditingRequirement(requirement);
-    setIsModalOpen(true);
+    if (onEdit) {
+      onEdit(requirement);
+    }
   };
 
   const handleDelete = (requirement: PositionReqListDto) => {
@@ -76,20 +65,25 @@ function PositionRequirements({ positionId }: PositionRequirementsProps) {
       await fetchData();
       setIsDeleteModalOpen(false);
       setDeletingRequirement(null);
+      
+      // Notify parent that requirement was deleted
+      if (onRequirementDeleted) {
+        onRequirementDeleted();
+      }
     } catch (error) {
       console.error('Error deleting requirement:', error);
     }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingRequirement(null);
   };
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setDeletingRequirement(null);
   };
+
+  // Expose fetchData to parent via ref
+  useImperativeHandle(ref, () => ({
+    fetchRequirements: fetchData
+  }));
 
   if (loading) {
     return (
@@ -102,17 +96,6 @@ function PositionRequirements({ positionId }: PositionRequirementsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">Position Requirements</h3>
-          
-        </div>
-        <Button onClick={handleAdd} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer">
-          <BadgePlus className="h-4 w-4" />
-          Add Requirement
-        </Button>
-      </div>
-
       <div className="space-y-4">
         {requirements.map((requirement) => {
           const professionType = professionTypes.find(pt => pt.id === requirement.professionTypeId);
@@ -178,19 +161,9 @@ function PositionRequirements({ positionId }: PositionRequirementsProps) {
           <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
             <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-gray-900 mb-2">No Requirements Set</h4>
-            
           </div>
         )}
       </div>
-
-      <PositionRequirementsModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSave}
-        positionId={positionId}
-        professionTypes={professionTypes}
-        editingRequirement={editingRequirement}
-      />
 
       <DeletePositionRequirementsModal
         requirement={deletingRequirement}
@@ -200,6 +173,6 @@ function PositionRequirements({ positionId }: PositionRequirementsProps) {
       />
     </div>
   );
-}
+});
 
 export default PositionRequirements;

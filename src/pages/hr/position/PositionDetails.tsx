@@ -18,14 +18,19 @@ import PositionBenefits from '../../../components/hr/position/settings/PositionB
 import PositionEducation from '../../../components/hr/position/settings/PositionEducation';
 import PositionRequirements from '../../../components/hr/position/settings/PositionRequirements';
 import PositionExperienceModal from '../../../components/hr/position/settings/PositionExperianceModal';
+import PositionRequirementsModal from '../../../components/hr/position/settings/PositionRequirementsModal';
 import type { 
   PositionListDto, 
   PositionSettingType,
   PositionExpAddDto,
   PositionExpModDto,
-  PositionExpListDto
+  PositionExpListDto,
+  PositionReqAddDto,
+  PositionReqModDto,
+  PositionReqListDto,
+  ProfessionTypeDto
 } from '../../../types/hr/position';
-import { positionService } from '../../../services/hr/positionService';
+import { positionService, lookupService } from '../../../services/hr/positionService';
 
 // Define the tab interface
 interface SettingTab {
@@ -83,15 +88,25 @@ function PositionDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Experience modal state (moved from PositionExperience)
+  // Experience modal state
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState<PositionExpListDto | null>(null);
   const [hasExperience, setHasExperience] = useState(false);
   const experienceRef = useRef<any>(null);
 
+  // Requirement modal state
+  const [hasRequirement, setHasRequirement] = useState(false);
+  const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false);
+  const [editingRequirement, setEditingRequirement] = useState<PositionReqListDto | null>(null);
+  const [professionTypes, setProfessionTypes] = useState<ProfessionTypeDto[]>([]);
+  const requirementRef = useRef<any>(null);
+
   useEffect(() => {
     if (id) {
       fetchPosition();
+      checkIfHasExperience();
+      checkIfHasRequirement();
+      fetchProfessionTypes();
     }
   }, [id]);
 
@@ -131,10 +146,8 @@ function PositionDetails() {
         await positionService.updatePositionExp(data.id, data);
       } else {
         await positionService.addPositionExp(data);
-        // After adding experience, hide the add button
         setHasExperience(true);
       }
-      // Refresh experiences in the child component
       if (experienceRef.current && experienceRef.current.fetchExperiences) {
         await experienceRef.current.fetchExperiences();
       }
@@ -148,7 +161,39 @@ function PositionDetails() {
     setEditingExperience(null);
   };
 
-  // Function to check if position has experiences
+  // Requirement modal handlers
+  const handleAddRequirement = () => {
+    setEditingRequirement(null);
+    setIsRequirementModalOpen(true);
+  };
+
+  const handleEditRequirement = (requirement: PositionReqListDto) => {
+    setEditingRequirement(requirement);
+    setIsRequirementModalOpen(true);
+  };
+
+  const handleSaveRequirement = async (data: PositionReqAddDto | PositionReqModDto) => {
+    try {
+      if ('id' in data) {
+        await positionService.updatePositionReq(data.id, data);
+      } else {
+        await positionService.addPositionReq(data);
+        setHasRequirement(true);
+      }
+      if (requirementRef.current && requirementRef.current.fetchRequirements) {
+        await requirementRef.current.fetchRequirements();
+      }
+    } catch (error) {
+      console.error('Error saving requirement:', error);
+    }
+  };
+
+  const handleCloseRequirementModal = () => {
+    setIsRequirementModalOpen(false);
+    setEditingRequirement(null);
+  };
+
+  // Check if position has experiences
   const checkIfHasExperience = async () => {
     try {
       const data = await positionService.getAllPositionExp();
@@ -159,12 +204,26 @@ function PositionDetails() {
     }
   };
 
-  // Check for existing experiences when component mounts
-  useEffect(() => {
-    if (id) {
-      checkIfHasExperience();
+  // Check if position has requirements
+  const checkIfHasRequirement = async () => {
+    try {
+      const data = await positionService.getAllPositionReq();
+      const positionRequirements = data.filter(req => req.positionId === id);
+      setHasRequirement(positionRequirements.length > 0);
+    } catch (error) {
+      console.error('Error checking requirements:', error);
     }
-  }, [id]);
+  };
+
+  // Fetch profession types
+  const fetchProfessionTypes = async () => {
+    try {
+      const data = await lookupService.getAllProfessionTypes();
+      setProfessionTypes(data);
+    } catch (error) {
+      console.error('Error fetching profession types:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -187,8 +246,7 @@ function PositionDetails() {
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Position Not Found</h3>
           <p className="text-gray-600 mb-6">{error || 'The requested position could not be found.'}</p>
-          <Button onClick={handleBack} variant={'outline'}>            Back to Positions
-          </Button>
+          <Button onClick={handleBack} variant={'outline'}>Back to Positions</Button>
         </div>
       </div>
     );
@@ -328,6 +386,17 @@ function PositionDetails() {
                   Add Experience
                 </Button>
               )}
+
+              {/* Add Requirements Button - Only shown for Requirements tab when no requirement exists */}
+              {activeTab === 'requirement' && !hasRequirement && (
+                <Button 
+                  onClick={handleAddRequirement}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Requirements
+                </Button>
+              )}
             </div>
           </div>
 
@@ -340,6 +409,14 @@ function PositionDetails() {
                 onEdit={handleEditExperience}
                 onExperienceAdded={() => setHasExperience(true)}
                 onExperienceDeleted={() => setHasExperience(false)}
+              />
+            ) : activeTab === 'requirement' ? (
+              <PositionRequirements 
+                positionId={position.id} 
+                ref={requirementRef}
+                onEdit={handleEditRequirement}
+                onRequirementAdded={() => setHasRequirement(true)}
+                onRequirementDeleted={() => setHasRequirement(false)}
               />
             ) : (
               <ActiveTabComponent positionId={position.id} />
@@ -354,6 +431,16 @@ function PositionDetails() {
           onSave={handleSaveExperience}
           positionId={position.id}
           editingExperience={editingExperience}
+        />
+
+        {/* Requirements Modal */}
+        <PositionRequirementsModal
+          isOpen={isRequirementModalOpen}
+          onClose={handleCloseRequirementModal}
+          onSave={handleSaveRequirement}
+          positionId={position.id}
+          professionTypes={professionTypes}
+          editingRequirement={editingRequirement}
         />
       </div>
     </div>

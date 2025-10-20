@@ -7,7 +7,6 @@ import { Input } from '../../../../components/ui/input';
 import List from '../../../../components/List/list';
 import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../types/hr/position';
 import type { ListItem } from '../../../../types/List/list';
-// import { PositionGender, WorkOption } from '../../../../types/hr/enum';
 
 interface PositionRequirementsModalProps {
   isOpen: boolean;
@@ -28,9 +27,9 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<PositionReqAddDto>({
     positionId,
-    gender: '2',
-    saturdayWorkOption: '2',
-    sundayWorkOption: '2',
+    gender: '',
+    saturdayWorkOption: '',
+    sundayWorkOption: '',
     workingHours: 8,
     professionTypeId: '' as UUID,
   });
@@ -48,9 +47,9 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     } else {
       setFormData({
         positionId,
-        gender: '2',
-        saturdayWorkOption: '2',
-        sundayWorkOption: '2',
+        gender: '',
+        saturdayWorkOption: '',
+        sundayWorkOption: '',
         workingHours: 8,
         professionTypeId: '' as UUID,
       });
@@ -94,7 +93,21 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     name: type.name,
   }));
 
-  // const selectedProfessionType = professionTypes.find(pt => pt.id === formData.professionTypeId);
+  // Gender options with null option
+  const genderOptions = [
+    { value: '', label: 'Select Gender Preference' },
+    { value: '0', label: 'Male Only' },
+    { value: '1', label: 'Female Only' },
+    { value: '2', label: 'Both Genders' }
+  ];
+
+  // Work options with null option
+  const workOptions = [
+    { value: '', label: 'Select Work Option' },
+    { value: '0', label: 'Morning' },
+    { value: '1', label: 'Afternoon' },
+    { value: '2', label: 'Both' }
+  ];
 
   if (!isOpen) return null;
 
@@ -169,9 +182,11 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                 onChange={(e) => handleSelectChange('gender', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
               >
-                <option value="0">Male Only</option>
-                <option value="1">Female Only</option>
-                <option value="2">Both Genders</option>
+                {genderOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -188,9 +203,11 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                   onChange={(e) => handleSelectChange('saturdayWorkOption', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 >
-                  <option value="0">Morning</option>
-                  <option value="1">Afternoon</option>
-                  <option value="2">Both</option>
+                  {workOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="space-y-2">
@@ -204,41 +221,14 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                   onChange={(e) => handleSelectChange('sundayWorkOption', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 >
-                  <option value="0">Morning</option>
-                  <option value="1">Afternoon</option>
-                  <option value="2">Both</option>
+                  {workOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
-
-            {/* Requirements Preview */}
-            {/* {(formData.professionTypeId || formData.workingHours > 0) && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <p className="text-sm text-green-800 font-medium mb-2">Requirements Preview:</p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-gray-600">Profession Type</p>
-                    <p className="font-semibold">{selectedProfessionType?.name || 'Not set'}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Working Hours</p>
-                    <p className="font-semibold">{formData.workingHours} hours/day</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Gender</p>
-                    <p className="font-semibold">{PositionGender[formData.gender as keyof typeof PositionGender]}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Saturday Work</p>
-                    <p className="font-semibold">{WorkOption[formData.saturdayWorkOption as keyof typeof WorkOption]}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Sunday Work</p>
-                    <p className="font-semibold">{WorkOption[formData.sundayWorkOption as keyof typeof WorkOption]}</p>
-                  </div>
-                </div>
-              </div>
-            )} */}
           </div>
         </div>
 
