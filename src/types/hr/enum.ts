@@ -51,3 +51,17 @@ export const WorkOptionAm = {
   "3": 'ምንም'
 } as const;
 export type WorkOptionAm = typeof WorkOptionAm[keyof typeof WorkOptionAm];
+
+export const Per = {
+  "0": 'Day',
+  "1": 'Month', 
+  "2": 'Year'
+} as const;
+export type Per = typeof Per[keyof typeof Per];
+
+export const PerAm = {
+  "0": 'ቀን',
+  "1": 'ወር',
+  "2": 'አመት'
+} as const;
+export type PerAm = typeof PerAm[keyof typeof PerAm];

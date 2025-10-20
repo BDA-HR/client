@@ -4,7 +4,9 @@ import { X, BadgePlus } from "lucide-react";
 import { Button } from "../../../ui/button";
 import { Label } from "../../../ui/label";
 import { Input } from "../../../ui/input";
+import List from "../../../List/list";
 import type { BenefitSetAddDto } from "../../../../types/hr/benefit";
+import type { ListItem } from "../../../../types/List/list";
 
 interface AddBenefitModalProps {
   isOpen: boolean;
@@ -20,12 +22,11 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
   const [formData, setFormData] = useState<BenefitSetAddDto>({
     name: "",
     benefitValue: 0,
+    per: "Month", // Default value
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -34,8 +35,15 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
     }));
   };
 
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = () => {
-    if (!formData.name.trim() || formData.benefitValue <= 0) return;
+    if (!formData.name.trim() || formData.benefitValue <= 0 || !formData.per) return;
 
     onAddBenefit(formData);
 
@@ -43,9 +51,17 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
     setFormData({
       name: "",
       benefitValue: 0,
+      per: "Month", // Reset to default
     });
     onClose();
   };
+
+  // Period options for the List component
+  const periodOptions: ListItem[] = [
+    { id: "Day", name: "Day" },
+    { id: "Month", name: "Month" },
+    { id: "Year", name: "Year" }
+  ];
 
   if (!isOpen) return null;
 
@@ -83,29 +99,44 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
                 id="name"
                 name="name"
                 value={formData.name}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 placeholder="Eg. Health Insurance, Transport Allowance"
                 className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 required
               />
             </div>
 
-            {/* Benefit Value */}
-            <div className="space-y-2">
-              <Label htmlFor="benefitValue" className="text-sm text-gray-500">
-                Value (Amount) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="benefitValue"
-                name="benefitValue"
-                type="number"
-                value={formData.benefitValue || ""}
-                onChange={handleChange}
-                placeholder="5000"
-                min="0"
-                className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
-                required
-              />
+            {/* Benefit Value and Period - Side by side */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Benefit Value */}
+              <div className="space-y-2">
+                <Label htmlFor="benefitValue" className="text-sm text-gray-500">
+                  Value (Amount) <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="benefitValue"
+                  name="benefitValue"
+                  type="number"
+                  value={formData.benefitValue || ""}
+                  onChange={handleInputChange}
+                  placeholder="5000"
+                  min="0"
+                  className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              {/* Period - Using List component */}
+              <div className="space-y-2">
+                <List
+                  items={periodOptions}
+                  selectedValue={formData.per}
+                  onSelect={(item) => handleSelectChange('per', item.id)}
+                  label="Period"
+                  placeholder="Select period"
+                  required
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -116,7 +147,7 @@ const AddBenefitModal: React.FC<AddBenefitModalProps> = ({
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!formData.name.trim() || formData.benefitValue <= 0}
+              disabled={!formData.name.trim() || formData.benefitValue <= 0 || !formData.per}
             >
               Save
             </Button>
