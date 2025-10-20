@@ -62,7 +62,7 @@ const EducationalQualSearchFilters: React.FC<
               {searchTerm && (
                 <button
                   onClick={clearSearch}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:bg-gray-100 rounded-r-md transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer rounded-r-md transition-colors"
                   style={{ right: '33.333%' }} // Adjust position for the 2/3 width input
                 >
                   <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
