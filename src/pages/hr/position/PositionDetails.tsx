@@ -11,6 +11,8 @@ import {
   UserCheck,
   Calendar,
   BadgePlus,
+  Grid,
+  List,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import PositionExperience from '../../../components/hr/position/settings/PositionExperiance';
@@ -122,6 +124,9 @@ function PositionDetails() {
   const [editingBenefit, setEditingBenefit] = useState<PositionBenefitListDto | null>(null);
   const [benefitSettings, setBenefitSettings] = useState<BenefitSettingDto[]>([]);
   const benefitRef = useRef<any>(null);
+
+  // Grid/List view state for benefits
+  const [benefitViewMode, setBenefitViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     if (id) {
@@ -477,54 +482,78 @@ function PositionDetails() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">
-                    {settingTabs.find(tab => tab.id === activeTab)?.label} Settings
+                   Position {settingTabs.find(tab => tab.id === activeTab)?.label} 
                   </h2>
                 </div>
               </div>
               
-              {/* Add Education Button - Only shown for Education tab */}
-              {activeTab === 'education' && (
-                <Button 
-                  onClick={handleAddEducation}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
-                >
-                  <BadgePlus className="h-4 w-4" />
-                  Add Education
-                </Button>
-              )}
+              <div className="flex items-center gap-3">
+                {/* View Mode Toggle - Only shown for Benefit tab */}
+                {activeTab === 'benefit' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800 whitespace-nowrap"
+                    onClick={() => setBenefitViewMode(benefitViewMode === "grid" ? "list" : "grid")}
+                  >
+                    {benefitViewMode === "grid" ? (
+                      <>
+                        <List className="h-4 w-4" />
+                        List View
+                      </>
+                    ) : (
+                      <>
+                        <Grid className="h-4 w-4" />
+                        Grid View
+                      </>
+                    )}
+                  </Button>
+                )}
 
-              {/* Add Benefit Button - Only shown for Benefit tab */}
-              {activeTab === 'benefit' && (
-                <Button 
-                  onClick={handleAddBenefit}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
-                >
-                  <BadgePlus className="h-4 w-4" />
-                  Add Benefit
-                </Button>
-              )}
+                {/* Add Education Button - Only shown for Education tab */}
+                {activeTab === 'education' && (
+                  <Button 
+                    onClick={handleAddEducation}
+                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
+                  >
+                    <BadgePlus className="h-4 w-4" />
+                    Add Education
+                  </Button>
+                )}
 
-              {/* Add Experience Button - Only shown for Experience tab when no experience exists */}
-              {activeTab === 'experience' && !hasExperience && (
-                <Button 
-                  onClick={handleAddExperience}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
-                >
-                  <BadgePlus className="h-4 w-4" />
-                  Add Experience
-                </Button>
-              )}
+                {/* Add Benefit Button - Only shown for Benefit tab */}
+                {activeTab === 'benefit' && (
+                  <Button 
+                    onClick={handleAddBenefit}
+                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
+                  >
+                    <BadgePlus className="h-4 w-4" />
+                    Add Benefit
+                  </Button>
+                )}
 
-              {/* Add Requirements Button - Only shown for Requirements tab when no requirement exists */}
-              {activeTab === 'requirement' && !hasRequirement && (
-                <Button 
-                  onClick={handleAddRequirement}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
-                >
-                  <BadgePlus className="h-4 w-4" />
-                  Add Requirements
-                </Button>
-              )}
+                {/* Add Experience Button - Only shown for Experience tab when no experience exists */}
+                {activeTab === 'experience' && !hasExperience && (
+                  <Button 
+                    onClick={handleAddExperience}
+                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
+                  >
+                    <BadgePlus className="h-4 w-4" />
+                    Add Experience
+                  </Button>
+                )}
+
+                {/* Add Requirements Button - Only shown for Requirements tab when no requirement exists */}
+                {activeTab === 'requirement' && !hasRequirement && (
+                  <Button 
+                    onClick={handleAddRequirement}
+                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
+                  >
+                    <BadgePlus className="h-4 w-4" />
+                    Add Requirements
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -557,6 +586,8 @@ function PositionDetails() {
                 positionId={position.id} 
                 ref={benefitRef}
                 onEdit={handleEditBenefit}
+                viewMode={benefitViewMode}
+                setViewMode={setBenefitViewMode}
               />
             ) : (
               <ActiveTabComponent positionId={position.id} />
