@@ -37,12 +37,15 @@ const JobGradeSubgrades: React.FC = () => {
       setLoading(true);
       setError(null);
 
+      // Get job grade from location state or fetch if needed
       if (location.state?.jobGrade) {
         setJobGrade(location.state.jobGrade);
       } else if (gradeId) {
-        console.log('Fetching job grade:', gradeId);
+        // You might need to fetch the job grade details here if not passed via state
+        console.log('Job grade ID:', gradeId);
       }
 
+      // Fetch steps for the job grade
       if (gradeId) {
         const stepsData = await jgStepService.getJgStepsByJobGrade(gradeId as UUID);
         setSteps(stepsData);
@@ -92,7 +95,10 @@ const JobGradeSubgrades: React.FC = () => {
 
     try {
       setError(null);
-      const newStep = await jgStepService.createJgStep(stepData);
+      const newStep = await jgStepService.createJgStep({
+        ...stepData,
+        jobGradeId: gradeId as UUID
+      });
       setSteps(prev => [...prev, newStep]);
       handleCloseAddModal();
     } catch (err) {
@@ -130,63 +136,32 @@ const JobGradeSubgrades: React.FC = () => {
     }
   };
 
+  // Format currency for display
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-ET', {
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
-      </div>
-    );
-  }
-
-  if (error && !steps.length) {
-    return (
-      <div className="min-h-screen bg-gray-50 ">
-        <div className="flex items-center mb-6">
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex items-center gap-4 mb-6">
           <Button
             variant="outline"
             onClick={handleBack}
-            className="mr-4 cursor-pointer border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            className="cursor-pointer border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Job Grades
           </Button>
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
-        >
-          <div className="flex justify-between items-center">
-            <span className="font-medium">
-              {error.includes("load") ? (
-                <>
-                  Failed to load job grade steps.{" "}
-                  <button
-                    onClick={loadJobGradeAndSteps}
-                    className="underline hover:text-red-800 font-semibold focus:outline-none"
-                  >
-                    Try again
-                  </button>{" "}
-                  later.
-                </>
-              ) : error.includes("create") ? (
-                "Failed to create step. Please try again."
-              ) : error.includes("update") ? (
-                "Failed to update step. Please try again."
-              ) : error.includes("delete") ? (
-                "Failed to delete step. Please try again."
-              ) : (
-                error
-              )}
-            </span>
-            <button
-              onClick={() => setError(null)}
-              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
-            >
-              ×
-            </button>
+        <div className="flex justify-center items-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading job grade steps...</p>
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -196,10 +171,10 @@ const JobGradeSubgrades: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-50 space-y-4"
+      className="bg-gray-50 space-y-4 min-h-screen"
     >
+      {/* Header Section */}
       <div className="flex items-center gap-4 mb-6">
-        {/* Back Button */}
         <Button
           variant="outline"
           onClick={handleBack}
@@ -209,10 +184,8 @@ const JobGradeSubgrades: React.FC = () => {
           Back to Job Grades
         </Button>
 
-        {/* Separator */}
         <div className="h-10 w-px bg-gray-300"></div>
 
-        {/* Header - Simplified without buttons */}
         <div className="flex-1">
           <JobGradeSubgradesHeader jobGrade={jobGrade} />
         </div>
@@ -279,17 +252,13 @@ const JobGradeSubgrades: React.FC = () => {
                   <div>
                     <span className="text-gray-500">Start Salary:</span>
                     <span className="ml-2 font-semibold">
-                      {new Intl.NumberFormat('en-ET', {
-                        minimumFractionDigits: 0,
-                      }).format(jobGrade.startSalary)} ETB
+                      {formatCurrency(jobGrade.startSalary)} ETB
                     </span>
                   </div>
                   <div>
                     <span className="text-gray-500">Max Salary:</span>
                     <span className="ml-2 font-semibold">
-                      {new Intl.NumberFormat('en-ET', {
-                        minimumFractionDigits: 0,
-                      }).format(jobGrade.maxSalary)} ETB
+                      {formatCurrency(jobGrade.maxSalary)} ETB
                     </span>
                   </div>
                 </div>
@@ -337,26 +306,28 @@ const JobGradeSubgrades: React.FC = () => {
       )}
 
       {/* Steps List */}
-      <div className={
-        viewMode === 'grid' 
-          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
-          : "space-y-4"
-      }>
-        {steps.map((step, index) => (
-          <StepCard
-            key={step.id}
-            step={step}
-            index={index}
-            totalSteps={steps.length}
-            onEdit={handleOpenEditModal}
-            onDelete={handleOpenDeleteModal}
-            isDeleting={deletingId === step.id}
-            viewMode={viewMode}
-          />
-        ))}
-      </div>
+      {!loading && (
+        <div className={
+          viewMode === 'grid' 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+            : "space-y-4"
+        }>
+          {steps.map((step, index) => (
+            <StepCard
+              key={step.id}
+              step={step}
+              index={index}
+              totalSteps={steps.length}
+              onEdit={handleOpenEditModal}
+              onDelete={handleOpenDeleteModal}
+              isDeleting={deletingId === step.id}
+              viewMode={viewMode}
+            />
+          ))}
+        </div>
+      )}
 
-      {steps.length === 0 && (
+      {!loading && steps.length === 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
