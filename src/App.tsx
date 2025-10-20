@@ -9,7 +9,7 @@ import InventoryDashboard from './pages/modules/Inventory';
 import CoreDashboard from './pages/modules/Core';
 import Finance from './pages/modules/Finance';
 import Procurement from './pages/modules/Procurement';
-import JobGrade from './pages/hr/employeepage/JobGrade';
+import JobGrade from './pages/hr/settings/jobgrade/JobGrade';
 import Termination from './pages/hr/employeepage/Termination';
 import CandidatePipeline from './pages/hr/recruitmentpage/CandidatePipeline';
 import OnBoarding from './pages/hr/recruitmentpage/OnBoarding';
@@ -38,12 +38,12 @@ import CompanyDetailsPage from './components/core/company/CompDetails';
 import BranchesPage from './pages/core/pageBranches';
 import FiscalYearHistory from './pages/core/pageFiscYearHist';
 import PagePeriod from './pages/core/pagePeriod';
-import PageSettings from './pages/hr/pageSettings';
-import JobGradeSubgrades from './pages/hr/employeepage/JobGradeSubgrades';
-import PageBenefitSet from './pages/hr/pageBenefitSet';
-import PageEducationalQual from './pages/hr/pageEducationalQual';
-import PagePosition from './pages/hr/pagePosition';
-import PositionDetails from './pages/hr/position/PositionDetails';
+import PageSettings from './pages/hr/settings/pageSettings';
+import JobGradeSubgrades from './pages/hr/settings/jobgrade/JobGradeSubgrades';
+import PageBenefitSet from './pages/hr/settings/pageBenefitSet';
+import PageEducationalQual from './pages/hr/settings/pageEducationalQual';
+import PagePosition from './pages/hr/settings/position/pagePosition';
+import PositionDetails from './pages/hr/settings/position/PositionDetails';
 
 
 function App() {

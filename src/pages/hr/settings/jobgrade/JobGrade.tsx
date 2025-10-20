@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import JobGradeHeader from '../../../components/hr/settings/jobgrade/JobGradeHeader';
-import JobGradeCard from '../../../components/hr/settings/jobgrade/JobGradeCard';
-import JobGradeSearchFilters from '../../../components/hr/settings/jobgrade/JobGradeSearchFilters';
-import AddJobGradeModal from '../../../components/hr/settings/jobgrade/AddJobGrade';
-import EditJobGradeModal from '../../../components/hr/settings/jobgrade/EditJobGradeModal';
-import DeleteJobGradeModal from '../../../components/hr/settings/jobgrade/DeleteJobGradeModal';
-import { jobGradeService } from '../../../services/hr/JobGradeServives';
-import type { JobGradeListDto, JobGradeAddDto, JobGradeModDto } from '../../../types/hr/jobgrade';
+import { Button } from '../../../../components/ui/button';
+import JobGradeHeader from '../../../../components/hr/settings/jobgrade/JobGradeHeader';
+import JobGradeCard from '../../../../components/hr/settings/jobgrade/JobGradeCard';
+import JobGradeSearchFilters from '../../../../components/hr/settings/jobgrade/JobGradeSearchFilters';
+import AddJobGradeModal from '../../../../components/hr/settings/jobgrade/AddJobGrade';
+import EditJobGradeModal from '../../../../components/hr/settings/jobgrade/EditJobGradeModal';
+import DeleteJobGradeModal from '../../../../components/hr/settings/jobgrade/DeleteJobGradeModal';
+import { jobGradeService } from '../../../../services/hr/JobGradeServives';
+import type { JobGradeListDto, JobGradeAddDto, JobGradeModDto } from '../../../../types/hr/jobgrade';
 
 const ITEMS_PER_PAGE = 20;
 

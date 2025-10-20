@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Briefcase, BadgePlus, Grid, List } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import JobGradeSubgradesHeader from '../../../components/hr/settings/jobgrade/JobGradeSubgradesHeader';
-import AddJgStepModal from '../../../components/hr/settings/jobgrade/AddJgStepModal';
-import EditJgStepModal from '../../../components/hr/settings/jobgrade/EditJgStepModal';
-import DeleteJgStepModal from '../../../components/hr/settings/jobgrade/DeleteJgStepModal';
-import StepCard from '../../../components/hr/settings/jobgrade/StepCard';
-import { jgStepService } from '../../../services/hr/JgStepService';
-import type { JobGradeListDto } from '../../../types/hr/jobgrade';
-import type { JgStepListDto, JgStepAddDto, JgStepModDto, UUID } from '../../../types/hr/JgStep';
+import { Button } from '../../../../components/ui/button';
+import JobGradeSubgradesHeader from '../../../../components/hr/settings/jobgrade/JobGradeSubgradesHeader';
+import AddJgStepModal from '../../../../components/hr/settings/jobgrade/AddJgStepModal';
+import EditJgStepModal from '../../../../components/hr/settings/jobgrade/EditJgStepModal';
+import DeleteJgStepModal from '../../../../components/hr/settings/jobgrade/DeleteJgStepModal';
+import StepCard from '../../../../components/hr/settings/jobgrade/StepCard';
+import { jgStepService } from '../../../../services/hr/JgStepService';
+import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
+import type { JgStepListDto, JgStepAddDto, JgStepModDto, UUID } from '../../../../types/hr/JgStep';
 
 const JobGradeSubgrades: React.FC = () => {
   const { gradeId } = useParams<{ gradeId: string }>();

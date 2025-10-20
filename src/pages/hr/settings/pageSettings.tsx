@@ -5,8 +5,8 @@ import {
   Award,
   Building
 } from 'lucide-react'
-import SettingsHeader from '../../components/hr/settings/SettingsHeader'
-import SettingCard from '../../components/hr/settings/SettingCard'
+import SettingsHeader from '../../../components/hr/settings/SettingsHeader'
+import SettingCard from '../../../components/hr/settings/SettingCard'
 
 // Animation variants
 const containerVariants = {

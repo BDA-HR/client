@@ -14,15 +14,15 @@ import {
   Grid,
   List,
 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import PositionExperience from '../../../components/hr/settings/position/positionSet/PositionExperiance';
-import PositionBenefits from '../../../components/hr/settings/position/positionSet/PositionBenefits';
-import PositionEducation from '../../../components/hr/settings/position/positionSet/PositionEducation';
-import PositionRequirements from '../../../components/hr/settings/position/positionSet/PositionRequirements';
-import PositionExperienceModal from '../../../components/hr/settings/position/positionSet/PositionExperianceModal';
-import PositionRequirementsModal from '../../../components/hr/settings/position/positionSet/PositionRequirementsModal';
-import PositionEducationModal from '../../../components/hr/settings/position/positionSet/PositionEducationModal';
-import PositionBenefitsModal from '../../../components/hr/settings/position/positionSet/PositionBenefitsModal';
+import { Button } from '../../../../components/ui/button';
+import PositionExperience from '../../../../components/hr/settings/position/positionSet/PositionExperiance';
+import PositionBenefits from '../../../../components/hr/settings/position/positionSet/PositionBenefits';
+import PositionEducation from '../../../../components/hr/settings/position/positionSet/PositionEducation';
+import PositionRequirements from '../../../../components/hr/settings/position/positionSet/PositionRequirements';
+import PositionExperienceModal from '../../../../components/hr/settings/position/positionSet/PositionExperianceModal';
+import PositionRequirementsModal from '../../../../components/hr/settings/position/positionSet/PositionRequirementsModal';
+import PositionEducationModal from '../../../../components/hr/settings/position/positionSet/PositionEducationModal';
+import PositionBenefitsModal from '../../../../components/hr/settings/position/positionSet/PositionBenefitsModal';
 import type { 
   PositionListDto, 
   PositionSettingType,
@@ -41,8 +41,8 @@ import type {
   ProfessionTypeDto,
   EducationLevelDto,
   BenefitSettingDto
-} from '../../../types/hr/position';
-import { positionService, lookupService } from '../../../services/hr/positionService';
+} from '../../../../types/hr/position';
+import { positionService, lookupService } from '../../../../services/hr/positionService';
 
 // Define the tab interface
 interface SettingTab {

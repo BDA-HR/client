@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
-import EducationalQualHeader from "../../components/hr/settings/educationalqual/EducationalQualHeader";
-import EducationalQualSearchFilters from "../../components/hr/settings/educationalqual/EducationalQualSearchFilters";
-import EditEducationalQualModal from "../../components/hr/settings/educationalqual/EditEducationalQualModal";
-import DeleteEducationalQualModal from "../../components/hr/settings/educationalqual/DeleteEducationalQualModal";
-import EducationalQualList from "../../components/hr/settings/educationalqual/EducationalQualList";
+import EducationalQualHeader from "../../../components/hr/settings/educationalqual/EducationalQualHeader";
+import EducationalQualSearchFilters from "../../../components/hr/settings/educationalqual/EducationalQualSearchFilters";
+import EditEducationalQualModal from "../../../components/hr/settings/educationalqual/EditEducationalQualModal";
+import DeleteEducationalQualModal from "../../../components/hr/settings/educationalqual/DeleteEducationalQualModal";
+import EducationalQualList from "../../../components/hr/settings/educationalqual/EducationalQualList";
 import { useState, useMemo, useEffect } from "react";
-import { educationQualService } from "../../services/hr/EducationQualService";
+import { educationQualService } from "../../../services/hr/EducationQualService";
 import type {
   EducationQualAddDto,
   EducationQualListDto,
   EducationQualModDto,
-} from "../../types/hr/educationalqual";
+} from "../../../types/hr/educationalqual";
 
 function PageEducationalQual() {
   const [educationalQuals, setEducationalQuals] = useState<EducationQualListDto[]>([]);
