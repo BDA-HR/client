@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { PositionReqListDto } from "../../../../types/hr/position";
-import { Button } from "../../../../components/ui/button";
+import type { PositionReqListDto } from "../../../../../types/hr/position";
+import { Button } from "../../../../ui/button";
 
 interface DeletePositionRequirementsModalProps {
   requirement: PositionReqListDto | null;

@@ -1,9 +1,9 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../../ui/button';
 import PositionEducationModal from './PositionEducationModal';
-import type { PositionEduListDto, PositionEduAddDto, PositionEduModDto, UUID, EducationLevelDto } from '../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../services/hr/positionService';
+import type { PositionEduListDto, PositionEduAddDto, PositionEduModDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
+import { positionService, lookupService } from '../../../../../services/hr/positionService';
 import DeletePositionEducationModal from './DeletePositionEducationModal';
 
 interface PositionEducationProps {

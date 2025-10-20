@@ -1,9 +1,9 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Edit, Trash2, Briefcase } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../../ui/button';
 import DeletePositionExperienceModal from './DeletePositionExperianceModal';
-import type { PositionExpListDto, UUID } from '../../../../types/hr/position';
-import { positionService } from '../../../../services/hr/positionService';
+import type { PositionExpListDto, UUID } from '../../../../../types/hr/position';
+import { positionService } from '../../../../../services/hr/positionService';
 
 interface PositionExperienceProps {
   positionId: UUID;

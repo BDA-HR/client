@@ -1,26 +1,26 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { PositionExpListDto } from "../../../../types/hr/position";
-import { Button } from "../../../../components/ui/button";
+import type { PositionBenefitListDto } from "../../../../../types/hr/position";
+import { Button } from "../../../../ui/button";
 
-interface DeletePositionExperienceModalProps {
-  experience: PositionExpListDto | null;
+interface DeletePositionBenefitsModalProps {
+  benefit: PositionBenefitListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (experience: PositionExpListDto) => void;
+  onConfirm: (benefit: PositionBenefitListDto) => void;
 }
 
-const DeletePositionExperienceModal: React.FC<DeletePositionExperienceModalProps> = ({
-  experience,
+const DeletePositionBenefitsModal: React.FC<DeletePositionBenefitsModalProps> = ({
+  benefit,
   isOpen,
   onClose,
   onConfirm,
 }) => {
-  if (!isOpen || !experience) return null;
+  if (!isOpen || !benefit) return null;
 
   const handleConfirm = () => {
-    onConfirm(experience);
+    onConfirm(benefit);
   };
 
   return (
@@ -39,42 +39,28 @@ const DeletePositionExperienceModal: React.FC<DeletePositionExperienceModalProps
             </div>
 
             <p className="text-lg font-medium text-red-600 mt-4">
-              Delete Experience Requirement?
+              Remove Benefit?
             </p>
             <p className="text-sm text-red-600 mt-2">
               This action cannot be undone.
             </p>
             
-            {/* Experience Details */}
+            {/* Benefit Details */}
             {/* <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-100">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Briefcase className="h-4 w-4 text-red-600" />
-                <p className="text-sm font-medium text-gray-800">{experience.position}</p>
+                <Award className="h-4 w-4 text-red-600" />
+                <p className="text-sm font-medium text-gray-800">{benefit.position}</p>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 text-xs text-gray-600">
-                <div>
-                  <p className="font-medium">Same Position Exp</p>
-                  <p>{experience.samePosExp} years</p>
-                </div>
-                <div>
-                  <p className="font-medium">Other Position Exp</p>
-                  <p>{experience.otherPosExp} years</p>
-                </div>
-                <div>
-                  <p className="font-medium">Minimum Age</p>
-                  <p>{experience.minAge} years</p>
-                </div>
-                <div>
-                  <p className="font-medium">Maximum Age</p>
-                  <p>{experience.maxAge} years</p>
-                </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-600 mb-2">Benefit will be removed from:</p>
+                <p className="text-sm font-semibold text-gray-800">{benefit.position}</p>
+                <p className="text-xs text-gray-500 mt-1">{benefit.positionAm}</p>
               </div>
               
-              <div className="mt-3 pt-3 border-t border-red-200 flex items-center justify-center gap-2">
-                <Calendar className="h-3 w-3 text-red-600" />
-                <p className="text-xs text-red-600 font-medium">
-                  Total Experience: {experience.samePosExp + experience.otherPosExp} years
+              <div className="mt-3 pt-3 border-t border-red-200">
+                <p className="text-xs text-red-600 font-medium text-center">
+                  This benefit assignment will be permanently removed
                 </p>
               </div>
             </div> */}
@@ -105,4 +91,4 @@ const DeletePositionExperienceModal: React.FC<DeletePositionExperienceModalProps
   );
 };
 
-export default DeletePositionExperienceModal;
+export default DeletePositionBenefitsModal;

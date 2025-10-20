@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Search, BadgePlus, Grid, List, X } from "lucide-react";
-import { Button } from "../../ui/button";
-import type { PositionListDto  } from "../../../types/hr/position";
+import { Button } from "../../../ui/button";
+import type { PositionListDto  } from "../../../../types/hr/position";
 
 interface PositionSearchFiltersProps {
   searchTerm: string;

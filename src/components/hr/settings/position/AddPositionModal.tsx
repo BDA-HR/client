@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { X, Loader2, BadgePlus } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Label } from '../../../components/ui/label';
-import { Input } from '../../../components/ui/input';
-import List from '../../../components/List/list';
-import type { PositionAddDto } from '../../../types/hr/position';
-import type { NameListDto, UUID } from '../../../types/hr/NameListDto';
-import type { ListItem } from '../../../types/List/list';
-import { departmentService } from '../../../services/core/deptservice';
-import { amharicRegex } from '../../../utils/amharic-regex';
+import { Button } from '../../../ui/button';
+import { Label } from '../../../ui/label';
+import { Input } from '../../../ui/input';
+import List from '../../../List/list';
+import type { PositionAddDto } from '../../../../types/hr/position';
+import type { NameListDto, UUID } from '../../../../types/hr/NameListDto';
+import type { ListItem } from '../../../../types/List/list';
+import { departmentService } from '../../../../services/core/deptservice';
+import { amharicRegex } from '../../../../utils/amharic-regex';
 
 interface AddPositionModalProps {
   isOpen: boolean;

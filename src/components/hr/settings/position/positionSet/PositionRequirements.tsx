@@ -1,10 +1,10 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Edit, Trash2, Settings } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../../ui/button';
 import DeletePositionRequirementsModal from './DeletePositionRequirementsModal';
-import type { PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../services/hr/positionService';
-import { PositionGender, WorkOption } from '../../../../types/hr/enum';
+import type { PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../../types/hr/position';
+import { positionService, lookupService } from '../../../../../services/hr/positionService';
+import { PositionGender, WorkOption } from '../../../../../types/hr/enum';
 
 interface PositionRequirementsProps {
   positionId: UUID;

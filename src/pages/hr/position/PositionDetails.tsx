@@ -15,14 +15,14 @@ import {
   List,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
-import PositionExperience from '../../../components/hr/position/settings/PositionExperiance';
-import PositionBenefits from '../../../components/hr/position/settings/PositionBenefits';
-import PositionEducation from '../../../components/hr/position/settings/PositionEducation';
-import PositionRequirements from '../../../components/hr/position/settings/PositionRequirements';
-import PositionExperienceModal from '../../../components/hr/position/settings/PositionExperianceModal';
-import PositionRequirementsModal from '../../../components/hr/position/settings/PositionRequirementsModal';
-import PositionEducationModal from '../../../components/hr/position/settings/PositionEducationModal';
-import PositionBenefitsModal from '../../../components/hr/position/settings/PositionBenefitsModal';
+import PositionExperience from '../../../components/hr/settings/position/positionSet/PositionExperiance';
+import PositionBenefits from '../../../components/hr/settings/position/positionSet/PositionBenefits';
+import PositionEducation from '../../../components/hr/settings/position/positionSet/PositionEducation';
+import PositionRequirements from '../../../components/hr/settings/position/positionSet/PositionRequirements';
+import PositionExperienceModal from '../../../components/hr/settings/position/positionSet/PositionExperianceModal';
+import PositionRequirementsModal from '../../../components/hr/settings/position/positionSet/PositionRequirementsModal';
+import PositionEducationModal from '../../../components/hr/settings/position/positionSet/PositionEducationModal';
+import PositionBenefitsModal from '../../../components/hr/settings/position/positionSet/PositionBenefitsModal';
 import type { 
   PositionListDto, 
   PositionSettingType,

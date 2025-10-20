@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Settings } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
-import { Label } from '../../../../components/ui/label';
-import { Input } from '../../../../components/ui/input';
-import List from '../../../../components/List/list';
-import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../types/hr/position';
-import type { ListItem } from '../../../../types/List/list';
-import { PositionGender, WorkOption } from '../../../../types/hr/enum';
+import { Button } from '../../../../ui/button';
+import { Label } from '../../../../ui/label';
+import { Input } from '../../../../ui/input';
+import List from '../../../../List/list';
+import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../../types/hr/position';
+import type { ListItem } from '../../../../../types/List/list';
+import { PositionGender, WorkOption } from '../../../../../types/hr/enum';
 
 interface PositionRequirementsModalProps {
   isOpen: boolean;

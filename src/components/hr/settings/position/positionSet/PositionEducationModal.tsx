@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, GraduationCap, BookOpen, School, University, Building2, Users } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
-import List from '../../../../components/List/list';
-import type { PositionEduAddDto, PositionEduModDto, PositionEduListDto, UUID, EducationLevelDto } from '../../../../types/hr/position';
-import type { ListItem } from '../../../../types/List/list';
+import { Button } from '../../../../ui/button';
+import List from '../../../../List/list';
+import type { PositionEduAddDto, PositionEduModDto, PositionEduListDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
+import type { ListItem } from '../../../../../types/List/list';
 
 interface PositionEducationModalProps {
   isOpen: boolean;

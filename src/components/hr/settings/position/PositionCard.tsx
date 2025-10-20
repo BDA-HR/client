@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Users, Building, MoreVertical, Edit, Trash2, ArrowRight } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import type { PositionListDto } from '../../../types/hr/position';
+import { Button } from '../../../ui/button';
+import type { PositionListDto } from '../../../../types/hr/position';
 import { useNavigate } from 'react-router-dom';
 
 interface PositionCardProps {

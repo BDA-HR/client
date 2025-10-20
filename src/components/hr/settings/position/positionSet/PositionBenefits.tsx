@@ -1,10 +1,10 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Trash2, Award } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../../ui/button';
 import PositionBenefitsModal from './PositionBenefitsModal';
 import DeletePositionBenefitsModal from './DeletePositionBenefitsModal';
-import type { PositionBenefitListDto, PositionBenefitAddDto, PositionBenefitModDto, UUID, BenefitSettingDto } from '../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../services/hr/positionService';
+import type { PositionBenefitListDto, PositionBenefitAddDto, PositionBenefitModDto, UUID, BenefitSettingDto } from '../../../../../types/hr/position';
+import { positionService, lookupService } from '../../../../../services/hr/positionService';
 
 interface PositionBenefitsProps {
   positionId: UUID;

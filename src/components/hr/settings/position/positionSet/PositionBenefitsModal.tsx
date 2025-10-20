@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Award } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '../../../../ui/button';
 // import { Label } from '../../../../components/ui/label';
-import List from '../../../../components/List/list';
-import type { PositionBenefitAddDto, PositionBenefitModDto, PositionBenefitListDto, UUID, BenefitSettingDto } from '../../../../types/hr/position';
-import type { ListItem } from '../../../../types/List/list';
+import List from '../../../../List/list';
+import type { PositionBenefitAddDto, PositionBenefitModDto, PositionBenefitListDto, UUID, BenefitSettingDto } from '../../../../../types/hr/position';
+import type { ListItem } from '../../../../../types/List/list';
 
 interface PositionBenefitsModalProps {
   isOpen: boolean;

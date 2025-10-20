@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { PositionListDto } from "../../../types/hr/position";
-import { Button } from "../../ui/button";
+import type { PositionListDto } from "../../../../types/hr/position";
+import { Button } from "../../../ui/button";
 
 interface DeletePositionModalProps {
   position: PositionListDto | null;
