@@ -391,13 +391,6 @@ const JobGradeSubgrades: React.FC = () => {
           <p className="text-gray-500 mb-4">
             Get started by creating the first step for this job grade.
           </p>
-          <Button
-            onClick={handleOpenAddModal}
-            className="bg-green-600 hover:bg-green-700 text-white"
-          >
-            <BadgePlus className="h-4 w-4 mr-2" />
-            Add First Step
-          </Button>
         </motion.div>
       )}
 
