@@ -52,15 +52,15 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
     });
   };
 
-  const clearAllFilters = () => {
-    setSearchTerm('');
-    setFilters({
-      minSalary: '',
-      maxSalary: '',
-    });
-  };
+  // const clearAllFilters = () => {
+  //   setSearchTerm('');
+  //   setFilters({
+  //     minSalary: '',
+  //     maxSalary: '',
+  //   });
+  // };
 
-  const hasActiveFilters = searchTerm !== '' || filters.minSalary !== '' || filters.maxSalary !== '';
+  // const hasActiveFilters = searchTerm !== '' || filters.minSalary !== '' || filters.maxSalary !== '';
 
   return (
     <motion.div
@@ -166,7 +166,7 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
             </Button>
 
             {/* Clear All Filters Button (only shown when multiple filters are active) */}
-            {hasActiveFilters && (searchTerm && (filters.minSalary !== '' || filters.maxSalary !== '')) && (
+            {/* {hasActiveFilters && (searchTerm && (filters.minSalary !== '' || filters.maxSalary !== '')) && (
               <Button
                 variant="outline"
                 size="sm"
@@ -176,7 +176,7 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
                 <X className="h-4 w-4" />
                 Clear All
               </Button>
-            )}
+            )} */}
           </div>
 
           {/* ➕ Add Job Grade Button */}
