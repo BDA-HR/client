@@ -116,7 +116,7 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
                 {filters.minSalary !== '' && (
                   <button
                     onClick={clearMinSalary}
-                    className="absolute inset-y-0 right-0 pr-2 flex items-center cursor-pointer hover:bg-gray-100 rounded-r-md transition-colors"
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center cursor-pointer rounded-r-md transition-colors"
                   >
                     <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
                   </button>
@@ -137,7 +137,7 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
                 {filters.maxSalary !== '' && (
                   <button
                     onClick={clearMaxSalary}
-                    className="absolute inset-y-0 right-0 pr-2 flex items-center cursor-pointer hover:bg-gray-100 rounded-r-md transition-colors"
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center cursor-pointer rounded-r-md transition-colors"
                   >
                     <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
                   </button>
