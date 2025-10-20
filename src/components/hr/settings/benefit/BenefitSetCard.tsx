@@ -9,6 +9,8 @@ interface BenefitSetListDto {
   name: string;
   benefit: number;
   benefitStr: string;
+  per: number;
+  perStr: string;
   rowVersion?: string;
 }
 
@@ -82,7 +84,9 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
             <div className="text-right">
               <p className="text-2xl font-bold text-green-600">
                 {benefitSet.benefitStr}{" "}
-                <span className="text-sm text-gray-500">ETB</span>
+                <span className="text-sm text-gray-500">
+                  ETB/ {benefitSet.perStr}
+                </span>
               </p>
             </div>
           </div>
@@ -100,27 +104,27 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
 
             {isMenuOpen && (
               <motion.div
-                          initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                          className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1"
-                        >
-                          <button
-                            className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
-                            onClick={handleEdit}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </button>
-                          <button
-                            className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
-                            onClick={handleDelete}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </button>
-                        </motion.div>
-                      )}
+                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1"
+              >
+                <button
+                  className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                  onClick={handleEdit}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </button>
+                <button
+                  className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </button>
+              </motion.div>
+            )}
           </div>
         </div>
       </motion.div>
@@ -184,7 +188,10 @@ const BenefitSetCard: React.FC<BenefitSetCardProps> = ({
       <div className="mb-2">
         <p className="text-3xl font-bold text-green-600">
           {benefitSet.benefitStr}{" "}
-          <span className="text-sm text-gray-500">ETB</span>
+          <span className="text-sm text-gray-500">
+            {" "}
+            ETB/ {benefitSet.perStr}
+          </span>
         </p>
       </div>
     </motion.div>
