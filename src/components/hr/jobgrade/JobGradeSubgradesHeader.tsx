@@ -1,14 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '../../../components/ui/button';
-import { BadgePlus, Grid, List, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import type { JobGradeListDto } from '../../../types/hr/jobgrade';
 
 interface JobGradeSubgradesHeaderProps {
   jobGrade: JobGradeListDto | null;
-  viewMode: 'grid' | 'list';
-  setViewMode: (mode: 'grid' | 'list') => void;
-  onAddStep: () => void;
 }
 
 // Define variants with proper TypeScript types
@@ -24,15 +20,12 @@ const itemVariants = {
     }
   }
 };
-
-const JobGradeSubgradesHeader: React.FC<JobGradeSubgradesHeaderProps> = ({ 
-  jobGrade, 
-  viewMode, 
-  setViewMode,
-  onAddStep 
-}) => {
+// const JobGradeSubgradesHeader: React.FC<JobGradeSubgradesHeaderProps> = ({ 
+//   jobGrade
+// })
+const JobGradeSubgradesHeader: React.FC<JobGradeSubgradesHeaderProps> = () => {
   return (
-    <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
+    <motion.div variants={itemVariants}>
       <div className="flex items-center gap-3">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -47,48 +40,13 @@ const JobGradeSubgradesHeader: React.FC<JobGradeSubgradesHeaderProps> = ({
               className="inline-block"
             >
               <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                {jobGrade?.name || 'Job Grade'}
+                {/* {jobGrade?.name || 'Job Grade'} */}
+                Job
               </span> Steps
             </motion.span>
           </h1>
         </motion.div>
       </div>
-      
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex space-x-3 mt-4 sm:mt-0"
-      >
-        {/* View Mode Toggle */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
-          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-        >
-          {viewMode === 'grid' ? (
-            <>
-              <List className="h-4 w-4" />
-              List View
-            </>
-          ) : (
-            <>
-              <Grid className="h-4 w-4" />
-              Grid View
-            </>
-          )}
-        </Button>
-
-        {/* Add Step Button */}
-        <Button
-          onClick={onAddStep}
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
-        >
-          <BadgePlus className="h-4 w-4 mr-2" />
-          Add Job Step
-        </Button>
-      </motion.div>
     </motion.div>
   );
 };

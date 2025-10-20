@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, BadgePlus, Grid, List } from 'lucide-react';
+import { Search, BadgePlus, Grid, List, X } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { JobGradeListDto } from '../../../types/hr/jobgrade';
 
@@ -34,12 +34,30 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
     });
   };
 
-  const clearFilters = () => {
+  const clearSearch = () => {
+    setSearchTerm('');
+  };
+
+  const clearMinSalary = () => {
+    setFilters({
+      ...filters,
+      minSalary: '',
+    });
+  };
+
+  const clearMaxSalary = () => {
+    setFilters({
+      ...filters,
+      maxSalary: '',
+    });
+  };
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
     setFilters({
       minSalary: '',
       maxSalary: '',
     });
-    setSearchTerm('');
   };
 
   const hasActiveFilters = searchTerm !== '' || filters.minSalary !== '' || filters.maxSalary !== '';
@@ -65,10 +83,18 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
               id="jobgrade-search"
               name="jobgrade-search"
               placeholder="Search job grades by name..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
+              className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {searchTerm && (
+              <button
+                onClick={clearSearch}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:bg-gray-100 rounded-r-md transition-colors"
+              >
+                <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -78,21 +104,45 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             {/* Salary Filters */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-              <input
-                type="number"
-                placeholder="Min Salary"
-                className="flex-1 text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500"
-                value={filters.minSalary}
-                onChange={(e) => handleSalaryFilterChange('minSalary', e.target.value)}
-              />
+              {/* Min Salary Input */}
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  placeholder="Min Salary"
+                  className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500 pr-8"
+                  value={filters.minSalary}
+                  onChange={(e) => handleSalaryFilterChange('minSalary', e.target.value)}
+                />
+                {filters.minSalary !== '' && (
+                  <button
+                    onClick={clearMinSalary}
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center cursor-pointer hover:bg-gray-100 rounded-r-md transition-colors"
+                  >
+                    <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                  </button>
+                )}
+              </div>
+
               <span className="hidden sm:block text-gray-400">–</span>
-              <input
-                type="number"
-                placeholder="Max Salary"
-                className="flex-1 text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500"
-                value={filters.maxSalary}
-                onChange={(e) => handleSalaryFilterChange('maxSalary', e.target.value)}
-              />
+
+              {/* Max Salary Input */}
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  placeholder="Max Salary"
+                  className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500 pr-8"
+                  value={filters.maxSalary}
+                  onChange={(e) => handleSalaryFilterChange('maxSalary', e.target.value)}
+                />
+                {filters.maxSalary !== '' && (
+                  <button
+                    onClick={clearMaxSalary}
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center cursor-pointer hover:bg-gray-100 rounded-r-md transition-colors"
+                  >
+                    <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* View Mode Toggle */}
@@ -115,15 +165,16 @@ const JobGradeSearchFilters: React.FC<JobGradeSearchFiltersProps> = ({
               )}
             </Button>
 
-            {/* Clear Filters Button */}
-            {hasActiveFilters && (
+            {/* Clear All Filters Button (only shown when multiple filters are active) */}
+            {hasActiveFilters && (searchTerm && (filters.minSalary !== '' || filters.maxSalary !== '')) && (
               <Button
                 variant="outline"
                 size="sm"
-                className="whitespace-nowrap"
-                onClick={clearFilters}
+                className="whitespace-nowrap gap-2"
+                onClick={clearAllFilters}
               >
-                Clear Filters
+                <X className="h-4 w-4" />
+                Clear All
               </Button>
             )}
           </div>

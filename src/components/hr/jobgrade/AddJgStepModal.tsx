@@ -53,14 +53,14 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
     onClose();
   };
 
-  const formatSalary = (salary: number): string => {
-    return new Intl.NumberFormat('en-ET', {
-      style: 'currency',
-      currency: 'ETB',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(salary);
-  };
+  // const formatSalary = (salary: number): string => {
+  //   return new Intl.NumberFormat('en-ET', {
+  //     style: 'currency',
+  //     currency: 'ETB',
+  //     minimumFractionDigits: 0,
+  //     maximumFractionDigits: 0
+  //   }).format(salary);
+  // };
 
   if (!isOpen) return null;
 
@@ -124,7 +124,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
             </div>
 
             {/* Salary Preview */}
-            {formData.salary > 0 && (
+            {/* {formData.salary > 0 && (
               <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                 <p className="text-sm text-green-800 font-medium mb-2">Salary Preview:</p>
                 <div className="flex items-center justify-between">
@@ -136,7 +136,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -148,7 +148,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
               onClick={handleSubmit}
               disabled={!formData.name.trim() || formData.salary <= 0}
             >
-              Save Step
+              Save
             </Button>
             <Button
               variant="outline"

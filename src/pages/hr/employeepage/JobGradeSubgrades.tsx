@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Briefcase, Plus } from 'lucide-react';
+import { ArrowLeft, Briefcase, BadgePlus, Grid, List } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import JobGradeSubgradesHeader from '../../../components/hr/jobgrade/JobGradeSubgradesHeader';
 import AddJgStepModal from '../../../components/hr/jobgrade/AddJgStepModal';
@@ -257,27 +257,29 @@ const JobGradeSubgrades: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-50 space-y-6"
+      className="bg-gray-50 space-y-4"
     >
-      {/* Back Button */}
-      <Button
-        variant="outline"
-        onClick={handleBack}
-        className="cursor-pointer"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Job Grades
-      </Button>
+      <div className="flex items-center gap-4 mb-6">
+  {/* Back Button */}
+  <Button
+    variant="outline"
+    onClick={handleBack}
+    className="cursor-pointer border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+  >
+    <ArrowLeft className="h-4 w-4 mr-2" />
+    Back to Job Grades
+  </Button>
 
-      {/* Header */}
-      <JobGradeSubgradesHeader
-        jobGrade={jobGrade}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        onAddStep={handleOpenAddModal}
-      />
+  {/* Separator */}
+  <div className="h-10 w-px bg-gray-300"></div>
 
-      {/* Job Grade Info Card */}
+  {/* Header - Simplified without buttons */}
+  <div className="flex-1">
+    <JobGradeSubgradesHeader jobGrade={jobGrade} />
+  </div>
+</div>
+
+      {/* Job Grade Info Card with Action Buttons */}
       {jobGrade && (
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -285,33 +287,72 @@ const JobGradeSubgrades: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="bg-white rounded-lg shadow-sm border border-green-100 p-6 mb-6"
         >
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-50 mr-4">
-              <Briefcase className="text-green-600" size={24} />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {jobGrade.name}
-              </h2>
-              <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-                <div>
-                  <span className="text-gray-500">Start Salary:</span>
-                  <span className="ml-2 font-semibold">
-                    {new Intl.NumberFormat('en-ET', {
-                      minimumFractionDigits: 0,
-                    }).format(jobGrade.startSalary)} ETB
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Max Salary:</span>
-                  <span className="ml-2 font-semibold">
-                    {new Intl.NumberFormat('en-ET', {
-                      minimumFractionDigits: 0,
-                    }).format(jobGrade.maxSalary)} ETB
-                  </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center flex-1">
+              <div className="p-3 rounded-full bg-green-50 mr-4">
+                <Briefcase className="text-green-600" size={24} />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {jobGrade.name}
+                </h2>
+                <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
+                  <div>
+                    <span className="text-gray-500">Start Salary:</span>
+                    <span className="ml-2 font-semibold">
+                      {new Intl.NumberFormat('en-ET', {
+                        minimumFractionDigits: 0,
+                      }).format(jobGrade.startSalary)} ETB
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Max Salary:</span>
+                    <span className="ml-2 font-semibold">
+                      {new Intl.NumberFormat('en-ET', {
+                        minimumFractionDigits: 0,
+                      }).format(jobGrade.maxSalary)} ETB
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex space-x-3"
+            >
+              {/* View Mode Toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800"
+                onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+              >
+                {viewMode === 'grid' ? (
+                  <>
+                    <List className="h-4 w-4" />
+                    List View
+                  </>
+                ) : (
+                  <>
+                    <Grid className="h-4 w-4" />
+                    Grid View
+                  </>
+                )}
+              </Button>
+
+              {/* Add Step Button */}
+              <Button
+                onClick={handleOpenAddModal}
+                className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
+              >
+                <BadgePlus className="h-4 w-4 mr-2" />
+                Add Job Step
+              </Button>
+            </motion.div>
           </div>
         </motion.div>
       )}
@@ -354,7 +395,7 @@ const JobGradeSubgrades: React.FC = () => {
             onClick={handleOpenAddModal}
             className="bg-green-600 hover:bg-green-700 text-white"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <BadgePlus className="h-4 w-4 mr-2" />
             Add First Step
           </Button>
         </motion.div>

@@ -131,21 +131,6 @@ const EditJgStepModal: React.FC<EditJgStepModalProps> = ({
               />
             </div>
 
-            {/* Salary Preview */}
-            {formData.salary > 0 && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <p className="text-sm text-green-800 font-medium mb-2">Salary Preview:</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm">Step Salary</p>
-                    <p className="font-semibold text-green-700 text-lg">
-                      {formatSalary(formData.salary)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Original Values for Reference */}
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
               <p className="text-sm text-gray-600 font-medium mb-2">Original Values:</p>
