@@ -1,23 +1,31 @@
-import { useState, useEffect } from 'react';
-import { Edit, Trash2, BadgePlus } from 'lucide-react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import PositionEducationModal from './PositionEducationModal';
 import type { PositionEduListDto, PositionEduAddDto, PositionEduModDto, UUID, EducationLevelDto } from '../../../../types/hr/position';
 import { positionService, lookupService } from '../../../../services/hr/positionService';
 import DeletePositionEducationModal from './DeletePositionEducationModal';
 
-
 interface PositionEducationProps {
   positionId: UUID;
+  onEdit: (education: PositionEduListDto) => void;
 }
 
-function PositionEducation({ positionId }: PositionEducationProps) {
+export interface PositionEducationRef {
+  fetchEducations: () => Promise<void>;
+}
+
+const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProps>(({ positionId, onEdit }, ref) => {
   const [educations, setEducations] = useState<PositionEduListDto[]>([]);
   const [educationLevels, setEducationLevels] = useState<EducationLevelDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<PositionEduListDto | null>(null);
-    const [deletingEducation, setDeletingEducation] = useState<PositionEduListDto | null>(null); // Item to delete
+  const [deletingEducation, setDeletingEducation] = useState<PositionEduListDto | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    fetchEducations: fetchData
+  }));
 
   useEffect(() => {
     fetchData();
@@ -54,26 +62,19 @@ function PositionEducation({ positionId }: PositionEducationProps) {
     }
   };
 
-  const handleAdd = () => {
-    setEditingEducation(null);
-    setIsModalOpen(true);
-  };
-
   const handleEdit = (education: PositionEduListDto) => {
     setEditingEducation(education);
-    setIsModalOpen(true);
+    onEdit(education);
   };
 
   const handleDelete = (education: PositionEduListDto) => {
     setDeletingEducation(education);
-    setIsModalOpen(true);
   };
 
   const handleConfirmDelete = async (education: PositionEduListDto) => {
     try {
       await positionService.deletePositionEdu(education.id);
       await fetchData();
-      setIsModalOpen(false);
       setDeletingEducation(null);
     } catch (error) {
       console.error('Error deleting education:', error);
@@ -81,7 +82,6 @@ function PositionEducation({ positionId }: PositionEducationProps) {
   };
 
   const handleCloseDeleteModal = () => {
-    setIsModalOpen(false);
     setDeletingEducation(null);
   };
 
@@ -101,14 +101,6 @@ function PositionEducation({ positionId }: PositionEducationProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Education Requirements</h3>
-        <Button onClick={handleAdd} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer">
-          <BadgePlus className="h-4 w-4" />
-          Add Education
-        </Button>
-      </div>
-
       <div className="space-y-4">
         {educations.map((education) => {
           const educationLevel = educationLevels.find(el => el.id === education.educationLevelId);
@@ -117,12 +109,12 @@ function PositionEducation({ positionId }: PositionEducationProps) {
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="font-semibold">{educationLevel?.name || 'Unknown Level'}</h4>
+                                    <p className="text-sm text-gray-500">
+{educationLevel?.nameAm || 'N/A'}
+                  </p>
                   <p className="text-sm text-gray-600">{education.position}</p>
                   <p className="text-sm text-gray-500 mt-1">
                     Qualification: {education.educationQual}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Amharic: {educationLevel?.nameAm || 'N/A'}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -130,7 +122,8 @@ function PositionEducation({ positionId }: PositionEducationProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleEdit(education)}
-className="flex items-center gap-1 border-green-300 text-green-700 hover:bg-green-50"                  >
+                    className="flex items-center gap-1 border-green-300 text-green-700 hover:bg-green-50"
+                  >
                     <Edit className="h-3 w-3" />
                     Edit
                   </Button>
@@ -163,14 +156,15 @@ className="flex items-center gap-1 border-green-300 text-green-700 hover:bg-gree
         educationLevels={educationLevels}
         editingEducation={editingEducation}
       />
-            <DeletePositionEducationModal
+
+      <DeletePositionEducationModal
         education={deletingEducation}
-        isOpen={isModalOpen}
+        isOpen={!!deletingEducation}
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
       />
     </div>
   );
-}
+});
 
 export default PositionEducation;

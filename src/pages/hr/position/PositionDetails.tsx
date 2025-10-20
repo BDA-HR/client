@@ -19,6 +19,8 @@ import PositionEducation from '../../../components/hr/position/settings/Position
 import PositionRequirements from '../../../components/hr/position/settings/PositionRequirements';
 import PositionExperienceModal from '../../../components/hr/position/settings/PositionExperianceModal';
 import PositionRequirementsModal from '../../../components/hr/position/settings/PositionRequirementsModal';
+import PositionEducationModal from '../../../components/hr/position/settings/PositionEducationModal';
+import PositionBenefitsModal from '../../../components/hr/position/settings/PositionBenefitsModal';
 import type { 
   PositionListDto, 
   PositionSettingType,
@@ -28,7 +30,15 @@ import type {
   PositionReqAddDto,
   PositionReqModDto,
   PositionReqListDto,
-  ProfessionTypeDto
+  PositionEduAddDto,
+  PositionEduModDto,
+  PositionEduListDto,
+  PositionBenefitAddDto,
+  PositionBenefitModDto,
+  PositionBenefitListDto,
+  ProfessionTypeDto,
+  EducationLevelDto,
+  BenefitSettingDto
 } from '../../../types/hr/position';
 import { positionService, lookupService } from '../../../services/hr/positionService';
 
@@ -101,12 +111,26 @@ function PositionDetails() {
   const [professionTypes, setProfessionTypes] = useState<ProfessionTypeDto[]>([]);
   const requirementRef = useRef<any>(null);
 
+  // Education modal state
+  const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
+  const [editingEducation, setEditingEducation] = useState<PositionEduListDto | null>(null);
+  const [educationLevels, setEducationLevels] = useState<EducationLevelDto[]>([]);
+  const educationRef = useRef<any>(null);
+
+  // Benefit modal state
+  const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false);
+  const [editingBenefit, setEditingBenefit] = useState<PositionBenefitListDto | null>(null);
+  const [benefitSettings, setBenefitSettings] = useState<BenefitSettingDto[]>([]);
+  const benefitRef = useRef<any>(null);
+
   useEffect(() => {
     if (id) {
       fetchPosition();
       checkIfHasExperience();
       checkIfHasRequirement();
       fetchProfessionTypes();
+      fetchEducationLevels();
+      fetchBenefitSettings();
     }
   }, [id]);
 
@@ -193,6 +217,68 @@ function PositionDetails() {
     setEditingRequirement(null);
   };
 
+  // Education modal handlers
+  const handleAddEducation = () => {
+    setEditingEducation(null);
+    setIsEducationModalOpen(true);
+  };
+
+  const handleEditEducation = (education: PositionEduListDto) => {
+    setEditingEducation(education);
+    setIsEducationModalOpen(true);
+  };
+
+  const handleSaveEducation = async (data: PositionEduAddDto | PositionEduModDto) => {
+    try {
+      if ('id' in data) {
+        await positionService.updatePositionEdu(data.id, data);
+      } else {
+        await positionService.addPositionEdu(data);
+      }
+      if (educationRef.current && educationRef.current.fetchEducations) {
+        await educationRef.current.fetchEducations();
+      }
+    } catch (error) {
+      console.error('Error saving education:', error);
+    }
+  };
+
+  const handleCloseEducationModal = () => {
+    setIsEducationModalOpen(false);
+    setEditingEducation(null);
+  };
+
+  // Benefit modal handlers
+  const handleAddBenefit = () => {
+    setEditingBenefit(null);
+    setIsBenefitModalOpen(true);
+  };
+
+  const handleEditBenefit = (benefit: PositionBenefitListDto) => {
+    setEditingBenefit(benefit);
+    setIsBenefitModalOpen(true);
+  };
+
+  const handleSaveBenefit = async (data: PositionBenefitAddDto | PositionBenefitModDto) => {
+    try {
+      if ('id' in data) {
+        await positionService.updatePositionBenefit(data.id, data);
+      } else {
+        await positionService.addPositionBenefit(data);
+      }
+      if (benefitRef.current && benefitRef.current.fetchBenefits) {
+        await benefitRef.current.fetchBenefits();
+      }
+    } catch (error) {
+      console.error('Error saving benefit:', error);
+    }
+  };
+
+  const handleCloseBenefitModal = () => {
+    setIsBenefitModalOpen(false);
+    setEditingBenefit(null);
+  };
+
   // Check if position has experiences
   const checkIfHasExperience = async () => {
     try {
@@ -222,6 +308,26 @@ function PositionDetails() {
       setProfessionTypes(data);
     } catch (error) {
       console.error('Error fetching profession types:', error);
+    }
+  };
+
+  // Fetch education levels
+  const fetchEducationLevels = async () => {
+    try {
+      const data = await lookupService.getAllEducationLevels();
+      setEducationLevels(data);
+    } catch (error) {
+      console.error('Error fetching education levels:', error);
+    }
+  };
+
+  // Fetch benefit settings
+  const fetchBenefitSettings = async () => {
+    try {
+      const data = await lookupService.getAllBenefitSettings();
+      setBenefitSettings(data);
+    } catch (error) {
+      console.error('Error fetching benefit settings:', error);
     }
   };
 
@@ -376,6 +482,28 @@ function PositionDetails() {
                 </div>
               </div>
               
+              {/* Add Education Button - Only shown for Education tab */}
+              {activeTab === 'education' && (
+                <Button 
+                  onClick={handleAddEducation}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Education
+                </Button>
+              )}
+
+              {/* Add Benefit Button - Only shown for Benefit tab */}
+              {activeTab === 'benefit' && (
+                <Button 
+                  onClick={handleAddBenefit}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Benefit
+                </Button>
+              )}
+
               {/* Add Experience Button - Only shown for Experience tab when no experience exists */}
               {activeTab === 'experience' && !hasExperience && (
                 <Button 
@@ -418,6 +546,18 @@ function PositionDetails() {
                 onRequirementAdded={() => setHasRequirement(true)}
                 onRequirementDeleted={() => setHasRequirement(false)}
               />
+            ) : activeTab === 'education' ? (
+              <PositionEducation 
+                positionId={position.id} 
+                ref={educationRef}
+                onEdit={handleEditEducation}
+              />
+            ) : activeTab === 'benefit' ? (
+              <PositionBenefits 
+                positionId={position.id} 
+                ref={benefitRef}
+                onEdit={handleEditBenefit}
+              />
             ) : (
               <ActiveTabComponent positionId={position.id} />
             )}
@@ -441,6 +581,26 @@ function PositionDetails() {
           positionId={position.id}
           professionTypes={professionTypes}
           editingRequirement={editingRequirement}
+        />
+
+        {/* Education Modal */}
+        <PositionEducationModal
+          isOpen={isEducationModalOpen}
+          onClose={handleCloseEducationModal}
+          onSave={handleSaveEducation}
+          positionId={position.id}
+          educationLevels={educationLevels}
+          editingEducation={editingEducation}
+        />
+
+        {/* Benefit Modal */}
+        <PositionBenefitsModal
+          isOpen={isBenefitModalOpen}
+          onClose={handleCloseBenefitModal}
+          onSave={handleSaveBenefit}
+          positionId={position.id}
+          benefitSettings={benefitSettings}
+          editingBenefit={editingBenefit}
         />
       </div>
     </div>

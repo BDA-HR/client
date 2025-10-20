@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Edit, Trash2, BadgePlus } from 'lucide-react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Edit, Trash2, Award } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import PositionBenefitsModal from './PositionBenefitsModal';
 import DeletePositionBenefitsModal from './DeletePositionBenefitsModal';
@@ -8,9 +8,14 @@ import { positionService, lookupService } from '../../../../services/hr/position
 
 interface PositionBenefitsProps {
   positionId: UUID;
+  onEdit: (benefit: PositionBenefitListDto) => void;
 }
 
-function PositionBenefits({ positionId }: PositionBenefitsProps) {
+export interface PositionBenefitsRef {
+  fetchBenefits: () => Promise<void>;
+}
+
+const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(({ positionId, onEdit }, ref) => {
   const [benefits, setBenefits] = useState<PositionBenefitListDto[]>([]);
   const [benefitSettings, setBenefitSettings] = useState<BenefitSettingDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +23,10 @@ function PositionBenefits({ positionId }: PositionBenefitsProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingBenefit, setEditingBenefit] = useState<PositionBenefitListDto | null>(null);
   const [deletingBenefit, setDeletingBenefit] = useState<PositionBenefitListDto | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    fetchBenefits: fetchData
+  }));
 
   useEffect(() => {
     fetchData();
@@ -54,14 +63,9 @@ function PositionBenefits({ positionId }: PositionBenefitsProps) {
     }
   };
 
-  const handleAdd = () => {
-    setEditingBenefit(null);
-    setIsModalOpen(true);
-  };
-
   const handleEdit = (benefit: PositionBenefitListDto) => {
     setEditingBenefit(benefit);
-    setIsModalOpen(true);
+    onEdit(benefit);
   };
 
   const handleDelete = (benefit: PositionBenefitListDto) => {
@@ -101,17 +105,6 @@ function PositionBenefits({ positionId }: PositionBenefitsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">Position Benefits</h3>
-          <p className="text-sm text-gray-600 mt-1">Manage benefits and allowances for this position</p>
-        </div>
-        <Button onClick={handleAdd} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer">
-          <BadgePlus className="h-4 w-4" />
-          Add Benefit
-        </Button>
-      </div>
-
       <div className="space-y-4">
         {benefits.map((benefit) => {
           const benefitSetting = benefitSettings.find(bs => bs.id === benefit.benefitSettingId);
@@ -120,14 +113,14 @@ function PositionBenefits({ positionId }: PositionBenefitsProps) {
               <div className="flex justify-between items-center">
                 <div className="flex items-start space-x-3">
                   <div className="p-2 bg-green-100 rounded-lg">
-                    <BadgePlus className="h-5 w-5 text-green-600" />
+                    <Award className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">{benefitSetting?.name || 'Unknown Benefit'}</h4>
-                    <p className="text-sm text-gray-600">{benefit.position}</p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Amharic: {benefitSetting?.nameAm || 'N/A'}
+                      {benefitSetting?.nameAm || 'N/A'}
                     </p>
+                    <p className="text-sm text-gray-600">{benefit.position}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -156,7 +149,7 @@ function PositionBenefits({ positionId }: PositionBenefitsProps) {
         })}
         {benefits.length === 0 && (
           <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-            <BadgePlus className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-gray-900 mb-2">No Benefits Assigned</h4>
             <p className="text-gray-600 mb-4">Add benefits and allowances for this position</p>
           </div>
@@ -180,6 +173,6 @@ function PositionBenefits({ positionId }: PositionBenefitsProps) {
       />
     </div>
   );
-}
+});
 
 export default PositionBenefits;
