@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { Users, Building, MoreVertical, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { PositionListDto } from '../../../types/hr/position';
@@ -14,26 +13,6 @@ interface PositionCardProps {
   onDelete: (position: PositionListDto) => void;
 }
 
-// Define variants with proper TypeScript types
-const cardVariants = {
-  hidden: { scale: 0.95, opacity: 0 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    transition: { 
-      type: 'spring' as const, 
-      stiffness: 120, 
-      damping: 12 
-    }
-  },
-  hover: { 
-    scale: 1.03, 
-    transition: { 
-      duration: 0.25 
-    } 
-  }
-};
-
 const PositionCard: React.FC<PositionCardProps> = ({
   position,
   viewMode,
@@ -44,16 +23,9 @@ const PositionCard: React.FC<PositionCardProps> = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Format vacancy status
-  const getVacancyBadge = (isVacant: string) => {
-    const isVacantBool = isVacant === '1';
-    return {
-      text: isVacantBool ? 'Vacant' : 'Filled',
-      color: isVacantBool ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-    };
-  };
 
-  const vacancyBadge = getVacancyBadge(position.isVacant);
+
+  
 
   // Close menu when clicking outside
   React.useEffect(() => {
@@ -92,14 +64,9 @@ const PositionCard: React.FC<PositionCardProps> = ({
   };
 
   return (
-    <motion.div
-      layout
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      whileHover="hover"
+    <div
       onClick={handleCardClick}
-      className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer group ${
+      className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-shadow relative cursor-pointer group ${
         viewMode === 'grid' ? 'p-5' : 'p-4 flex items-start'
       }`}
     >
@@ -125,13 +92,8 @@ const PositionCard: React.FC<PositionCardProps> = ({
               </div>
             </div>
             
-            {/* Right side with badge and menu - properly spaced */}
+            {/* Right side with menu only - removed vacancy badge */}
             <div className="flex items-center gap-3 ml-4 flex-shrink-0">
-              {/* Vacancy Badge */}
-              <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${vacancyBadge.color}`}>
-                {vacancyBadge.text}
-              </span>
-              
               {/* More Options Menu */}
               <div ref={menuRef}>
                 <Button
@@ -144,12 +106,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
                 </Button>
 
                 {showMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1"
-                  >
+                  <div className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1">
                     <button
                       className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
                       onClick={handleEdit}
@@ -164,7 +121,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete
                     </button>
-                  </motion.div>
+                  </div>
                 )}
               </div>
             </div>
@@ -217,13 +174,8 @@ const PositionCard: React.FC<PositionCardProps> = ({
                 </div>
               </div>
               
-              {/* Right side with badge, menu, and arrow */}
+              {/* Right side with menu and arrow - removed vacancy badge */}
               <div className="flex items-center gap-3 flex-shrink-0">
-                {/* Vacancy Badge */}
-                <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${vacancyBadge.color}`}>
-                  {vacancyBadge.text}
-                </span>
-                
                 {/* More Options Menu */}
                 <div ref={menuRef}>
                   <Button
@@ -236,12 +188,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
                   </Button>
 
                   {showMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                      className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1"
-                    >
+                    <div className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1">
                       <button
                         className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
                         onClick={handleEdit}
@@ -256,11 +203,11 @@ const PositionCard: React.FC<PositionCardProps> = ({
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
                       </button>
-                    </motion.div>
+                    </div>
                   )}
                 </div>
                 
-                <ArrowRight className="h-4 w-4 text-green-500 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 text-green-500" />
               </div>
             </div>
             
@@ -281,16 +228,10 @@ const PositionCard: React.FC<PositionCardProps> = ({
               </div>
             </div>
 
-            {/* Navigation Hint for List View */}
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-xs text-green-600">
-                Click to manage experience, benefits, education, and requirements
-              </p>
-            </div>
           </div>
         </>
       )}
-    </motion.div>
+    </div>
   );
 };
 

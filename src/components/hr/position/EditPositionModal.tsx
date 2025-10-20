@@ -250,41 +250,7 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                 </div>
               </div>
 
-              {/* Position Preview */}
-              {(formData.name || formData.nameAm) && (
-                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                  <p className="text-sm text-green-800 font-medium mb-2">Position Preview:</p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">English Name:</span>
-                      <span className="font-semibold">{formData.name || 'Not set'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Amharic Name:</span>
-                      <span className="font-semibold">{formData.nameAm || 'Not set'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Positions:</span>
-                      <span className="font-semibold">{formData.noOfPosition}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Department:</span>
-                      <span className="font-semibold">
-                        {selectedDepartment ? 
-                          departments.find(d => d.id === selectedDepartment)?.name || 'Not set' 
-                          : 'Not set'
-                        }
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-t border-green-200 pt-2 mt-2">
-                      <span className="text-gray-600 font-medium">Status:</span>
-                      <span className={`font-bold ${formData.isVacant === '1' ? 'text-green-600' : 'text-gray-600'}`}>
-                        {formData.isVacant === '1' ? 'Vacant' : 'Filled'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
+
 
               {/* Original Values for Reference */}
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">

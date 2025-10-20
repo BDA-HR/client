@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -10,15 +10,20 @@ import {
   Building,
   UserCheck,
   Calendar,
+  BadgePlus,
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import PositionExperience from '../../../components/hr/position/settings/PositionExperiance';
 import PositionBenefits from '../../../components/hr/position/settings/PositionBenefits';
 import PositionEducation from '../../../components/hr/position/settings/PositionEducation';
 import PositionRequirements from '../../../components/hr/position/settings/PositionRequirements';
+import PositionExperienceModal from '../../../components/hr/position/settings/PositionExperianceModal';
 import type { 
   PositionListDto, 
-  PositionSettingType
+  PositionSettingType,
+  PositionExpAddDto,
+  PositionExpModDto,
+  PositionExpListDto
 } from '../../../types/hr/position';
 import { positionService } from '../../../services/hr/positionService';
 
@@ -27,7 +32,6 @@ interface SettingTab {
   id: PositionSettingType;
   label: string;
   icon: React.ComponentType<any>;
-  description: string;
   color: string;
 }
 
@@ -36,28 +40,24 @@ const settingTabs: SettingTab[] = [
     id: 'experience', 
     label: 'Experience', 
     icon: Briefcase, 
-    description: 'Set experience requirements and age limits',
     color: 'green'
   },
   { 
     id: 'benefit', 
     label: 'Benefits', 
     icon: Award, 
-    description: 'Manage position benefits and allowances',
     color: 'green'
   },
   { 
     id: 'education', 
     label: 'Education', 
     icon: GraduationCap, 
-    description: 'Set education qualifications and levels',
     color: 'green'
   },
   { 
     id: 'requirement', 
     label: 'Requirements', 
     icon: Settings, 
-    description: 'Configure job requirements and work conditions',
     color: 'green'
   },
 ];
@@ -72,22 +72,6 @@ const greenTheme = {
     border: 'border-green-200',
     icon: 'text-green-600',
     active: 'border-green-500 text-green-600 bg-green-50'
-  },
-  secondary: {
-    light: 'bg-emerald-50',
-    medium: 'bg-emerald-100', 
-    dark: 'bg-emerald-500',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
-    icon: 'text-emerald-600'
-  },
-  accent: {
-    light: 'bg-teal-50',
-    medium: 'bg-teal-100',
-    dark: 'bg-teal-500',
-    text: 'text-teal-700',
-    border: 'border-teal-200',
-    icon: 'text-teal-600'
   }
 };
 
@@ -98,6 +82,12 @@ function PositionDetails() {
   const [position, setPosition] = useState<PositionListDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Experience modal state (moved from PositionExperience)
+  const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
+  const [editingExperience, setEditingExperience] = useState<PositionExpListDto | null>(null);
+  const [hasExperience, setHasExperience] = useState(false);
+  const experienceRef = useRef<any>(null);
 
   useEffect(() => {
     if (id) {
@@ -123,6 +113,58 @@ function PositionDetails() {
   const handleBack = () => {
     navigate('/hr/settings/position');
   };
+
+  // Experience modal handlers
+  const handleAddExperience = () => {
+    setEditingExperience(null);
+    setIsExperienceModalOpen(true);
+  };
+
+  const handleEditExperience = (experience: PositionExpListDto) => {
+    setEditingExperience(experience);
+    setIsExperienceModalOpen(true);
+  };
+
+  const handleSaveExperience = async (data: PositionExpAddDto | PositionExpModDto) => {
+    try {
+      if ('id' in data) {
+        await positionService.updatePositionExp(data.id, data);
+      } else {
+        await positionService.addPositionExp(data);
+        // After adding experience, hide the add button
+        setHasExperience(true);
+      }
+      // Refresh experiences in the child component
+      if (experienceRef.current && experienceRef.current.fetchExperiences) {
+        await experienceRef.current.fetchExperiences();
+      }
+    } catch (error) {
+      console.error('Error saving experience:', error);
+    }
+  };
+
+  const handleCloseExperienceModal = () => {
+    setIsExperienceModalOpen(false);
+    setEditingExperience(null);
+  };
+
+  // Function to check if position has experiences
+  const checkIfHasExperience = async () => {
+    try {
+      const data = await positionService.getAllPositionExp();
+      const positionExperiences = data.filter(exp => exp.positionId === id);
+      setHasExperience(positionExperiences.length > 0);
+    } catch (error) {
+      console.error('Error checking experiences:', error);
+    }
+  };
+
+  // Check for existing experiences when component mounts
+  useEffect(() => {
+    if (id) {
+      checkIfHasExperience();
+    }
+  }, [id]);
 
   if (loading) {
     return (
@@ -160,7 +202,7 @@ function PositionDetails() {
   }[activeTab];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen space-y-4">
       <div className="mx-auto">
         {/* Header Section */}
         <div className="mb-8">
@@ -177,18 +219,6 @@ function PositionDetails() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{position.name}</h1>
                 <p className="text-lg text-gray-600 mt-1">{position.nameAm}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                position.isVacant === '1' 
-                  ? 'bg-green-100 text-green-800 border border-green-200' 
-                  : 'bg-gray-100 text-gray-800 border border-gray-200'
-              }`}>
-                {position.isVacantStr}
-              </div>
-              <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg">
-                <Users className="text-white" size={28} />
               </div>
             </div>
           </div>
@@ -285,49 +315,46 @@ function PositionDetails() {
                   <h2 className="text-xl font-bold text-gray-900">
                     {settingTabs.find(tab => tab.id === activeTab)?.label} Settings
                   </h2>
-                  <p className="text-gray-600 text-sm mt-1">
-                    {settingTabs.find(tab => tab.id === activeTab)?.description}
-                  </p>
                 </div>
               </div>
-              <div className={`px-3 py-1 rounded-full text-xs font-medium ${greenTheme.primary.light} ${greenTheme.primary.text}`}>
-                Configure {settingTabs.find(tab => tab.id === activeTab)?.label.toLowerCase()} requirements
-              </div>
+              
+              {/* Add Experience Button - Only shown for Experience tab when no experience exists */}
+              {activeTab === 'experience' && !hasExperience && (
+                <Button 
+                  onClick={handleAddExperience}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Experience
+                </Button>
+              )}
             </div>
           </div>
 
           {/* Tab Content */}
           <div className="p-6">
-            <ActiveTabComponent positionId={position.id} />
+            {activeTab === 'experience' ? (
+              <PositionExperience 
+                positionId={position.id} 
+                ref={experienceRef}
+                onEdit={handleEditExperience}
+                onExperienceAdded={() => setHasExperience(true)}
+                onExperienceDeleted={() => setHasExperience(false)}
+              />
+            ) : (
+              <ActiveTabComponent positionId={position.id} />
+            )}
           </div>
         </div>
 
-        {/* Quick Actions Footer */}
-        <div className="mt-6 flex items-center justify-between text-sm text-gray-500">
-          <div className="flex items-center space-x-4">
-            <span>Position ID: {position.id}</span>
-            <span>•</span>
-            <span>Last updated: {new Date(position.updatedAt).toLocaleDateString()}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleBack}
-              className="border-green-300 text-green-700 hover:bg-green-50"
-            >
-              Back to List
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => window.print()}
-              className="border-green-300 text-green-700 hover:bg-green-50"
-            >
-              Print Details
-            </Button>
-          </div>
-        </div>
+        {/* Experience Modal */}
+        <PositionExperienceModal
+          isOpen={isExperienceModalOpen}
+          onClose={handleCloseExperienceModal}
+          onSave={handleSaveExperience}
+          positionId={position.id}
+          editingExperience={editingExperience}
+        />
       </div>
     </div>
   );
