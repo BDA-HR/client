@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, BadgePlus } from "lucide-react";
+import { Search, BadgePlus, X } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import AddEducationalQualModal from "./AddEducationalQualModal";
 import type { EducationQualAddDto } from "../../../types/hr/educationalqual";
@@ -16,7 +16,7 @@ const EducationalQualSearchFilters: React.FC<
 > = ({ searchTerm, setSearchTerm, onAddEducationalQual }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const clearFilters = () => {
+  const clearSearch = () => {
     setSearchTerm("");
   };
 
@@ -55,28 +55,24 @@ const EducationalQualSearchFilters: React.FC<
                 id="educationalqual-search"
                 name="educationalqual-search"
                 placeholder="Search Educational Qualifications"
-                className="block w-full md:w-2/3 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                className="block w-full md:w-2/3 pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:bg-gray-100 rounded-r-md transition-colors"
+                  style={{ right: '33.333%' }} // Adjust position for the 2/3 width input
+                >
+                  <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                </button>
+              )}
             </div>
           </div>
 
-          {/* 🎚 Filters + Add Button */}
-          <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
-            {/* Clear Filter Button
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                className="whitespace-nowrap w-full sm:w-auto"
-                onClick={clearFilters}
-                disabled={!searchTerm}
-              >
-                Clear Search
-              </Button>
-            </div> */}
-
+          {/* Add Button */}
+          <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto items-center justify-end">
             {/* ➕ Add Educational Qualification Button */}
             <Button
               onClick={handleAddClick}
