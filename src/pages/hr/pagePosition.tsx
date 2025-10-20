@@ -132,9 +132,12 @@ function PagePosition() {
     );
   }
 
-  if (error) {
-    return (
-      <motion.div
+  return (
+    <div className="mx-auto space-y-6">
+      <PositionHeader />
+
+      {error && (
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
@@ -153,11 +156,11 @@ function PagePosition() {
                   later.
                 </>
               ) : error.includes("create") ? (
-                "Failed to create company. Please try again."
+                "Failed to create position. Please try again."
               ) : error.includes("update") ? (
-                "Failed to update company. Please try again."
+                "Failed to update position. Please try again."
               ) : error.includes("delete") ? (
-                "Failed to delete company. Please try again."
+                "Failed to delete position. Please try again."
               ) : (
                 error
               )}
@@ -170,12 +173,7 @@ function PagePosition() {
             </button>
           </div>
         </motion.div>
-    );
-  }
-
-  return (
-    <div className="mx-auto space-y-6">
-      <PositionHeader />
+      )}
 
       <PositionSearchFilters
         searchTerm={searchTerm}
