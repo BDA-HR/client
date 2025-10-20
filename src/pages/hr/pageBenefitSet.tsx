@@ -7,130 +7,19 @@ import BenefitSearchFilters from "../../components/hr/benefit/BenefitSearchFilte
 import AddBenefitModal from "../../components/hr/benefit/AddBenfitModal";
 import EditBenefitSetModal from "../../components/hr/benefit/EditBenefitSetModal";
 import DeleteBenefitModal from "../../components/hr/benefit/DeleteBenefitModal";
-import type { UUID, BenefitSetListDto } from "../../types/hr/benefit";
-
-interface BenefitSetAddDto {
-  name: string;
-  benefitValue: number;
-}
-
-interface BenefitSetModDto {
-  id: UUID;
-  name: string;
-  benefitValue: number;
-  rowVersion: string;
-}
-
-// Mock service functions
-const benefitSetService = {
-  getBenefitSets: async (): Promise<BenefitSetListDto[]> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: "1" as UUID,
-            name: "Health Insurance",
-            benefit: 5000,
-            benefitStr: "5,000",
-            rowVersion: "1",
-            isDeleted: false,
-            createdAt: new Date().toISOString(),
-            createdAtAm: new Date().toISOString(),
-            modifiedAt: new Date().toISOString(),
-            modifiedAtAm: new Date().toISOString(),
-          },
-          {
-            id: "2" as UUID,
-            name: "Transport Allowance",
-            benefit: 2000,
-            benefitStr: "2,000",
-            rowVersion: "1",
-            isDeleted: false,
-            createdAt: new Date().toISOString(),
-            createdAtAm: new Date().toISOString(),
-            modifiedAt: new Date().toISOString(),
-            modifiedAtAm: new Date().toISOString(),
-          },
-          {
-            id: "3" as UUID,
-            name: "Housing Allowance",
-            benefit: 8000,
-            benefitStr: "8,000",
-            rowVersion: "1",
-            isDeleted: false,
-            createdAt: new Date().toISOString(),
-            createdAtAm: new Date().toISOString(),
-            modifiedAt: new Date().toISOString(),
-            modifiedAtAm: new Date().toISOString(),
-          },
-        ]);
-      }, 500);
-    });
-  },
-
-  createBenefitSet: async (
-    data: BenefitSetAddDto
-  ): Promise<BenefitSetListDto> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: Math.random().toString(36).substr(2, 9) as UUID,
-          name: data.name,
-          benefit: data.benefitValue,
-          benefitStr: data.benefitValue.toLocaleString(),
-          rowVersion: "1",
-          isDeleted: false,
-          createdAt: new Date().toISOString(),
-          createdAtAm: new Date().toISOString(),
-          modifiedAt: new Date().toISOString(),
-          modifiedAtAm: new Date().toISOString(),
-        });
-      }, 500);
-    });
-  },
-
-  updateBenefitSet: async (
-    data: BenefitSetModDto
-  ): Promise<BenefitSetListDto> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: data.id,
-          name: data.name,
-          benefit: data.benefitValue,
-          benefitStr: data.benefitValue.toLocaleString(),
-          rowVersion: data.rowVersion,
-          isDeleted: false,
-          createdAt: new Date().toISOString(),
-          createdAtAm: new Date().toISOString(),
-          modifiedAt: new Date().toISOString(),
-          modifiedAtAm: new Date().toISOString(),
-        });
-      }, 500);
-    });
-  },
-
-  deleteBenefitSet: async (id: string): Promise<void> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("Deleted benefit set:", id);
-        resolve();
-      }, 500);
-    });
-  },
-};
+import { benefitSetService } from "../../services/hr/BenefitSetService";
+import type { BenefitSetListDto, BenefitSetAddDto, BenefitSetModDto } from "../../types/hr/benefit";
 
 const PageBenefitSet: React.FC = () => {
   const [benefitSets, setBenefitSets] = useState<BenefitSetListDto[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingBenefitSet, setEditingBenefitSet] =
-    useState<BenefitSetListDto | null>(null);
-  const [deletingBenefitSet, setDeletingBenefitSet] =
-    useState<BenefitSetListDto | null>(null);
+  const [editingBenefitSet, setEditingBenefitSet] = useState<BenefitSetListDto | null>(null);
+  const [deletingBenefitSet, setDeletingBenefitSet] = useState<BenefitSetListDto | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Load benefit sets on component mount
   useEffect(() => {
@@ -140,9 +29,11 @@ const PageBenefitSet: React.FC = () => {
   const loadBenefitSets = async () => {
     try {
       setLoading(true);
-      const data = await benefitSetService.getBenefitSets();
+      setError(null);
+      const data = await benefitSetService.getAllBenefitSets();
       setBenefitSets(data);
     } catch (error) {
+      setError('Failed to load benefit sets');
       console.error("Error loading benefit sets:", error);
     } finally {
       setLoading(false);
@@ -151,16 +42,19 @@ const PageBenefitSet: React.FC = () => {
 
   const handleAddSubmit = async (data: BenefitSetAddDto) => {
     try {
+      setError(null);
       const newBenefitSet = await benefitSetService.createBenefitSet(data);
       setBenefitSets((prev) => [...prev, newBenefitSet]);
       setIsAddModalOpen(false);
     } catch (error) {
+      setError('Failed to create benefit set');
       console.error("Error adding benefit set:", error);
     }
   };
 
   const handleEditSubmit = async (data: BenefitSetModDto) => {
     try {
+      setError(null);
       const updatedBenefitSet = await benefitSetService.updateBenefitSet(data);
       setBenefitSets((prev) =>
         prev.map((set) =>
@@ -169,17 +63,20 @@ const PageBenefitSet: React.FC = () => {
       );
       setEditingBenefitSet(null);
     } catch (error) {
+      setError('Failed to update benefit set');
       console.error("Error updating benefit set:", error);
     }
   };
 
   const handleDeleteConfirm = async (benefitSet: BenefitSetListDto) => {
     try {
+      setError(null);
       setDeletingId(benefitSet.id);
       await benefitSetService.deleteBenefitSet(benefitSet.id);
       setBenefitSets((prev) => prev.filter((set) => set.id !== benefitSet.id));
       setDeletingBenefitSet(null);
     } catch (err) {
+      setError('Failed to delete benefit set');
       console.error("Error deleting benefit set:", err);
     } finally {
       setDeletingId(null);
@@ -205,12 +102,56 @@ const PageBenefitSet: React.FC = () => {
     );
   }
 
+  if (error && !benefitSets.length) {
+    return (
+      <div className="min-h-screen bg-gray-50 ">
+        <BenefitSetHeader />
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load benefit sets.{" "}
+                  <button
+                    onClick={loadBenefitSets}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("create") ? (
+                "Failed to create benefit set. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update benefit set. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete benefit set. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <motion.section
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-50 space-y-6"
+      className="bg-gray-50 space-y-6 min-h-screen"
     >
       {/* Header Component */}
       <BenefitSetHeader />
@@ -224,6 +165,46 @@ const PageBenefitSet: React.FC = () => {
         viewMode={viewMode}
         setViewMode={setViewMode}
       />
+
+      {/* Error Display - Now positioned under the search filter */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load benefit sets.{" "}
+                  <button
+                    onClick={loadBenefitSets}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("create") ? (
+                "Failed to create benefit set. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update benefit set. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete benefit set. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Benefit Sets Grid/List */}
       <div

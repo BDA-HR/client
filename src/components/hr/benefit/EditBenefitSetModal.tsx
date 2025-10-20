@@ -74,7 +74,6 @@ const EditBenefitSetModal: React.FC<EditBenefitSetModalProps> = ({
   };
 
   // Calculate monthly equivalent
-  const monthlyBenefit = formData.benefitValue / 12;
 
   if (!isOpen || !benefitSet) return null;
 

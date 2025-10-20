@@ -8,17 +8,17 @@ import JobGradeSearchFilters from '../../../components/hr/jobgrade/JobGradeSearc
 import AddJobGradeModal from '../../../components/hr/jobgrade/AddJobGrade';
 import EditJobGradeModal from '../../../components/hr/jobgrade/EditJobGradeModal';
 import DeleteJobGradeModal from '../../../components/hr/jobgrade/DeleteJobGradeModal';
-import { jobGradeMockData } from '../../../components/hr/jobgrade/JobGradeData';
+import { jobGradeService } from '../../../services/hr/JobGradeServives';
 import type { JobGradeListDto, JobGradeAddDto, JobGradeModDto } from '../../../types/hr/jobgrade';
-import type { UUID } from 'crypto';
 
-const ITEMS_PER_PAGE = 20; // Good for grid layout (3x3)
+const ITEMS_PER_PAGE = 20;
 
 const JobGradePage = () => {
   const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
   const [filteredGrades, setFilteredGrades] = useState<JobGradeListDto[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ 
     minSalary: '' as number | '',
@@ -38,16 +38,12 @@ const JobGradePage = () => {
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
   const currentGrades = filteredGrades.slice(startIndex, endIndex);
 
+  // Load job grades on component mount
   useEffect(() => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setJobGrades(jobGradeMockData);
-      setFilteredGrades(jobGradeMockData);
-      setLoading(false);
-    }, 1000);
+    loadJobGrades();
   }, []);
 
+  // Filter job grades when search term or filters change
   useEffect(() => {
     let results = jobGrades;
     
@@ -59,7 +55,7 @@ const JobGradePage = () => {
       );
     }
     
-    // Salary filters - Fixed type comparison
+    // Salary filters
     if (filters.minSalary !== '') {
       results = results.filter(grade => grade.startSalary >= Number(filters.minSalary));
     }
@@ -71,22 +67,34 @@ const JobGradePage = () => {
     setCurrentPage(1); // Reset to first page when filters change
   }, [searchTerm, filters, jobGrades]);
 
-  const handleAddGrade = (newGrade: JobGradeAddDto) => {
-    const gradeWithId: JobGradeListDto = {
-      ...newGrade,
-      id: generateUUID() as UUID,
-      rowVersion: '1',
-      isDeleted: false,
-      createdAt: new Date().toISOString(),
-      createdAtAm: new Date().toISOString(),
-      modifiedAt: new Date().toISOString(),
-      modifiedAtAm: new Date().toISOString()
-    };
+  const loadJobGrades = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const grades = await jobGradeService.getAllJobGrades();
+      setJobGrades(grades);
+      setFilteredGrades(grades);
+    } catch (err) {
+      setError('Failed to load job grades');
+      console.error('Error loading job grades:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setJobGrades(prev => [gradeWithId, ...prev]);
-    setFilteredGrades(prev => [gradeWithId, ...prev]);
-    setExpandedCard(gradeWithId.id);
-    setCurrentPage(1); // Go to first page to see the new grade
+  const handleAddGrade = async (newGrade: JobGradeAddDto) => {
+    try {
+      setError(null);
+      const createdGrade = await jobGradeService.createJobGrade(newGrade);
+      setJobGrades(prev => [createdGrade, ...prev]);
+      setFilteredGrades(prev => [createdGrade, ...prev]);
+      setExpandedCard(createdGrade.id);
+      setCurrentPage(1);
+      setIsAddModalOpen(false);
+    } catch (err) {
+      setError('Failed to create job grade');
+      console.error('Error creating job grade:', err);
+    }
   };
 
   const handleEdit = (jobGrade: JobGradeListDto) => {
@@ -99,46 +107,36 @@ const JobGradePage = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = (jobGrade: JobGradeListDto) => {
-    setJobGrades(prev => prev.filter(grade => grade.id !== jobGrade.id));
-    setFilteredGrades(prev => prev.filter(grade => grade.id !== jobGrade.id));
-    setIsDeleteModalOpen(false);
-    setDeletingGrade(null);
+  const handleConfirmDelete = async (jobGrade: JobGradeListDto) => {
+    try {
+      setError(null);
+      await jobGradeService.deleteJobGrade(jobGrade.id);
+      setJobGrades(prev => prev.filter(grade => grade.id !== jobGrade.id));
+      setFilteredGrades(prev => prev.filter(grade => grade.id !== jobGrade.id));
+      setIsDeleteModalOpen(false);
+      setDeletingGrade(null);
+    } catch (err) {
+      setError('Failed to delete job grade');
+      console.error('Error deleting job grade:', err);
+    }
   };
 
-  const handleSaveEdit = (updatedGrade: JobGradeModDto) => {
-    const currentTime = new Date().toISOString();
-    setJobGrades(prev => prev.map(grade => 
-      grade.id === updatedGrade.id 
-        ? { 
-            ...grade, 
-            ...updatedGrade,
-            modifiedAt: currentTime,
-            modifiedAtAm: currentTime
-          } 
-        : grade
-    ));
-    setFilteredGrades(prev => prev.map(grade => 
-      grade.id === updatedGrade.id 
-        ? { 
-            ...grade, 
-            ...updatedGrade,
-            modifiedAt: currentTime,
-            modifiedAtAm: currentTime
-          } 
-        : grade
-    ));
-    setIsEditModalOpen(false);
-    setEditingGrade(null);
-  };
-
-  // UUID generator for new grades
-  const generateUUID = (): string => {
-    return `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+  const handleSaveEdit = async (updatedGrade: JobGradeModDto) => {
+    try {
+      setError(null);
+      const savedGrade = await jobGradeService.updateJobGrade(updatedGrade);
+      setJobGrades(prev => prev.map(grade => 
+        grade.id === savedGrade.id ? savedGrade : grade
+      ));
+      setFilteredGrades(prev => prev.map(grade => 
+        grade.id === savedGrade.id ? savedGrade : grade
+      ));
+      setIsEditModalOpen(false);
+      setEditingGrade(null);
+    } catch (err) {
+      setError('Failed to update job grade');
+      console.error('Error updating job grade:', err);
+    }
   };
 
   return (
@@ -151,9 +149,47 @@ const JobGradePage = () => {
         visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
       }}
     >
-      <JobGradeHeader
-        jobGrades={jobGrades}
-      />
+      <JobGradeHeader jobGrades={jobGrades} />
+
+      {/* Error Display */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load job grades.{" "}
+                  <button
+                    onClick={loadJobGrades}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("create") ? (
+                "Failed to create job grade. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update job grade. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete job grade. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       <JobGradeSearchFilters
         searchTerm={searchTerm}
@@ -202,11 +238,13 @@ const JobGradePage = () => {
         >
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading job grades...</p>
           </div>
         </motion.div>
       )}
 
-      {!loading && currentGrades.length ? (
+      {/* Success State */}
+      {!loading && !error && currentGrades.length > 0 && (
         <>
           <motion.div 
             className={
@@ -230,10 +268,24 @@ const JobGradePage = () => {
             </AnimatePresence>
           </motion.div>
         </>
-      ) : !loading && (
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && filteredGrades.length === 0 && jobGrades.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-green-100">
           <BookOpen className="h-10 w-10 text-gray-400 mb-4" />
           <h3 className="text-lg font-medium text-gray-900">No job grades found</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Get started by creating your first job grade
+          </p>
+        </div>
+      )}
+
+      {/* No Results State */}
+      {!loading && !error && jobGrades.length > 0 && filteredGrades.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-green-100">
+          <BookOpen className="h-10 w-10 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900">No job grades match your search</h3>
           <p className="text-sm text-gray-500 mt-1">
             Try adjusting your search or filters
           </p>
@@ -249,10 +301,6 @@ const JobGradePage = () => {
           </Button>
         </div>
       )}
-
-      {/* {!loading && filteredGrades.length > 0 && (
-        <JobGradeAnalytics jobGrades={jobGrades} filteredGrades={filteredGrades} />
-      )} */}
     </motion.section>
   );
 };

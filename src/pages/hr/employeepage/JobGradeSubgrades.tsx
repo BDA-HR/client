@@ -8,103 +8,9 @@ import AddJgStepModal from '../../../components/hr/jobgrade/AddJgStepModal';
 import EditJgStepModal from '../../../components/hr/jobgrade/EditJgStepModal';
 import DeleteJgStepModal from '../../../components/hr/jobgrade/DeleteJgStepModal';
 import StepCard from '../../../components/hr/jobgrade/StepCard';
+import { jgStepService } from '../../../services/hr/JgStepService';
 import type { JobGradeListDto } from '../../../types/hr/jobgrade';
 import type { JgStepListDto, JgStepAddDto, JgStepModDto, UUID } from '../../../types/hr/JgStep';
-
-// Mock API service - replace with actual API calls
-const jobGradeStepService = {
-  getByJobGradeId: async (jobGradeId: string): Promise<JgStepListDto[]> => {
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockSteps: JgStepListDto[] = [
-          {
-            id: '1' as UUID,
-            name: 'Junior Level',
-            salary: 15000,
-            jobGradeId: jobGradeId as UUID,
-            jobGrade: 'Grade A',
-            createdAt: new Date().toISOString(),
-            createdBy: 'system',
-            updatedAt: new Date().toISOString(),
-            updatedBy: 'system',
-            rowVersion: '1'
-          },
-          {
-            id: '2' as UUID,
-            name: 'Intermediate Level',
-            salary: 25000,
-            jobGradeId: jobGradeId as UUID,
-            jobGrade: 'Grade A',
-            createdAt: new Date().toISOString(),
-            createdBy: 'system',
-            updatedAt: new Date().toISOString(),
-            updatedBy: 'system',
-            rowVersion: '1'
-          },
-          {
-            id: '3' as UUID,
-            name: 'Senior Level',
-            salary: 35000,
-            jobGradeId: jobGradeId as UUID,
-            jobGrade: 'Grade A',
-            createdAt: new Date().toISOString(),
-            createdBy: 'system',
-            updatedAt: new Date().toISOString(),
-            updatedBy: 'system',
-            rowVersion: '1'
-          }
-        ];
-        resolve(mockSteps);
-      }, 500);
-    });
-  },
-
-  create: async (stepData: JgStepAddDto): Promise<JgStepListDto> => {
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newStep: JgStepListDto = {
-          id: Math.random().toString(36).substr(2, 9),
-          ...stepData,
-          jobGrade: 'Grade A',
-          createdAt: new Date().toISOString(),
-          createdBy: 'user',
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'user',
-          rowVersion: '1'
-        };
-        resolve(newStep);
-      }, 500);
-    });
-  },
-
-  update: async (stepData: JgStepModDto): Promise<JgStepListDto> => {
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const updatedStep: JgStepListDto = {
-          ...stepData,
-          jobGrade: 'Grade A',
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'user',
-          createdAt: new Date().toISOString(), // These would come from server in real app
-          createdBy: 'system'
-        };
-        resolve(updatedStep);
-      }, 500);
-    });
-  },
-
-  delete: async (stepId: string): Promise<void> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log('Deleted step:', stepId);
-        resolve();
-      }, 500);
-    });
-  }
-};
 
 const JobGradeSubgrades: React.FC = () => {
   const { gradeId } = useParams<{ gradeId: string }>();
@@ -138,7 +44,7 @@ const JobGradeSubgrades: React.FC = () => {
       }
 
       if (gradeId) {
-        const stepsData = await jobGradeStepService.getByJobGradeId(gradeId);
+        const stepsData = await jgStepService.getJgStepsByJobGrade(gradeId as UUID);
         setSteps(stepsData);
       }
     } catch (err) {
@@ -185,7 +91,8 @@ const JobGradeSubgrades: React.FC = () => {
     if (!gradeId) return;
 
     try {
-      const newStep = await jobGradeStepService.create(stepData);
+      setError(null);
+      const newStep = await jgStepService.createJgStep(stepData);
       setSteps(prev => [...prev, newStep]);
       handleCloseAddModal();
     } catch (err) {
@@ -196,7 +103,8 @@ const JobGradeSubgrades: React.FC = () => {
 
   const handleEditStep = async (stepData: JgStepModDto) => {
     try {
-      const updatedStep = await jobGradeStepService.update(stepData);
+      setError(null);
+      const updatedStep = await jgStepService.updateJgStep(stepData);
       setSteps(prev => prev.map(step => 
         step.id === updatedStep.id ? updatedStep : step
       ));
@@ -209,8 +117,9 @@ const JobGradeSubgrades: React.FC = () => {
 
   const handleDeleteStep = async (step: JgStepListDto) => {
     try {
+      setError(null);
       setDeletingId(step.id);
-      await jobGradeStepService.delete(step.id);
+      await jgStepService.deleteJgStep(step.id);
       setSteps(prev => prev.filter(s => s.id !== step.id));
       handleCloseDeleteModal();
     } catch (err) {
@@ -229,25 +138,55 @@ const JobGradeSubgrades: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && !steps.length) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 ">
         <div className="flex items-center mb-6">
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={handleBack}
-            className="mr-4 hover:bg-green-50"
+            className="mr-4 cursor-pointer border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Job Grades
           </Button>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">{error}</p>
-          <Button onClick={loadJobGradeAndSteps} className="mt-2">
-            Retry
-          </Button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load job grade steps.{" "}
+                  <button
+                    onClick={loadJobGradeAndSteps}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("create") ? (
+                "Failed to create step. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update step. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete step. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -260,24 +199,64 @@ const JobGradeSubgrades: React.FC = () => {
       className="bg-gray-50 space-y-4"
     >
       <div className="flex items-center gap-4 mb-6">
-  {/* Back Button */}
-  <Button
-    variant="outline"
-    onClick={handleBack}
-    className="cursor-pointer border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-  >
-    <ArrowLeft className="h-4 w-4 mr-2" />
-    Back to Job Grades
-  </Button>
+        {/* Back Button */}
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="cursor-pointer border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Job Grades
+        </Button>
 
-  {/* Separator */}
-  <div className="h-10 w-px bg-gray-300"></div>
+        {/* Separator */}
+        <div className="h-10 w-px bg-gray-300"></div>
 
-  {/* Header - Simplified without buttons */}
-  <div className="flex-1">
-    <JobGradeSubgradesHeader jobGrade={jobGrade} />
-  </div>
-</div>
+        {/* Header - Simplified without buttons */}
+        <div className="flex-1">
+          <JobGradeSubgradesHeader jobGrade={jobGrade} />
+        </div>
+      </div>
+
+      {/* Error Display */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("load") ? (
+                <>
+                  Failed to load job grade steps.{" "}
+                  <button
+                    onClick={loadJobGradeAndSteps}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("create") ? (
+                "Failed to create step. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update step. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete step. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Job Grade Info Card with Action Buttons */}
       {jobGrade && (

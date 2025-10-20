@@ -37,9 +37,8 @@ const BenefitSetHeader = () => {
               className="inline-block"
             >
               <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                Benefit
-              </span>{" "}
-              Settings
+                Benefits
+              </span>
             </motion.span>
           </h1>
         </motion.div>
