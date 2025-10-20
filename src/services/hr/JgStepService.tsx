@@ -1,3 +1,4 @@
+// services/hr/JgStepService.ts
 import { api } from '../api';
 import type { 
   JgStepListDto, 
@@ -9,35 +10,24 @@ import type {
 class JgStepService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/JgStep`;
 
-  // GET: /api/core/hrmm/v1/JgStep/AllJgStep
-  async getAllJgSteps(): Promise<JgStepListDto[]> {
+  // GET: /api/core/hrmm/v1/JgStep/AllJgSteps/{id} - Get list of Job Grade Steps by JobGradeId
+  async getJgStepsByJobGrade(jobGradeId: UUID): Promise<JgStepListDto[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/AllJgStep`);
+      const response = await api.get(`${this.baseUrl}/AllJgSteps/${jobGradeId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching job grade steps:', error);
+      console.error('Error fetching job grade steps by job grade:', error);
       throw error;
     }
   }
 
-  // GET: /api/core/hrmm/v1/JgStep/GetJgStep/{id}
+  // GET: /api/core/hrmm/v1/JgStep/GetJgStep/{id} - Get single job grade step
   async getJgStepById(id: UUID): Promise<JgStepListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetJgStep/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching job grade step:', error);
-      throw error;
-    }
-  }
-
-  // GET: /api/core/hrmm/v1/JgStep/GetJgStepsByJobGrade/{jobGradeId}
-  async getJgStepsByJobGrade(jobGradeId: UUID): Promise<JgStepListDto[]> {
-    try {
-      const response = await api.get(`${this.baseUrl}/GetJgStepsByJobGrade/${jobGradeId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching job grade steps by job grade:', error);
       throw error;
     }
   }
