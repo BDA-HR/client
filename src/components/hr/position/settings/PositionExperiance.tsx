@@ -161,10 +161,6 @@ function PositionExperience({ positionId }: PositionExperienceProps) {
             <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-gray-900 mb-2">No Experience Requirements</h4>
             <p className="text-gray-600 mb-4">Add experience requirements for this position</p>
-            <Button onClick={handleAdd} className="bg-green-600 hover:bg-green-700">
-              <BadgePlus className="h-4 w-4 mr-2" />
-              Add First Requirement
-            </Button>
           </div>
         )}
       </div>

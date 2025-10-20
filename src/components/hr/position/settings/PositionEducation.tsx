@@ -4,7 +4,7 @@ import { Button } from '../../../../components/ui/button';
 import PositionEducationModal from './PositionEducationModal';
 import type { PositionEduListDto, PositionEduAddDto, PositionEduModDto, UUID, EducationLevelDto } from '../../../../types/hr/position';
 import { positionService, lookupService } from '../../../../services/hr/positionService';
-import DeletePositionEducationModal from './DeletePositionEducationModal'; // Import the delete modal
+import DeletePositionEducationModal from './DeletePositionEducationModal';
 
 
 interface PositionEducationProps {
