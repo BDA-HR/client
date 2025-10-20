@@ -7,6 +7,7 @@ import { Input } from '../../../../components/ui/input';
 import List from '../../../../components/List/list';
 import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../types/hr/position';
 import type { ListItem } from '../../../../types/List/list';
+import { PositionGender, WorkOption } from '../../../../types/hr/enum';
 
 interface PositionRequirementsModalProps {
   isOpen: boolean;
@@ -25,11 +26,12 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
   professionTypes,
   editingRequirement
 }) => {
+  // Initialize with default values - using "3" (None) for work options
   const [formData, setFormData] = useState<PositionReqAddDto>({
     positionId,
-    gender: '',
-    saturdayWorkOption: '',
-    sundayWorkOption: '',
+    gender: '2', // Default to "Both"
+    saturdayWorkOption: '3', // Default to "None"
+    sundayWorkOption: '3', // Default to "None"
     workingHours: 8,
     professionTypeId: '' as UUID,
   });
@@ -47,9 +49,9 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     } else {
       setFormData({
         positionId,
-        gender: '',
-        saturdayWorkOption: '',
-        sundayWorkOption: '',
+        gender: '2', // Default to "Both"
+        saturdayWorkOption: '3', // Default to "None"
+        sundayWorkOption: '3', // Default to "None"
         workingHours: 8,
         professionTypeId: '' as UUID,
       });
@@ -88,25 +90,25 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     onClose();
   };
 
+  // Profession Type List - uses UUIDs, so we can use the List component
   const professionTypeListItems: ListItem[] = professionTypes.map(type => ({
     id: type.id,
     name: type.name,
   }));
 
-  // Gender options with null option
-  const genderOptions = [
-    { value: '', label: 'Select Gender Preference' },
-    { value: '0', label: 'Male Only' },
-    { value: '1', label: 'Female Only' },
-    { value: '2', label: 'Both Genders' }
+  // Gender options based on your backend enum
+  const genderOptions: ListItem[] = [
+    { id: '0' as UUID, name: PositionGender['0'] }, // Male
+    { id: '1' as UUID, name: PositionGender['1'] }, // Female
+    { id: '2' as UUID, name: PositionGender['2'] }  // Both
   ];
 
-  // Work options with null option
-  const workOptions = [
-    { value: '', label: 'Select Work Option' },
-    { value: '0', label: 'Morning' },
-    { value: '1', label: 'Afternoon' },
-    { value: '2', label: 'Both' }
+  // Work options including "None" (3) option
+  const workOptions: ListItem[] = [
+    { id: '0' as UUID, name: WorkOption['0'] }, // Morning
+    { id: '1' as UUID, name: WorkOption['1'] }, // Afternoon
+    { id: '2' as UUID, name: WorkOption['2'] }, // Both
+    { id: '3' as UUID, name: WorkOption['3'] }  // None
   ];
 
   if (!isOpen) return null;
@@ -137,7 +139,7 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
 
         {/* Body */}
         <div className="px-6">
-          <div className="py-4 space-y-3">
+          <div className="py-4 space-y-4">
             {/* Profession Type */}
             <div className="space-y-2">
               <List
@@ -153,7 +155,7 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
             {/* Working Hours */}
             <div className="space-y-2">
               <Label htmlFor="workingHours" className="text-sm text-gray-500">
-                Working Hours (per day) <span className="text-red-500">*</span>
+                Working Hours (per day) <span className="text-red-500"> *</span>
               </Label>
               <Input
                 id="workingHours"
@@ -172,61 +174,34 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
 
             {/* Gender */}
             <div className="space-y-2">
-              <Label htmlFor="gender" className="text-sm text-gray-500">
-                Gender Preference
-              </Label>
-              <select
-                id="gender"
-                name="gender"
-                value={formData.gender}
-                onChange={(e) => handleSelectChange('gender', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
-              >
-                {genderOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <List
+                items={genderOptions}
+                selectedValue={formData.gender}
+                onSelect={(item) => handleSelectChange('gender', item.id)}
+                label="Gender Preference"
+                placeholder="Select gender preference"
+              />
             </div>
 
             {/* Work Options */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="saturdayWorkOption" className="text-sm text-gray-500">
-                  Saturday Work
-                </Label>
-                <select
-                  id="saturdayWorkOption"
-                  name="saturdayWorkOption"
-                  value={formData.saturdayWorkOption}
-                  onChange={(e) => handleSelectChange('saturdayWorkOption', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
-                >
-                  {workOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <List
+                  items={workOptions}
+                  selectedValue={formData.saturdayWorkOption}
+                  onSelect={(item) => handleSelectChange('saturdayWorkOption', item.id)}
+                  label="Saturday Work"
+                  placeholder="Select Saturday work"
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sundayWorkOption" className="text-sm text-gray-500">
-                  Sunday Work
-                </Label>
-                <select
-                  id="sundayWorkOption"
-                  name="sundayWorkOption"
-                  value={formData.sundayWorkOption}
-                  onChange={(e) => handleSelectChange('sundayWorkOption', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
-                >
-                  {workOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <List
+                  items={workOptions}
+                  selectedValue={formData.sundayWorkOption}
+                  onSelect={(item) => handleSelectChange('sundayWorkOption', item.id)}
+                  label="Sunday Work"
+                  placeholder="Select Sunday work"
+                />
               </div>
             </div>
           </div>

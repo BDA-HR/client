@@ -39,13 +39,15 @@ export type YesNoAm = typeof YesNoAm[keyof typeof YesNoAm];
 export const WorkOption = {
   "0": 'Morning',
   "1": 'Afternoon',
-  "2": 'Both'
+  "2": 'Both',
+  "3": 'None'
 } as const;
 export type WorkOption = typeof WorkOption[keyof typeof WorkOption];
 
 export const WorkOptionAm = {
   "0": 'ጠዋት',
   "1": 'ከሰዓት',
-  "2": 'ሁለቱም'
+  "2": 'ሁለቱም',
+  "3": 'ምንም'
 } as const;
 export type WorkOptionAm = typeof WorkOptionAm[keyof typeof WorkOptionAm];
