@@ -21,7 +21,7 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
   positionId, 
   onEdit, 
   viewMode, 
-  setViewMode 
+  
 }, ref) => {
   const [benefits, setBenefits] = useState<PositionBenefitListDto[]>([]);
   const [benefitSettings, setBenefitSettings] = useState<BenefitSettingDto[]>([]);
