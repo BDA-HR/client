@@ -201,7 +201,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
             </div>
 
             {/* Salary Preview */}
-            {formData.salary > 0 && (
+            {/* {formData.salary > 0 && (
               <div className={`p-3 rounded-lg border ${
                 salaryStatus === 'valid' 
                   ? 'bg-green-50 border-green-100' 
@@ -226,7 +226,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
                   )}
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
