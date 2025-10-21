@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Edit, GraduationCap, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import PositionEducationModal from './PositionEducationModal';
 import type { PositionEduListDto, PositionEduAddDto, PositionEduModDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
@@ -157,15 +157,11 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
           );
         })}
         {educations.length === 0 && (
-          <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
             <div className="p-8">
-              <GraduationCap className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2 text-lg">No Education Requirements Set</p>
               <p className="text-sm text-gray-500 mb-4">
                 No education requirements have been set for this position yet.
               </p>
             </div>
-          </div>
         )}
       </div>
 

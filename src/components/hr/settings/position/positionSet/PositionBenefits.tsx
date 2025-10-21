@@ -245,11 +245,7 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
         
         {benefits.length === 0 && (
           <div className="text-center py-12 col-span-full">
-            <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-              <Award className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2 text-lg">No Benefits Assigned for this position</p>
-              <p className="text-sm text-gray-500">Click the "Add Benefit" button to get started</p>
-            </div>
+              <p className="text-sm text-gray-500">No Benefits Assigned for this position</p>
           </div>
         )}
       </div>

@@ -54,22 +54,22 @@ interface SettingTab {
 }
 
 const settingTabs: SettingTab[] = [
-  { 
-    id: 'experience', 
-    label: 'Experience', 
-    icon: Briefcase, 
-    color: 'green'
-  },
-  { 
+    { 
     id: 'benefit', 
     label: 'Benefits', 
     icon: Award, 
     color: 'green'
   },
-  { 
+    { 
     id: 'education', 
     label: 'Education', 
     icon: GraduationCap, 
+    color: 'green'
+  },
+  { 
+    id: 'experience', 
+    label: 'Experience', 
+    icon: Briefcase, 
     color: 'green'
   },
   { 
