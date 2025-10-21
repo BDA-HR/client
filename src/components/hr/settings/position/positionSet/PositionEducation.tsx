@@ -40,6 +40,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
         listService.getAllEducationLevels(),
       ]);
       
+      // Filter educations by positionId
       const positionEducations = educationsData.filter(edu => edu.positionId === positionId);
       setEducations(positionEducations);
       setEducationLevels(educationLevelsData);
@@ -53,19 +54,28 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
   const handleSave = async (data: PositionEduAddDto | PositionEduModDto) => {
     try {
       if ('id' in data) {
+        // Update existing education
         await positionService.updatePositionEducation(data);
       } else {
-        await positionService.createPositionEducation(data);
+        // Create new education - ensure positionId is included
+        const educationData: PositionEduAddDto = {
+          ...data,
+          positionId: positionId
+        };
+        await positionService.createPositionEducation(educationData);
       }
       await fetchData();
+      setIsModalOpen(false);
+      setEditingEducation(null);
     } catch (error) {
       console.error('Error saving education:', error);
+      throw error; // Re-throw to handle in modal
     }
   };
 
   const handleEdit = (education: PositionEduListDto) => {
     setEditingEducation(education);
-    setIsModalOpen(true); // Open modal when editing
+    setIsModalOpen(true);
     onEdit(education);
   };
 
@@ -73,13 +83,15 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
     setDeletingEducation(education);
   };
 
-  const handleConfirmDelete = async (education: PositionEduListDto) => {
-    try {
-      await positionService.deletePositionEducation(education.id);
-      await fetchData();
-      setDeletingEducation(null);
-    } catch (error) {
-      console.error('Error deleting education:', error);
+  const handleConfirmDelete = async () => {
+    if (deletingEducation) {
+      try {
+        await positionService.deletePositionEducation(deletingEducation.id);
+        await fetchData();
+        setDeletingEducation(null);
+      } catch (error) {
+        console.error('Error deleting education:', error);
+      }
     }
   };
 
@@ -91,7 +103,6 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
     setIsModalOpen(false);
     setEditingEducation(null);
   };
-
 
   if (loading) {
     return (
@@ -145,15 +156,13 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
           );
         })}
         {educations.length === 0 && (
-            <div className="p-8">
-              <p className="text-sm text-gray-500 mb-4 text-center">
-                No education requirements have been set for this position yet.
-              </p>
-            </div>
+          <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+            <p className="text-gray-500 mb-4">No education requirements found for this position.</p>
+          </div>
         )}
       </div>
 
-      {/* Modal - Remove educationLevels prop */}
+      {/* Education Modal */}
       <PositionEducationModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -162,6 +171,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
         editingEducation={editingEducation}
       />
 
+      {/* Delete Confirmation Modal */}
       <DeletePositionEducationModal
         education={deletingEducation}
         isOpen={!!deletingEducation}
