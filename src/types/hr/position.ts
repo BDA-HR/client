@@ -3,7 +3,30 @@ import type { BaseDto } from './BaseDto';
 
 export type { UUID };
 
-// Main Position Types
+// Position Benefit Types (Updated)
+export interface PositionBenefitListDto extends BaseDto {
+  benefitSettingId: UUID;
+  positionId: UUID;
+  position: string;
+  positionAm: string;
+  benefitName: string;
+  perStr: string;
+  benefit: string;
+}
+
+export interface PositionBenefitAddDto {
+  benefitSettingId: UUID;
+  positionId: UUID;
+}
+
+export interface PositionBenefitModDto {
+  id: UUID;
+  benefitSettingId: UUID;
+  positionId: UUID;
+  rowVersion: string;
+}
+
+// ... rest of your existing types remain the same
 export interface PositionListDto extends BaseDto {
   departmentId: UUID;
   isVacant: '0' | '1';
@@ -57,26 +80,6 @@ export interface PositionExpModDto {
   otherPosExp: number;
   minAge: number;
   maxAge: number;
-  positionId: UUID;
-  rowVersion: string;
-}
-
-// Position Benefit Types
-export interface PositionBenefitListDto extends BaseDto {
-  benefitSettingId: UUID;
-  positionId: UUID;
-  position: string;
-  positionAm: string;
-}
-
-export interface PositionBenefitAddDto {
-  benefitSettingId: UUID;
-  positionId: UUID;
-}
-
-export interface PositionBenefitModDto {
-  id: UUID;
-  benefitSettingId: UUID;
   positionId: UUID;
   rowVersion: string;
 }

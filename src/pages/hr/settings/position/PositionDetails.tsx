@@ -40,9 +40,10 @@ import type {
   PositionBenefitListDto,
   ProfessionTypeDto,
   EducationLevelDto,
-  BenefitSettingDto
+  BenefitSettingDto,
+
 } from '../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../services/hr/positionService';
+import { positionService } from '../../../../services/hr/positionService';
 
 // Define the tab interface
 interface SettingTab {
@@ -110,19 +111,19 @@ function PositionDetails() {
   const [hasRequirement, setHasRequirement] = useState(false);
   const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false);
   const [editingRequirement, setEditingRequirement] = useState<PositionReqListDto | null>(null);
-  const [professionTypes, setProfessionTypes] = useState<ProfessionTypeDto[]>([]);
+  const [professionTypes] = useState<ProfessionTypeDto[]>([]);
   const requirementRef = useRef<any>(null);
 
   // Education modal state
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<PositionEduListDto | null>(null);
-  const [educationLevels, setEducationLevels] = useState<EducationLevelDto[]>([]);
+  const [educationLevels] = useState<EducationLevelDto[]>([]);
   const educationRef = useRef<any>(null);
 
   // Benefit modal state
   const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false);
   const [editingBenefit, setEditingBenefit] = useState<PositionBenefitListDto | null>(null);
-  const [benefitSettings, setBenefitSettings] = useState<BenefitSettingDto[]>([]);
+  const [benefitSettings] = useState<BenefitSettingDto[]>([]);
   const benefitRef = useRef<any>(null);
 
   // Grid/List view state for benefits
@@ -142,8 +143,8 @@ function PositionDetails() {
   const fetchPosition = async () => {
     try {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      const positionData = await positionService.getPosition(id!);
+      // Use actual service call
+      const positionData = await positionService.getPositionById(id!);
       setPosition(positionData);
       setError(null);
     } catch (err) {
@@ -172,9 +173,11 @@ function PositionDetails() {
   const handleSaveExperience = async (data: PositionExpAddDto | PositionExpModDto) => {
     try {
       if ('id' in data) {
-        await positionService.updatePositionExp(data.id, data);
+        // Update existing experience
+        await positionService.updatePositionExperience(data);
       } else {
-        await positionService.addPositionExp(data);
+        // Create new experience
+        await positionService.createPositionExperience(data);
         setHasExperience(true);
       }
       if (experienceRef.current && experienceRef.current.fetchExperiences) {
@@ -182,6 +185,7 @@ function PositionDetails() {
       }
     } catch (error) {
       console.error('Error saving experience:', error);
+      throw error; // Re-throw to handle in modal
     }
   };
 
@@ -204,9 +208,11 @@ function PositionDetails() {
   const handleSaveRequirement = async (data: PositionReqAddDto | PositionReqModDto) => {
     try {
       if ('id' in data) {
-        await positionService.updatePositionReq(data.id, data);
+        // Update existing requirement
+        await positionService.updatePositionRequirement(data);
       } else {
-        await positionService.addPositionReq(data);
+        // Create new requirement
+        await positionService.createPositionRequirement(data);
         setHasRequirement(true);
       }
       if (requirementRef.current && requirementRef.current.fetchRequirements) {
@@ -214,6 +220,7 @@ function PositionDetails() {
       }
     } catch (error) {
       console.error('Error saving requirement:', error);
+      throw error; // Re-throw to handle in modal
     }
   };
 
@@ -236,15 +243,18 @@ function PositionDetails() {
   const handleSaveEducation = async (data: PositionEduAddDto | PositionEduModDto) => {
     try {
       if ('id' in data) {
-        await positionService.updatePositionEdu(data.id, data);
+        // Update existing education
+        await positionService.updatePositionEducation(data);
       } else {
-        await positionService.addPositionEdu(data);
+        // Create new education
+        await positionService.createPositionEducation(data);
       }
       if (educationRef.current && educationRef.current.fetchEducations) {
         await educationRef.current.fetchEducations();
       }
     } catch (error) {
       console.error('Error saving education:', error);
+      throw error; // Re-throw to handle in modal
     }
   };
 
@@ -267,15 +277,18 @@ function PositionDetails() {
   const handleSaveBenefit = async (data: PositionBenefitAddDto | PositionBenefitModDto) => {
     try {
       if ('id' in data) {
-        await positionService.updatePositionBenefit(data.id, data);
+        // Update existing benefit
+        await positionService.updatePositionBenefit(data);
       } else {
-        await positionService.addPositionBenefit(data);
+        // Create new benefit
+        await positionService.createPositionBenefit(data);
       }
       if (benefitRef.current && benefitRef.current.fetchBenefits) {
         await benefitRef.current.fetchBenefits();
       }
     } catch (error) {
       console.error('Error saving benefit:', error);
+      throw error; // Re-throw to handle in modal
     }
   };
 
@@ -287,7 +300,7 @@ function PositionDetails() {
   // Check if position has experiences
   const checkIfHasExperience = async () => {
     try {
-      const data = await positionService.getAllPositionExp();
+      const data = await positionService.getAllPositionExperiences();
       const positionExperiences = data.filter(exp => exp.positionId === id);
       setHasExperience(positionExperiences.length > 0);
     } catch (error) {
@@ -298,7 +311,7 @@ function PositionDetails() {
   // Check if position has requirements
   const checkIfHasRequirement = async () => {
     try {
-      const data = await positionService.getAllPositionReq();
+      const data = await positionService.getAllPositionRequirements();
       const positionRequirements = data.filter(req => req.positionId === id);
       setHasRequirement(positionRequirements.length > 0);
     } catch (error) {
@@ -306,31 +319,37 @@ function PositionDetails() {
     }
   };
 
-  // Fetch profession types
+  // Fetch profession types (you'll need to implement this in your service)
   const fetchProfessionTypes = async () => {
     try {
-      const data = await lookupService.getAllProfessionTypes();
-      setProfessionTypes(data);
+      // This should be implemented in your lookup service
+      // const data = await lookupService.getAllProfessionTypes();
+      // setProfessionTypes(data);
+      console.log('Fetch profession types - implement this');
     } catch (error) {
       console.error('Error fetching profession types:', error);
     }
   };
 
-  // Fetch education levels
+  // Fetch education levels (you'll need to implement this in your service)
   const fetchEducationLevels = async () => {
     try {
-      const data = await lookupService.getAllEducationLevels();
-      setEducationLevels(data);
+      // This should be implemented in your lookup service
+      // const data = await lookupService.getAllEducationLevels();
+      // setEducationLevels(data);
+      console.log('Fetch education levels - implement this');
     } catch (error) {
       console.error('Error fetching education levels:', error);
     }
   };
 
-  // Fetch benefit settings
+  // Fetch benefit settings (you'll need to implement this in your service)
   const fetchBenefitSettings = async () => {
     try {
-      const data = await lookupService.getAllBenefitSettings();
-      setBenefitSettings(data);
+      // This should be implemented in your lookup service
+      // const data = await lookupService.getAllBenefitSettings();
+      // setBenefitSettings(data);
+      console.log('Fetch benefit settings - implement this');
     } catch (error) {
       console.error('Error fetching benefit settings:', error);
     }
@@ -362,13 +381,6 @@ function PositionDetails() {
       </div>
     );
   }
-
-  const ActiveTabComponent = {
-    experience: PositionExperience,
-    benefit: PositionBenefits,
-    education: PositionEducation,
-    requirement: PositionRequirements,
-  }[activeTab];
 
   return (
     <div className="min-h-screen space-y-4">
@@ -557,9 +569,10 @@ function PositionDetails() {
             </div>
           </div>
 
-          {/* Tab Content */}
+          {/* Tab Content with Properly Typed Conditional Rendering */}
           <div className="p-6">
-            {activeTab === 'experience' ? (
+            {/* Experience Tab */}
+            {activeTab === 'experience' && (
               <PositionExperience 
                 positionId={position.id} 
                 ref={experienceRef}
@@ -567,7 +580,10 @@ function PositionDetails() {
                 onExperienceAdded={() => setHasExperience(true)}
                 onExperienceDeleted={() => setHasExperience(false)}
               />
-            ) : activeTab === 'requirement' ? (
+            )}
+            
+            {/* Requirements Tab */}
+            {activeTab === 'requirement' && (
               <PositionRequirements 
                 positionId={position.id} 
                 ref={requirementRef}
@@ -575,13 +591,19 @@ function PositionDetails() {
                 onRequirementAdded={() => setHasRequirement(true)}
                 onRequirementDeleted={() => setHasRequirement(false)}
               />
-            ) : activeTab === 'education' ? (
+            )}
+            
+            {/* Education Tab */}
+            {activeTab === 'education' && (
               <PositionEducation 
                 positionId={position.id} 
                 ref={educationRef}
                 onEdit={handleEditEducation}
               />
-            ) : activeTab === 'benefit' ? (
+            )}
+            
+            {/* Benefits Tab */}
+            {activeTab === 'benefit' && (
               <PositionBenefits 
                 positionId={position.id} 
                 ref={benefitRef}
@@ -589,8 +611,6 @@ function PositionDetails() {
                 viewMode={benefitViewMode}
                 setViewMode={setBenefitViewMode}
               />
-            ) : (
-              <ActiveTabComponent positionId={position.id} />
             )}
           </div>
         </div>
