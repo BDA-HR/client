@@ -25,7 +25,7 @@ const PositionExperience = forwardRef(({ positionId, onEdit, onExperienceAdded, 
   const fetchExperiences = async () => {
     try {
       setLoading(true);
-      const data = await positionService.getAllPositionExp();
+      const data = await positionService.getAllPositionExperiences();
       const positionExperiences = data.filter(exp => exp.positionId === positionId);
       setExperiences(positionExperiences);
       
@@ -53,7 +53,7 @@ const PositionExperience = forwardRef(({ positionId, onEdit, onExperienceAdded, 
 
   const handleConfirmDelete = async (experience: PositionExpListDto) => {
     try {
-      await positionService.deletePositionExp(experience.id);
+      await positionService.deletePositionExperience(experience.id);
       await fetchExperiences();
       setIsDeleteModalOpen(false);
       setDeletingExperience(null);

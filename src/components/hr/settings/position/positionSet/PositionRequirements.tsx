@@ -28,7 +28,7 @@ const PositionRequirements = forwardRef(({ positionId, onEdit, onRequirementAdde
     try {
       setLoading(true);
       const [requirementsData, professionTypesData] = await Promise.all([
-        positionService.getAllPositionReq(),
+        positionService.getAllPositionRequirements(),
         lookupService.getAllProfessionTypes(),
       ]);
       
@@ -60,7 +60,7 @@ const PositionRequirements = forwardRef(({ positionId, onEdit, onRequirementAdde
 
   const handleConfirmDelete = async (requirement: PositionReqListDto) => {
     try {
-      await positionService.deletePositionReq(requirement.id);
+      await positionService.deletePositionRequirement(requirement.id);
       await fetchData();
       setIsDeleteModalOpen(false);
       setDeletingRequirement(null);
