@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, Award } from 'lucide-react';
-import { Button } from '../../../../ui/button';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { X, Award } from "lucide-react";
+import { Button } from "../../../../ui/button";
 // import { Label } from '../../../../components/ui/label';
-import List from '../../../../List/list';
-import type { PositionBenefitAddDto, PositionBenefitModDto, PositionBenefitListDto, UUID, BenefitSettingDto } from '../../../../../types/hr/position';
-import type { ListItem } from '../../../../../types/List/list';
+import List from "../../../../List/list";
+import type {
+  PositionBenefitAddDto,
+  PositionBenefitModDto,
+  PositionBenefitListDto,
+  UUID,
+  BenefitSettingDto,
+} from "../../../../../types/hr/position";
+import type { ListItem } from "../../../../../types/List/list";
 
 interface PositionBenefitsModalProps {
   isOpen: boolean;
@@ -22,9 +28,11 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
   onSave,
   positionId,
   benefitSettings,
-  editingBenefit
+  editingBenefit,
 }) => {
-  const [selectedBenefitSetting, setSelectedBenefitSetting] = useState<UUID | undefined>();
+  const [selectedBenefitSetting, setSelectedBenefitSetting] = useState<
+    UUID | undefined
+  >();
 
   useEffect(() => {
     if (editingBenefit) {
@@ -56,12 +64,14 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
     onClose();
   };
 
-  const benefitListItems: ListItem[] = benefitSettings.map(setting => ({
+  const benefitListItems: ListItem[] = benefitSettings.map((setting) => ({
     id: setting.id,
     name: setting.name,
   }));
 
-  const selectedBenefit = benefitSettings.find(bs => bs.id === selectedBenefitSetting);
+  const selectedBenefit = benefitSettings.find(
+    (bs) => bs.id === selectedBenefitSetting
+  );
 
   if (!isOpen) return null;
 
@@ -78,7 +88,7 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
           <div className="flex items-center gap-2">
             <Award size={20} />
             <h2 className="text-lg font-bold text-gray-800">
-              {editingBenefit ? 'Edit Benefit' : 'Add Benefit'}
+              {editingBenefit ? "Edit Benefit" : "Add Benefit"}
             </h2>
           </div>
           <button
@@ -127,10 +137,14 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
             {/* Current Selection Info */}
             {editingBenefit && selectedBenefit && (
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <p className="text-sm text-blue-800 font-medium mb-2">Currently Selected:</p>
+                <p className="text-sm text-blue-800 font-medium mb-2">
+                  Currently Selected:
+                </p>
                 <div className="space-y-1 text-sm">
                   <p className="text-blue-700">{selectedBenefit.name}</p>
-                  <p className="text-blue-600 text-xs">{selectedBenefit.nameAm}</p>
+                  <p className="text-blue-600 text-xs">
+                    {selectedBenefit.nameAm}
+                  </p>
                 </div>
               </div>
             )}
@@ -145,7 +159,7 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
               onClick={handleSubmit}
               disabled={!selectedBenefitSetting}
             >
-              {editingBenefit ? 'Update' : 'Save'}
+              {editingBenefit ? "Update" : "Save"}
             </Button>
             <Button
               variant="outline"

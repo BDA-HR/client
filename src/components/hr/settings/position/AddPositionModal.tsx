@@ -4,7 +4,6 @@ import { X, Loader2, BadgePlus } from "lucide-react";
 import { Button } from "../../../ui/button";
 import { Label } from "../../../ui/label";
 import { Input } from "../../../ui/input";
-import { Select } from "../../../ui/select";
 import List from "../../../List/list";
 import type { PositionAddDto } from "../../../../types/hr/position";
 import type { NameListDto, UUID } from "../../../../types/hr/NameListDto";

@@ -1,5 +1,5 @@
-import { api } from '../../api';
-import type { 
+import { api } from "../../api";
+import type {
   UUID,
   PositionListDto,
   PositionAddDto,
@@ -16,16 +16,26 @@ import type {
   PositionReqListDto,
   PositionReqAddDto,
   PositionReqModDto,
-  BenefitSettingDto
-} from '../../../types/hr/position';
-import { id } from 'date-fns/locale';
+  BenefitSettingDto,
+} from "../../../types/hr/position";
+import { id } from "date-fns/locale";
 
 class PositionService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/Position`;
-  private benefitUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionBenefit`;
-  private eduUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionEdu`;
-  private expUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionExp`;
-  private reqUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionReq`;
+  private baseUrl = `${
+    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+  }/Position`;
+  private benefitUrl = `${
+    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+  }/PositionBenefit`;
+  private eduUrl = `${
+    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+  }/PositionEdu`;
+  private expUrl = `${
+    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+  }/PositionExp`;
+  private reqUrl = `${
+    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+  }/PositionReq`;
 
   // ============ POSITION CRUD OPERATIONS ============
 
@@ -35,7 +45,7 @@ class PositionService {
       const response = await api.get(`${this.baseUrl}/AllPosition`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching positions:', error);
+      console.error("Error fetching positions:", error);
       throw error;
     }
   }
@@ -46,7 +56,7 @@ class PositionService {
       const response = await api.get(`${this.baseUrl}/GetPosition/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching position:', error);
+      console.error("Error fetching position:", error);
       throw error;
     }
   }
@@ -57,7 +67,7 @@ class PositionService {
       const response = await api.post(`${this.baseUrl}/AddPosition`, position);
       return response.data;
     } catch (error) {
-      console.error('Error creating position:', error);
+      console.error("Error creating position:", error);
       throw error;
     }
   }
@@ -65,10 +75,13 @@ class PositionService {
   // PUT: /api/core/hrmm/v1/Position/ModPosition/{id}
   async updatePosition(updateData: PositionModDto): Promise<PositionListDto> {
     try {
-      const response = await api.put(`${this.baseUrl}/ModPosition/${updateData.id}`, updateData);
+      const response = await api.put(
+        `${this.baseUrl}/ModPosition/${updateData.id}`,
+        updateData
+      );
       return response.data;
     } catch (error) {
-      console.error('Error updating position:', error);
+      console.error("Error updating position:", error);
       throw error;
     }
   }
@@ -78,53 +91,54 @@ class PositionService {
     try {
       await api.delete(`${this.baseUrl}/DelPosition/${id}`);
     } catch (error) {
-      console.error('Error deleting position:', error);
+      console.error("Error deleting position:", error);
       throw error;
     }
   }
 
   // ============ POSITION BENEFIT OPERATIONS ============
 
-  // GET: /api/core/hrmm/v1/PositionBenefit/AllPositionBenefit
-  async getAllPositionBenefits(): Promise<PositionBenefitListDto[]> {
+  // GET: /api/core/hrmm/v1/PositionBenefit/AllPositionBenefit/{id}
+  async getAllPositionBenefits(id: UUID): Promise<PositionBenefitListDto[]> {
     try {
-      const response = await api.get(`${this.benefitUrl}/AllPositionBenefit`);
+      const response = await api.get(
+        `${this.benefitUrl}/AllPositionBenefit/${id}`
+      );
       return response.data;
     } catch (error) {
-      console.error('Error fetching position benefits:', error);
-      throw error;
-    }
-  }
-
-  // GET: /api/core/hrmm/v1/PositionBenefit/GetPositionBenefit/{id}
-  async getPositionBenefitById(id: UUID): Promise<PositionBenefitListDto> {
-    try {
-      const response = await api.get(`${this.benefitUrl}/GetPositionBenefit/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching position benefit:', error);
+      console.error("Error fetching position benefits:", error);
       throw error;
     }
   }
 
   // POST: /api/core/hrmm/v1/PositionBenefit/AddPositionBenefit
-  async createPositionBenefit(benefit: PositionBenefitAddDto): Promise<PositionBenefitListDto> {
+  async createPositionBenefit(
+    benefit: PositionBenefitAddDto
+  ): Promise<PositionBenefitListDto> {
     try {
-      const response = await api.post(`${this.benefitUrl}/AddPositionBenefit`, benefit);
+      const response = await api.post(
+        `${this.benefitUrl}/AddPositionBenefit`,
+        benefit
+      );
       return response.data;
     } catch (error) {
-      console.error('Error creating position benefit:', error);
+      console.error("Error creating position benefit:", error);
       throw error;
     }
   }
 
   // PUT: /api/core/hrmm/v1/PositionBenefit/ModPositionBenefit/{id}
-  async updatePositionBenefit(updateData: PositionBenefitModDto): Promise<PositionBenefitListDto> {
+  async updatePositionBenefit(
+    updateData: PositionBenefitModDto
+  ): Promise<PositionBenefitListDto> {
     try {
-      const response = await api.put(`${this.benefitUrl}/ModPositionBenefit/${updateData.id}`, updateData);
+      const response = await api.put(
+        `${this.benefitUrl}/ModPositionBenefit/${updateData.id}`,
+        updateData
+      );
       return response.data;
     } catch (error) {
-      console.error('Error updating position benefit:', error);
+      console.error("Error updating position benefit:", error);
       throw error;
     }
   }
@@ -134,53 +148,52 @@ class PositionService {
     try {
       await api.delete(`${this.benefitUrl}/DelPositionBenefit/${id}`);
     } catch (error) {
-      console.error('Error deleting position benefit:', error);
+      console.error("Error deleting position benefit:", error);
       throw error;
     }
   }
 
   // ============ POSITION EDUCATION OPERATIONS ============
 
-  // GET: /api/core/hrmm/v1/PositionEdu/AllPositionEdu
-  async getAllPositionEducations(): Promise<PositionEduListDto[]> {
+  // GET: /api/core/hrmm/v1/PositionEdu/AllPositionEdu/{id}
+  async getAllPositionEducations(id: UUID): Promise<PositionEduListDto[]> {
     try {
-      const response = await api.get(`${this.eduUrl}/AllPositionEdu`);
+      const response = await api.get(`${this.eduUrl}/AllPositionEdu/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching position educations:', error);
-      throw error;
-    }
-  }
-
-  // GET: /api/core/hrmm/v1/PositionEdu/GetPositionEdu/{id}
-  async getPositionEducationById(id: UUID): Promise<PositionEduListDto> {
-    try {
-      const response = await api.get(`${this.eduUrl}/GetPositionEdu/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching position education:', error);
+      console.error("Error fetching position educations:", error);
       throw error;
     }
   }
 
   // POST: /api/core/hrmm/v1/PositionEdu/AddPositionEdu
-  async createPositionEducation(education: PositionEduAddDto): Promise<PositionEduListDto> {
+  async createPositionEducation(
+    education: PositionEduAddDto
+  ): Promise<PositionEduListDto> {
     try {
-      const response = await api.post(`${this.eduUrl}/AddPositionEdu`, education);
+      const response = await api.post(
+        `${this.eduUrl}/AddPositionEdu`,
+        education
+      );
       return response.data;
     } catch (error) {
-      console.error('Error creating position education:', error);
+      console.error("Error creating position education:", error);
       throw error;
     }
   }
 
   // PUT: /api/core/hrmm/v1/PositionEdu/ModPositionEdu/{id}
-  async updatePositionEducation(updateData: PositionEduModDto): Promise<PositionEduListDto> {
+  async updatePositionEducation(
+    updateData: PositionEduModDto
+  ): Promise<PositionEduListDto> {
     try {
-      const response = await api.put(`${this.eduUrl}/ModPositionEdu/${updateData.id}`, updateData);
+      const response = await api.put(
+        `${this.eduUrl}/ModPositionEdu/${updateData.id}`,
+        updateData
+      );
       return response.data;
     } catch (error) {
-      console.error('Error updating position education:', error);
+      console.error("Error updating position education:", error);
       throw error;
     }
   }
@@ -190,53 +203,52 @@ class PositionService {
     try {
       await api.delete(`${this.eduUrl}/DelPositionEdu/${id}`);
     } catch (error) {
-      console.error('Error deleting position education:', error);
+      console.error("Error deleting position education:", error);
       throw error;
     }
   }
 
   // ============ POSITION EXPERIENCE OPERATIONS ============
 
-  // GET: /api/core/hrmm/v1/PositionExp/AllPositionExp
-  async getAllPositionExperiences(): Promise<PositionExpListDto[]> {
+  // GET: /api/core/hrmm/v1/PositionExp/AllPositionExp/{id}
+  async getAllPositionExperiences(id: UUID): Promise<PositionExpListDto[]> {
     try {
-      const response = await api.get(`${this.expUrl}/AllPositionExp`);
+      const response = await api.get(`${this.expUrl}/AllPositionExp/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching position experiences:', error);
-      throw error;
-    }
-  }
-
-  // GET: /api/core/hrmm/v1/PositionExp/GetPositionExp/{id}
-  async getPositionExperienceById(id: UUID): Promise<PositionExpListDto> {
-    try {
-      const response = await api.get(`${this.expUrl}/GetPositionExp/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching position experience:', error);
+      console.error("Error fetching position experiences:", error);
       throw error;
     }
   }
 
   // POST: /api/core/hrmm/v1/PositionExp/AddPositionExp
-  async createPositionExperience(experience: PositionExpAddDto): Promise<PositionExpListDto> {
+  async createPositionExperience(
+    experience: PositionExpAddDto
+  ): Promise<PositionExpListDto> {
     try {
-      const response = await api.post(`${this.expUrl}/AddPositionExp`, experience);
+      const response = await api.post(
+        `${this.expUrl}/AddPositionExp`,
+        experience
+      );
       return response.data;
     } catch (error) {
-      console.error('Error creating position experience:', error);
+      console.error("Error creating position experience:", error);
       throw error;
     }
   }
 
   // PUT: /api/core/hrmm/v1/PositionExp/ModPositionExp/{id}
-  async updatePositionExperience(updateData: PositionExpModDto): Promise<PositionExpListDto> {
+  async updatePositionExperience(
+    updateData: PositionExpModDto
+  ): Promise<PositionExpListDto> {
     try {
-      const response = await api.put(`${this.expUrl}/ModPositionExp/${updateData.id}`, updateData);
+      const response = await api.put(
+        `${this.expUrl}/ModPositionExp/${updateData.id}`,
+        updateData
+      );
       return response.data;
     } catch (error) {
-      console.error('Error updating position experience:', error);
+      console.error("Error updating position experience:", error);
       throw error;
     }
   }
@@ -246,53 +258,52 @@ class PositionService {
     try {
       await api.delete(`${this.expUrl}/DelPositionExp/${id}`);
     } catch (error) {
-      console.error('Error deleting position experience:', error);
+      console.error("Error deleting position experience:", error);
       throw error;
     }
   }
 
   // ============ POSITION REQUIREMENT OPERATIONS ============
 
-  // GET: /api/core/hrmm/v1/PositionReq/AllPositionReq
-  async getAllPositionRequirements(): Promise<PositionReqListDto[]> {
+  // GET: /api/core/hrmm/v1/PositionReq/AllPositionReq/{id}
+  async getAllPositionRequirements(id: UUID): Promise<PositionReqListDto[]> {
     try {
       const response = await api.get(`${this.reqUrl}/AllPositionReq/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching position requirements:', error);
-      throw error;
-    }
-  }
-
-  // GET: /api/core/hrmm/v1/PositionReq/GetPositionReq/{id}
-  async getPositionRequirementById(id: UUID): Promise<PositionReqListDto> {
-    try {
-      const response = await api.get(`${this.reqUrl}/GetPositionReq/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching position requirement:', error);
+      console.error("Error fetching position requirements:", error);
       throw error;
     }
   }
 
   // POST: /api/core/hrmm/v1/PositionReq/AddPositionReq
-  async createPositionRequirement(requirement: PositionReqAddDto): Promise<PositionReqListDto> {
+  async createPositionRequirement(
+    requirement: PositionReqAddDto
+  ): Promise<PositionReqListDto> {
     try {
-      const response = await api.post(`${this.reqUrl}/AddPositionReq`, requirement);
+      const response = await api.post(
+        `${this.reqUrl}/AddPositionReq`,
+        requirement
+      );
       return response.data;
     } catch (error) {
-      console.error('Error creating position requirement:', error);
+      console.error("Error creating position requirement:", error);
       throw error;
     }
   }
 
   // PUT: /api/core/hrmm/v1/PositionReq/ModPositionReq/{id}
-  async updatePositionRequirement(updateData: PositionReqModDto): Promise<PositionReqListDto> {
+  async updatePositionRequirement(
+    updateData: PositionReqModDto
+  ): Promise<PositionReqListDto> {
     try {
-      const response = await api.put(`${this.reqUrl}/ModPositionReq/${updateData.id}`, updateData);
+      const response = await api.put(
+        `${this.reqUrl}/ModPositionReq/${updateData.id}`,
+        updateData
+      );
       return response.data;
     } catch (error) {
-      console.error('Error updating position requirement:', error);
+      console.error("Error updating position requirement:", error);
       throw error;
     }
   }
@@ -302,22 +313,22 @@ class PositionService {
     try {
       await api.delete(`${this.reqUrl}/DelPositionReq/${id}`);
     } catch (error) {
-      console.error('Error deleting position requirement:', error);
+      console.error("Error deleting position requirement:", error);
       throw error;
     }
   }
 }
 
 class LookupService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}`;
+  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"}`;
 
-  // GET: /api/core/hrmm/v1/BenefitSet/AllBenefitSet
+  // GET: /api/core/hrmm/v1/Names/AllBenefitSetName
   async getAllBenefitSettings(): Promise<BenefitSettingDto[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/BenefitSet/AllBenefitSetName`);
+      const response = await api.get(`${this.baseUrl}/Names/AllBenefitSetName`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching benefit settings:', error);
+      console.error("Error fetching benefit settings:", error);
       throw error;
     }
   }
