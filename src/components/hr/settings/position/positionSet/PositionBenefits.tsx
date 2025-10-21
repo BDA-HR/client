@@ -43,7 +43,7 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
     try {
       setLoading(true);
       const [benefitsData, benefitSettingsData] = await Promise.all([
-        positionService.getAllPositionBenefit(),
+        positionService.getAllPositionBenefits(),
         lookupService.getAllBenefitSettings(),
       ]);
       
@@ -60,9 +60,9 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
   const handleSave = async (data: PositionBenefitAddDto | PositionBenefitModDto) => {
     try {
       if ('id' in data) {
-        await positionService.updatePositionBenefit(data.id, data);
+        await positionService.updatePositionBenefit(data);
       } else {
-        await positionService.addPositionBenefit(data);
+        await positionService.createPositionBenefit(data);
       }
       await fetchData();
     } catch (error) {

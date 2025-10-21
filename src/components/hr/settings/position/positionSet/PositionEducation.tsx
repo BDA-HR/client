@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, GraduationCap, Trash2 } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import PositionEducationModal from './PositionEducationModal';
 import type { PositionEduListDto, PositionEduAddDto, PositionEduModDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
@@ -35,7 +35,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
     try {
       setLoading(true);
       const [educationsData, educationLevelsData] = await Promise.all([
-        positionService.getAllPositionEdu(),
+        positionService.getAllPositionEducations(),
         lookupService.getAllEducationLevels(),
       ]);
       
@@ -52,9 +52,9 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
   const handleSave = async (data: PositionEduAddDto | PositionEduModDto) => {
     try {
       if ('id' in data) {
-        await positionService.updatePositionEdu(data.id, data);
+        await positionService.updatePositionEducation(data);
       } else {
-        await positionService.addPositionEdu(data);
+        await positionService.createPositionEducation(data);
       }
       await fetchData();
     } catch (error) {
@@ -64,6 +64,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
 
   const handleEdit = (education: PositionEduListDto) => {
     setEditingEducation(education);
+    setIsModalOpen(true); // Open modal when editing
     onEdit(education);
   };
 
@@ -73,7 +74,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
 
   const handleConfirmDelete = async (education: PositionEduListDto) => {
     try {
-      await positionService.deletePositionEdu(education.id);
+      await positionService.deletePositionEducation(education.id);
       await fetchData();
       setDeletingEducation(null);
     } catch (error) {
@@ -90,6 +91,11 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
     setEditingEducation(null);
   };
 
+  const handleAddEducation = () => {
+    setEditingEducation(null);
+    setIsModalOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -101,20 +107,29 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
 
   return (
     <div className="space-y-6">
+      {/* Add Education Button */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleAddEducation}
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          Add Education Requirement
+        </Button>
+      </div>
+
       <div className="space-y-4">
         {educations.map((education) => {
           const educationLevel = educationLevels.find(el => el.id === education.educationLevelId);
           return (
-            <div key={education.id} className="border border-gray-200 rounded-lg p-4">
+            <div key={education.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
               <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-semibold">{educationLevel?.name || 'Unknown Level'}</h4>
-                                    <p className="text-sm text-gray-500">
-{educationLevel?.nameAm || 'N/A'}
-                  </p>
-                  <p className="text-sm text-gray-600">{education.position}</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Qualification: {education.educationQual}
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 text-lg">
+                    {educationLevel?.name || 'Unknown Level'}
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-1">{education.position}</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    <span className="font-medium">Qualification:</span> {education.educationQual}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -131,7 +146,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(education)}
-                    className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                    className="flex items-center gap-1 text-red-600 hover:text-red-700 border-red-300 hover:bg-red-50"
                   >
                     <Trash2 className="h-3 w-3" />
                     Delete
@@ -142,18 +157,30 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
           );
         })}
         {educations.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No education requirements set for this position.
+          <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+            <div className="p-8">
+              <GraduationCap className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 mb-2 text-lg">No Education Requirements Set</p>
+              <p className="text-sm text-gray-500 mb-4">
+                No education requirements have been set for this position yet.
+              </p>
+              <Button
+                onClick={handleAddEducation}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Add Education Requirement
+              </Button>
+            </div>
           </div>
         )}
       </div>
 
+      {/* Modal - Remove educationLevels prop */}
       <PositionEducationModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSave}
         positionId={positionId}
-        educationLevels={educationLevels}
         editingEducation={editingEducation}
       />
 
