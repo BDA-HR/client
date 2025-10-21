@@ -38,12 +38,9 @@ const PositionExperience = forwardRef(
     const fetchExperiences = async () => {
       try {
         setLoading(true);
-        const data = await positionService.getAllPositionExperiences(
-          positionId
-        );
-        const positionExperiences = data.filter(
-          (exp) => exp.positionId === positionId
-        );
+        const positionExperiences =
+          await positionService.getAllPositionExperiences(positionId);
+
         setExperiences(positionExperiences);
 
         // Notify parent about experience status

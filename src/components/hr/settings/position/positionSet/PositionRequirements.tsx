@@ -1,12 +1,15 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Edit, Trash2, Settings } from 'lucide-react';
-import { Button } from '../../../../ui/button';
-import DeletePositionRequirementsModal from './DeletePositionRequirementsModal';
-import type { PositionReqListDto, UUID } from '../../../../../types/hr/position';
-import { positionService } from '../../../../../services/hr/settings/positionService';
-import { PositionGender, WorkOption } from '../../../../../types/hr/enum';
-import { listService } from '../../../../../services/List/listservice';
-import type { ListItem } from '../../../../../types/List/list';
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { Edit, Trash2, Settings } from "lucide-react";
+import { Button } from "../../../../ui/button";
+import DeletePositionRequirementsModal from "./DeletePositionRequirementsModal";
+import type {
+  PositionReqListDto,
+  UUID,
+} from "../../../../../types/hr/position";
+import { positionService } from "../../../../../services/hr/settings/positionService";
+import { PositionGender, WorkOption } from "../../../../../types/hr/enum";
+import { listService } from "../../../../../services/List/listservice";
+import type { ListItem } from "../../../../../types/List/list";
 
 interface PositionRequirementsProps {
   positionId: UUID;
@@ -19,17 +22,16 @@ export interface PositionRequirementsRef {
   fetchRequirements: () => Promise<void>;
 }
 
-const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequirementsProps>(({ 
-  positionId, 
-  onEdit, 
-  onRequirementAdded, 
-  onRequirementDeleted 
-}, ref) => {
+const PositionRequirements = forwardRef<
+  PositionRequirementsRef,
+  PositionRequirementsProps
+>(({ positionId, onEdit, onRequirementAdded, onRequirementDeleted }, ref) => {
   const [requirements, setRequirements] = useState<PositionReqListDto[]>([]);
   const [professionTypes, setProfessionTypes] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deletingRequirement, setDeletingRequirement] = useState<PositionReqListDto | null>(null);
+  const [deletingRequirement, setDeletingRequirement] =
+    useState<PositionReqListDto | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -39,11 +41,13 @@ const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequire
     try {
       setLoading(true);
       const [requirementsData, professionTypesData] = await Promise.all([
-        positionService.getAllPositionRequirements(),
+        positionService.getAllPositionRequirements(positionId),
         listService.getAllProfessionTypes(),
       ]);
-      
-      const positionRequirements = requirementsData.filter(req => req.positionId === positionId);
+
+      const positionRequirements = requirementsData.filter(
+        (req) => req.positionId === positionId
+      );
       setRequirements(positionRequirements);
       setProfessionTypes(professionTypesData);
 
@@ -52,7 +56,7 @@ const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequire
         onRequirementAdded();
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
@@ -75,13 +79,13 @@ const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequire
       await fetchData();
       setIsDeleteModalOpen(false);
       setDeletingRequirement(null);
-      
+
       // Notify parent that requirement was deleted
       if (onRequirementDeleted) {
         onRequirementDeleted();
       }
     } catch (error) {
-      console.error('Error deleting requirement:', error);
+      console.error("Error deleting requirement:", error);
     }
   };
 
@@ -92,7 +96,7 @@ const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequire
 
   // Expose fetchData to parent via ref
   useImperativeHandle(ref, () => ({
-    fetchRequirements: fetchData
+    fetchRequirements: fetchData,
   }));
 
   if (loading) {
@@ -108,9 +112,14 @@ const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequire
     <div className="space-y-6">
       <div className="space-y-4">
         {requirements.map((requirement) => {
-          const professionType = professionTypes.find(pt => pt.id === requirement.professionTypeId);
+          const professionType = professionTypes.find(
+            (pt) => pt.id === requirement.professionTypeId
+          );
           return (
-            <div key={requirement.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+            <div
+              key={requirement.id}
+              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex items-start space-x-4 flex-1">
                   <div className="p-3 bg-green-100 rounded-lg">
@@ -119,27 +128,51 @@ const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequire
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 flex-1">
                     <div>
                       <p className="text-sm text-gray-500">Profession Type</p>
-                      <p className="font-semibold text-gray-900">{professionType?.name || 'Unknown'}</p>
+                      <p className="font-semibold text-gray-900">
+                        {professionType?.name || "Unknown"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Working Hours</p>
-                      <p className="font-semibold text-gray-900">{requirement.workingHours} hours/day</p>
+                      <p className="font-semibold text-gray-900">
+                        {requirement.workingHours} hours/day
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Gender</p>
-                      <p className="font-semibold text-gray-900">{PositionGender[requirement.gender as keyof typeof PositionGender]}</p>
+                      <p className="font-semibold text-gray-900">
+                        {
+                          PositionGender[
+                            requirement.gender as keyof typeof PositionGender
+                          ]
+                        }
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Saturday Work</p>
-                      <p className="font-semibold text-gray-900">{WorkOption[requirement.saturdayWorkOption as keyof typeof WorkOption]}</p>
+                      <p className="font-semibold text-gray-900">
+                        {
+                          WorkOption[
+                            requirement.saturdayWorkOption as keyof typeof WorkOption
+                          ]
+                        }
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Sunday Work</p>
-                      <p className="font-semibold text-gray-900">{WorkOption[requirement.sundayWorkOption as keyof typeof WorkOption]}</p>
+                      <p className="font-semibold text-gray-900">
+                        {
+                          WorkOption[
+                            requirement.sundayWorkOption as keyof typeof WorkOption
+                          ]
+                        }
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Position</p>
-                      <p className="font-semibold text-gray-900">{requirement.position}</p>
+                      <p className="font-semibold text-gray-900">
+                        {requirement.position}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -169,7 +202,9 @@ const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequire
         })}
         {requirements.length === 0 && (
           <div className="text-center py-6">
-            <p className="text-gray-600 mb-4">No Requirements Assigned for this position</p>
+            <p className="text-gray-600 mb-4">
+              No Requirements Assigned for this position
+            </p>
           </div>
         )}
       </div>

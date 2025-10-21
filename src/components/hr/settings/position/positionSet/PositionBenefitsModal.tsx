@@ -9,7 +9,6 @@ import type {
   PositionBenefitModDto,
   PositionBenefitListDto,
   UUID,
-  BenefitSettingDto,
 } from "../../../../../types/hr/position";
 import type { ListItem } from "../../../../../types/List/list";
 
@@ -18,7 +17,7 @@ interface PositionBenefitsModalProps {
   onClose: () => void;
   onSave: (data: PositionBenefitAddDto | PositionBenefitModDto) => void;
   positionId: UUID;
-  benefitSettings: BenefitSettingDto[];
+  benefitSettings: ListItem[];
   editingBenefit?: PositionBenefitListDto | null;
 }
 
@@ -143,7 +142,7 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
                 <div className="space-y-1 text-sm">
                   <p className="text-blue-700">{selectedBenefit.name}</p>
                   <p className="text-blue-600 text-xs">
-                    {selectedBenefit.nameAm}
+                    {selectedBenefit.name}
                   </p>
                 </div>
               </div>

@@ -16,12 +16,10 @@ import type {
   PositionReqListDto,
   PositionReqAddDto,
   PositionReqModDto,
-  BenefitSettingDto,
 } from "../../../types/hr/position";
-import { id } from "date-fns/locale";
+import type { ListItem } from "../../../types/List/list";
 
 class PositionService {
-<<<<<<< HEAD
   private baseUrl = `${
     import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
   }/Position`;
@@ -37,13 +35,6 @@ class PositionService {
   private reqUrl = `${
     import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
   }/PositionReq`;
-=======
-  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/Position`;
-  private benefitUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionBenefit`;
-  private eduUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionEdu`;
-  private expUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionExp`;
-  private reqUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionReq`;
->>>>>>> 8bd3c09713c14fba4e43073e58afd78d6e2dc0b2
 
   // ============ POSITION CRUD OPERATIONS ============
 
@@ -331,7 +322,7 @@ class LookupService {
   private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"}`;
 
   // GET: /api/core/hrmm/v1/Names/AllBenefitSetName
-  async getAllBenefitSettings(): Promise<BenefitSettingDto[]> {
+  async getAllBenefitSettings(): Promise<ListItem[]> {
     try {
       const response = await api.get(`${this.baseUrl}/Names/AllBenefitSetName`);
       return response.data;
