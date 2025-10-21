@@ -1,14 +1,21 @@
-import React, { useState, useRef } from 'react';
-import { Users, Building, MoreVertical, Edit, Trash2, ArrowRight } from 'lucide-react';
-import { Button } from '../../../ui/button';
-import type { PositionListDto } from '../../../../types/hr/position';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef } from "react";
+import {
+  Users,
+  Building,
+  MoreVertical,
+  Edit,
+  Trash2,
+  ArrowRight,
+} from "lucide-react";
+import { Button } from "../../../ui/button";
+import type { PositionListDto } from "../../../../types/hr/position";
+import { useNavigate } from "react-router-dom";
 
 interface PositionCardProps {
   position: PositionListDto;
   expanded: boolean;
   onToggleExpand: () => void;
-  viewMode: 'grid' | 'list';
+  viewMode: "grid" | "list";
   onEdit: (position: PositionListDto) => void;
   onDelete: (position: PositionListDto) => void;
 }
@@ -17,15 +24,11 @@ const PositionCard: React.FC<PositionCardProps> = ({
   position,
   viewMode,
   onEdit,
-  onDelete
+  onDelete,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-
-
-  
 
   // Close menu when clicking outside
   React.useEffect(() => {
@@ -35,8 +38,8 @@ const PositionCard: React.FC<PositionCardProps> = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleEdit = (e: React.MouseEvent) => {
@@ -54,7 +57,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
   // Navigate to position details page with the 4 sub-cards
   const handleCardClick = () => {
     navigate(`/hr/settings/position/${position.id}`, {
-      state: { position }
+      state: { position },
     });
   };
 
@@ -67,10 +70,10 @@ const PositionCard: React.FC<PositionCardProps> = ({
     <div
       onClick={handleCardClick}
       className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-shadow relative cursor-pointer group ${
-        viewMode === 'grid' ? 'p-5' : 'p-4 flex items-start'
+        viewMode === "grid" ? "p-5" : "p-4 flex items-start"
       }`}
     >
-      {viewMode === 'grid' ? (
+      {viewMode === "grid" ? (
         <>
           {/* Header Section with proper spacing */}
           <div className="flex items-start justify-between mb-4">
@@ -85,13 +88,9 @@ const PositionCard: React.FC<PositionCardProps> = ({
                 <p className="text-sm text-gray-600 mt-1 truncate">
                   {position.nameAm}
                 </p>
-                <div className="flex items-center text-sm text-gray-500 mt-1">
-                  <Building className="h-4 w-4 mr-1 flex-shrink-0" />
-                  <span className="truncate">{position.department}</span>
-                </div>
               </div>
             </div>
-            
+
             {/* Right side with menu only - removed vacancy badge */}
             <div className="flex items-center gap-3 ml-4 flex-shrink-0">
               {/* More Options Menu */}
@@ -126,11 +125,13 @@ const PositionCard: React.FC<PositionCardProps> = ({
               </div>
             </div>
           </div>
-          
+
           {/* Position Information */}
           <div className="space-y-3 text-sm">
             <div className="bg-green-50 p-3 rounded-lg">
-              <p className="font-medium text-green-800 mb-2">Position Details</p>
+              <p className="font-medium text-green-800 mb-2">
+                Position Details
+              </p>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Number of Positions:</span>
@@ -138,11 +139,19 @@ const PositionCard: React.FC<PositionCardProps> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Department:</span>
-                  <span className="font-semibold text-sm truncate max-w-[120px]">{position.department}</span>
+                  <span className="font-semibold text-sm truncate max-w-[120px]">
+                    {position.department}
+                  </span>
                 </div>
                 <div className="flex justify-between border-t border-green-200 pt-2 mt-2">
-                  <span className="text-gray-600 font-medium">Status:</span>
-                  <span className={`font-bold ${position.isVacant === '1' ? 'text-green-600' : 'text-gray-600'}`}>
+                  <span className="text-gray-600 font-medium">Is Vacant?</span>
+                  <span
+                    className={`font-bold ${
+                      position.isVacant === "1"
+                        ? "text-green-600"
+                        : "text-gray-600"
+                    }`}
+                  >
                     {position.isVacantStr}
                   </span>
                 </div>
@@ -173,7 +182,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
                   <span className="truncate">{position.department}</span>
                 </div>
               </div>
-              
+
               {/* Right side with menu and arrow - removed vacancy badge */}
               <div className="flex items-center gap-3 flex-shrink-0">
                 {/* More Options Menu */}
@@ -206,11 +215,11 @@ const PositionCard: React.FC<PositionCardProps> = ({
                     </div>
                   )}
                 </div>
-                
+
                 <ArrowRight className="h-4 w-4 text-green-500" />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
               <div>
                 <p className="text-xs text-gray-500">Positions</p>
@@ -222,12 +231,17 @@ const PositionCard: React.FC<PositionCardProps> = ({
               </div>
               <div>
                 <p className="text-xs text-gray-500">Status</p>
-                <p className={`font-semibold ${position.isVacant === '1' ? 'text-green-600' : 'text-gray-600'}`}>
+                <p
+                  className={`font-semibold ${
+                    position.isVacant === "1"
+                      ? "text-green-600"
+                      : "text-gray-600"
+                  }`}
+                >
                   {position.isVacantStr}
                 </p>
               </div>
             </div>
-
           </div>
         </>
       )}

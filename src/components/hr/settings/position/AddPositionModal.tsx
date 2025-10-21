@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { X, Loader2, BadgePlus } from 'lucide-react';
-import { Button } from '../../../ui/button';
-import { Label } from '../../../ui/label';
-import { Input } from '../../../ui/input';
-import List from '../../../List/list';
-import type { PositionAddDto } from '../../../../types/hr/position';
-import type { NameListDto, UUID } from '../../../../types/hr/NameListDto';
-import type { ListItem } from '../../../../types/List/list';
-import { departmentService } from '../../../../services/core/deptservice';
-import { amharicRegex } from '../../../../utils/amharic-regex';
+import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { X, Loader2, BadgePlus } from "lucide-react";
+import { Button } from "../../../ui/button";
+import { Label } from "../../../ui/label";
+import { Input } from "../../../ui/input";
+import { Select } from "../../../ui/select";
+import List from "../../../List/list";
+import type { PositionAddDto } from "../../../../types/hr/position";
+import type { NameListDto, UUID } from "../../../../types/hr/NameListDto";
+import type { ListItem } from "../../../../types/List/list";
+import { departmentService } from "../../../../services/core/deptservice";
+import { amharicRegex } from "../../../../utils/amharic-regex";
 
 interface AddPositionModalProps {
   isOpen: boolean;
@@ -23,25 +24,27 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
   onAddPosition,
 }) => {
   const [formData, setFormData] = useState<PositionAddDto>({
-    name: '',
-    nameAm: '',
+    name: "",
+    nameAm: "",
     noOfPosition: 1,
-    isVacant: '1',
-    departmentId: '' as UUID,
+    isVacant: "1",
+    departmentId: "" as UUID,
   });
 
   const [departments, setDepartments] = useState<NameListDto[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<UUID | undefined>(undefined);
+  const [selectedDepartment, setSelectedDepartment] = useState<
+    UUID | undefined
+  >(undefined);
 
   // Wrap handleClose in useCallback to prevent unnecessary re-renders
   const handleClose = useCallback(() => {
     setFormData({
-      name: '',
-      nameAm: '',
+      name: "",
+      nameAm: "",
       noOfPosition: 1,
-      isVacant: '1',
-      departmentId: '' as UUID,
+      isVacant: "1",
+      departmentId: "" as UUID,
     });
     setSelectedDepartment(undefined);
     onClose();
@@ -51,19 +54,19 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
   useEffect(() => {
     const fetchDepartments = async () => {
       if (!isOpen) return;
-      
+
       setLoading(true);
       try {
         const depts = await departmentService.getAllDepartments();
         setDepartments(depts);
-        
+
         // Set first department as default if none selected
         if (depts.length > 0 && !selectedDepartment) {
           setSelectedDepartment(depts[0].id);
-          setFormData(prev => ({ ...prev, departmentId: depts[0].id }));
+          setFormData((prev) => ({ ...prev, departmentId: depts[0].id }));
         }
       } catch (err) {
-        console.error('Error fetching departments:', err);
+        console.error("Error fetching departments:", err);
       } finally {
         setLoading(false);
       }
@@ -76,50 +79,60 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        name: '',
-        nameAm: '',
+        name: "",
+        nameAm: "",
         noOfPosition: 1,
-        isVacant: '1',
-        departmentId: departments.length > 0 ? departments[0].id : '' as UUID,
+        isVacant: "1",
+        departmentId: departments.length > 0 ? departments[0].id : ("" as UUID),
       });
-      setSelectedDepartment(departments.length > 0 ? departments[0].id : undefined);
+      setSelectedDepartment(
+        departments.length > 0 ? departments[0].id : undefined
+      );
     }
   }, [isOpen, departments]);
 
   // Convert departments to ListItem format
-  const departmentListItems: ListItem[] = departments.map(dept => ({
+  const departmentListItems: ListItem[] = departments.map((dept) => ({
     id: dept.id,
-    name: dept.name
+    name: dept.name,
   }));
 
   const handleSelectDepartment = (item: ListItem) => {
     setSelectedDepartment(item.id);
-    setFormData(prev => ({ ...prev, departmentId: item.id }));
+    setFormData((prev) => ({ ...prev, departmentId: item.id }));
   };
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === '' || amharicRegex.test(value)) {
-      setFormData((prev) => ({ 
-        ...prev, 
-        nameAm: value 
+    if (value === "" || amharicRegex.test(value)) {
+      setFormData((prev) => ({
+        ...prev,
+        nameAm: value,
       }));
     }
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: name === 'noOfPosition' ? Number(value) : value 
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "noOfPosition" ? Number(value) : value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission
-    if (!formData.name.trim() || !formData.nameAm.trim() || formData.noOfPosition <= 0 || !formData.departmentId) return;
+    if (
+      !formData.name.trim() ||
+      !formData.nameAm.trim() ||
+      formData.noOfPosition <= 0 ||
+      !formData.departmentId
+    )
+      return;
 
     onAddPosition(formData);
     handleClose();
@@ -128,13 +141,13 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
   // Add escape key to close
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         handleClose();
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, handleClose]); // Now handleClose is stable due to useCallback
 
   if (!isOpen) return null;
@@ -177,13 +190,21 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                   required
                   disabled={loading}
                 />
-                {loading && <p className="text-sm text-gray-500">Loading departments...</p>}
+                {loading && (
+                  <p className="text-sm text-gray-500">
+                    Loading departments...
+                  </p>
+                )}
               </div>
 
               {/* Position Name (English) */}
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm text-gray-700 font-medium">
-                  Position Name (English) <span className="text-red-500">*</span>
+                <Label
+                  htmlFor="name"
+                  className="text-sm text-gray-700 font-medium"
+                >
+                  Position Name (English){" "}
+                  <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="name"
@@ -198,8 +219,12 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
 
               {/* Position Name (Amharic) */}
               <div className="space-y-2">
-                <Label htmlFor="nameAm" className="text-sm text-gray-700 font-medium">
-                  Position Name (Amharic) <span className="text-red-500">*</span>
+                <Label
+                  htmlFor="nameAm"
+                  className="text-sm text-gray-700 font-medium"
+                >
+                  Position Name (Amharic){" "}
+                  <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="nameAm"
@@ -215,7 +240,10 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
               {/* Number of Positions and Vacancy Status */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="noOfPosition" className="text-sm text-gray-700 font-medium">
+                  <Label
+                    htmlFor="noOfPosition"
+                    className="text-sm text-gray-700 font-medium"
+                  >
                     Number of Positions <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -230,10 +258,13 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="isVacant" className="text-sm text-gray-700 font-medium">
-                    Vacancy Status <span className="text-red-500">*</span>
+                  <Label
+                    htmlFor="isVacant"
+                    className="text-sm text-gray-700 font-medium"
+                  >
+                    Is Vacant? <span className="text-red-500">*</span>
                   </Label>
                   <select
                     id="isVacant"
@@ -243,8 +274,8 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   >
-                    <option value="1">Vacant</option>
-                    <option value="0">Filled</option>
+                    <option value="0">YES</option>
+                    <option value="1">NO</option>
                   </select>
                 </div>
               </div>
@@ -302,8 +333,8 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                 className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
                 type="submit"
                 disabled={
-                  !formData.name.trim() || 
-                  !formData.nameAm.trim() || 
+                  !formData.name.trim() ||
+                  !formData.nameAm.trim() ||
                   formData.noOfPosition <= 0 ||
                   !formData.departmentId
                 }
@@ -314,7 +345,7 @@ const AddPositionModal: React.FC<AddPositionModalProps> = ({
                     Loading...
                   </>
                 ) : (
-                  'Save'
+                  "Save"
                 )}
               </Button>
             </div>
