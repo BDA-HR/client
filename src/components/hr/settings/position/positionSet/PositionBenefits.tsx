@@ -8,12 +8,8 @@ import type {
   PositionBenefitAddDto,
   PositionBenefitModDto,
   UUID,
-  BenefitSettingDto,
 } from "../../../../../types/hr/position";
-import {
-  positionService,
-  lookupService,
-} from "../../../../../services/hr/settings/positionService";
+import { positionService } from "../../../../../services/hr/settings/positionService";
 
 interface PositionBenefitsProps {
   positionId: UUID;
@@ -29,9 +25,6 @@ export interface PositionBenefitsRef {
 const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
   ({ positionId, onEdit, viewMode }, ref) => {
     const [benefits, setBenefits] = useState<PositionBenefitListDto[]>([]);
-    const [benefitSettings, setBenefitSettings] = useState<BenefitSettingDto[]>(
-      []
-    );
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -51,18 +44,14 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [benefitsData, benefitSettingsData] = await Promise.all([
-          positionService.getAllPositionBenefits(positionId),
-          lookupService.getAllBenefitSettings(),
-        ]);
-
+        const benefitsData = await positionService.getAllPositionBenefits(positionId);
+        
         const positionBenefits = benefitsData.filter(
           (benefit) => benefit.positionId === positionId
         );
         setBenefits(positionBenefits);
-        setBenefitSettings(benefitSettingsData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching benefits:", error);
       } finally {
         setLoading(false);
       }
@@ -141,9 +130,6 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
           }
         >
           {benefits.map((benefit) => {
-            const benefitSetting = benefitSettings.find(
-              (bs) => bs.id === benefit.benefitSettingId
-            );
             const amount = getRandomAmount();
 
             if (viewMode === "grid") {
@@ -162,13 +148,8 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
 
                     {/* Benefit Name */}
                     <h4 className="font-semibold text-gray-900 text-lg mb-2">
-                      {benefitSetting?.name || "Unknown Benefit"}
+                      {benefit.benefitName || "Unknown Benefit"}
                     </h4>
-
-                    {/* Amharic Name */}
-                    <p className="text-sm text-gray-500 mb-3">
-                      {benefitSetting?.nameAm || "N/A"}
-                    </p>
 
                     {/* Position */}
                     <p className="text-sm text-gray-600 mb-4">
@@ -221,13 +202,8 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
                       <div className="flex-1">
                         {/* Benefit Name */}
                         <h4 className="font-semibold text-gray-900 text-lg mb-1">
-                          {benefitSetting?.name || "Unknown Benefit"}
+                          {benefit.benefitName || "Unknown Benefit"}
                         </h4>
-
-                        {/* Amharic Name */}
-                        <p className="text-sm text-gray-500 mb-2">
-                          {benefitSetting?.nameAm || "N/A"}
-                        </p>
 
                         {/* Position */}
                         <p className="text-sm text-gray-600 font-medium">
@@ -281,7 +257,6 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
           onClose={handleCloseModal}
           onSave={handleSave}
           positionId={positionId}
-          benefitSettings={benefitSettings}
           editingBenefit={editingBenefit}
         />
 

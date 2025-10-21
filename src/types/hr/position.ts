@@ -127,8 +127,8 @@ export interface PositionReqListDto extends BaseDto {
 
 export interface PositionReqAddDto {
   gender: '0' | '1' | '2';
-  saturdayWorkOption: '0' | '1' | '2';
-  sundayWorkOption: '0' | '1' | '2';
+  saturdayWorkOption: '0' | '1' | '2' | '3';
+  sundayWorkOption: '0' | '1' | '2' | '3';
   workingHours: number;
   professionTypeId: UUID;
   positionId: UUID;
@@ -137,8 +137,8 @@ export interface PositionReqAddDto {
 export interface PositionReqModDto {
   id: UUID;
   gender: '0' | '1' | '2';
-  saturdayWorkOption: '0' | '1' | '2';
-  sundayWorkOption: '0' | '1' | '2';
+  saturdayWorkOption: '0' | '1' | '2' | '3';
+  sundayWorkOption: '0' | '1' | '2' | '3';
   workingHours: number;
   professionTypeId: UUID;
   positionId: UUID;

@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { X, Award } from "lucide-react";
+import { X, Award, Loader2 } from "lucide-react";
 import { Button } from "../../../../ui/button";
-// import { Label } from '../../../../components/ui/label';
-import List from "../../../../List/list";
+import { Label } from "../../../../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../ui/select";
 import type {
   PositionBenefitAddDto,
   PositionBenefitModDto,
   PositionBenefitListDto,
   UUID,
 } from "../../../../../types/hr/position";
-import type { ListItem } from "../../../../../types/List/list";
+import type { NameListItem } from "../../../../../types/NameList/nameList";
+import { nameListService } from "../../../../../services/hr/NameListService";
 
 interface PositionBenefitsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: PositionBenefitAddDto | PositionBenefitModDto) => void;
   positionId: UUID;
-  benefitSettings: ListItem[];
   editingBenefit?: PositionBenefitListDto | null;
 }
 
@@ -26,20 +32,57 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
   onClose,
   onSave,
   positionId,
-  benefitSettings,
   editingBenefit,
 }) => {
   const [selectedBenefitSetting, setSelectedBenefitSetting] = useState<
     UUID | undefined
   >();
+  const [benefitSettings, setBenefitSettings] = useState<NameListItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  // Wrap handleClose in useCallback to prevent unnecessary re-renders
+  const handleClose = useCallback(() => {
+    setSelectedBenefitSetting(undefined);
+    setBenefitSettings([]);
+    onClose();
+  }, [onClose]);
+
+  // Fetch benefit settings when modal opens
   useEffect(() => {
-    if (editingBenefit) {
-      setSelectedBenefitSetting(editingBenefit.benefitSettingId);
-    } else {
-      setSelectedBenefitSetting(undefined);
+    const fetchBenefitSettings = async () => {
+      if (!isOpen) return;
+
+      setLoading(true);
+      try {
+        const settings = await nameListService.getAllBenefitSetNames();
+        setBenefitSettings(settings);
+
+        // Set first benefit setting as default if none selected and not editing
+        if (settings.length > 0 && !selectedBenefitSetting && !editingBenefit) {
+          setSelectedBenefitSetting(settings[0].id);
+        }
+      } catch (err) {
+        console.error("Error fetching benefit settings:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBenefitSettings();
+  }, [isOpen, selectedBenefitSetting, editingBenefit]);
+
+  // Reset form when modal opens or editing benefit changes
+  useEffect(() => {
+    if (isOpen) {
+      if (editingBenefit) {
+        setSelectedBenefitSetting(editingBenefit.benefitSettingId);
+      } else {
+        setSelectedBenefitSetting(
+          benefitSettings.length > 0 ? benefitSettings[0].id : undefined
+        );
+      }
     }
-  }, [editingBenefit]);
+  }, [isOpen, editingBenefit, benefitSettings]);
 
   const handleSubmit = () => {
     if (!selectedBenefitSetting) return;
@@ -60,17 +103,24 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
       onSave(formData);
     }
 
-    onClose();
+    handleClose();
   };
-
-  const benefitListItems: ListItem[] = benefitSettings.map((setting) => ({
-    id: setting.id,
-    name: setting.name,
-  }));
 
   const selectedBenefit = benefitSettings.find(
     (bs) => bs.id === selectedBenefitSetting
   );
+
+  // Add escape key to close
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -91,7 +141,7 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
             </h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
           >
             <X size={24} />
@@ -103,35 +153,36 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
           <div className="py-4 space-y-3">
             {/* Benefit Selection */}
             <div className="space-y-2">
-              {/* <Label className="text-sm text-gray-500">
+              <Label className="block text-sm font-medium text-gray-700">
                 Benefit Setting <span className="text-red-500">*</span>
-              </Label> */}
-              <List
-                items={benefitListItems}
-                selectedValue={selectedBenefitSetting}
-                onSelect={(item) => setSelectedBenefitSetting(item.id)}
-                label="Select Benefit"
-                placeholder="Choose a benefit"
-                required
-              />
+              </Label>
+              <Select
+                value={selectedBenefitSetting || ""}
+                onValueChange={(value) => setSelectedBenefitSetting(value as UUID)}
+                disabled={loading}
+              >
+                <SelectTrigger className={`
+                  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                  focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
+                  text-sm transition-colors
+                  ${loading ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-900'}
+                `}>
+                  <SelectValue placeholder={loading ? "Loading benefits..." : "Choose a benefit"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {benefitSettings.map((setting) => (
+                    <SelectItem key={setting.id} value={setting.id} className="text-gray-900">
+                      {setting.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {loading && (
+                <p className="text-sm text-gray-500">
+                  Loading benefit settings...
+                </p>
+              )}
             </div>
-
-            {/* Benefit Preview */}
-            {/* {selectedBenefit && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <p className="text-sm text-green-800 font-medium mb-2">Benefit Preview:</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Benefit Name:</span>
-                    <span className="font-semibold">{selectedBenefit.name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Amharic Name:</span>
-                    <span className="font-semibold">{selectedBenefit.nameAm}</span>
-                  </div>
-                </div>
-              </div>
-            )} */}
 
             {/* Current Selection Info */}
             {editingBenefit && selectedBenefit && (
@@ -141,9 +192,6 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
                 </p>
                 <div className="space-y-1 text-sm">
                   <p className="text-blue-700">{selectedBenefit.name}</p>
-                  <p className="text-blue-600 text-xs">
-                    {selectedBenefit.name}
-                  </p>
                 </div>
               </div>
             )}
@@ -156,14 +204,22 @@ const PositionBenefitsModal: React.FC<PositionBenefitsModalProps> = ({
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!selectedBenefitSetting}
+              disabled={!selectedBenefitSetting || loading}
             >
-              {editingBenefit ? "Update" : "Save"}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Loading...
+                </>
+              ) : (
+                editingBenefit ? "Update" : "Save"
+              )}
             </Button>
             <Button
               variant="outline"
               className="cursor-pointer px-6"
-              onClick={onClose}
+              onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </Button>

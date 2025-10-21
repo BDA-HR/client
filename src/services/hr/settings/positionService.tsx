@@ -17,7 +17,6 @@ import type {
   PositionReqAddDto,
   PositionReqModDto,
 } from "../../../types/hr/position";
-import type { ListItem } from "../../../types/List/list";
 
 class PositionService {
   private baseUrl = `${
@@ -318,20 +317,4 @@ class PositionService {
   }
 }
 
-class LookupService {
-  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"}`;
-
-  // GET: /api/core/hrmm/v1/Names/AllBenefitSetName
-  async getAllBenefitSettings(): Promise<ListItem[]> {
-    try {
-      const response = await api.get(`${this.baseUrl}/Names/AllBenefitSetName`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching benefit settings:", error);
-      throw error;
-    }
-  }
-}
-
 export const positionService = new PositionService();
-export const lookupService = new LookupService();

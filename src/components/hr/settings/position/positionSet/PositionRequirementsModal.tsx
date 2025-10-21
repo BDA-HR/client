@@ -1,20 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Settings } from 'lucide-react';
+import { X, Settings, Loader2 } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Label } from '../../../../ui/label';
 import { Input } from '../../../../ui/input';
-import List from '../../../../List/list';
-import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../../types/hr/position';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../ui/select';
+import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID } from '../../../../../types/hr/position';
 import type { ListItem } from '../../../../../types/List/list';
 import { PositionGender, WorkOption } from '../../../../../types/hr/enum';
+import { listService } from '../../../../../services/List/listservice';
 
 interface PositionRequirementsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: PositionReqAddDto | PositionReqModDto) => void;
   positionId: UUID;
-  professionTypes: ProfessionTypeDto[];
   editingRequirement?: PositionReqListDto | null;
 }
 
@@ -23,7 +29,6 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
   onClose,
   onSave,
   positionId,
-  professionTypes,
   editingRequirement
 }) => {
   // Initialize with default values - using "3" (None) for work options
@@ -36,27 +41,77 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     professionTypeId: '' as UUID,
   });
 
+  const [professionTypes, setProfessionTypes] = useState<ListItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedProfessionType, setSelectedProfessionType] = useState<UUID | undefined>(undefined);
+
+  // Wrap handleClose in useCallback to prevent unnecessary re-renders
+  const handleClose = useCallback(() => {
+    setFormData({
+      positionId,
+      gender: '2',
+      saturdayWorkOption: '3',
+      sundayWorkOption: '3',
+      workingHours: 8,
+      professionTypeId: '' as UUID,
+    });
+    setSelectedProfessionType(undefined);
+    onClose();
+  }, [onClose, positionId]);
+
+  // Fetch profession types when modal opens
   useEffect(() => {
-    if (editingRequirement) {
-      setFormData({
-        positionId: editingRequirement.positionId,
-        gender: editingRequirement.gender,
-        saturdayWorkOption: editingRequirement.saturdayWorkOption,
-        sundayWorkOption: editingRequirement.sundayWorkOption,
-        workingHours: editingRequirement.workingHours,
-        professionTypeId: editingRequirement.professionTypeId,
-      });
-    } else {
-      setFormData({
-        positionId,
-        gender: '2', // Default to "Both"
-        saturdayWorkOption: '3', // Default to "None"
-        sundayWorkOption: '3', // Default to "None"
-        workingHours: 8,
-        professionTypeId: '' as UUID,
-      });
+    const fetchProfessionTypes = async () => {
+      if (!isOpen) return;
+
+      setLoading(true);
+      try {
+        const types = await listService.getAllProfessionTypes();
+        setProfessionTypes(types);
+
+        // Set first profession type as default if none selected and not editing
+        if (types.length > 0 && !selectedProfessionType && !editingRequirement) {
+          setSelectedProfessionType(types[0].id);
+          setFormData((prev) => ({ ...prev, professionTypeId: types[0].id }));
+        }
+      } catch (err) {
+        console.error("Error fetching profession types:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfessionTypes();
+  }, [isOpen, selectedProfessionType, editingRequirement]);
+
+  // Reset form when modal opens or editing requirement changes
+  useEffect(() => {
+    if (isOpen) {
+      if (editingRequirement) {
+        setFormData({
+          positionId: editingRequirement.positionId,
+          gender: editingRequirement.gender,
+          saturdayWorkOption: editingRequirement.saturdayWorkOption,
+          sundayWorkOption: editingRequirement.sundayWorkOption,
+          workingHours: editingRequirement.workingHours,
+          professionTypeId: editingRequirement.professionTypeId,
+        });
+        setSelectedProfessionType(editingRequirement.professionTypeId);
+      } else {
+        setFormData({
+          positionId,
+          gender: '2',
+          saturdayWorkOption: '3',
+          sundayWorkOption: '3',
+          workingHours: 8,
+          professionTypeId: professionTypes.length > 0 ? professionTypes[0].id : ('' as UUID),
+        });
+        setSelectedProfessionType(
+          professionTypes.length > 0 ? professionTypes[0].id : undefined
+        );
+      }
     }
-  }, [editingRequirement, positionId]);
+  }, [isOpen, editingRequirement, positionId, professionTypes]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,6 +128,12 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     }));
   };
 
+  const handleSelectProfessionType = (value: string) => {
+    const selectedId = value as UUID;
+    setSelectedProfessionType(selectedId);
+    setFormData((prev) => ({ ...prev, professionTypeId: selectedId }));
+  };
+
   const handleSubmit = () => {
     if (!formData.professionTypeId || formData.workingHours <= 0) return;
 
@@ -87,14 +148,8 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
       onSave(formData);
     }
 
-    onClose();
+    handleClose();
   };
-
-  // Profession Type List - uses UUIDs, so we can use the List component
-  const professionTypeListItems: ListItem[] = professionTypes.map(type => ({
-    id: type.id,
-    name: type.name,
-  }));
 
   // Gender options based on your backend enum
   const genderOptions: ListItem[] = [
@@ -110,6 +165,18 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     { id: '2' as UUID, name: WorkOption['2'] }, // Both
     { id: '3' as UUID, name: WorkOption['3'] }  // None
   ];
+
+  // Add escape key to close
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -130,7 +197,7 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
             </h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
           >
             <X size={24} />
@@ -142,14 +209,36 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
           <div className="py-4 space-y-4">
             {/* Profession Type */}
             <div className="space-y-2">
-              <List
-                items={professionTypeListItems}
-                selectedValue={formData.professionTypeId}
-                onSelect={(item) => handleSelectChange('professionTypeId', item.id)}
-                label="Select Profession Type"
-                placeholder="Choose a profession type"
+              <Label className="block text-sm font-medium text-gray-700">
+                Select Profession Type <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={selectedProfessionType || ""}
+                onValueChange={handleSelectProfessionType}
+                disabled={loading}
                 required
-              />
+              >
+                <SelectTrigger className={`
+                  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                  focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
+                  text-sm transition-colors
+                  ${loading ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-900'}
+                `}>
+                  <SelectValue placeholder="Choose a profession type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {professionTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id} className="text-gray-900">
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {loading && (
+                <p className="text-sm text-gray-500">
+                  Loading profession types...
+                </p>
+              )}
             </div>
 
             {/* Working Hours */}
@@ -174,34 +263,67 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
 
             {/* Gender */}
             <div className="space-y-2">
-              <List
-                items={genderOptions}
-                selectedValue={formData.gender}
-                onSelect={(item) => handleSelectChange('gender', item.id)}
-                label="Gender Preference"
-                placeholder="Select gender preference"
-              />
+              <Label className="block text-sm font-medium text-gray-700">
+                Gender Preference
+              </Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => handleSelectChange('gender', value)}
+              >
+                <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900">
+                  <SelectValue placeholder="Select gender preference" />
+                </SelectTrigger>
+                <SelectContent>
+                  {genderOptions.map((option) => (
+                    <SelectItem key={option.id} value={option.id} className="text-gray-900">
+                      {option.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Work Options */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <List
-                  items={workOptions}
-                  selectedValue={formData.saturdayWorkOption}
-                  onSelect={(item) => handleSelectChange('saturdayWorkOption', item.id)}
-                  label="Saturday Work"
-                  placeholder="Select Saturday work"
-                />
+                <Label className="block text-sm font-medium text-gray-700">
+                  Saturday Work
+                </Label>
+                <Select
+                  value={formData.saturdayWorkOption}
+                  onValueChange={(value) => handleSelectChange('saturdayWorkOption', value)}
+                >
+                  <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900">
+                    <SelectValue placeholder="Select Saturday work" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workOptions.map((option) => (
+                      <SelectItem key={option.id} value={option.id} className="text-gray-900">
+                        {option.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <List
-                  items={workOptions}
-                  selectedValue={formData.sundayWorkOption}
-                  onSelect={(item) => handleSelectChange('sundayWorkOption', item.id)}
-                  label="Sunday Work"
-                  placeholder="Select Sunday work"
-                />
+                <Label className="block text-sm font-medium text-gray-700">
+                  Sunday Work
+                </Label>
+                <Select
+                  value={formData.sundayWorkOption}
+                  onValueChange={(value) => handleSelectChange('sundayWorkOption', value)}
+                >
+                  <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900">
+                    <SelectValue placeholder="Select Sunday work" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workOptions.map((option) => (
+                      <SelectItem key={option.id} value={option.id} className="text-gray-900">
+                        {option.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -213,14 +335,22 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!formData.professionTypeId || formData.workingHours <= 0}
+              disabled={!formData.professionTypeId || formData.workingHours <= 0 || loading}
             >
-              {editingRequirement ? 'Update' : 'Save'}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Loading...
+                </>
+              ) : (
+                editingRequirement ? 'Update' : 'Save'
+              )}
             </Button>
             <Button
               variant="outline"
               className="cursor-pointer px-6"
-              onClick={onClose}
+              onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </Button>

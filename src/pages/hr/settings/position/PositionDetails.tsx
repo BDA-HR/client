@@ -38,15 +38,9 @@ import type {
   PositionBenefitAddDto,
   PositionBenefitModDto,
   PositionBenefitListDto,
-  ProfessionTypeDto,
-  EducationLevelDto,
+  UUID,
 } from "../../../../types/hr/position";
-import {
-  lookupService,
-  positionService,
-} from "../../../../services/hr/settings/positionService";
-import type { ListItem } from "../../../../types/List/list";
-import { listService } from "../../../../services/List/listservice";
+import { positionService } from "../../../../services/hr/settings/positionService";
 
 // Define the tab interface
 interface SettingTab {
@@ -97,7 +91,7 @@ const greenTheme = {
 };
 
 function PositionDetails() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: UUID }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<PositionSettingType>("benefit");
   const [position, setPosition] = useState<PositionListDto | null>(null);
@@ -116,21 +110,18 @@ function PositionDetails() {
   const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false);
   const [editingRequirement, setEditingRequirement] =
     useState<PositionReqListDto | null>(null);
-  const [professionTypes] = useState<ProfessionTypeDto[]>([]);
   const requirementRef = useRef<any>(null);
 
   // Education modal state
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [editingEducation, setEditingEducation] =
     useState<PositionEduListDto | null>(null);
-  const [educationLevels] = useState<EducationLevelDto[]>([]);
   const educationRef = useRef<any>(null);
 
   // Benefit modal state
   const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false);
   const [editingBenefit, setEditingBenefit] =
     useState<PositionBenefitListDto | null>(null);
-  const [benefitSettings] = useState<ListItem[]>([]);
   const benefitRef = useRef<any>(null);
 
   // Grid/List view state for benefits
@@ -143,16 +134,12 @@ function PositionDetails() {
       fetchPosition();
       checkIfHasExperience();
       checkIfHasRequirement();
-      fetchProfessionTypes();
-      fetchEducationLevels();
-      fetchBenefitSettings();
     }
   }, [id]);
 
   const fetchPosition = async () => {
     try {
       setLoading(true);
-      // Use actual service call
       const positionData = await positionService.getPositionById(id!);
       setPosition(positionData);
       setError(null);
@@ -184,10 +171,8 @@ function PositionDetails() {
   ) => {
     try {
       if ("id" in data) {
-        // Update existing experience
         await positionService.updatePositionExperience(data);
       } else {
-        // Create new experience
         await positionService.createPositionExperience(data);
         setHasExperience(true);
       }
@@ -196,7 +181,7 @@ function PositionDetails() {
       }
     } catch (error) {
       console.error("Error saving experience:", error);
-      throw error; // Re-throw to handle in modal
+      throw error;
     }
   };
 
@@ -221,10 +206,8 @@ function PositionDetails() {
   ) => {
     try {
       if ("id" in data) {
-        // Update existing requirement
         await positionService.updatePositionRequirement(data);
       } else {
-        // Create new requirement
         await positionService.createPositionRequirement(data);
         setHasRequirement(true);
       }
@@ -233,7 +216,7 @@ function PositionDetails() {
       }
     } catch (error) {
       console.error("Error saving requirement:", error);
-      throw error; // Re-throw to handle in modal
+      throw error;
     }
   };
 
@@ -258,10 +241,8 @@ function PositionDetails() {
   ) => {
     try {
       if ("id" in data) {
-        // Update existing education
         await positionService.updatePositionEducation(data);
       } else {
-        // Create new education
         await positionService.createPositionEducation(data);
       }
       if (educationRef.current && educationRef.current.fetchEducations) {
@@ -269,7 +250,7 @@ function PositionDetails() {
       }
     } catch (error) {
       console.error("Error saving education:", error);
-      throw error; // Re-throw to handle in modal
+      throw error;
     }
   };
 
@@ -294,10 +275,8 @@ function PositionDetails() {
   ) => {
     try {
       if ("id" in data) {
-        // Update existing benefit
         await positionService.updatePositionBenefit(data);
       } else {
-        // Create new benefit
         await positionService.createPositionBenefit(data);
       }
       if (benefitRef.current && benefitRef.current.fetchBenefits) {
@@ -305,7 +284,7 @@ function PositionDetails() {
       }
     } catch (error) {
       console.error("Error saving benefit:", error);
-      throw error; // Re-throw to handle in modal
+      throw error;
     }
   };
 
@@ -328,47 +307,11 @@ function PositionDetails() {
   // Check if position has requirements
   const checkIfHasRequirement = async () => {
     try {
-      const data = await positionService.getAllPositionRequirements();
+      const data = await positionService.getAllPositionRequirements(id!);
       const positionRequirements = data.filter((req) => req.positionId === id);
       setHasRequirement(positionRequirements.length > 0);
     } catch (error) {
       console.error("Error checking requirements:", error);
-    }
-  };
-
-  // Fetch profession types (you'll need to implement this in your service)
-  const fetchProfessionTypes = async () => {
-    try {
-      // This should be implemented in your lookup service
-      const data = await listService.getAllProfessionTypes();
-      setProfessionTypes(data);
-      console.log("Fetch profession types - implement this");
-    } catch (error) {
-      console.error("Error fetching profession types:", error);
-    }
-  };
-
-  // Fetch education levels (you'll need to implement this in your service)
-  const fetchEducationLevels = async () => {
-    try {
-      // This should be implemented in your lookup service
-      // const data = await lookupService.getAllEducationLevels();
-      // setEducationLevels(data);
-      console.log("Fetch education levels - implement this");
-    } catch (error) {
-      console.error("Error fetching education levels:", error);
-    }
-  };
-
-  // Fetch benefit settings (you'll need to implement this in your service)
-  const fetchBenefitSettings = async () => {
-    try {
-      // This should be implemented in your lookup service
-      const data = await lookupService.getAllBenefitSettings();
-      benefitSettings(data);
-      console.log("Fetch benefit settings - implement this");
-    } catch (error) {
-      console.error("Error fetching benefit settings:", error);
     }
   };
 
@@ -677,7 +620,6 @@ function PositionDetails() {
           onClose={handleCloseRequirementModal}
           onSave={handleSaveRequirement}
           positionId={position.id}
-          professionTypes={professionTypes}
           editingRequirement={editingRequirement}
         />
 
@@ -687,7 +629,6 @@ function PositionDetails() {
           onClose={handleCloseEducationModal}
           onSave={handleSaveEducation}
           positionId={position.id}
-          educationLevels={educationLevels}
           editingEducation={editingEducation}
         />
 
@@ -697,7 +638,6 @@ function PositionDetails() {
           onClose={handleCloseBenefitModal}
           onSave={handleSaveBenefit}
           positionId={position.id}
-          benefitSettings={benefitSettings}
           editingBenefit={editingBenefit}
         />
       </div>
