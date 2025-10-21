@@ -3,6 +3,7 @@ import type { UUID, ListItem } from '../../types/List/list';
 
 class ListService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'lup/v1'}`;
+  private hrmmBaseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}`;
 
   // Quarter services
   async getAllQuarters(): Promise<ListItem[]> {
@@ -42,6 +43,27 @@ class ListService {
       return response.data;
     } catch (error) {
       console.error('Error fetching education level:', error);
+      throw error;
+    }
+  }
+
+  // EducationQualName services
+  async getAllEducationQualNames(): Promise<ListItem[]> {
+    try {
+      const response = await api.get(`${this.hrmmBaseUrl}/Names/AllEducationQualName`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching education qualification names:', error);
+      throw error;
+    }
+  }
+
+  async getEducationQualNameById(id: UUID): Promise<ListItem> {
+    try {
+      const response = await api.get(`${this.hrmmBaseUrl}/Names/GetEducationQualName/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching education qualification name:', error);
       throw error;
     }
   }
