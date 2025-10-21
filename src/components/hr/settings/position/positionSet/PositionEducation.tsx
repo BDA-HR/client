@@ -92,10 +92,6 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
     setEditingEducation(null);
   };
 
-  const handleAddEducation = () => {
-    setEditingEducation(null);
-    setIsModalOpen(true);
-  };
 
   if (loading) {
     return (
@@ -108,15 +104,6 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
 
   return (
     <div className="space-y-6">
-      {/* Add Education Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={handleAddEducation}
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          Add Education Requirement
-        </Button>
-      </div>
 
       <div className="space-y-4">
         {educations.map((education) => {
@@ -159,7 +146,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
         })}
         {educations.length === 0 && (
             <div className="p-8">
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 mb-4 text-center">
                 No education requirements have been set for this position yet.
               </p>
             </div>
