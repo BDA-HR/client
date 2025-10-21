@@ -96,7 +96,7 @@ const greenTheme = {
 function PositionDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<PositionSettingType>('experience');
+  const [activeTab, setActiveTab] = useState<PositionSettingType>('benefit');
   const [position, setPosition] = useState<PositionListDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

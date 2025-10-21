@@ -67,6 +67,27 @@ class ListService {
       throw error;
     }
   }
+
+  // ProfessionType services
+  async getAllProfessionTypes(): Promise<ListItem[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/ProfessionType`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching profession types:', error);
+      throw error;
+    }
+  }
+
+  async getProfessionTypeById(id: UUID): Promise<ListItem> {
+    try {
+      const response = await api.get(`${this.baseUrl}/ProfessionType/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching profession type:', error);
+      throw error;
+    }
+  }
 }
 
 export const listService = new ListService();

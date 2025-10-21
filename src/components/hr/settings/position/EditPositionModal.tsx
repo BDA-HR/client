@@ -234,7 +234,7 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                 
                 <div className="space-y-2">
                   <Label htmlFor="isVacant" className="text-sm text-gray-700 font-medium">
-                    Vacancy Status <span className="text-red-500">*</span>
+                    Is Vacant <span className="text-red-500">*</span>
                   </Label>
                   <select
                     id="isVacant"
@@ -244,8 +244,9 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   >
-                    <option value="1">Vacant</option>
-                    <option value="0">Filled</option>
+                    <option value="0">Yes</option>
+                                        <option value="1">No</option>
+
                   </select>
                 </div>
               </div>

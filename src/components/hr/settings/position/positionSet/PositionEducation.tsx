@@ -3,8 +3,9 @@ import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import PositionEducationModal from './PositionEducationModal';
 import type { PositionEduListDto, PositionEduAddDto, PositionEduModDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../../services/hr/settings/positionService';
+import { positionService } from '../../../../../services/hr/settings/positionService';
 import DeletePositionEducationModal from './DeletePositionEducationModal';
+import { listService } from '../../../../../services/List/listservice';
 
 interface PositionEducationProps {
   positionId: UUID;
@@ -36,7 +37,7 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
       setLoading(true);
       const [educationsData, educationLevelsData] = await Promise.all([
         positionService.getAllPositionEducations(),
-        lookupService.getAllEducationLevels(),
+        listService.getAllEducationLevels(),
       ]);
       
       const positionEducations = educationsData.filter(edu => edu.positionId === positionId);

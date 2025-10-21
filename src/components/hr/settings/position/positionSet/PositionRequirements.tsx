@@ -2,9 +2,11 @@ import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Edit, Trash2, Settings } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import DeletePositionRequirementsModal from './DeletePositionRequirementsModal';
-import type { PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../../services/hr/settings/positionService';
+import type { PositionReqListDto, UUID } from '../../../../../types/hr/position';
+import { positionService } from '../../../../../services/hr/settings/positionService';
 import { PositionGender, WorkOption } from '../../../../../types/hr/enum';
+import { listService } from '../../../../../services/List/listservice';
+import type { ListItem } from '../../../../../types/List/list';
 
 interface PositionRequirementsProps {
   positionId: UUID;
@@ -13,9 +15,18 @@ interface PositionRequirementsProps {
   onRequirementDeleted?: () => void;
 }
 
-const PositionRequirements = forwardRef(({ positionId, onEdit, onRequirementAdded, onRequirementDeleted }: PositionRequirementsProps, ref) => {
+export interface PositionRequirementsRef {
+  fetchRequirements: () => Promise<void>;
+}
+
+const PositionRequirements = forwardRef<PositionRequirementsRef, PositionRequirementsProps>(({ 
+  positionId, 
+  onEdit, 
+  onRequirementAdded, 
+  onRequirementDeleted 
+}, ref) => {
   const [requirements, setRequirements] = useState<PositionReqListDto[]>([]);
-  const [professionTypes, setProfessionTypes] = useState<ProfessionTypeDto[]>([]);
+  const [professionTypes, setProfessionTypes] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingRequirement, setDeletingRequirement] = useState<PositionReqListDto | null>(null);
@@ -29,7 +40,7 @@ const PositionRequirements = forwardRef(({ positionId, onEdit, onRequirementAdde
       setLoading(true);
       const [requirementsData, professionTypesData] = await Promise.all([
         positionService.getAllPositionRequirements(),
-        lookupService.getAllProfessionTypes(),
+        listService.getAllProfessionTypes(),
       ]);
       
       const positionRequirements = requirementsData.filter(req => req.positionId === positionId);
@@ -158,7 +169,7 @@ const PositionRequirements = forwardRef(({ positionId, onEdit, onRequirementAdde
         })}
         {requirements.length === 0 && (
           <div className="text-center py-6">
-            <p className="text-gray-600 mb-4">No Reuirements  Assigned for this position</p>
+            <p className="text-gray-600 mb-4">No Requirements Assigned for this position</p>
           </div>
         )}
       </div>

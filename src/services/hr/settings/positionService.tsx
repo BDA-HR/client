@@ -16,10 +16,9 @@ import type {
   PositionReqListDto,
   PositionReqAddDto,
   PositionReqModDto,
-  ProfessionTypeDto,
-  EducationLevelDto,
   BenefitSettingDto
 } from '../../../types/hr/position';
+import { id } from 'date-fns/locale';
 
 class PositionService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/Position`;
@@ -257,7 +256,7 @@ class PositionService {
   // GET: /api/core/hrmm/v1/PositionReq/AllPositionReq
   async getAllPositionRequirements(): Promise<PositionReqListDto[]> {
     try {
-      const response = await api.get(`${this.reqUrl}/AllPositionReq`);
+      const response = await api.get(`${this.reqUrl}/AllPositionReq/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching position requirements:', error);
@@ -312,32 +311,10 @@ class PositionService {
 class LookupService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}`;
 
-  // GET: /api/core/hrmm/v1/EducationQual/AllEducationQual
-  async getAllEducationLevels(): Promise<EducationLevelDto[]> {
-    try {
-      const response = await api.get(`${this.baseUrl}/EducationQual/AllEducationQual`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching education levels:', error);
-      throw error;
-    }
-  }
-
-  // GET: /api/core/hrmm/v1/ProfessionType/AllProfessionType
-  async getAllProfessionTypes(): Promise<ProfessionTypeDto[]> {
-    try {
-      const response = await api.get(`${this.baseUrl}/ProfessionType/AllProfessionType`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching profession types:', error);
-      throw error;
-    }
-  }
-
   // GET: /api/core/hrmm/v1/BenefitSet/AllBenefitSet
   async getAllBenefitSettings(): Promise<BenefitSettingDto[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/BenefitSet/AllBenefitSet`);
+      const response = await api.get(`${this.baseUrl}/BenefitSet/AllBenefitSetName`);
       return response.data;
     } catch (error) {
       console.error('Error fetching benefit settings:', error);
