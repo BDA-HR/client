@@ -30,13 +30,8 @@ function PagePosition() {
   const fetchPositions = async () => {
     try {
       setLoading(true);
-      // Commented out service call - using dummy data directly
-      // const positions = await positionService.getAllPositions();
-      // setPositionData(positions);
-      
-      // Using dummy data directly for testing
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading
-      const positions = await positionService.getAllPositions(); // This now returns dummy data
+      // Use actual service call
+      const positions = await positionService.getAllPositions();
       setPositionData(positions);
       setError(null);
     } catch (err) {
@@ -53,11 +48,8 @@ function PagePosition() {
 
   const handleAddPosition = async (newPositionData: PositionAddDto) => {
     try {
-      // Commented out service call - using dummy data directly
-      // await positionService.addPosition(newPositionData);
-      
-      // Using dummy data directly for testing
-      await positionService.addPosition(newPositionData); // This now uses dummy data
+      // Use actual service call
+      await positionService.createPosition(newPositionData);
       await fetchPositions(); // Refresh the list
       setIsAddModalOpen(false);
     } catch (err) {
@@ -78,11 +70,8 @@ function PagePosition() {
 
   const handleConfirmDelete = async (position: PositionListDto) => {
     try {
-      // Commented out service call - using dummy data directly
-      // await positionService.deletePosition(position.id);
-      
-      // Using dummy data directly for testing
-      await positionService.deletePosition(position.id); // This now uses dummy data
+      // Use actual service call
+      await positionService.deletePosition(position.id);
       await fetchPositions(); // Refresh the list
       setIsDeleteModalOpen(false);
       setPositionToDelete(null);
@@ -99,11 +88,8 @@ function PagePosition() {
 
   const handleSavePosition = async (updatedPosition: PositionModDto) => {
     try {
-      // Commented out service call - using dummy data directly
-      // await positionService.updatePosition(updatedPosition.id, updatedPosition);
-      
-      // Using dummy data directly for testing
-      await positionService.updatePosition(updatedPosition.id, updatedPosition); // This now uses dummy data
+      // Use actual service call
+      await positionService.updatePosition(updatedPosition);
       await fetchPositions(); // Refresh the list
       setIsEditModalOpen(false);
       setSelectedPosition(null);
