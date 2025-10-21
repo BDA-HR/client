@@ -21,6 +21,7 @@ import type {
 import { id } from "date-fns/locale";
 
 class PositionService {
+<<<<<<< HEAD
   private baseUrl = `${
     import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
   }/Position`;
@@ -36,6 +37,13 @@ class PositionService {
   private reqUrl = `${
     import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
   }/PositionReq`;
+=======
+  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/Position`;
+  private benefitUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionBenefit`;
+  private eduUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionEdu`;
+  private expUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionExp`;
+  private reqUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionReq`;
+>>>>>>> 8bd3c09713c14fba4e43073e58afd78d6e2dc0b2
 
   // ============ POSITION CRUD OPERATIONS ============
 
