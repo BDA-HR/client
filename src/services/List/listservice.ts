@@ -1,9 +1,9 @@
 import { api } from '../api';
-import type { UUID, ListItem } from '../../types/List/list';
+import type { ListItem } from '../../types/List/list';
 
 class ListService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'lup/v1'}`;
-  private hrmmBaseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}`;
+  private baseUrl = `${import.meta.env.VITE_LUP_URL || '/lup/v1'}`;
+  private hrmmBaseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || '/core/hrmm/v1'}`;
 
   // Quarter services
   async getAllQuarters(): Promise<ListItem[]> {
@@ -12,16 +12,6 @@ class ListService {
       return response.data;
     } catch (error) {
       console.error('Error fetching quarters:', error);
-      throw error;
-    }
-  }
-
-  async getQuarterById(id: UUID): Promise<ListItem> {
-    try {
-      const response = await api.get(`${this.baseUrl}/Quarter/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching quarter:', error);
       throw error;
     }
   }
@@ -37,16 +27,6 @@ class ListService {
     }
   }
 
-  async getEducationLevelById(id: UUID): Promise<ListItem> {
-    try {
-      const response = await api.get(`${this.baseUrl}/EducationLevel/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching education level:', error);
-      throw error;
-    }
-  }
-
   // EducationQualName services
   async getAllEducationQualNames(): Promise<ListItem[]> {
     try {
@@ -58,16 +38,6 @@ class ListService {
     }
   }
 
-  async getEducationQualNameById(id: UUID): Promise<ListItem> {
-    try {
-      const response = await api.get(`${this.hrmmBaseUrl}/Names/GetEducationQualName/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching education qualification name:', error);
-      throw error;
-    }
-  }
-
   // ProfessionType services
   async getAllProfessionTypes(): Promise<ListItem[]> {
     try {
@@ -75,16 +45,6 @@ class ListService {
       return response.data;
     } catch (error) {
       console.error('Error fetching profession types:', error);
-      throw error;
-    }
-  }
-
-  async getProfessionTypeById(id: UUID): Promise<ListItem> {
-    try {
-      const response = await api.get(`${this.baseUrl}/ProfessionType/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching profession type:', error);
       throw error;
     }
   }
