@@ -5,7 +5,7 @@ import EditEducationalQualModal from "../../../components/hr/settings/educationa
 import DeleteEducationalQualModal from "../../../components/hr/settings/educationalqual/DeleteEducationalQualModal";
 import EducationalQualList from "../../../components/hr/settings/educationalqual/EducationalQualList";
 import { useState, useMemo, useEffect } from "react";
-import { educationQualService } from "../../../services/hr/EducationQualService";
+import { educationQualService } from "../../../services/hr/settings/EducationQualService";
 import type {
   EducationQualAddDto,
   EducationQualListDto,

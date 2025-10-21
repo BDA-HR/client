@@ -24,6 +24,27 @@ class ListService {
       throw error;
     }
   }
+
+  // EducationLevel services
+  async getAllEducationLevels(): Promise<ListItem[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/EducationLevel`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching education levels:', error);
+      throw error;
+    }
+  }
+
+  async getEducationLevelById(id: UUID): Promise<ListItem> {
+    try {
+      const response = await api.get(`${this.baseUrl}/EducationLevel/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching education level:', error);
+      throw error;
+    }
+  }
 }
 
 export const listService = new ListService();

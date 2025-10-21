@@ -1,10 +1,10 @@
-import { api } from '../api';
+import { api } from '../../api';
 import type { 
   BenefitSetListDto, 
   BenefitSetAddDto, 
   BenefitSetModDto, 
   UUID 
-} from '../../types/hr/benefit';
+} from '../../../types/hr/benefit';
 
 class BenefitSetService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/BenefitSet`;

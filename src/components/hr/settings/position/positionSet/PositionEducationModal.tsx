@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, GraduationCap, BookOpen, School, University, Building2, Users } from 'lucide-react';
+import { X, GraduationCap, BookOpen, School, University, Building2, Users, Loader2 } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import List from '../../../../List/list';
 import type { PositionEduAddDto, PositionEduModDto, PositionEduListDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
 import type { ListItem } from '../../../../../types/List/list';
+import { listService } from '../../../../../services/List/listservice';
 
 interface PositionEducationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: PositionEduAddDto | PositionEduModDto) => void;
   positionId: UUID;
-  educationLevels: EducationLevelDto[];
   editingEducation?: PositionEduListDto | null;
 }
 
@@ -31,18 +31,69 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
   onClose,
   onSave,
   positionId,
-  educationLevels,
   editingEducation
 }) => {
   const [selectedEducationLevel, setSelectedEducationLevel] = useState<UUID | undefined>();
+  const [educationLevels, setEducationLevels] = useState<EducationLevelDto[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  // Wrap handleClose in useCallback to prevent unnecessary re-renders
+  const handleClose = useCallback(() => {
+    setSelectedEducationLevel(undefined);
+    onClose();
+  }, [onClose]);
+
+  // Fetch education levels when modal opens
   useEffect(() => {
-    if (editingEducation) {
-      setSelectedEducationLevel(editingEducation.educationLevelId);
-    } else {
-      setSelectedEducationLevel(undefined);
+    const fetchEducationLevels = async () => {
+      if (!isOpen) return;
+      
+      setLoading(true);
+      try {
+        const educationLevelsData = await listService.getAllEducationLevels();
+        // Transform ListItem[] to EducationLevelDto[]
+        const transformedData: EducationLevelDto[] = educationLevelsData.map(item => ({
+          id: item.id as UUID,
+          name: item.name,
+        }));
+        setEducationLevels(transformedData);
+        
+        // Set first education level as default if none selected and not editing
+        if (transformedData.length > 0 && !selectedEducationLevel && !editingEducation) {
+          setSelectedEducationLevel(transformedData[0].id);
+        }
+      } catch (err) {
+        console.error('Error fetching education levels:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEducationLevels();
+  }, [isOpen, selectedEducationLevel, editingEducation]);
+
+  // Reset form when modal opens and set editing data
+  useEffect(() => {
+    if (isOpen) {
+      if (editingEducation) {
+        setSelectedEducationLevel(editingEducation.educationLevelId);
+      } else if (educationLevels.length > 0) {
+        setSelectedEducationLevel(educationLevels[0].id);
+      } else {
+        setSelectedEducationLevel(undefined);
+      }
     }
-  }, [editingEducation]);
+  }, [isOpen, editingEducation, educationLevels]);
+
+  // Convert education levels to ListItem format
+  const educationLevelListItems: ListItem[] = educationLevels.map(level => ({
+    id: level.id,
+    name: level.name,
+  }));
+
+  const handleSelectEducationLevel = (item: ListItem) => {
+    setSelectedEducationLevel(item.id);
+  };
 
   const handleSubmit = () => {
     if (!selectedEducationLevel) return;
@@ -64,13 +115,8 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
       onSave(formData);
     }
 
-    onClose();
+    handleClose();
   };
-
-  const educationLevelListItems: ListItem[] = educationLevels.map(level => ({
-    id: level.id,
-    name: level.name,
-  }));
 
   const selectedEducation = educationLevels.find(el => el.id === selectedEducationLevel);
   
@@ -80,18 +126,17 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
     return <IconComponent className="h-5 w-5" />;
   };
 
-  // Get education level description
-  // const getEducationDescription = (levelName: string) => {
-  //   const descriptions: { [key: string]: string } = {
-  //     'Preparatory': 'Pre-university preparation program',
-  //     'College': 'College-level education and training',
-  //     'TVT': 'Technical and Vocational Training',
-  //     'High School': 'Secondary education completion',
-  //     'University': 'University degree or higher education',
-  //     'Elementary': 'Basic primary education'
-  //   };
-  //   return descriptions[levelName] || 'Educational qualification requirement';
-  // };
+  // Add escape key to close
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -104,135 +149,86 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
         className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
+        <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <GraduationCap size={20} className="text-green-600" />
+            <GraduationCap className="h-5 w-5 text-green-600" />
             <h2 className="text-lg font-bold text-gray-800">
               {editingEducation ? 'Edit Education' : 'Add Education'}
             </h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            type="button"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
         {/* Body */}
         <div className="px-6">
-          <div className="py-4 space-y-3">
-            {/* Education Level Selection */}
+          <div className="py-4 space-y-4">
+            {/* Education Level Selection using List Component */}
             <div className="space-y-2">
-              {/* <Label className="text-sm text-gray-500">
-                Education Level <span className="text-red-500">*</span>
-              </Label> */}
               <List
                 items={educationLevelListItems}
                 selectedValue={selectedEducationLevel}
-                onSelect={(item) => setSelectedEducationLevel(item.id)}
+                onSelect={handleSelectEducationLevel}
                 label="Select Education Level"
                 placeholder="Choose an education level"
                 required
+                disabled={loading}
               />
+              {loading && <p className="text-sm text-gray-500">Loading education levels...</p>}
             </div>
 
-            {/* Education Preview */}
-            {/* {selectedEducation && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <p className="text-sm text-green-800 font-medium mb-3">Education Preview:</p>
-                <div className="flex items-start space-x-3">
-                  <div className="p-2 bg-white rounded-lg border border-green-200">
+            {/* Current Selection Info */}
+            {selectedEducation && (
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                <p className="text-sm text-blue-800 font-medium mb-2">
+                  {editingEducation ? 'Currently Selected:' : 'Selected Education:'}
+                </p>
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
                     {getEducationIcon(selectedEducation.name)}
                   </div>
                   <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{selectedEducation.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{selectedEducation.nameAm}</p>
-                      </div>
-                      <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                        Required
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {getEducationDescription(selectedEducation.name)}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Additional Information */}
-                {/* <div className="mt-3 pt-3 border-t border-green-200">
-                  <div className="grid grid-cols-2 gap-4 text-xs text-gray-600">
-                    <div>
-                      <span className="font-medium">Level:</span>
-                      <span className="ml-1">
-                        {['University', 'College'].includes(selectedEducation.name) ? 'Higher' : 
-                         ['Preparatory', 'High School'].includes(selectedEducation.name) ? 'Secondary' : 
-                         ['TVT'].includes(selectedEducation.name) ? 'Technical' : 'Basic'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium">Type:</span>
-                      <span className="ml-1">
-                        {['TVT'].includes(selectedEducation.name) ? 'Vocational' : 'Academic'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )} */} 
-
-            {/* Current Selection Info */}
-            {editingEducation && selectedEducation && (
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <p className="text-sm text-blue-800 font-medium mb-2">Currently Selected:</p>
-                <div className="flex items-center space-x-2">
-                  <div className="p-1 bg-blue-100 rounded">
-                    {getEducationIcon(selectedEducation.name)}
-                  </div>
-                  <div>
                     <p className="text-blue-700 font-medium">{selectedEducation.name}</p>
-                    <p className="text-blue-600 text-xs">{selectedEducation.nameAm}</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Education Level Guide */}
-            {/* <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xs font-medium text-gray-700 mb-2">Education Levels Guide:</p>
-              <div className="space-y-1 text-xs text-gray-600">
-                <div className="flex justify-between">
-                  <span>Elementary → High School → Preparatory → University</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>TVT → Technical and Vocational Training</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>College → Higher Education Institution</span>
-                </div>
-              </div>
-            </div> */}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="border-t px-6 py-2">
-          <div className="mx-auto flex justify-center items-center gap-1.5">
+        <div className="border-t px-6 py-4 rounded-b-xl">
+          <div className="flex flex-row-reverse justify-center items-center gap-3">
+            <Button
+              variant="outline"
+              className="cursor-pointer px-6 border-gray-300 hover:bg-gray-100"
+              onClick={handleClose}
+              type="button"
+              disabled={loading}
+            >
+              Cancel
+            </Button>
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!selectedEducationLevel}
+              disabled={!selectedEducationLevel || loading}
             >
-              {editingEducation ? 'Update' : 'Save'}
-            </Button>
-            <Button
-              variant="outline"
-              className="cursor-pointer px-6 border-green-300 text-green-700 hover:bg-green-50"
-              onClick={onClose}
-            >
-              Cancel
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Loading...
+                </>
+              ) : editingEducation ? (
+                'Update'
+              ) : (
+                'Save'
+              )}
             </Button>
           </div>
         </div>

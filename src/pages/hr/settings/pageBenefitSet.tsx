@@ -7,7 +7,7 @@ import BenefitSearchFilters from "../../../components/hr/settings/benefit/Benefi
 import AddBenefitModal from "../../../components/hr/settings/benefit/AddBenfitModal";
 import EditBenefitSetModal from "../../../components/hr/settings/benefit/EditBenefitSetModal";
 import DeleteBenefitModal from "../../../components/hr/settings/benefit/DeleteBenefitModal";
-import { benefitSetService } from "../../../services/hr/BenefitSetService";
+import { benefitSetService } from "../../../services/hr/settings/BenefitSetService";
 import type { BenefitSetListDto, BenefitSetAddDto, BenefitSetModDto } from "../../../types/hr/benefit";
 
 const PageBenefitSet: React.FC = () => {

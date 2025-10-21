@@ -1,10 +1,10 @@
-import { api } from '../api';
+import { api } from '../../api';
 import type { 
   JobGradeListDto, 
   JobGradeAddDto, 
   JobGradeModDto, 
   UUID 
-} from '../../types/hr/jobgrade';
+} from '../../../types/hr/jobgrade';
 
 class JobGradeService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/JobGrade`;

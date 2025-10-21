@@ -6,7 +6,7 @@ export type { UUID };
 export interface BenefitSetListDto extends BaseDto {
   name: string;
   benefit: number;
-  per: string; // enum Per
+  per: number; // enum Pe
   perStr: string;
   benefitStr: string;
 }

@@ -8,7 +8,7 @@ import AddJgStepModal from '../../../../components/hr/settings/jobgrade/AddJgSte
 import EditJgStepModal from '../../../../components/hr/settings/jobgrade/EditJgStepModal';
 import DeleteJgStepModal from '../../../../components/hr/settings/jobgrade/DeleteJgStepModal';
 import StepCard from '../../../../components/hr/settings/jobgrade/StepCard';
-import { jgStepService } from '../../../../services/hr/JgStepService';
+import { jgStepService } from '../../../../services/hr/settings/JgStepService';
 import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
 import type { JgStepListDto, JgStepAddDto, JgStepModDto, UUID } from '../../../../types/hr/JgStep';
 
@@ -30,7 +30,7 @@ const JobGradeSubgrades: React.FC = () => {
 
   useEffect(() => {
     loadJobGradeAndSteps();
-  }, [gradeId, location.state]);
+  });
 
   const loadJobGradeAndSteps = async () => {
     try {
@@ -336,7 +336,7 @@ const JobGradeSubgrades: React.FC = () => {
         >
           <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No Steps Found
+            No Job Steps Found
           </h3>
           <p className="text-gray-500 mb-4">
             Get started by creating the first step for this job grade.

@@ -1,14 +1,14 @@
 // services/hr/JgStepService.ts
-import { api } from '../api';
+import { api } from '../../api';
 import type { 
   JgStepListDto, 
   JgStepAddDto, 
   JgStepModDto, 
   UUID 
-} from '../../types/hr/JgStep';
+} from '../../../types/hr/JgStep';
 
 class JgStepService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/JgStep`;
+  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/JgStep`;
 
   // GET: /api/core/hrmm/v1/JgStep/AllJgSteps/{id} - Get list of Job Grade Steps by JobGradeId
   async getJgStepsByJobGrade(jobGradeId: UUID): Promise<JgStepListDto[]> {
