@@ -21,11 +21,11 @@ import type {
 import { id } from 'date-fns/locale';
 
 class PositionService {
-  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/Position`;
-  private benefitUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionBenefit`;
-  private eduUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionEdu`;
-  private expUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionExp`;
-  private reqUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/PositionReq`;
+  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/Position`;
+  private benefitUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionBenefit`;
+  private eduUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionEdu`;
+  private expUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionExp`;
+  private reqUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/PositionReq`;
 
   // ============ POSITION CRUD OPERATIONS ============
 
