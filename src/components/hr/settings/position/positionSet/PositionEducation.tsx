@@ -164,12 +164,6 @@ const PositionEducation = forwardRef<PositionEducationRef, PositionEducationProp
               <p className="text-sm text-gray-500 mb-4">
                 No education requirements have been set for this position yet.
               </p>
-              <Button
-                onClick={handleAddEducation}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                Add Education Requirement
-              </Button>
             </div>
           </div>
         )}
