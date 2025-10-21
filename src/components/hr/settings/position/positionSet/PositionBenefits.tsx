@@ -4,7 +4,7 @@ import { Button } from '../../../../ui/button';
 import PositionBenefitsModal from './PositionBenefitsModal';
 import DeletePositionBenefitsModal from './DeletePositionBenefitsModal';
 import type { PositionBenefitListDto, PositionBenefitAddDto, PositionBenefitModDto, UUID, BenefitSettingDto } from '../../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../../services/hr/positionService';
+import { positionService, lookupService } from '../../../../../services/hr/settings/positionService';
 
 interface PositionBenefitsProps {
   positionId: UUID;

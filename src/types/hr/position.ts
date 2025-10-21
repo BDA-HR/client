@@ -149,7 +149,7 @@ export interface PositionReqModDto {
 export interface EducationLevelDto {
   id: UUID;
   name: string;
-  nameAm: string;
+
 }
 
 export interface ProfessionTypeDto {

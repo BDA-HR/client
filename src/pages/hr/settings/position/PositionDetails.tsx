@@ -43,7 +43,7 @@ import type {
   BenefitSettingDto,
 
 } from '../../../../types/hr/position';
-import { positionService } from '../../../../services/hr/positionService';
+import { positionService } from '../../../../services/hr/settings/positionService';
 
 // Define the tab interface
 interface SettingTab {

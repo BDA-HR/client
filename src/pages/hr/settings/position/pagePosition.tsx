@@ -7,7 +7,7 @@ import AddPositionModal from '../../../../components/hr/settings/position/AddPos
 import EditPositionModal from '../../../../components/hr/settings/position/EditPositionModal';
 import DeletePositionModal from '../../../../components/hr/settings/position/DeletePositionModal';
 import type { PositionListDto, PositionAddDto, PositionModDto } from '../../../../types/hr/position';
-import { positionService } from '../../../../services/hr/positionService';
+import { positionService } from '../../../../services/hr/settings/positionService';
 import { motion } from 'framer-motion';
 
 function PagePosition() {

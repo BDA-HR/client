@@ -3,7 +3,7 @@ import { Edit, Trash2, Settings } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import DeletePositionRequirementsModal from './DeletePositionRequirementsModal';
 import type { PositionReqListDto, UUID, ProfessionTypeDto } from '../../../../../types/hr/position';
-import { positionService, lookupService } from '../../../../../services/hr/positionService';
+import { positionService, lookupService } from '../../../../../services/hr/settings/positionService';
 import { PositionGender, WorkOption } from '../../../../../types/hr/enum';
 
 interface PositionRequirementsProps {

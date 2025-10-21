@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api } from '../../api';
 import type { 
   UUID,
   PositionListDto,
@@ -16,7 +16,7 @@ import type {
   PositionReqListDto,
   PositionReqAddDto,
   PositionReqModDto
-} from '../../types/hr/position';
+} from '../../../types/hr/position';
 
 class PositionService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/Position`;
