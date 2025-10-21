@@ -15,7 +15,10 @@ import type {
   PositionEduModDto,
   PositionReqListDto,
   PositionReqAddDto,
-  PositionReqModDto
+  PositionReqModDto,
+  ProfessionTypeDto,
+  EducationLevelDto,
+  BenefitSettingDto
 } from '../../../types/hr/position';
 
 class PositionService {
@@ -306,4 +309,42 @@ class PositionService {
   }
 }
 
+class LookupService {
+  private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}`;
+
+  // GET: /api/core/hrmm/v1/EducationQual/AllEducationQual
+  async getAllEducationLevels(): Promise<EducationLevelDto[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/EducationQual/AllEducationQual`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching education levels:', error);
+      throw error;
+    }
+  }
+
+  // GET: /api/core/hrmm/v1/ProfessionType/AllProfessionType
+  async getAllProfessionTypes(): Promise<ProfessionTypeDto[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/ProfessionType/AllProfessionType`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching profession types:', error);
+      throw error;
+    }
+  }
+
+  // GET: /api/core/hrmm/v1/BenefitSet/AllBenefitSet
+  async getAllBenefitSettings(): Promise<BenefitSettingDto[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/BenefitSet/AllBenefitSet`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching benefit settings:', error);
+      throw error;
+    }
+  }
+}
+
 export const positionService = new PositionService();
+export const lookupService = new LookupService();
