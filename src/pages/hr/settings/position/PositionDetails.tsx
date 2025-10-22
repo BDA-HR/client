@@ -293,10 +293,12 @@ function PositionDetails() {
     setEditingBenefit(null);
   };
 
-  // Check if position has experiences
+// Check if position has experiences
   const checkIfHasExperience = async () => {
     try {
-      const data = await positionService.getAllPositionExperiences();
+      if (!id) return;
+      
+      const data = await positionService.getAllPositionExperiences(id);
       const positionExperiences = data.filter((exp) => exp.positionId === id);
       setHasExperience(positionExperiences.length > 0);
     } catch (error) {
@@ -304,10 +306,12 @@ function PositionDetails() {
     }
   };
 
-  // Check if position has requirements
+// Check if position has requirements
   const checkIfHasRequirement = async () => {
     try {
-      const data = await positionService.getAllPositionRequirements(id!);
+      if (!id) return;
+      
+      const data = await positionService.getAllPositionRequirements(id);
       const positionRequirements = data.filter((req) => req.positionId === id);
       setHasRequirement(positionRequirements.length > 0);
     } catch (error) {

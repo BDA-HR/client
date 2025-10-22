@@ -151,11 +151,6 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
                       {benefit.benefitName || "Unknown Benefit"}
                     </h4>
 
-                    {/* Position */}
-                    <p className="text-sm text-gray-600 mb-4">
-                      {benefit.position}
-                    </p>
-
                     {/* Amount */}
                     <div className="mt-auto">
                       <span className="text-xl font-bold text-green-600">
