@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Edit, Trash2, Settings } from "lucide-react";
 import { Button } from "../../../../ui/button";
@@ -166,12 +167,6 @@ const PositionRequirements = forwardRef<
                             requirement.sundayWorkOption as keyof typeof WorkOption
                           ]
                         }
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Position</p>
-                      <p className="font-semibold text-gray-900">
-                        {requirement.position}
                       </p>
                     </div>
                   </div>
