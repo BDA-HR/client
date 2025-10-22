@@ -44,6 +44,7 @@ import PageBenefitSet from './pages/hr/settings/pageBenefitSet';
 import PageEducationalQual from './pages/hr/settings/pageEducationalQual';
 import PagePosition from './pages/hr/settings/position/pagePosition';
 import PositionDetails from './pages/hr/settings/position/PositionDetails';
+import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
 
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
 
             {/* START HR ROUTES */}
             <Route path='/hr/employees/record' element={<EmployeeManagementPage />} />
+            <Route path='/hr/employees/record/Add' element={<AddEmployeePage />} />
             <Route path="/hr/employees/:id" element={<EmployeeDetailsPage />} />
             <Route path='/hr/settings/jobgrade' element={<JobGrade />} />
             <Route path='/hr/settings/jobgrade/:gradeId/steps' element={<JobGradeSubgrades />} />
