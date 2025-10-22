@@ -26,7 +26,8 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [deletingBenefit, setDeletingBenefit] = useState<PositionBenefitListDto | null>(null);
+    const [deletingBenefit, setDeletingBenefit] =
+      useState<PositionBenefitListDto | null>(null);
 
     useImperativeHandle(ref, () => ({
       fetchBenefits: fetchData,
@@ -34,13 +35,16 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
 
     useEffect(() => {
       fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [positionId]);
 
     const fetchData = async () => {
       try {
         setLoading(true);
-        const benefitsData = await positionService.getAllPositionBenefits(positionId);
-        
+        const benefitsData = await positionService.getAllPositionBenefits(
+          positionId
+        );
+
         const positionBenefits = benefitsData.filter(
           (benefit) => benefit.positionId === positionId
         );
@@ -115,17 +119,17 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     {/* Icon */}
-                    <div className="p-3 bg-green-100 rounded-lg mb-4">
+                    <div className="p-3 bg-green-100 rounded-lg mb-1">
                       <Award className="h-6 w-6 text-green-600" />
                     </div>
 
                     {/* Benefit Name */}
-                    <h4 className="font-semibold text-gray-900 text-lg mb-2">
+                    <h4 className="font-semibold text-gray-900 text-lg mb-0">
                       {benefit.benefitName || "Unknown Benefit"}
                     </h4>
 
                     {/* Amount - Updated formatting */}
-                    <div className="mt-auto mb-4">
+                    <div className="mt-auto mb-0">
                       <p className="text-2xl font-bold text-green-600">
                         {benefit.benefit}{" "}
                         <span className="text-sm text-gray-500">
