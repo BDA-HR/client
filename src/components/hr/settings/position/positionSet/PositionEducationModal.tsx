@@ -6,7 +6,7 @@ import List from '../../../../List/list';
 import type { PositionEduAddDto, PositionEduModDto, PositionEduListDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
 import type { ListItem } from '../../../../../types/List/list';
 import { listService } from '../../../../../services/List/listservice';
-import { nameListService } from '../../../../../services/hr/NameListService'; 
+import { nameListService } from '../../../../../services/List/HrmmNameListService'; 
 
 interface PositionEducationModalProps {
   isOpen: boolean;

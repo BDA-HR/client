@@ -15,7 +15,7 @@ import type {
   UUID,
 } from "../../../../../types/hr/position";
 import type { NameListItem } from "../../../../../types/NameList/nameList";
-import { nameListService } from "../../../../../services/hr/NameListService";
+import { nameListService } from "../../../../../services/List/HrmmNameListService";
 
 interface PositionBenefitsModalProps {
   isOpen: boolean;
