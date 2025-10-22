@@ -29,6 +29,7 @@ class CompanyService {
   async createCompany(company: AddCompDto): Promise<CompListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddCompany`, company);
+      console.info('Error creating company:', response.data.id);
       return response.data;
     } catch (error) {
       console.error('Error creating company:', error);
