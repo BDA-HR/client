@@ -6,14 +6,12 @@ import DeletePositionBenefitsModal from "./DeletePositionBenefitsModal";
 import type {
   PositionBenefitListDto,
   PositionBenefitAddDto,
-  PositionBenefitModDto,
   UUID,
 } from "../../../../../types/hr/position";
 import { positionService } from "../../../../../services/hr/settings/positionService";
 
 interface PositionBenefitsProps {
   positionId: UUID;
-  onEdit: (benefit: PositionBenefitListDto) => void;
   viewMode: "grid" | "list";
   setViewMode: (mode: "grid" | "list") => void;
 }
@@ -23,15 +21,12 @@ export interface PositionBenefitsRef {
 }
 
 const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
-  ({ positionId, onEdit, viewMode }, ref) => {
+  ({ positionId, viewMode }, ref) => {
     const [benefits, setBenefits] = useState<PositionBenefitListDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [editingBenefit, setEditingBenefit] =
-      useState<PositionBenefitListDto | null>(null);
-    const [deletingBenefit, setDeletingBenefit] =
-      useState<PositionBenefitListDto | null>(null);
+    const [deletingBenefit, setDeletingBenefit] = useState<PositionBenefitListDto | null>(null);
 
     useImperativeHandle(ref, () => ({
       fetchBenefits: fetchData,
@@ -57,25 +52,13 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
       }
     };
 
-    const handleSave = async (
-      data: PositionBenefitAddDto | PositionBenefitModDto
-    ) => {
+    const handleSave = async (data: PositionBenefitAddDto) => {
       try {
-        if ("id" in data) {
-          await positionService.updatePositionBenefit(data);
-        } else {
-          await positionService.createPositionBenefit(data);
-        }
+        await positionService.createPositionBenefit(data);
         await fetchData();
       } catch (error) {
         console.error("Error saving benefit:", error);
       }
-    };
-
-    const handleEdit = (benefit: PositionBenefitListDto) => {
-      setEditingBenefit(benefit);
-      setIsModalOpen(true);
-      onEdit(benefit);
     };
 
     const handleDelete = (benefit: PositionBenefitListDto) => {
@@ -96,18 +79,11 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
 
     const handleCloseModal = () => {
       setIsModalOpen(false);
-      setEditingBenefit(null);
     };
 
     const handleCloseDeleteModal = () => {
       setIsDeleteModalOpen(false);
       setDeletingBenefit(null);
-    };
-
-    // Generate random monetary values for demonstration
-    const getRandomAmount = () => {
-      const amounts = [1500, 2000, 3000, 4500, 6000, 7500, 8500, 10000];
-      return amounts[Math.floor(Math.random() * amounts.length)];
     };
 
     if (loading) {
@@ -130,15 +106,12 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
           }
         >
           {benefits.map((benefit) => {
-            const amount = getRandomAmount();
-
             if (viewMode === "grid") {
               // Grid View Layout
               return (
                 <div
                   key={benefit.id}
-                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white"
-                  onClick={() => handleEdit(benefit)}
+                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 bg-white relative"
                 >
                   <div className="flex flex-col items-center text-center h-full">
                     {/* Icon */}
@@ -151,29 +124,23 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
                       {benefit.benefitName || "Unknown Benefit"}
                     </h4>
 
-                    {/* Position */}
-                    <p className="text-sm text-gray-600 mb-4">
-                      {benefit.position}
-                    </p>
-
-                    {/* Amount */}
-                    <div className="mt-auto">
-                      <span className="text-xl font-bold text-green-600">
-                        {amount.toLocaleString()} ETB
-                      </span>
-                      <span className="text-sm text-gray-500 ml-2">/month</span>
+                    {/* Amount - Updated formatting */}
+                    <div className="mt-auto mb-4">
+                      <p className="text-2xl font-bold text-green-600">
+                        {benefit.benefit}{" "}
+                        <span className="text-sm text-gray-500">
+                          ETB/ {benefit.perStr}
+                        </span>
+                      </p>
                     </div>
 
-                    {/* Delete Button */}
-                    <div className="mt-4 pt-4 border-t border-gray-200 w-full">
+                    {/* Action Buttons */}
+                    <div className="mt-4 pt-4 border-t border-gray-200 w-full flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(benefit);
-                        }}
-                        className="w-full flex items-center justify-center gap-2 text-red-600 hover:text-red-700 border-red-300 hover:bg-red-50"
+                        onClick={() => handleDelete(benefit)}
+                        className="flex-1 flex items-center justify-center gap-2 text-red-600 hover:text-red-700 border-red-300 hover:bg-red-50"
                       >
                         <Trash2 className="h-4 w-4" />
                         Delete
@@ -187,8 +154,7 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
               return (
                 <div
                   key={benefit.id}
-                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white"
-                  onClick={() => handleEdit(benefit)}
+                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 bg-white"
                 >
                   <div className="flex justify-between items-start">
                     {/* Left Content */}
@@ -205,32 +171,24 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
                           {benefit.benefitName || "Unknown Benefit"}
                         </h4>
 
-                        {/* Position */}
-                        <p className="text-sm text-gray-600 font-medium">
-                          {benefit.position}
-                        </p>
-
-                        {/* Amount */}
+                        {/* Amount - Updated formatting */}
                         <div className="mt-3">
-                          <span className="text-xl font-bold text-green-600">
-                            {amount.toLocaleString()} ETB
-                          </span>
-                          <span className="text-sm text-gray-500 ml-2">
-                            /month
-                          </span>
+                          <p className="text-2xl font-bold text-green-600">
+                            {benefit.benefit}{" "}
+                            <span className="text-sm text-gray-500">
+                              ETB/ {benefit.perStr}
+                            </span>
+                          </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Right Content - Delete Button */}
+                    {/* Right Content - Action Buttons */}
                     <div className="flex gap-2 ml-4">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(benefit);
-                        }}
+                        onClick={() => handleDelete(benefit)}
                         className="flex items-center gap-2 text-red-600 hover:text-red-700 border-red-300 hover:bg-red-50"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -257,7 +215,6 @@ const PositionBenefits = forwardRef<PositionBenefitsRef, PositionBenefitsProps>(
           onClose={handleCloseModal}
           onSave={handleSave}
           positionId={positionId}
-          editingBenefit={editingBenefit}
         />
 
         <DeletePositionBenefitsModal
