@@ -6,6 +6,7 @@ import List from '../../../../List/list';
 import type { PositionEduAddDto, PositionEduModDto, PositionEduListDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
 import type { ListItem } from '../../../../../types/List/list';
 import { listService } from '../../../../../services/List/listservice';
+import { nameListService } from '../../../../../services/hr/NameListService'; 
 
 interface PositionEducationModalProps {
   isOpen: boolean;
@@ -47,6 +48,21 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
     onClose();
   }, [onClose]);
 
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      if (editingEducation) {
+        // Set editing values
+        setSelectedEducationLevel(editingEducation.educationLevelId);
+        setSelectedEducationQual(editingEducation.educationQualId);
+      } else {
+        // Reset to empty for new education
+        setSelectedEducationLevel(undefined);
+        setSelectedEducationQual(undefined);
+      }
+    }
+  }, [isOpen, editingEducation]);
+
   // Fetch education levels and qualification names when modal opens
   useEffect(() => {
     const fetchEducationData = async () => {
@@ -55,10 +71,10 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
       setLoading(true);
       setLoadingQuals(true);
       try {
-        // Fetch both education levels and qualification names in parallel
+        // Fetch education levels from listService and qualification names from nameListService
         const [levelsData, qualNamesData] = await Promise.all([
           listService.getAllEducationLevels(),
-          listService.getAllEducationQualNames()
+          nameListService.getAllEducationQualNames() // Use nameListService here
         ]);
 
         // Transform ListItem[] to EducationLevelDto[]
@@ -69,12 +85,14 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
         setEducationLevels(transformedLevels);
         setEducationQualNames(qualNamesData);
         
-        // Set first education level and qual as default if none selected and not editing
-        if (transformedLevels.length > 0 && !selectedEducationLevel && !editingEducation) {
-          setSelectedEducationLevel(transformedLevels[0].id);
-        }
-        if (qualNamesData.length > 0 && !selectedEducationQual && !editingEducation) {
-          setSelectedEducationQual(qualNamesData[0].id);
+        // Only set defaults if we're NOT editing and no selection has been made
+        if (!editingEducation) {
+          if (transformedLevels.length > 0 && !selectedEducationLevel) {
+            setSelectedEducationLevel(transformedLevels[0].id);
+          }
+          if (qualNamesData.length > 0 && !selectedEducationQual) {
+            setSelectedEducationQual(qualNamesData[0].id);
+          }
         }
       } catch (err) {
         console.error('Error fetching education data:', err);
@@ -85,24 +103,7 @@ const PositionEducationModal: React.FC<PositionEducationModalProps> = ({
     };
 
     fetchEducationData();
-  }, [isOpen, selectedEducationLevel, selectedEducationQual, editingEducation]);
-
-  // Reset form when modal opens and set editing data
-  useEffect(() => {
-    if (isOpen) {
-      if (editingEducation) {
-        setSelectedEducationLevel(editingEducation.educationLevelId);
-        setSelectedEducationQual(editingEducation.educationQualId);
-      } else {
-        if (educationLevels.length > 0) {
-          setSelectedEducationLevel(educationLevels[0].id);
-        }
-        if (educationQualNames.length > 0) {
-          setSelectedEducationQual(educationQualNames[0].id);
-        }
-      }
-    }
-  }, [isOpen, editingEducation, educationLevels, educationQualNames]);
+  }, [isOpen, editingEducation]); // Removed selectedEducationLevel and selectedEducationQual from dependencies
 
   const handleSelectEducationLevel = (item: ListItem) => {
     setSelectedEducationLevel(item.id);
