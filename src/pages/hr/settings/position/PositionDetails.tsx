@@ -36,8 +36,6 @@ import type {
   PositionEduModDto,
   PositionEduListDto,
   PositionBenefitAddDto,
-  PositionBenefitModDto,
-  PositionBenefitListDto,
   UUID,
 } from "../../../../types/hr/position";
 import { positionService } from "../../../../services/hr/settings/positionService";
@@ -120,8 +118,6 @@ function PositionDetails() {
 
   // Benefit modal state
   const [isBenefitModalOpen, setIsBenefitModalOpen] = useState(false);
-  const [editingBenefit, setEditingBenefit] =
-    useState<PositionBenefitListDto | null>(null);
   const benefitRef = useRef<any>(null);
 
   // Grid/List view state for benefits
@@ -261,24 +257,12 @@ function PositionDetails() {
 
   // Benefit modal handlers
   const handleAddBenefit = () => {
-    setEditingBenefit(null);
     setIsBenefitModalOpen(true);
   };
 
-  const handleEditBenefit = (benefit: PositionBenefitListDto) => {
-    setEditingBenefit(benefit);
-    setIsBenefitModalOpen(true);
-  };
-
-  const handleSaveBenefit = async (
-    data: PositionBenefitAddDto | PositionBenefitModDto
-  ) => {
+  const handleSaveBenefit = async (data: PositionBenefitAddDto) => {
     try {
-      if ("id" in data) {
-        await positionService.updatePositionBenefit(data);
-      } else {
-        await positionService.createPositionBenefit(data);
-      }
+      await positionService.createPositionBenefit(data);
       if (benefitRef.current && benefitRef.current.fetchBenefits) {
         await benefitRef.current.fetchBenefits();
       }
@@ -290,7 +274,6 @@ function PositionDetails() {
 
   const handleCloseBenefitModal = () => {
     setIsBenefitModalOpen(false);
-    setEditingBenefit(null);
   };
 
 // Check if position has experiences
@@ -601,7 +584,6 @@ function PositionDetails() {
               <PositionBenefits
                 positionId={position.id}
                 ref={benefitRef}
-                onEdit={handleEditBenefit}
                 viewMode={benefitViewMode}
                 setViewMode={setBenefitViewMode}
               />
@@ -642,7 +624,6 @@ function PositionDetails() {
           onClose={handleCloseBenefitModal}
           onSave={handleSaveBenefit}
           positionId={position.id}
-          editingBenefit={editingBenefit}
         />
       </div>
     </div>
