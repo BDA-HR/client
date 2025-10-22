@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Users,
@@ -276,7 +277,7 @@ function PositionDetails() {
     setIsBenefitModalOpen(false);
   };
 
-// Check if position has experiences
+  // Check if position has experiences
   const checkIfHasExperience = async () => {
     try {
       if (!id) return;
@@ -289,7 +290,7 @@ function PositionDetails() {
     }
   };
 
-// Check if position has requirements
+  // Check if position has requirements
   const checkIfHasRequirement = async () => {
     try {
       if (!id) return;
@@ -304,9 +305,9 @@ function PositionDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex justify-center items-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <h3 className="text-lg font-semibold text-gray-700">
             Loading Position Details
           </h3>
@@ -320,312 +321,387 @@ function PositionDetails() {
 
   if (error || !position) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center border border-green-200">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="h-8 w-8 text-red-600" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
-            Position Not Found
-          </h3>
-          <p className="text-gray-600 mb-6">
-            {error || "The requested position could not be found."}
-          </p>
-          <Button onClick={handleBack} variant={"outline"}>
+      <div className="mx-auto space-y-6">
+        <div className="flex items-center space-x-4 mb-6">
+          <Button variant="outline" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4" />
             Back to Positions
           </Button>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error && error.includes("fetch") ? (
+                <>
+                  Failed to load position details.{" "}
+                  <button
+                    onClick={fetchPosition}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : (
+                error || "Position not found"
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <div className="text-gray-400 mb-4">
+            <Users className="h-16 w-16 mx-auto" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Position Not Found
+          </h3>
+          <p className="text-gray-500 mb-4">
+            {error || "The requested position could not be found."}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen space-y-4">
-      <div className="mx-auto">
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={handleBack}>
-                <ArrowLeft className="h-4 w-4" />
-                Back to Positions
-              </Button>
-              <div className="h-8 w-px bg-green-300"></div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                  {position.name}
-                </h1>
-                <p className="text-lg text-gray-600 mt-1">{position.nameAm}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Position Stats */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200 hover:shadow-md transition-shadow duration-200">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Building className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Department
-                  </p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {position.department}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200 hover:shadow-md transition-shadow duration-200">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <UserCheck className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Positions</p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {position.noOfPosition}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200 hover:shadow-md transition-shadow duration-200">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Calendar className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Status</p>
-                  <p
-                    className={`text-lg font-semibold ${
-                      position.isVacant === "1"
-                        ? "text-green-600"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {position.isVacantStr}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs Navigation */}
-        <div className="mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-green-200 p-2">
-            <nav className="flex space-x-2">
-              {settingTabs.map((tab) => {
-                const IconComponent = tab.icon;
-                const isActive = activeTab === tab.id;
-
-                return (
+    <div className="mx-auto space-y-6">
+      {/* Error Display */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          <div className="flex justify-between items-center">
+            <span className="font-medium">
+              {error.includes("fetch") ? (
+                <>
+                  Failed to load position details.{" "}
                   <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 ${
-                      isActive
-                        ? `${greenTheme.primary.light} border border-green-300 text-green-700 shadow-sm`
-                        : "text-gray-500 hover:text-green-700 hover:bg-green-50"
-                    }`}
+                    onClick={fetchPosition}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
                   >
-                    <IconComponent
-                      className={`h-5 w-5 ${
-                        isActive ? greenTheme.primary.icon : "text-gray-400"
-                      }`}
-                    />
-                    {tab.label}
-                    {isActive && (
-                      <div className="w-2 h-2 rounded-full bg-green-500 ml-1"></div>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("save") ? (
+                "Failed to save changes. Please try again."
+              ) : error.includes("create") ? (
+                "Failed to create item. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update item. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete item. Please try again."
+              ) : (
+                error
+              )}
+            </span>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button variant="outline" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4" />
+              Back to Positions
+            </Button>
+            <div className="h-8 w-px bg-green-300"></div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                {position.name}
+              </h1>
+              <p className="text-lg text-gray-600 mt-1">{position.nameAm}</p>
+            </div>
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div className="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
-          {/* Tab Header */}
-          <div className={`border-b ${greenTheme.primary.border} px-6 py-4`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-lg ${greenTheme.primary.light}`}>
-                  {settingTabs.find((tab) => tab.id === activeTab) && (
-                    <IconComponent
-                      icon={
-                        settingTabs.find((tab) => tab.id === activeTab)!.icon
-                      }
-                      className={`h-6 w-6 ${greenTheme.primary.icon}`}
-                    />
-                  )}
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Position{" "}
-                    {settingTabs.find((tab) => tab.id === activeTab)?.label}
-                  </h2>
-                </div>
+        {/* Position Stats */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Building className="h-5 w-5 text-green-600" />
               </div>
-
-              <div className="flex items-center gap-3">
-                {/* View Mode Toggle - Only shown for Benefit tab */}
-                {activeTab === "benefit" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800 whitespace-nowrap"
-                    onClick={() =>
-                      setBenefitViewMode(
-                        benefitViewMode === "grid" ? "list" : "grid"
-                      )
-                    }
-                  >
-                    {benefitViewMode === "grid" ? (
-                      <>
-                        <List className="h-4 w-4" />
-                        List View
-                      </>
-                    ) : (
-                      <>
-                        <Grid className="h-4 w-4" />
-                        Grid View
-                      </>
-                    )}
-                  </Button>
-                )}
-
-                {/* Add Education Button - Only shown for Education tab */}
-                {activeTab === "education" && (
-                  <Button
-                    onClick={handleAddEducation}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
-                  >
-                    <BadgePlus className="h-4 w-4" />
-                    Add Education
-                  </Button>
-                )}
-
-                {/* Add Benefit Button - Only shown for Benefit tab */}
-                {activeTab === "benefit" && (
-                  <Button
-                    onClick={handleAddBenefit}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
-                  >
-                    <BadgePlus className="h-4 w-4" />
-                    Add Benefit
-                  </Button>
-                )}
-
-                {/* Add Experience Button - Only shown for Experience tab when no experience exists */}
-                {activeTab === "experience" && !hasExperience && (
-                  <Button
-                    onClick={handleAddExperience}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
-                  >
-                    <BadgePlus className="h-4 w-4" />
-                    Add Experience
-                  </Button>
-                )}
-
-                {/* Add Requirements Button - Only shown for Requirements tab when no requirement exists */}
-                {activeTab === "requirement" && !hasRequirement && (
-                  <Button
-                    onClick={handleAddRequirement}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
-                  >
-                    <BadgePlus className="h-4 w-4" />
-                    Add Requirements
-                  </Button>
-                )}
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Department
+                </p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {position.department}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Tab Content with Properly Typed Conditional Rendering */}
-          <div className="p-6">
-            {/* Experience Tab */}
-            {activeTab === "experience" && (
-              <PositionExperience
-                positionId={position.id}
-                ref={experienceRef}
-                onEdit={handleEditExperience}
-                onExperienceAdded={() => setHasExperience(true)}
-                onExperienceDeleted={() => setHasExperience(false)}
-              />
-            )}
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <UserCheck className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Positions</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {position.noOfPosition}
+                </p>
+              </div>
+            </div>
+          </div>
 
-            {/* Requirements Tab */}
-            {activeTab === "requirement" && (
-              <PositionRequirements
-                positionId={position.id}
-                ref={requirementRef}
-                onEdit={handleEditRequirement}
-                onRequirementAdded={() => setHasRequirement(true)}
-                onRequirementDeleted={() => setHasRequirement(false)}
-              />
-            )}
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Calendar className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Status</p>
+                <p
+                  className={`text-lg font-semibold ${
+                    position.isVacant === "1"
+                      ? "text-green-600"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {position.isVacantStr}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Education Tab */}
-            {activeTab === "education" && (
-              <PositionEducation
-                positionId={position.id}
-                ref={educationRef}
-                onEdit={handleEditEducation}
-              />
-            )}
+      {/* Tabs Navigation */}
+      <div className="mb-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-green-200 p-2">
+          <nav className="flex space-x-2">
+            {settingTabs.map((tab) => {
+              const IconComponent = tab.icon;
+              const isActive = activeTab === tab.id;
 
-            {/* Benefits Tab */}
-            {activeTab === "benefit" && (
-              <PositionBenefits
-                positionId={position.id}
-                ref={benefitRef}
-                viewMode={benefitViewMode}
-                setViewMode={setBenefitViewMode}
-              />
-            )}
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 ${
+                    isActive
+                      ? `${greenTheme.primary.light} border border-green-300 text-green-700 shadow-sm`
+                      : "text-gray-500 hover:text-green-700 hover:bg-green-50"
+                  }`}
+                >
+                  <IconComponent
+                    className={`h-5 w-5 ${
+                      isActive ? greenTheme.primary.icon : "text-gray-400"
+                    }`}
+                  />
+                  {tab.label}
+                  {isActive && (
+                    <div className="w-2 h-2 rounded-full bg-green-500 ml-1"></div>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
+        {/* Tab Header */}
+        <div className={`border-b ${greenTheme.primary.border} px-6 py-4`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={`p-2 rounded-lg ${greenTheme.primary.light}`}>
+                {settingTabs.find((tab) => tab.id === activeTab) && (
+                  <IconComponent
+                    icon={
+                      settingTabs.find((tab) => tab.id === activeTab)!.icon
+                    }
+                    className={`h-6 w-6 ${greenTheme.primary.icon}`}
+                  />
+                )}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Position{" "}
+                  {settingTabs.find((tab) => tab.id === activeTab)?.label}
+                </h2>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* View Mode Toggle - Only shown for Benefit tab */}
+              {activeTab === "benefit" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800 whitespace-nowrap"
+                  onClick={() =>
+                    setBenefitViewMode(
+                      benefitViewMode === "grid" ? "list" : "grid"
+                    )
+                  }
+                >
+                  {benefitViewMode === "grid" ? (
+                    <>
+                      <List className="h-4 w-4" />
+                      List View
+                    </>
+                  ) : (
+                    <>
+                      <Grid className="h-4 w-4" />
+                      Grid View
+                    </>
+                  )}
+                </Button>
+              )}
+
+              {/* Add Education Button - Only shown for Education tab */}
+              {activeTab === "education" && (
+                <Button
+                  onClick={handleAddEducation}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Education
+                </Button>
+              )}
+
+              {/* Add Benefit Button - Only shown for Benefit tab */}
+              {activeTab === "benefit" && (
+                <Button
+                  onClick={handleAddBenefit}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Benefit
+                </Button>
+              )}
+
+              {/* Add Experience Button - Only shown for Experience tab when no experience exists */}
+              {activeTab === "experience" && !hasExperience && (
+                <Button
+                  onClick={handleAddExperience}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Experience
+                </Button>
+              )}
+
+              {/* Add Requirements Button - Only shown for Requirements tab when no requirement exists */}
+              {activeTab === "requirement" && !hasRequirement && (
+                <Button
+                  onClick={handleAddRequirement}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap cursor-pointer"
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  Add Requirements
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Experience Modal */}
-        <PositionExperienceModal
-          isOpen={isExperienceModalOpen}
-          onClose={handleCloseExperienceModal}
-          onSave={handleSaveExperience}
-          positionId={position.id}
-          editingExperience={editingExperience}
-        />
+        {/* Tab Content with Properly Typed Conditional Rendering */}
+        <div className="p-6">
+          {/* Experience Tab */}
+          {activeTab === "experience" && (
+            <PositionExperience
+              positionId={position.id}
+              ref={experienceRef}
+              onEdit={handleEditExperience}
+              onExperienceAdded={() => setHasExperience(true)}
+              onExperienceDeleted={() => setHasExperience(false)}
+            />
+          )}
 
-        {/* Requirements Modal */}
-        <PositionRequirementsModal
-          isOpen={isRequirementModalOpen}
-          onClose={handleCloseRequirementModal}
-          onSave={handleSaveRequirement}
-          positionId={position.id}
-          editingRequirement={editingRequirement}
-        />
+          {/* Requirements Tab */}
+          {activeTab === "requirement" && (
+            <PositionRequirements
+              positionId={position.id}
+              ref={requirementRef}
+              onEdit={handleEditRequirement}
+              onRequirementAdded={() => setHasRequirement(true)}
+              onRequirementDeleted={() => setHasRequirement(false)}
+            />
+          )}
 
-        {/* Education Modal */}
-        <PositionEducationModal
-          isOpen={isEducationModalOpen}
-          onClose={handleCloseEducationModal}
-          onSave={handleSaveEducation}
-          positionId={position.id}
-          editingEducation={editingEducation}
-        />
+          {/* Education Tab */}
+          {activeTab === "education" && (
+            <PositionEducation
+              positionId={position.id}
+              ref={educationRef}
+              onEdit={handleEditEducation}
+            />
+          )}
 
-        {/* Benefit Modal */}
-        <PositionBenefitsModal
-          isOpen={isBenefitModalOpen}
-          onClose={handleCloseBenefitModal}
-          onSave={handleSaveBenefit}
-          positionId={position.id}
-        />
+          {/* Benefits Tab */}
+          {activeTab === "benefit" && (
+            <PositionBenefits
+              positionId={position.id}
+              ref={benefitRef}
+              viewMode={benefitViewMode}
+              setViewMode={setBenefitViewMode}
+            />
+          )}
+        </div>
       </div>
+
+      {/* Experience Modal */}
+      <PositionExperienceModal
+        isOpen={isExperienceModalOpen}
+        onClose={handleCloseExperienceModal}
+        onSave={handleSaveExperience}
+        positionId={position.id}
+        editingExperience={editingExperience}
+      />
+
+      {/* Requirements Modal */}
+      <PositionRequirementsModal
+        isOpen={isRequirementModalOpen}
+        onClose={handleCloseRequirementModal}
+        onSave={handleSaveRequirement}
+        positionId={position.id}
+        editingRequirement={editingRequirement}
+      />
+
+      {/* Education Modal */}
+      <PositionEducationModal
+        isOpen={isEducationModalOpen}
+        onClose={handleCloseEducationModal}
+        onSave={handleSaveEducation}
+        positionId={position.id}
+        editingEducation={editingEducation}
+      />
+
+      {/* Benefit Modal */}
+      <PositionBenefitsModal
+        isOpen={isBenefitModalOpen}
+        onClose={handleCloseBenefitModal}
+        onSave={handleSaveBenefit}
+        positionId={position.id}
+      />
     </div>
   );
 }
