@@ -13,7 +13,7 @@ export type GenderAm = typeof GenderAm[keyof typeof GenderAm];
 export const PositionGender = {
   "0": 'Male',
   "1": 'Female', 
-  "2": 'Both'
+  "2": 'Male/Female'
 } as const;
 export type PositionGender = typeof PositionGender[keyof typeof PositionGender];
 
