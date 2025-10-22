@@ -7,8 +7,6 @@ export type { UUID };
 export interface PositionBenefitListDto extends BaseDto {
   benefitSettingId: UUID;
   positionId: UUID;
-  position: string;
-  positionAm: string;
   benefitName: string;
   perStr: string;
   benefit: string;
@@ -62,8 +60,6 @@ export interface PositionExpListDto extends BaseDto {
   otherPosExp: number;
   minAge: number;
   maxAge: number;
-  position: string;
-  positionAm: string;
 }
 
 export interface PositionExpAddDto {
@@ -89,8 +85,6 @@ export interface PositionEduListDto extends BaseDto {
   positionId: UUID;
   educationQualId: UUID;
   educationLevelId: UUID;
-  position: string;
-  positionAm: string;
   educationQual: string;
   educationLevel: string;
 }
@@ -121,8 +115,6 @@ export interface PositionReqListDto extends BaseDto {
   saturdayWorkOptionStr: string;
   sundayWorkOptionStr: string;
   professionType: string;
-  position: string;
-  positionAm: string;
 }
 
 export interface PositionReqAddDto {
