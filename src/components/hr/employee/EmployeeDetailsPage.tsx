@@ -101,9 +101,9 @@ const EmployeeDetailsPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-gray-50 p-4 md:p-8"
+      className="min-h-screen"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto">
         {/* Header Section */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
