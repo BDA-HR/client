@@ -4,20 +4,26 @@ import EmployeeManagementHeader from '../../../components/hr/employee/EmployeeMa
 import EmployeeStatsCards from '../../../components/hr/employee/EmployeeStatsCards';
 import EmployeeSearchFilters from '../../../components/hr/employee/EmployeeSearchFilters';
 import EmployeeTable from '../../../components/hr/employee/EmployeeTable';
-import type { Employee } from '../../../types/employee';
-import { initialEmployees } from '../../../data/employee';
+import type { EmployeeListDto } from '../../../types/hr/employee';
+import { initialEmployees } from '../../../data/hr/employee';
+import type { UUID } from '../../../types/hr/employee';
+
+// Extended type for local state management
+type EmployeeWithStatus = EmployeeListDto & {
+  status?: "active" | "on-leave";
+};
 
 const EmployeeManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     department: '',
     status: '',
-    contractType: '',
+    employmentType: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [employees, setEmployees] = useState<EmployeeWithStatus[]>(initialEmployees);
 
   // Check for new employee data when component mounts or when returning from add employee page
   useEffect(() => {
@@ -51,52 +57,32 @@ const EmployeeManagementPage = () => {
     };
   }, []);
 
-  const handleAddEmployee = (newEmployee: Omit<Employee, 'id'>) => {
-    const employeeWithId: Employee = {
+  const handleAddEmployee = (newEmployee: Omit<EmployeeListDto, 'id'>) => {
+    const employeeWithId: EmployeeWithStatus = {
       ...newEmployee,
-      id: `emp-${Date.now()}`,
+      id: `emp-${Date.now()}` as UUID,
       // Ensure all required fields are present
-      employeeId: newEmployee.employeeId || `EMP${Date.now().toString().slice(-6)}`,
-      middleName: newEmployee.middleName || '',
-      city: newEmployee.city || '',
-      state: newEmployee.state || '',
-      postalCode: newEmployee.postalCode || '',
-      country: newEmployee.country || '',
-      dateOfBirth: newEmployee.dateOfBirth || '',
-      gender: newEmployee.gender || '',
-      maritalStatus: newEmployee.maritalStatus || '',
-      emergencyContact: newEmployee.emergencyContact || {
-        name: '',
-        relationship: '',
-        phone: ''
-      },
-      jobGrade: newEmployee.jobGrade || '',
-      employeeCategory: newEmployee.employeeCategory || '',
-      reportingTo: newEmployee.reportingTo || '',
-      manager: newEmployee.manager || '',
-      team: newEmployee.team || '',
-      workLocation: newEmployee.workLocation || '',
-      workSchedule: newEmployee.workSchedule || '',
-      currency: newEmployee.currency || 'USD',
-      paymentMethod: newEmployee.paymentMethod || '',
-      bankDetails: newEmployee.bankDetails || {
-        bankName: '',
-        accountNumber: '',
-        branchCode: ''
-      },
-      taxInformation: newEmployee.taxInformation || '',
-      totalLeavesTaken: newEmployee.totalLeavesTaken || 0,
-      leaveBalance: newEmployee.leaveBalance || 0,
-      attendancePercentage: newEmployee.attendancePercentage || 100,
-      performanceRating: newEmployee.performanceRating || 0,
-      lastAppraisalDate: newEmployee.lastAppraisalDate || '',
-      nextAppraisalDate: newEmployee.nextAppraisalDate || '',
-      keyPerformanceIndicators: newEmployee.keyPerformanceIndicators || [],
-      skills: newEmployee.skills || [],
-      competencies: newEmployee.competencies || [],
-      trainings: newEmployee.trainings || [],
-      previousRoles: newEmployee.previousRoles || [],
-      documents: newEmployee.documents || [],
+      personId: newEmployee.personId || `person-${Date.now()}` as UUID,
+      jobGradeId: newEmployee.jobGradeId || 'grade-1' as UUID,
+      positionId: newEmployee.positionId || 'position-1' as UUID,
+      departmentId: newEmployee.departmentId || 'dept-1' as UUID,
+      employmentTypeId: newEmployee.employmentTypeId || 'type-1' as UUID,
+      employmentNatureId: newEmployee.employmentNatureId || 'nature-1' as UUID,
+      gender: newEmployee.gender || '0',
+      nationality: newEmployee.nationality || 'Ethiopian',
+      code: newEmployee.code || `EMP${Date.now().toString().slice(-6)}`,
+      employmentDate: newEmployee.employmentDate || new Date().toISOString().split('T')[0],
+      jobGrade: newEmployee.jobGrade || 'G1',
+      position: newEmployee.position || 'Employee',
+      department: newEmployee.department || 'General',
+      employmentType: newEmployee.employmentType || 'Full-time',
+      employmentNature: newEmployee.employmentNature || 'Permanent',
+      genderStr: newEmployee.genderStr || 'Male',
+      empFullName: newEmployee.empFullName || 'New Employee',
+      empFullNameAm: newEmployee.empFullNameAm || 'አዲስ ሰራተኛ',
+      employmentDateStr: newEmployee.employmentDateStr || new Date().toLocaleDateString(),
+      employmentDateStrAm: newEmployee.employmentDateStrAm || new Date().toLocaleDateString(),
+      status: 'active' as "active" | "on-leave",
       createdAt: newEmployee.createdAt || new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
       updatedBy: newEmployee.updatedBy || 'System'
@@ -109,7 +95,7 @@ const EmployeeManagementPage = () => {
     console.log('New employee added:', employeeWithId);
   };
 
-  const handleEmployeeUpdate = (updatedEmployee: Employee) => {
+  const handleEmployeeUpdate = (updatedEmployee: EmployeeWithStatus) => {
     setEmployees(prev => 
       prev.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp)
     );
@@ -139,19 +125,23 @@ const EmployeeManagementPage = () => {
 
   // Filter employees based on search and filters
   const filteredEmployees = employees.filter(employee => {
-    const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Search through available fields
     const matchesSearch = 
-      fullName.includes(searchTerm.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.jobTitle.toLowerCase().includes(searchTerm.toLowerCase());
+      employee.empFullName.toLowerCase().includes(searchLower) ||
+      employee.empFullNameAm.toLowerCase().includes(searchLower) ||
+      employee.code.toLowerCase().includes(searchLower) ||
+      employee.department.toLowerCase().includes(searchLower) ||
+      employee.position.toLowerCase().includes(searchLower) ||
+      employee.employmentType.toLowerCase().includes(searchLower) ||
+      employee.nationality.toLowerCase().includes(searchLower);
     
     const matchesDepartment = filters.department ? employee.department === filters.department : true;
     const matchesStatus = filters.status ? employee.status === filters.status : true;
-    const matchesContract = filters.contractType ? employee.contractType === filters.contractType : true;
+    const matchesEmploymentType = filters.employmentType ? employee.employmentType === filters.employmentType : true;
 
-    return matchesSearch && matchesDepartment && matchesStatus && matchesContract;
+    return matchesSearch && matchesDepartment && matchesStatus && matchesEmploymentType;
   });
 
   // Pagination logic
@@ -160,6 +150,11 @@ const EmployeeManagementPage = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Calculate stats based on current data
+  const totalEmployees = employees.length;
+  const activeEmployees = employees.filter(e => e.status === "active").length;
+  const onLeaveEmployees = employees.filter(e => e.status === "on-leave").length;
 
   return (
     <motion.div 
@@ -173,9 +168,9 @@ const EmployeeManagementPage = () => {
           <EmployeeManagementHeader />
           
           <EmployeeStatsCards 
-            totalEmployees={employees.length}
-            activeEmployees={employees.filter(e => e.status === "active").length}
-            onLeaveEmployees={employees.filter(e => e.status === "on-leave").length}
+            totalEmployees={totalEmployees}
+            activeEmployees={activeEmployees}
+            onLeaveEmployees={onLeaveEmployees}
           />
 
           <EmployeeSearchFilters 

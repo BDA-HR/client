@@ -8,120 +8,14 @@ import {
   MoreVertical,
   User,
   X,
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
-  Award,
-  BarChart2,
-  DollarSign,
-  Users,
-  Star,
-  TrendingUp
+  MapPin
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
+import type { EmployeeListDto } from '../../../types/hr/employee';
 
-// Enhanced Employee Type with all ERP fields
-type Employee = {
-  id: string;
-  employeeId: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  email: string;
-  role: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  dateOfBirth: string;
-  gender: string;
-  maritalStatus: string;
-  emergencyContact: {
-    name: string;
-    relationship: string;
-    phone: string;
-  };
-
-  // Employment Details
-  department: string;
-  jobTitle: string;
-  jobGrade: string;
-  employeeCategory: string;
-  reportingTo: string;
-  manager: string;
-  team: string;
-  joiningDate: string;
-  contractType: "Full-time" | "Part-time" | "Freelance" | "Internship";
-  employmentStatus: "Active" | "On Leave" | "Terminated" | "Probation";
-  status: "active" | "on-leave";
-  workLocation: string;
-  workSchedule: string;
-
-  // Compensation
-  salary: number;
-  currency: string;
-  paymentMethod: string;
-  bankDetails: {
-    bankName: string;
-    accountNumber: string;
-    branchCode: string;
-  };
-  taxInformation: string;
-
-  // Time & Attendance
-  lastCheckIn?: string;
-  lastCheckOut?: string;
-  totalLeavesTaken: number;
-  leaveBalance: number;
-  attendancePercentage: number;
-
-  // Performance
-  performanceRating: number;
-  lastAppraisalDate: string;
-  nextAppraisalDate: string;
-  keyPerformanceIndicators: {
-    name: string;
-    target: string;
-    actual: string;
-    weight: number;
-  }[];
-  skills: string[];
-  competencies: string[];
-
-  // Training & Development
-  trainings: {
-    name: string;
-    date: string;
-    duration: string;
-    status: "Completed" | "In Progress" | "Pending";
-    certification?: string;
-  }[];
-
-  // Career History
-  previousRoles: {
-    jobTitle: string;
-    department: string;
-    startDate: string;
-    endDate: string;
-    responsibilities: string;
-  }[];
-
-  // Documents
-  documents: {
-    type: string;
-    name: string;
-    issueDate: string;
-    expiryDate?: string;
-    status: string;
-  }[];
-
-  // System
-  createdAt: string;
-  updatedAt: string;
-  updatedBy: string;
+// Simplified Employee type based on EmployeeListDto
+type Employee = EmployeeListDto & {
+  status?: "active" | "on-leave"; // Optional status field
 };
 
 interface EmployeeTableProps {
@@ -150,19 +44,18 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
   const sortedEmployees = [...employees].sort((a, b) => {
-    return new Date(b.joiningDate).getTime() - new Date(a.joiningDate).getTime();
+    return new Date(b.employmentDate).getTime() - new Date(a.employmentDate).getTime();
   });
 
-const handleViewDetails = (employee: Employee) => {
-  sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
-  sessionStorage.setItem('currentModule', 'HR');
-  
-  // Use window.open with the same origin to maintain session
-  const newWindow = window.open(`/hr/employees/${employee.id}`, '_blank');
-  if (newWindow) {
-    newWindow.focus();
-  }
-};
+  const handleViewDetails = (employee: Employee) => {
+    sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
+    sessionStorage.setItem('currentModule', 'HR');
+    
+    const newWindow = window.open(`/hr/employees/${employee.id}`, '_blank');
+    if (newWindow) {
+      newWindow.focus();
+    }
+  };
 
   const handleEdit = (employee: Employee) => {
     setSelectedEmployee(employee);
@@ -202,7 +95,7 @@ const handleViewDetails = (employee: Employee) => {
     setModalType(null);
   };
 
-  const getContractTypeColor = (type: Employee["contractType"]): string => {
+  const getEmploymentTypeColor = (type: string): string => {
     switch (type) {
       case "Full-time": return "bg-green-100 text-green-800";
       case "Part-time": return "bg-blue-100 text-blue-800";
@@ -257,7 +150,7 @@ const handleViewDetails = (employee: Employee) => {
                 transition={{ duration: 0.3 }}
               >
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Name
+                  Employee
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   Status
@@ -266,13 +159,13 @@ const handleViewDetails = (employee: Employee) => {
                   Department
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                  Job Title
+                  Position
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Joining Date
+                  Employment Date
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contract
+                  Employment Type
                 </th>
                 <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -299,17 +192,20 @@ const handleViewDetails = (employee: Employee) => {
                       </motion.div>
                       <div className="ml-3">
                         <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
-                          {employee.firstName} {employee.lastName}
+                          {employee.empFullName}
                         </div>
-                        <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                          {employee.email}
+                        {/* <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
+                          {employee.code}
+                        </div> */}
+                        <div className="text-xs text-gray-400 truncate max-w-[120px] md:max-w-none">
+                          {employee.empFullNameAm}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status)}`}>
-                      {employee.status === "active" ? "Active" : "On Leave"}
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status || 'active')}`}>
+                      {employee.status === "on-leave" ? "On Leave" : "Active"}
                     </span>
                   </td>
                   <td className={`px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell ${getDepartmentColor(employee.department)}`}>
@@ -318,21 +214,21 @@ const handleViewDetails = (employee: Employee) => {
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
                       <Briefcase className="text-gray-400 mr-2 h-4 w-4" />
-                      <span className="truncate max-w-[120px]">{employee.jobTitle}</span>
+                      <span className="truncate max-w-[120px]">{employee.position}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <div className="flex items-center">
                       <Calendar className="text-gray-400 mr-2 h-4 w-4" />
-                      <span>{employee.joiningDate}</span>
+                      <span>{employee.employmentDateStr || employee.employmentDate}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <motion.span 
                       whileHover={{ scale: 1.05 }}
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getContractTypeColor(employee.contractType)}`}
+                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.employmentType)}`}
                     >
-                      {employee.contractType}
+                      {employee.employmentType}
                     </motion.span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -364,7 +260,7 @@ const handleViewDetails = (employee: Employee) => {
                             onClick={() => handleStatusChange(employee)}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
                           >
-                            {employee.status === 'active' ? 'Mark as On Leave' : 'Mark as Active'}
+                            {employee.status === 'on-leave' ? 'Mark as Active' : 'Mark as On Leave'}
                           </button>
                           <button 
                             onClick={() => handleTerminate(employee)}
@@ -388,7 +284,7 @@ const handleViewDetails = (employee: Employee) => {
             <button
               onClick={() => onPageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-whi"
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Previous
             </button>
@@ -445,14 +341,15 @@ const handleViewDetails = (employee: Employee) => {
         </div>
       </motion.div>
 
-      {/* Enhanced Employee Details Modal */}
+      {/* Simplified Employee Details Modal */}
       {selectedEmployee && modalType === 'view' && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
               <div>
-                <h2 className="text-2xl font-bold">{selectedEmployee.firstName} {selectedEmployee.lastName}</h2>
-                <p className="text-gray-600">{selectedEmployee.jobTitle} • {selectedEmployee.department}</p>
+                <h2 className="text-2xl font-bold">{selectedEmployee.empFullName}</h2>
+                <p className="text-gray-600">{selectedEmployee.position} • {selectedEmployee.department}</p>
+                <p className="text-sm text-gray-500">{selectedEmployee.empFullNameAm}</p>
               </div>
               <button
                 onClick={() => setModalType(null)}
@@ -462,270 +359,104 @@ const handleViewDetails = (employee: Employee) => {
               </button>
             </div>
 
-            <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Personal Information */}
+            <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Basic Information */}
               <div className="space-y-6">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <User className="mr-2 text-blue-500" size={20} />
-                    Personal Information
+                    Basic Information
                   </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-start">
-                      <Mail className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Email</p>
-                        <p>{selectedEmployee.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Phone className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Phone</p>
-                        <p>{selectedEmployee.phone}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <MapPin className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Address</p>
-                        <p>{selectedEmployee.address}, {selectedEmployee.city}, {selectedEmployee.country}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Calendar className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Date of Birth</p>
-                        <p>{selectedEmployee.dateOfBirth}</p>
-                      </div>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Employee Code</p>
+                      <p className="font-medium">{selectedEmployee.code}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Employee ID</p>
-                      <p className="font-medium">{selectedEmployee.employeeId}</p>
+                      <p className="text-sm text-gray-500">Gender</p>
+                      <p className="font-medium">{selectedEmployee.genderStr}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Nationality</p>
+                      <p className="font-medium">{selectedEmployee.nationality}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Employment Nature</p>
+                      <p className="font-medium">{selectedEmployee.employmentNature}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Emergency Contact */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Users className="mr-2 text-red-500" size={20} />
-                    Emergency Contact
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-500">Name</p>
-                      <p>{selectedEmployee.emergencyContact.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Relationship</p>
-                      <p>{selectedEmployee.emergencyContact.relationship}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Phone</p>
-                      <p>{selectedEmployee.emergencyContact.phone}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Employment Details */}
-              <div className="space-y-6">
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Briefcase className="mr-2 text-green-500" size={20} />
                     Employment Details
                   </h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <div>
-                      <p className="text-sm text-gray-500">Employee ID</p>
-                      <p>{selectedEmployee.employeeId}</p>
+                      <p className="text-sm text-gray-500">Department</p>
+                      <p className="font-medium">{selectedEmployee.department}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Position</p>
+                      <p className="font-medium">{selectedEmployee.position}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Job Grade</p>
-                      <p>{selectedEmployee.jobGrade}</p>
+                      <p className="font-medium">{selectedEmployee.jobGrade}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Category</p>
-                      <p>{selectedEmployee.employeeCategory}</p>
+                      <p className="text-sm text-gray-500">Employment Type</p>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentType)}`}>
+                        {selectedEmployee.employmentType}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dates & System Information */}
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Calendar className="mr-2 text-purple-500" size={20} />
+                    Employment Dates
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Employment Date</p>
+                      <p className="font-medium">{selectedEmployee.employmentDateStr || selectedEmployee.employmentDate}</p>
+                      <p className="text-sm text-gray-500">{selectedEmployee.employmentDateStrAm}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Reporting To</p>
-                      <p>{selectedEmployee.reportingTo}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Manager</p>
-                      <p>{selectedEmployee.manager}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Team</p>
-                      <p>{selectedEmployee.team}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Joining Date</p>
-                      <p>{selectedEmployee.joiningDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Contract Type</p>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getContractTypeColor(selectedEmployee.contractType)}`}>
-                        {selectedEmployee.contractType}
+                      <p className="text-sm text-gray-500">Status</p>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status || 'active')}`}>
+                        {selectedEmployee.status === "on-leave" ? "On Leave" : "Active"}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Time & Attendance */}
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Clock className="mr-2 text-purple-500" size={20} />
-                    Time & Attendance
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Last Check-In</p>
-                      <p>{selectedEmployee.lastCheckIn || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Last Check-Out</p>
-                      <p>{selectedEmployee.lastCheckOut || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Leaves Taken</p>
-                      <p>{selectedEmployee.totalLeavesTaken} days</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Leave Balance</p>
-                      <p>{selectedEmployee.leaveBalance} days</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-500">Attendance Percentage</p>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                        <div 
-                          className="h-2.5 rounded-full bg-green-500" 
-                          style={{ width: `${selectedEmployee.attendancePercentage}%` }}
-                        ></div>
-                      </div>
-                      <p className="text-right text-sm mt-1">{selectedEmployee.attendancePercentage}%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Performance & Compensation */}
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <BarChart2 className="mr-2 text-amber-500" size={20} />
-                    Performance
+                    <MapPin className="mr-2 text-amber-500" size={20} />
+                    System Information
                   </h3>
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm text-gray-500">Current Rating</p>
-                      <div className="flex items-center">
-                        <span className="px-2 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                          {selectedEmployee.performanceRating}/5
-                        </span>
-                        <div className="ml-2 flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star 
-                              key={i} 
-                              size={16} 
-                              className={`${i < Math.floor(selectedEmployee.performanceRating) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
-                            />
-                          ))}
-                        </div>
-                      </div>
+                      <p className="text-sm text-gray-500">Created</p>
+                      <p className="font-medium">{selectedEmployee.createdAt}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Last Appraisal</p>
-                      <p>{selectedEmployee.lastAppraisalDate}</p>
+                      <p className="text-sm text-gray-500">Last Updated</p>
+                      <p className="font-medium">{selectedEmployee.updatedAt}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Next Appraisal</p>
-                      <p>{selectedEmployee.nextAppraisalDate}</p>
+                      <p className="text-sm text-gray-500">Updated By</p>
+                      <p className="font-medium">{selectedEmployee.updatedBy}</p>
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <DollarSign className="mr-2 text-emerald-500" size={20} />
-                    Compensation
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-500">Salary</p>
-                      <p className="text-lg font-medium">
-                        {selectedEmployee.currency} {selectedEmployee.salary.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Payment Method</p>
-                      <p>{selectedEmployee.paymentMethod}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Bank Details</p>
-                      <p className="text-sm">
-                        {selectedEmployee.bankDetails.bankName} ••••{selectedEmployee.bankDetails.accountNumber.slice(-4)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Award className="mr-2 text-indigo-500" size={20} />
-                    Training & Development
-                  </h3>
-                  <div className="space-y-3">
-                    {selectedEmployee.trainings.slice(0, 2).map((training, index) => (
-                      <div key={index} className="text-sm">
-                        <p className="font-medium">{training.name}</p>
-                        <div className="flex justify-between text-gray-500">
-                          <span>{training.date}</span>
-                          <span className={
-                            training.status === "Completed" ? "text-green-500" :
-                            training.status === "In Progress" ? "text-blue-500" : "text-gray-500"
-                          }>
-                            {training.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Career History */}
-            <div className="p-6 border-t">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <TrendingUp className="mr-2 text-purple-500" size={20} />
-                Career History
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Period</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Responsibilities</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {selectedEmployee.previousRoles.map((role, index) => (
-                      <tr key={index}>
-                        <td className="px-4 py-2 text-sm">{role.jobTitle}</td>
-                        <td className="px-4 py-2 text-sm">{role.department}</td>
-                        <td className="px-4 py-2 text-sm">
-                          {role.startDate} - {role.endDate || 'Present'}
-                        </td>
-                        <td className="px-4 py-2 text-sm text-gray-500">{role.responsibilities}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </div>
 
@@ -755,8 +486,13 @@ const handleViewDetails = (employee: Employee) => {
               </button>
             </div>
             <div className="p-6">
-              {/* Edit form would go here */}
               <p className="text-gray-600">Edit form implementation would go here...</p>
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  This would contain a form to edit the employee's basic information.
+                  The form would include fields for position, department, employment type, etc.
+                </p>
+              </div>
             </div>
             <div className="border-t p-4 flex justify-end space-x-3 sticky bottom-0 bg-white">
               <button
@@ -783,7 +519,7 @@ const handleViewDetails = (employee: Employee) => {
             <div className="p-6">
               <h2 className="text-xl font-bold mb-4">Confirm Status Change</h2>
               <p className="text-gray-600 mb-6">
-                Are you sure you want to change {selectedEmployee.firstName}'s status to{' '}
+                Are you sure you want to change {selectedEmployee.empFullName}'s status to{' '}
                 {selectedEmployee.status === 'active' ? 'On Leave' : 'Active'}?
               </p>
               <div className="flex justify-end space-x-3">
@@ -812,7 +548,7 @@ const handleViewDetails = (employee: Employee) => {
             <div className="p-6">
               <h2 className="text-xl font-bold mb-4">Confirm Termination</h2>
               <p className="text-gray-600 mb-6">
-                Are you sure you want to terminate {selectedEmployee.firstName}'s employment? This action cannot be undone.
+                Are you sure you want to terminate {selectedEmployee.empFullName}'s employment? This action cannot be undone.
               </p>
               <div className="flex justify-end space-x-3">
                 <button

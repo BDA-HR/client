@@ -1,5 +1,6 @@
 import type { UUID } from 'crypto';
 import type { BaseDto } from './BaseDto';
+export type {UUID}
 
 export interface EmployeeListDto extends BaseDto {
   personId: UUID;
