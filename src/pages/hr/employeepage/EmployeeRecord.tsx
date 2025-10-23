@@ -161,7 +161,7 @@ const EmployeeManagementPage = () => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6 bg-gray-50 min-h-screen p-4"
+      className="space-y-6"
     >
       <div className="w-full mx-auto">
         <div className="flex flex-col space-y-6">
