@@ -1,124 +1,131 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Formik, Form, Field} from 'formik';
-import type {FormikProps  } from 'formik';
+import { motion } from 'framer-motion';
+import type { FormikProps } from 'formik';
+import { Field } from 'formik';
 import * as Yup from 'yup';
-import { ChevronRight, User, Building, Users, CheckCircle } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { User, Building} from 'lucide-react';
+import type { UUID } from 'crypto';
 
-// Validation Schemas for each step
-const step1ValidationSchema = Yup.object({
+// Import components
+import { AddEmployeeStepHeader } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepHeader';
+import { AddEmployeeStepForm } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepForm';
+import type { EmployeeAddDto, JobGradeDto, DepartmentDto, EmploymentTypeDto, EmploymentNatureDto } from '../../../types/hr/employee';
+
+// Validation Schemas
+const personalInfoValidationSchema = Yup.object({
   firstName: Yup.string()
-    .required('First name is required')
+    .required('First name in English is required')
     .min(2, 'First name must be at least 2 characters'),
+  firstNameAm: Yup.string()
+    .required('First name in Amharic is required')
+    .min(2, 'First name must be at least 2 characters'),
+  middleName: Yup.string().optional(),
+  middleNameAm: Yup.string().optional(),
   lastName: Yup.string()
-    .required('Last name is required')
+    .required('Last name in English is required')
     .min(2, 'Last name must be at least 2 characters'),
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  phoneNumber: Yup.string()
-    .required('Phone number is required')
-    .matches(/^[0-9+\-\s()]+$/, 'Invalid phone number format'),
-  password: Yup.string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-    ),
-  confirmPassword: Yup.string()
-    .required('Please confirm your password')
-    .oneOf([Yup.ref('password')], 'Passwords must match')
+  lastNameAm: Yup.string()
+    .required('Last name in Amharic is required')
+    .min(2, 'Last name must be at least 2 characters'),
+  gender: Yup.string()
+    .required('Gender is required')
+    .oneOf(['0', '1'], 'Please select a valid gender'),
+  nationality: Yup.string()
+    .required('Nationality is required')
+    .min(2, 'Nationality must be at least 2 characters'),
+  employmentDate: Yup.date()
+    .required('Employment date is required')
+    .max(new Date(), 'Employment date cannot be in the future'),
 });
 
-const step2ValidationSchema = Yup.object({
-  companyName: Yup.string()
-    .required('Company name is required')
-    .min(2, 'Company name must be at least 2 characters'),
-  businessType: Yup.string()
-    .required('Business type is required'),
-  employeeCount: Yup.string()
-    .required('Employee count is required'),
-  taxId: Yup.string()
-    .required('Tax ID is required')
-    .min(5, 'Tax ID must be at least 5 characters'),
-  address: Yup.string()
-    .required('Business address is required')
-    .min(10, 'Address must be at least 10 characters')
+const employmentDetailsValidationSchema = Yup.object({
+  jobGradeId: Yup.string()
+    .required('Job grade is required')
+    .uuid('Invalid job grade selection'),
+  positionId: Yup.string()
+    .required('Position is required')
+    .uuid('Invalid position selection'),
+  departmentId: Yup.string()
+    .required('Department is required')
+    .uuid('Invalid department selection'),
+  employmentTypeId: Yup.string()
+    .required('Employment type is required')
+    .uuid('Invalid employment type selection'),
+  employmentNatureId: Yup.string()
+    .required('Employment nature is required')
+    .uuid('Invalid employment nature selection'),
 });
 
-const step3ValidationSchema = Yup.object({
-  additionalUsers: Yup.array().of(
-    Yup.object({
-      firstName: Yup.string().required('First name is required'),
-      lastName: Yup.string().required('Last name is required'),
-      email: Yup.string().email('Invalid email address').required('Email is required'),
-      role: Yup.string().required('Role is required')
-    })
-  )
-});
-
-// Combined validation schema
-const validationSchemas = [
-  step1ValidationSchema,
-  step2ValidationSchema,
-  step3ValidationSchema
+// Mock data for dropdowns (replace with actual API calls)
+const mockJobGrades: JobGradeDto[] = [
+  { id: '1' as UUID, name: 'Grade 1', nameAm: 'ግሬድ 1' },
+  { id: '2' as UUID, name: 'Grade 2', nameAm: 'ግሬድ 2' },
+  { id: '3' as UUID, name: 'Grade 3', nameAm: 'ግሬድ 3' },
 ];
 
-interface EmployeeFormData {
-  // Step 1: Your Profile
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  confirmPassword: string;
-  
-  // Step 2: Business Information
-  companyName: string;
-  businessType: string;
-  employeeCount: string;
-  taxId: string;
-  address: string;
-  
-  // Step 3: Additional Users
-  additionalUsers: Array<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-  }>;
+const mockDepartments: DepartmentDto[] = [
+  { id: '1' as UUID, name: 'Engineering', nameAm: 'ኢንጂነሪንግ' },
+  { id: '2' as UUID, name: 'Human Resources', nameAm: 'ሰው ሀብት' },
+  { id: '3' as UUID, name: 'Finance', nameAm: 'ፋይናንስ' },
+];
+
+const mockEmploymentTypes: EmploymentTypeDto[] = [
+  { id: '1' as UUID, name: 'Full-time', nameAm: 'ሙሉ ጊዜ' },
+  { id: '2' as UUID, name: 'Part-time', nameAm: 'ከፊል ጊዜ' },
+  { id: '3' as UUID, name: 'Contract', nameAm: 'ኮንትራት' },
+];
+
+const mockEmploymentNatures: EmploymentNatureDto[] = [
+  { id: '1' as UUID, name: 'Permanent', nameAm: 'ቋሚ' },
+  { id: '2' as UUID, name: 'Temporary', nameAm: 'ጊዜያዊ' },
+  { id: '3' as UUID, name: 'Probation', nameAm: 'ሙከራ' },
+];
+
+const validationSchemas = [
+  personalInfoValidationSchema,
+  employmentDetailsValidationSchema,
+];
+
+interface EmployeeFormData extends EmployeeAddDto {
+  jobGradeId: UUID;
+  positionId: UUID;
+  departmentId: UUID;
+  employmentTypeId: UUID;
+  employmentNatureId: UUID;
 }
 
 const initialValues: EmployeeFormData = {
   firstName: '',
+  firstNameAm: '',
+  middleName: '',
+  middleNameAm: '',
   lastName: '',
-  email: '',
-  phoneNumber: '',
-  password: '',
-  confirmPassword: '',
-  companyName: '',
-  businessType: '',
-  employeeCount: '',
-  taxId: '',
-  address: '',
-  additionalUsers: []
+  lastNameAm: '',
+  gender: '1' as '0' | '1',
+  nationality: 'Ethiopian',
+  employmentDate: new Date().toISOString().split('T')[0],
+  jobGradeId: '' as UUID,
+  positionId: '' as UUID,
+  departmentId: '' as UUID,
+  employmentTypeId: '' as UUID,
+  employmentNatureId: '' as UUID,
 };
 
 const steps = [
-  { id: 1, title: 'Your Profile', icon: User },
-  { id: 2, title: 'Business Information', icon: Building },
-  { id: 3, title: 'Additional Users', icon: Users }
+  { id: 1, title: 'Personal Info', icon: User },
+  { id: 2, title: 'Employment Details', icon: Building },
 ];
 
 const AddEmployeePage: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [snapshot, setSnapshot] = useState<EmployeeFormData>(initialValues);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isLastStep = currentStep === steps.length - 1;
+  const handleBackToEmployees = () => {
+    navigate('/employees');
+  };
 
   const handleNext = (values: EmployeeFormData) => {
     setSnapshot(values);
@@ -131,7 +138,7 @@ const AddEmployeePage: React.FC = () => {
   };
 
   const handleSubmit = async (values: EmployeeFormData, actions: any) => {
-    if (isLastStep) {
+    if (currentStep === steps.length - 1) {
       await submitForm(values, actions);
     } else {
       actions.setTouched({});
@@ -141,21 +148,24 @@ const AddEmployeePage: React.FC = () => {
   };
 
   const submitForm = async (values: EmployeeFormData, actions: any) => {
+    setIsSubmitting(true);
     try {
       console.log('Form submitted:', values);
       // Here you would typically make an API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
       
       // Navigate to success page or employees list
       navigate('/employees');
     } catch (error) {
       console.error('Submission error:', error);
       actions.setSubmitting(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const renderStepContent = (formikProps: FormikProps<EmployeeFormData>) => {
-    const { errors, touched, values, setFieldValue } = formikProps;
+  const renderStepContent = (formikProps: FormikProps<EmployeeFormData> & { isSubmitting?: boolean }) => {
+    const { errors, touched, values } = formikProps;
 
     switch (currentStep) {
       case 0:
@@ -167,16 +177,17 @@ const AddEmployeePage: React.FC = () => {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Your Profile</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
               <p className="text-gray-600 mt-2">
-                Enter the login information for your account. You will be able to create additional users after registering.
+                Enter the personal details for the new employee.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* First Name (English) */}
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name *
+                  First Name (English) *
                 </label>
                 <Field
                   id="firstName"
@@ -187,16 +198,80 @@ const AddEmployeePage: React.FC = () => {
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Input Your First Name"
+                  placeholder="Input First Name in English"
                 />
                 {errors.firstName && touched.firstName && (
                   <div className="text-red-600 text-sm mt-1">{errors.firstName}</div>
                 )}
               </div>
 
+              {/* First Name (Amharic) */}
+              <div>
+                <label htmlFor="firstNameAm" className="block text-sm font-medium text-gray-700 mb-2">
+                  First Name (Amharic) *
+                </label>
+                <Field
+                  id="firstNameAm"
+                  name="firstNameAm"
+                  type="text"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    errors.firstNameAm && touched.firstNameAm
+                      ? 'border-red-300'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="መጀመሪያ ስም በአማርኛ"
+                />
+                {errors.firstNameAm && touched.firstNameAm && (
+                  <div className="text-red-600 text-sm mt-1">{errors.firstNameAm}</div>
+                )}
+              </div>
+
+              {/* Middle Name (English) */}
+              <div>
+                <label htmlFor="middleName" className="block text-sm font-medium text-gray-700 mb-2">
+                  Middle Name (English)
+                </label>
+                <Field
+                  id="middleName"
+                  name="middleName"
+                  type="text"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    errors.middleName && touched.middleName
+                      ? 'border-red-300'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="Input Middle Name in English"
+                />
+                {errors.middleName && touched.middleName && (
+                  <div className="text-red-600 text-sm mt-1">{errors.middleName}</div>
+                )}
+              </div>
+
+              {/* Middle Name (Amharic) */}
+              <div>
+                <label htmlFor="middleNameAm" className="block text-sm font-medium text-gray-700 mb-2">
+                  Middle Name (Amharic)
+                </label>
+                <Field
+                  id="middleNameAm"
+                  name="middleNameAm"
+                  type="text"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    errors.middleNameAm && touched.middleNameAm
+                      ? 'border-red-300'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="መካከለኛ ስም በአማርኛ"
+                />
+                {errors.middleNameAm && touched.middleNameAm && (
+                  <div className="text-red-600 text-sm mt-1">{errors.middleNameAm}</div>
+                )}
+              </div>
+
+              {/* Last Name (English) */}
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name *
+                  Last Name (English) *
                 </label>
                 <Field
                   id="lastName"
@@ -207,90 +282,97 @@ const AddEmployeePage: React.FC = () => {
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Input Your Last Name"
+                  placeholder="Input Last Name in English"
                 />
                 {errors.lastName && touched.lastName && (
                   <div className="text-red-600 text-sm mt-1">{errors.lastName}</div>
                 )}
               </div>
 
+              {/* Last Name (Amharic) */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email *
+                <label htmlFor="lastNameAm" className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name (Amharic) *
                 </label>
                 <Field
-                  id="email"
-                  name="email"
-                  type="email"
+                  id="lastNameAm"
+                  name="lastNameAm"
+                  type="text"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.email && touched.email
+                    errors.lastNameAm && touched.lastNameAm
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Input Your Email"
+                  placeholder="የአባት ስም በአማርኛ"
                 />
-                {errors.email && touched.email && (
-                  <div className="text-red-600 text-sm mt-1">{errors.email}</div>
+                {errors.lastNameAm && touched.lastNameAm && (
+                  <div className="text-red-600 text-sm mt-1">{errors.lastNameAm}</div>
                 )}
               </div>
 
+              {/* Gender */}
               <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number *
+                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
+                  Gender *
                 </label>
                 <Field
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  type="tel"
+                  as="select"
+                  id="gender"
+                  name="gender"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.phoneNumber && touched.phoneNumber
+                    errors.gender && touched.gender
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Input Your Phone Number"
-                />
-                {errors.phoneNumber && touched.phoneNumber && (
-                  <div className="text-red-600 text-sm mt-1">{errors.phoneNumber}</div>
+                >
+                  <option value="">Select Gender</option>
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </Field>
+                {errors.gender && touched.gender && (
+                  <div className="text-red-600 text-sm mt-1">{errors.gender}</div>
                 )}
               </div>
 
+              {/* Nationality */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
+                <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nationality *
                 </label>
                 <Field
-                  id="password"
-                  name="password"
-                  type="password"
+                  id="nationality"
+                  name="nationality"
+                  type="text"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.password && touched.password
+                    errors.nationality && touched.nationality
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Create Password"
+                  placeholder="Input Nationality"
+                  value={values.nationality}
                 />
-                {errors.password && touched.password && (
-                  <div className="text-red-600 text-sm mt-1">{errors.password}</div>
+                {errors.nationality && touched.nationality && (
+                  <div className="text-red-600 text-sm mt-1">{errors.nationality}</div>
                 )}
               </div>
 
+              {/* Employment Date */}
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password *
+                <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-2">
+                  Employment Date *
                 </label>
                 <Field
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
+                  id="employmentDate"
+                  name="employmentDate"
+                  type="date"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.confirmPassword && touched.confirmPassword
+                    errors.employmentDate && touched.employmentDate
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Confirm Your Password"
                 />
-                {errors.confirmPassword && touched.confirmPassword && (
-                  <div className="text-red-600 text-sm mt-1">{errors.confirmPassword}</div>
+                {errors.employmentDate && touched.employmentDate && (
+                  <div className="text-red-600 text-sm mt-1">{errors.employmentDate}</div>
                 )}
               </div>
             </div>
@@ -306,246 +388,141 @@ const AddEmployeePage: React.FC = () => {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Business Information</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Employment Details</h2>
               <p className="text-gray-600 mt-2">
-                Enter your company details and business information.
+                Enter the employment information for the new employee.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Name *
-                </label>
-                <Field
-                  id="companyName"
-                  name="companyName"
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.companyName && touched.companyName
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="Input Company Name"
-                />
-                {errors.companyName && touched.companyName && (
-                  <div className="text-red-600 text-sm mt-1">{errors.companyName}</div>
-                )}
-              </div>
-
+              {/* Job Grade */}
               <div>
-                <label htmlFor="businessType" className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Type *
+                <label htmlFor="jobGradeId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Job Grade *
                 </label>
                 <Field
                   as="select"
-                  id="businessType"
-                  name="businessType"
+                  id="jobGradeId"
+                  name="jobGradeId"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.businessType && touched.businessType
+                    errors.jobGradeId && touched.jobGradeId
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
                 >
-                  <option value="">Select Business Type</option>
-                  <option value="llc">LLC</option>
-                  <option value="corporation">Corporation</option>
-                  <option value="sole-proprietorship">Sole Proprietorship</option>
-                  <option value="partnership">Partnership</option>
+                  <option value="">Select Job Grade</option>
+                  {mockJobGrades.map((grade) => (
+                    <option key={grade.id} value={grade.id}>
+                      {grade.name}
+                    </option>
+                  ))}
                 </Field>
-                {errors.businessType && touched.businessType && (
-                  <div className="text-red-600 text-sm mt-1">{errors.businessType}</div>
+                {errors.jobGradeId && touched.jobGradeId && (
+                  <div className="text-red-600 text-sm mt-1">{errors.jobGradeId}</div>
                 )}
               </div>
 
+              {/* Department */}
               <div>
-                <label htmlFor="employeeCount" className="block text-sm font-medium text-gray-700 mb-2">
-                  Employee Count *
+                <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Department *
                 </label>
                 <Field
                   as="select"
-                  id="employeeCount"
-                  name="employeeCount"
+                  id="departmentId"
+                  name="departmentId"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.employeeCount && touched.employeeCount
+                    errors.departmentId && touched.departmentId
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
                 >
-                  <option value="">Select Employee Count</option>
-                  <option value="1-10">1-10</option>
-                  <option value="11-50">11-50</option>
-                  <option value="51-200">51-200</option>
-                  <option value="201-500">201-500</option>
-                  <option value="500+">500+</option>
+                  <option value="">Select Department</option>
+                  {mockDepartments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
                 </Field>
-                {errors.employeeCount && touched.employeeCount && (
-                  <div className="text-red-600 text-sm mt-1">{errors.employeeCount}</div>
+                {errors.departmentId && touched.departmentId && (
+                  <div className="text-red-600 text-sm mt-1">{errors.departmentId}</div>
                 )}
               </div>
 
+              {/* Position */}
               <div>
-                <label htmlFor="taxId" className="block text-sm font-medium text-gray-700 mb-2">
-                  Tax ID *
+                <label htmlFor="positionId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Position *
                 </label>
                 <Field
-                  id="taxId"
-                  name="taxId"
+                  id="positionId"
+                  name="positionId"
                   type="text"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.taxId && touched.taxId
+                    errors.positionId && touched.positionId
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Input Tax ID"
+                  placeholder="Input Position"
                 />
-                {errors.taxId && touched.taxId && (
-                  <div className="text-red-600 text-sm mt-1">{errors.taxId}</div>
+                {errors.positionId && touched.positionId && (
+                  <div className="text-red-600 text-sm mt-1">{errors.positionId}</div>
                 )}
               </div>
 
-              <div className="md:col-span-2">
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Address *
+              {/* Employment Type */}
+              <div>
+                <label htmlFor="employmentTypeId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Employment Type *
                 </label>
                 <Field
-                  as="textarea"
-                  id="address"
-                  name="address"
-                  rows={3}
+                  as="select"
+                  id="employmentTypeId"
+                  name="employmentTypeId"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.address && touched.address
+                    errors.employmentTypeId && touched.employmentTypeId
                       ? 'border-red-300'
                       : 'border-gray-300'
                   }`}
-                  placeholder="Input Business Address"
-                />
-                {errors.address && touched.address && (
-                  <div className="text-red-600 text-sm mt-1">{errors.address}</div>
+                >
+                  <option value="">Select Employment Type</option>
+                  {mockEmploymentTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </Field>
+                {errors.employmentTypeId && touched.employmentTypeId && (
+                  <div className="text-red-600 text-sm mt-1">{errors.employmentTypeId}</div>
                 )}
               </div>
-            </div>
-          </motion.div>
-        );
 
-      case 2:
-        return (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Additional Users</h2>
-              <p className="text-gray-600 mt-2">
-                Add additional team members to your account (optional).
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {values.additionalUsers.map((user, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-semibold text-gray-900">User {index + 1}</h3>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const newUsers = values.additionalUsers.filter((_, i) => i !== index);
-                        setFieldValue('additionalUsers', newUsers);
-                      }}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        First Name *
-                      </label>
-                      <Field
-                        name={`additionalUsers[${index}].firstName`}
-                        type="text"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          errors.additionalUsers?.[index]?.['firstName' as keyof typeof user] && 
-                          touched.additionalUsers?.[index]?.['firstName' as keyof typeof user]
-                            ? 'border-red-300'
-                            : 'border-gray-300'
-                        }`}
-                        placeholder="First Name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Last Name *
-                      </label>
-                      <Field
-                        name={`additionalUsers[${index}].lastName`}
-                        type="text"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          errors.additionalUsers?.[index]?.['lastName' as keyof typeof user] && 
-                          touched.additionalUsers?.[index]?.['lastName' as keyof typeof user]
-                            ? 'border-red-300'
-                            : 'border-gray-300'
-                        }`}
-                        placeholder="Last Name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email *
-                      </label>
-                      <Field
-                        name={`additionalUsers[${index}].email`}
-                        type="email"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          errors.additionalUsers?.[index]?.['email' as keyof typeof user] && 
-                          touched.additionalUsers?.[index]?.['email' as keyof typeof user]
-                            ? 'border-red-300'
-                            : 'border-gray-300'
-                        }`}
-                        placeholder="Email"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Role *
-                      </label>
-                      <Field
-                        as="select"
-                        name={`additionalUsers[${index}].role`}
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          errors.additionalUsers?.[index]?.['role' as keyof typeof user] && 
-                          touched.additionalUsers?.[index]?.['role' as keyof typeof user]
-                            ? 'border-red-300'
-                            : 'border-gray-300'
-                        }`}
-                      >
-                        <option value="">Select Role</option>
-                        <option value="manager">Manager</option>
-                        <option value="hr">HR</option>
-                        <option value="employee">Employee</option>
-                        <option value="admin">Admin</option>
-                      </Field>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  const newUsers = [...values.additionalUsers, { firstName: '', lastName: '', email: '', role: '' }];
-                  setFieldValue('additionalUsers', newUsers);
-                }}
-                className="w-full border-2 border-dashed border-gray-300 hover:border-green-500 hover:bg-green-50"
-              >
-                + Add Another User
-              </Button>
+              {/* Employment Nature */}
+              <div>
+                <label htmlFor="employmentNatureId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Employment Nature *
+                </label>
+                <Field
+                  as="select"
+                  id="employmentNatureId"
+                  name="employmentNatureId"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    errors.employmentNatureId && touched.employmentNatureId
+                      ? 'border-red-300'
+                      : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Select Employment Nature</option>
+                  {mockEmploymentNatures.map((nature) => (
+                    <option key={nature.id} value={nature.id}>
+                      {nature.name}
+                    </option>
+                  ))}
+                </Field>
+                {errors.employmentNatureId && touched.employmentNatureId && (
+                  <div className="text-red-600 text-sm mt-1">{errors.employmentNatureId}</div>
+                )}
+              </div>
             </div>
           </motion.div>
         );
@@ -556,109 +533,28 @@ const AddEmployeePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen ">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Employee Registration</h1>
-          <p className="text-lg text-gray-600">Complete the following steps to register a new employee</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Combined Header Component */}
+        <AddEmployeeStepHeader
+          steps={steps}
+          currentStep={currentStep}
+          onBack={handleBackToEmployees}
+          title="Add New Employee"
+          backButtonText="Back to Employees"
+        />
 
-        {/* Progress Steps */}
-        <div className="bg-white rounded-2xl shadow-sm border border-green-200 p-6 mb-8">
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => {
-              const IconComponent = step.icon;
-              const isCompleted = currentStep > index;
-              const isCurrent = currentStep === index;
-              
-              return (
-                <React.Fragment key={step.id}>
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${
-                        isCompleted
-                          ? 'bg-green-500 border-green-500 text-white'
-                          : isCurrent
-                          ? 'border-green-500 bg-green-50 text-green-600'
-                          : 'border-gray-300 bg-white text-gray-400'
-                      }`}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle className="w-6 h-6" />
-                      ) : (
-                        <IconComponent className="w-6 h-6" />
-                      )}
-                    </div>
-                    <span
-                      className={`mt-2 text-sm font-medium ${
-                        isCurrent || isCompleted
-                          ? 'text-green-600'
-                          : 'text-gray-500'
-                      }`}
-                    >
-                      {step.title}
-                    </span>
-                    <span className="text-xs text-gray-400 mt-1">Step {step.id}</span>
-                  </div>
-                  
-                  {index < steps.length - 1 && (
-                    <div
-                      className={`flex-1 h-1 mx-4 ${
-                        currentStep > index ? 'bg-green-500' : 'bg-gray-200'
-                      }`}
-                    />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Formik Form */}
-        <Formik
-          initialValues={snapshot}
-          validationSchema={validationSchemas[currentStep]}
+        {/* Combined Form Component */}
+        <AddEmployeeStepForm
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          snapshot={snapshot}
+          validationSchemas={validationSchemas}
           onSubmit={handleSubmit}
-        >
-          {(formikProps) => (
-            <Form>
-              <div className="bg-white rounded-2xl shadow-sm border border-green-200 p-8">
-                <AnimatePresence mode="wait">
-                  {renderStepContent(formikProps)}
-                </AnimatePresence>
-
-                {/* Navigation Buttons */}
-                <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleBack(formikProps.values)}
-                    disabled={currentStep === 0}
-                    className="flex items-center gap-2"
-                  >
-                    Back
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    disabled={formikProps.isSubmitting || !formikProps.isValid}
-                    className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    {formikProps.isSubmitting ? (
-                      'Processing...'
-                    ) : isLastStep ? (
-                      'Complete Registration'
-                    ) : (
-                      'Save & Continue'
-                    )}
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </Form>
-          )}
-        </Formik>
+          onBack={handleBack}
+          renderStepContent={renderStepContent}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </div>
   );
