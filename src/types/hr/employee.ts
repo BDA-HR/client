@@ -1,6 +1,6 @@
 import type { UUID } from 'crypto';
 import type { BaseDto } from './BaseDto';
-export type {UUID}
+export type { UUID }
 
 export interface EmployeeListDto extends BaseDto {
   personId: UUID;
@@ -9,7 +9,7 @@ export interface EmployeeListDto extends BaseDto {
   departmentId: UUID;
   employmentTypeId: UUID;
   employmentNatureId: UUID;
-  gender: '0' | '1' ;
+  gender: '0' | '1'; 
   nationality: string;
   code: string;
   employmentDate: string; // ISO string from DateTime
@@ -32,7 +32,7 @@ export interface EmployeeAddDto {
   middleNameAm: string;
   lastName: string;
   lastNameAm: string;
-  gender: '0' | '1' ;
+  gender: '0' | '1';
   nationality: string;
   employmentDate: string; // ISO string from DateTime
   jobGradeId: UUID;
@@ -50,7 +50,7 @@ export interface EmployeeModDto {
   middleNameAm: string;
   lastName: string;
   lastNameAm: string;
-  gender: '0' | '1' ; 
+  gender: '0' | '1';
   nationality: string;
   employmentDate: string; // ISO string from DateTime
   personId: UUID;
@@ -64,6 +64,12 @@ export interface EmployeeModDto {
 
 // You might also want these related types for dropdowns/selects
 export interface JobGradeDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+}
+
+export interface PositionDto { // Added PositionDto since it's referenced in the DTOs
   id: UUID;
   name: string;
   nameAm: string;
@@ -95,11 +101,10 @@ export interface EmployeeFilters {
   jobGradeId?: UUID;
   employmentTypeId?: UUID;
   employmentNatureId?: UUID;
-  gender: '0' | '1' ;
+  gender: '0' | '1' | '';
 }
 
 // Response type for employee details
 export interface EmployeeDetailsData {
   employee: EmployeeListDto;
-  
 }

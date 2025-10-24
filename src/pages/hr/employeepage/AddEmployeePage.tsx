@@ -6,7 +6,7 @@ import type { UUID } from 'crypto';
 // Import components
 import { AddEmployeeStepHeader } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepHeader';
 import { AddEmployeeStepForm } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepForm';
-import type { EmployeeAddDto, JobGradeDto, DepartmentDto, EmploymentTypeDto } from '../../../types/hr/employee';
+import type { EmployeeAddDto, JobGradeDto, DepartmentDto, EmploymentTypeDto, EmploymentNatureDto, PositionDto } from '../../../types/hr/employee';
 
 // Mock data for mapping (same as in the form)
 const mockJobGrades: JobGradeDto[] = [
@@ -23,12 +23,28 @@ const mockDepartments: DepartmentDto[] = [
   { id: '5' as UUID, name: 'Operations', nameAm: 'ኦፕሬሽን' },
 ];
 
+const mockPositions: PositionDto[] = [
+  { id: '1' as UUID, name: 'Software Engineer', nameAm: 'ሶፍትዌር ኢንጂነር' },
+  { id: '2' as UUID, name: 'Senior Software Engineer', nameAm: 'ከፍተኛ ሶፍትዌር ኢንጂነር' },
+  { id: '3' as UUID, name: 'HR Manager', nameAm: 'ሰው ሀብት ማኔጅር' },
+  { id: '4' as UUID, name: 'Finance Analyst', nameAm: 'ፋይናንስ አናላይዝር' },
+  { id: '5' as UUID, name: 'Marketing Specialist', nameAm: 'ግብይት ስፔሻሊስት' },
+  { id: '6' as UUID, name: 'Operations Manager', nameAm: 'ኦፕሬሽንስ ማኔጅር' },
+  { id: '7' as UUID, name: 'Product Manager', nameAm: 'ምርት ማኔጅር' },
+  { id: '8' as UUID, name: 'Data Scientist', nameAm: 'ዳታ ሳይንቲስት' },
+];
+
 const mockEmploymentTypes: EmploymentTypeDto[] = [
   { id: '1' as UUID, name: 'Full-time', nameAm: 'ሙሉ ጊዜ' },
   { id: '2' as UUID, name: 'Part-time', nameAm: 'ከፊል ጊዜ' },
   { id: '3' as UUID, name: 'Contract', nameAm: 'ኮንትራት' },
 ];
 
+const mockEmploymentNatures: EmploymentNatureDto[] = [
+  { id: '1' as UUID, name: 'Permanent', nameAm: 'ቋሚ' },
+  { id: '2' as UUID, name: 'Temporary', nameAm: 'ጊዜያዊ' },
+  { id: '3' as UUID, name: 'Probation', nameAm: 'ሙከራ' },
+];
 
 const initialValues: EmployeeAddDto = {
   firstName: '',
@@ -37,7 +53,7 @@ const initialValues: EmployeeAddDto = {
   middleNameAm: '',
   lastName: '',
   lastNameAm: '',
-  gender: '1' as '0' | '1',
+  gender: '' as '0' | '1',
   nationality: 'Ethiopian',
   employmentDate: new Date().toISOString().split('T')[0],
   jobGradeId: '' as UUID,
@@ -87,86 +103,72 @@ const AddEmployeePage: React.FC = () => {
     try {
       console.log('Form submitted:', values);
       
-      // Map the form data to the expected Employee type
+      // Construct the full names from the individual name parts
+      const empFullName = `${values.firstName}${values.middleName ? ` ${values.middleName}` : ''} ${values.lastName}`.trim();
+      const empFullNameAm = `${values.firstNameAm}${values.middleNameAm ? ` ${values.middleNameAm}` : ''} ${values.lastNameAm}`.trim();
+
+      // Get display names from IDs
+      const jobGrade = mockJobGrades.find(g => g.id === values.jobGradeId)?.name || 'G1';
+      const department = mockDepartments.find(d => d.id === values.departmentId)?.name || 'General';
+      const position = mockPositions.find(p => p.id === values.positionId)?.name || 'Employee';
+      const employmentType = mockEmploymentTypes.find(t => t.id === values.employmentTypeId)?.name || 'Full-time';
+      const employmentNature = mockEmploymentNatures.find(n => n.id === values.employmentNatureId)?.name || 'Permanent';
+      const genderStr = values.gender === '1' ? 'Male' : 'Female';
+
+      // Generate employee code
+      const employeeCode = `EMP${Date.now().toString().slice(-6)}`;
+      
+      // Format dates properly
+      const employmentDateObj = new Date(values.employmentDate);
+      const employmentDateStr = employmentDateObj.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      const currentDate = new Date();
+      const createdAt = currentDate.toISOString().split('T')[0];
+      const updatedAt = currentDate.toISOString().split('T')[0];
+
+      // Create the employee data in the format expected by EmployeeManagementPage
       const newEmployee = {
-        // Personal Information
-        id: `emp-${Date.now()}`,
-        employeeId: `EMP${Date.now().toString().slice(-6)}`,
-        firstName: values.firstName,
-        middleName: values.middleName || '',
-        lastName: values.lastName,
-        email: `${values.firstName.toLowerCase()}.${values.lastName.toLowerCase()}@company.com`,
-        role: 'Employee',
-        phone: '+251-XXX-XXXX',
-        address: 'Address to be updated',
-        city: 'City to be updated',
-        state: 'State to be updated',
-        postalCode: '00000',
-        country: values.nationality,
-        dateOfBirth: '1990-01-01',
-        gender: values.gender === '1' ? 'Male' : 'Female',
-        maritalStatus: 'Single',
+        // Basic employee info
+        id: `emp-${Date.now()}` as UUID,
+        personId: `person-${Date.now()}` as UUID,
+        code: employeeCode,
         
-        // Emergency Contact
-        emergencyContact: {
-          name: 'Emergency Contact',
-          relationship: 'Spouse',
-          phone: '+251-XXX-XXXX'
-        },
+        // Personal information
+        empFullName: empFullName,
+        empFullNameAm: empFullNameAm,
+        gender: values.gender,
+        genderStr: genderStr,
+        nationality: values.nationality,
         
-        // Employment Details - Map IDs to actual names
-        department: mockDepartments.find(d => d.id === values.departmentId)?.name || 'Engineering',
-        jobTitle: values.positionId,
-        jobGrade: mockJobGrades.find(g => g.id === values.jobGradeId)?.name || 'Grade 1',
-        employeeCategory: 'Professional',
-        reportingTo: 'Manager Name',
-        manager: 'Manager Name',
-        team: 'Development Team',
-        joiningDate: values.employmentDate,
-        contractType: mockEmploymentTypes.find(t => t.id === values.employmentTypeId)?.name || 'Full-time',
-        employmentStatus: 'Active',
-        status: 'active' as 'active' | 'on-leave',
-        workLocation: 'Main Office',
-        workSchedule: '9 AM - 6 PM',
+        // Employment details
+        employmentDate: values.employmentDate,
+        employmentDateStr: employmentDateStr,
+        employmentDateStrAm: employmentDateStr, // You might want different formatting for Amharic
+        jobGradeId: values.jobGradeId,
+        jobGrade: jobGrade,
+        positionId: values.positionId,
+        position: position,
+        departmentId: values.departmentId,
+        department: department,
+        employmentTypeId: values.employmentTypeId,
+        employmentType: employmentType,
+        employmentNatureId: values.employmentNatureId,
+        employmentNature: employmentNature,
         
-        // Compensation
-        salary: 50000,
-        currency: 'USD',
-        paymentMethod: 'Bank Transfer',
-        bankDetails: {
-          bankName: 'Commercial Bank',
-          accountNumber: '****1234',
-          branchCode: 'CBET'
-        },
-        taxInformation: 'Tax info to be updated',
-        
-        // Time & Attendance
-        lastCheckIn: '09:00 AM',
-        lastCheckOut: '06:00 PM',
-        totalLeavesTaken: 0,
-        leaveBalance: 21,
-        attendancePercentage: 100,
-        
-        // Performance
-        performanceRating: 0,
-        lastAppraisalDate: '',
-        nextAppraisalDate: '',
-        keyPerformanceIndicators: [],
-        skills: [],
-        competencies: [],
-        
-        // Training & Development
-        trainings: [],
-        previousRoles: [],
-        documents: [],
-        
-        // System
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0],
-        updatedBy: 'HR Manager'
+        // System info
+        status: 'active' as "active" | "on-leave",
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        updatedBy: 'System'
       };
 
-      // Store the mapped employee data in sessionStorage
+      console.log('New employee created:', newEmployee);
+      
+      // Store the employee data in sessionStorage
       sessionStorage.setItem('newEmployee', JSON.stringify(newEmployee));
       
       // Simulate API call delay
@@ -183,7 +185,7 @@ const AddEmployeePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen8">
+    <div className="min-h-screen">
       <div className="mx-auto">
         {/* Header Component */}
         <AddEmployeeStepHeader

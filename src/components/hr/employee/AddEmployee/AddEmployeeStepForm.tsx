@@ -2,12 +2,13 @@ import React from 'react';
 import { Formik, Form } from 'formik';
 import type { FormikProps } from 'formik';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Field } from 'formik';
 import * as Yup from 'yup';
 import { Button } from '../../../../components/ui/button';
-import { ChevronRight } from 'lucide-react';
-import type { EmployeeAddDto, JobGradeDto, DepartmentDto, EmploymentTypeDto, EmploymentNatureDto } from '../../../../types/hr/employee';
+import { ChevronRight, User, Briefcase, CheckCircle2 } from 'lucide-react';
+import type { EmployeeAddDto, JobGradeDto, DepartmentDto, EmploymentTypeDto, EmploymentNatureDto, PositionDto } from '../../../../types/hr/employee';
 import type { UUID } from 'crypto';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
+import { Input } from '../../../ui/input';
 
 // Validation Schemas
 const basicInfoValidationSchema = Yup.object({
@@ -61,6 +62,17 @@ const mockDepartments: DepartmentDto[] = [
   { id: '5' as UUID, name: 'Operations', nameAm: 'ኦፕሬሽን' },
 ];
 
+const mockPositions: PositionDto[] = [
+  { id: '1' as UUID, name: 'Software Engineer', nameAm: 'ሶፍትዌር ኢንጂነር' },
+  { id: '2' as UUID, name: 'Senior Software Engineer', nameAm: 'ከፍተኛ ሶፍትዌር ኢንጂነር' },
+  { id: '3' as UUID, name: 'HR Manager', nameAm: 'ሰው ሀብት ማኔጅር' },
+  { id: '4' as UUID, name: 'Finance Analyst', nameAm: 'ፋይናንስ አናላይዝር' },
+  { id: '5' as UUID, name: 'Marketing Specialist', nameAm: 'ግብይት ስፔሻሊስት' },
+  { id: '6' as UUID, name: 'Operations Manager', nameAm: 'ኦፕሬሽንስ ማኔጅር' },
+  { id: '7' as UUID, name: 'Product Manager', nameAm: 'ምርት ማኔጅር' },
+  { id: '8' as UUID, name: 'Data Scientist', nameAm: 'ዳታ ሳይንቲስት' },
+];
+
 const mockEmploymentTypes: EmploymentTypeDto[] = [
   { id: '1' as UUID, name: 'Full-time', nameAm: 'ሙሉ ጊዜ' },
   { id: '2' as UUID, name: 'Part-time', nameAm: 'ከፊል ጊዜ' },
@@ -98,343 +110,433 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   const isLastStep = currentStep === totalSteps - 1;
 
   const renderStepContent = (formikProps: FormikProps<EmployeeAddDto> & { isSubmitting?: boolean }) => {
-    const { errors, touched, values } = formikProps;
+    const { errors, touched, values, handleChange, handleBlur, setFieldValue } = formikProps;
+
+    // Updated input styling to match the first modal
+    const inputClassName = (fieldName: keyof EmployeeAddDto) => 
+      `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+        errors[fieldName] && touched[fieldName]
+          ? 'border-red-500'
+          : 'border-gray-300'
+      }`;
+
+    const selectTriggerClassName = (fieldName: keyof EmployeeAddDto) => 
+      `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+        errors[fieldName] && touched[fieldName]
+          ? 'border-red-500'
+          : 'border-gray-300'
+      }`;
 
     switch (currentStep) {
       case 0:
         return (
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-8"
           >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Basic Information</h2>
-              <p className="text-gray-600 mt-2">
-                Enter all the required information for the new employee.
+            {/* Header */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <User className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Basic Information
+              </h2>
+              <p className="text-gray-500 mt-3 text-lg">
+                Enter all the required information for the new employee
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Form Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Personal Information Section */}
+              <div className="lg:col-span-2">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-2 h-8 bg-gradient-to-b from-green-400 to-green-600 rounded-full"></div>
+                  <h3 className="text-xl font-semibold text-gray-800">Personal Information</h3>
+                </div>
+              </div>
+
               {/* First Name (English) */}
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
                   First Name (English) *
                 </label>
-                <Field
+                <Input
                   id="firstName"
                   name="firstName"
                   type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.firstName && touched.firstName
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="Input First Name in English"
+                  value={values.firstName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputClassName('firstName')}
+                  placeholder="John"
                 />
                 {errors.firstName && touched.firstName && (
-                  <div className="text-red-600 text-sm mt-1">{errors.firstName}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.firstName}
+                  </motion.div>
                 )}
               </div>
 
               {/* First Name (Amharic) */}
-              <div>
-                <label htmlFor="firstNameAm" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="firstNameAm" className="block text-sm font-medium text-gray-700 mb-1">
                   First Name (Amharic) *
                 </label>
-                <Field
+                <Input
                   id="firstNameAm"
                   name="firstNameAm"
                   type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.firstNameAm && touched.firstNameAm
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="መጀመሪያ ስም በአማርኛ"
+                  value={values.firstNameAm}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputClassName('firstNameAm')}
+                  placeholder="ጆን"
                 />
                 {errors.firstNameAm && touched.firstNameAm && (
-                  <div className="text-red-600 text-sm mt-1">{errors.firstNameAm}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.firstNameAm}
+                  </motion.div>
                 )}
               </div>
 
               {/* Middle Name (English) */}
-              <div>
-                <label htmlFor="middleName" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="middleName" className="block text-sm font-medium text-gray-700 mb-1">
                   Middle Name (English)
                 </label>
-                <Field
+                <Input
                   id="middleName"
                   name="middleName"
                   type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.middleName && touched.middleName
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="Input Middle Name in English"
+                  value={values.middleName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
+                  placeholder="Michael"
                 />
-                {errors.middleName && touched.middleName && (
-                  <div className="text-red-600 text-sm mt-1">{errors.middleName}</div>
-                )}
               </div>
 
               {/* Middle Name (Amharic) */}
-              <div>
-                <label htmlFor="middleNameAm" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="middleNameAm" className="block text-sm font-medium text-gray-700 mb-1">
                   Middle Name (Amharic)
                 </label>
-                <Field
+                <Input
                   id="middleNameAm"
                   name="middleNameAm"
                   type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.middleNameAm && touched.middleNameAm
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="መካከለኛ ስም በአማርኛ"
+                  value={values.middleNameAm}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
+                  placeholder="ማይክል"
                 />
-                {errors.middleNameAm && touched.middleNameAm && (
-                  <div className="text-red-600 text-sm mt-1">{errors.middleNameAm}</div>
-                )}
               </div>
 
               {/* Last Name (English) */}
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
                   Last Name (English) *
                 </label>
-                <Field
+                <Input
                   id="lastName"
                   name="lastName"
                   type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.lastName && touched.lastName
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="Input Last Name in English"
+                  value={values.lastName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputClassName('lastName')}
+                  placeholder="Doe"
                 />
                 {errors.lastName && touched.lastName && (
-                  <div className="text-red-600 text-sm mt-1">{errors.lastName}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.lastName}
+                  </motion.div>
                 )}
               </div>
 
               {/* Last Name (Amharic) */}
-              <div>
-                <label htmlFor="lastNameAm" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="lastNameAm" className="block text-sm font-medium text-gray-700 mb-1">
                   Last Name (Amharic) *
                 </label>
-                <Field
+                <Input
                   id="lastNameAm"
                   name="lastNameAm"
                   type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.lastNameAm && touched.lastNameAm
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="የአባት ስም በአማርኛ"
+                  value={values.lastNameAm}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputClassName('lastNameAm')}
+                  placeholder="ዶው"
                 />
                 {errors.lastNameAm && touched.lastNameAm && (
-                  <div className="text-red-600 text-sm mt-1">{errors.lastNameAm}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.lastNameAm}
+                  </motion.div>
                 )}
               </div>
 
               {/* Gender */}
-              <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
                   Gender *
                 </label>
-                <Field
-                  as="select"
-                  id="gender"
-                  name="gender"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.gender && touched.gender
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
+                <Select 
+                  value={values.gender} 
+                  onValueChange={(value) => setFieldValue('gender', value)}
                 >
-                  <option value="">Select Gender</option>
-                  <option value="1">Male</option>
-                  <option value="0">Female</option>
-                </Field>
+                  <SelectTrigger className={selectTriggerClassName('gender')}>
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Male</SelectItem>
+                    <SelectItem value="0">Female</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errors.gender && touched.gender && (
-                  <div className="text-red-600 text-sm mt-1">{errors.gender}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.gender}
+                  </motion.div>
                 )}
               </div>
 
               {/* Nationality */}
-              <div>
-                <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-1">
                   Nationality *
                 </label>
-                <Field
+                <Input
                   id="nationality"
                   name="nationality"
                   type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.nationality && touched.nationality
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="Input Nationality"
                   value={values.nationality}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputClassName('nationality')}
+                  placeholder="Ethiopian"
                 />
                 {errors.nationality && touched.nationality && (
-                  <div className="text-red-600 text-sm mt-1">{errors.nationality}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.nationality}
+                  </motion.div>
                 )}
               </div>
 
+              {/* Employment Details Section */}
+              <div className="lg:col-span-2 mt-4">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
+                  <h3 className="text-xl font-semibold text-gray-800">Employment Details</h3>
+                </div>
+              </div>
+
               {/* Employment Date */}
-              <div>
-                <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-1">
                   Employment Date *
                 </label>
-                <Field
+                <Input
                   id="employmentDate"
                   name="employmentDate"
                   type="date"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.employmentDate && touched.employmentDate
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
+                  value={values.employmentDate}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputClassName('employmentDate')}
                 />
                 {errors.employmentDate && touched.employmentDate && (
-                  <div className="text-red-600 text-sm mt-1">{errors.employmentDate}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.employmentDate}
+                  </motion.div>
                 )}
               </div>
 
               {/* Job Grade */}
-              <div>
-                <label htmlFor="jobGradeId" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="jobGradeId" className="block text-sm font-medium text-gray-700 mb-1">
                   Job Grade *
                 </label>
-                <Field
-                  as="select"
-                  id="jobGradeId"
-                  name="jobGradeId"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.jobGradeId && touched.jobGradeId
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
+                <Select 
+                  value={values.jobGradeId} 
+                  onValueChange={(value) => setFieldValue('jobGradeId', value)}
                 >
-                  <option value="">Select Job Grade</option>
-                  {mockJobGrades.map((grade) => (
-                    <option key={grade.id} value={grade.id}>
-                      {grade.name}
-                    </option>
-                  ))}
-                </Field>
+                  <SelectTrigger className={selectTriggerClassName('jobGradeId')}>
+                    <SelectValue placeholder="Select Job Grade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockJobGrades.map((grade) => (
+                      <SelectItem key={grade.id} value={grade.id}>
+                        {grade.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.jobGradeId && touched.jobGradeId && (
-                  <div className="text-red-600 text-sm mt-1">{errors.jobGradeId}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.jobGradeId}
+                  </motion.div>
                 )}
               </div>
 
               {/* Department */}
-              <div>
-                <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700 mb-1">
                   Department *
                 </label>
-                <Field
-                  as="select"
-                  id="departmentId"
-                  name="departmentId"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.departmentId && touched.departmentId
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
+                <Select 
+                  value={values.departmentId} 
+                  onValueChange={(value) => setFieldValue('departmentId', value)}
                 >
-                  <option value="">Select Department</option>
-                  {mockDepartments.map((dept) => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </option>
-                  ))}
-                </Field>
+                  <SelectTrigger className={selectTriggerClassName('departmentId')}>
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockDepartments.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.departmentId && touched.departmentId && (
-                  <div className="text-red-600 text-sm mt-1">{errors.departmentId}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.departmentId}
+                  </motion.div>
                 )}
               </div>
 
-              {/* Position */}
-              <div>
-                <label htmlFor="positionId" className="block text-sm font-medium text-gray-700 mb-2">
+              {/* Position - Changed to Select */}
+              <div className="space-y-2">
+                <label htmlFor="positionId" className="block text-sm font-medium text-gray-700 mb-1">
                   Position *
                 </label>
-                <Field
-                  id="positionId"
-                  name="positionId"
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.positionId && touched.positionId
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="Input Position"
-                />
+                <Select 
+                  value={values.positionId} 
+                  onValueChange={(value) => setFieldValue('positionId', value)}
+                >
+                  <SelectTrigger className={selectTriggerClassName('positionId')}>
+                    <SelectValue placeholder="Select Position" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockPositions.map((position) => (
+                      <SelectItem key={position.id} value={position.id}>
+                        {position.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.positionId && touched.positionId && (
-                  <div className="text-red-600 text-sm mt-1">{errors.positionId}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.positionId}
+                  </motion.div>
                 )}
               </div>
 
               {/* Employment Type */}
-              <div>
-                <label htmlFor="employmentTypeId" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="employmentTypeId" className="block text-sm font-medium text-gray-700 mb-1">
                   Employment Type *
                 </label>
-                <Field
-                  as="select"
-                  id="employmentTypeId"
-                  name="employmentTypeId"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.employmentTypeId && touched.employmentTypeId
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
+                <Select 
+                  value={values.employmentTypeId} 
+                  onValueChange={(value) => setFieldValue('employmentTypeId', value)}
                 >
-                  <option value="">Select Employment Type</option>
-                  {mockEmploymentTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                </Field>
+                  <SelectTrigger className={selectTriggerClassName('employmentTypeId')}>
+                    <SelectValue placeholder="Select Employment Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockEmploymentTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.employmentTypeId && touched.employmentTypeId && (
-                  <div className="text-red-600 text-sm mt-1">{errors.employmentTypeId}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.employmentTypeId}
+                  </motion.div>
                 )}
               </div>
 
               {/* Employment Nature */}
-              <div>
-                <label htmlFor="employmentNatureId" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="employmentNatureId" className="block text-sm font-medium text-gray-700 mb-1">
                   Employment Nature *
                 </label>
-                <Field
-                  as="select"
-                  id="employmentNatureId"
-                  name="employmentNatureId"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.employmentNatureId && touched.employmentNatureId
-                      ? 'border-red-300'
-                      : 'border-gray-300'
-                  }`}
+                <Select 
+                  value={values.employmentNatureId} 
+                  onValueChange={(value) => setFieldValue('employmentNatureId', value)}
                 >
-                  <option value="">Select Employment Nature</option>
-                  {mockEmploymentNatures.map((nature) => (
-                    <option key={nature.id} value={nature.id}>
-                      {nature.name}
-                    </option>
-                  ))}
-                </Field>
+                  <SelectTrigger className={selectTriggerClassName('employmentNatureId')}>
+                    <SelectValue placeholder="Select Employment Nature" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockEmploymentNatures.map((nature) => (
+                      <SelectItem key={nature.id} value={nature.id}>
+                        {nature.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.employmentNatureId && touched.employmentNatureId && (
-                  <div className="text-red-600 text-sm mt-1">{errors.employmentNatureId}</div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.employmentNatureId}
+                  </motion.div>
                 )}
               </div>
             </div>
@@ -444,80 +546,110 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       case 1:
         return (
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-8"
           >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Review Information</h2>
-              <p className="text-gray-600 mt-2">
-                Please review all the information before submitting.
+            {/* Header */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <CheckCircle2 className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Review Information
+              </h2>
+              <p className="text-gray-500 mt-3 text-lg">
+                Please review all information before submitting
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-3">Basic Information</h3>
-                  <dl className="space-y-2">
-                    <div>
-                      <dt className="text-sm text-gray-500">Full Name (English)</dt>
-                      <dd className="font-medium">{values.firstName} {values.middleName} {values.lastName}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Full Name (Amharic)</dt>
-                      <dd className="font-medium">{values.firstNameAm} {values.middleNameAm} {values.lastNameAm}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Gender</dt>
-                      <dd className="font-medium">{values.gender === '1' ? 'Male' : 'Female'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Nationality</dt>
-                      <dd className="font-medium">{values.nationality}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Employment Date</dt>
-                      <dd className="font-medium">{values.employmentDate}</dd>
-                    </div>
-                  </dl>
+            {/* Review Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Personal Information Card */}
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                    <User className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800">Personal Information</h3>
                 </div>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Full Name (English)</dt>
+                    <dd className="font-semibold text-gray-900">{values.firstName} {values.middleName} {values.lastName}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Full Name (Amharic)</dt>
+                    <dd className="font-semibold text-gray-900">{values.firstNameAm} {values.middleNameAm} {values.lastNameAm}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Gender</dt>
+                    <dd className="font-semibold text-gray-900">{values.gender === '1' ? 'Male' : 'Female'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Nationality</dt>
+                    <dd className="font-semibold text-gray-900">{values.nationality}</dd>
+                  </div>
+                </dl>
+              </motion.div>
 
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-3">Employment Details</h3>
-                  <dl className="space-y-2">
-                    <div>
-                      <dt className="text-sm text-gray-500">Job Grade</dt>
-                      <dd className="font-medium">
-                        {mockJobGrades.find(g => g.id === values.jobGradeId)?.name || 'Not selected'}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Department</dt>
-                      <dd className="font-medium">
-                        {mockDepartments.find(d => d.id === values.departmentId)?.name || 'Not selected'}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Position</dt>
-                      <dd className="font-medium">{values.positionId}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Employment Type</dt>
-                      <dd className="font-medium">
-                        {mockEmploymentTypes.find(t => t.id === values.employmentTypeId)?.name || 'Not selected'}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Employment Nature</dt>
-                      <dd className="font-medium">
-                        {mockEmploymentNatures.find(n => n.id === values.employmentNatureId)?.name || 'Not selected'}
-                      </dd>
-                    </div>
-                  </dl>
+              {/* Employment Details Card */}
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800">Employment Details</h3>
                 </div>
-              </div>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Employment Date</dt>
+                    <dd className="font-semibold text-gray-900">{values.employmentDate}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Job Grade</dt>
+                    <dd className="font-semibold text-gray-900">
+                      {mockJobGrades.find(g => g.id === values.jobGradeId)?.name || 'Not selected'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Department</dt>
+                    <dd className="font-semibold text-gray-900">
+                      {mockDepartments.find(d => d.id === values.departmentId)?.name || 'Not selected'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Position</dt>
+                    <dd className="font-semibold text-gray-900">
+                      {mockPositions.find(p => p.id === values.positionId)?.name || 'Not selected'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Employment Type</dt>
+                    <dd className="font-semibold text-gray-900">
+                      {mockEmploymentTypes.find(t => t.id === values.employmentTypeId)?.name || 'Not selected'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Employment Nature</dt>
+                    <dd className="font-semibold text-gray-900">
+                      {mockEmploymentNatures.find(n => n.id === values.employmentNatureId)?.name || 'Not selected'}
+                    </dd>
+                  </div>
+                </dl>
+              </motion.div>
             </div>
           </motion.div>
         );
@@ -536,38 +668,49 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
     >
       {(formikProps) => (
         <Form>
-          <div className="bg-white rounded-2xl shadow-sm border border-green-200 p-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100 p-8">
             <AnimatePresence mode="wait">
               {renderStepContent({ ...formikProps, isSubmitting })}
             </AnimatePresence>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onBack(formikProps.values)}
-                disabled={currentStep === 0 || formikProps.isSubmitting}
-                className="flex items-center gap-2"
-              >
-                Back
-              </Button>
-
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex justify-between items-center mt-12 pt-8 border-t border-gray-200"
+            >
+              <div className="flex-1">
+                {currentStep > 0 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => onBack(formikProps.values)}
+                    disabled={formikProps.isSubmitting}
+                    className="cursor-pointer"
+                  >
+                    Back
+                  </Button>
+                )}
+              </div>
+              
               <Button
                 type="submit"
                 disabled={formikProps.isSubmitting || !formikProps.isValid || isSubmitting}
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white flex items-center gap-3 shadow-lg hover:shadow-xl transition-all duration-200 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-105 disabled:scale-100 cursor-pointer"
               >
-                {(formikProps.isSubmitting || isSubmitting) ? (
-                  'Processing...'
-                ) : isLastStep ? (
-                  'Complete Registration'
-                ) : (
-                  'Save & Continue'
-                )}
-                <ChevronRight className="w-4 h-4" />
+                <span className="font-semibold">
+                  {(formikProps.isSubmitting || isSubmitting) ? (
+                    'Processing...'
+                  ) : isLastStep ? (
+                    'Complete Registration'
+                  ) : (
+                    'Save & Continue'
+                  )}
+                </span>
+                <ChevronRight className="w-5 h-5" />
               </Button>
-            </div>
+            </motion.div>
           </div>
         </Form>
       )}

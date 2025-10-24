@@ -6,7 +6,6 @@ import EmployeeSearchFilters from '../../../components/hr/employee/EmployeeSearc
 import EmployeeTable from '../../../components/hr/employee/EmployeeTable';
 import type { EmployeeListDto } from '../../../types/hr/employee';
 import { initialEmployees } from '../../../data/hr/employee';
-import type { UUID } from '../../../types/hr/employee';
 
 // Extended type for local state management
 type EmployeeWithStatus = EmployeeListDto & {
@@ -15,15 +14,15 @@ type EmployeeWithStatus = EmployeeListDto & {
 
 const EmployeeManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
-    department: '',
-    status: '',
-    employmentType: '',
-  });
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
   const [employees, setEmployees] = useState<EmployeeWithStatus[]>(initialEmployees);
+  const [previousStats, setPreviousStats] = useState({
+    total: 0,
+    active: 0,
+    onLeave: 0
+  });
 
   // Check for new employee data when component mounts or when returning from add employee page
   useEffect(() => {
@@ -57,59 +56,76 @@ const EmployeeManagementPage = () => {
     };
   }, []);
 
-  const handleAddEmployee = (newEmployee: Omit<EmployeeListDto, 'id'>) => {
-    const employeeWithId: EmployeeWithStatus = {
-      ...newEmployee,
-      id: `emp-${Date.now()}` as UUID,
-      // Ensure all required fields are present
-      personId: newEmployee.personId || `person-${Date.now()}` as UUID,
-      jobGradeId: newEmployee.jobGradeId || 'grade-1' as UUID,
-      positionId: newEmployee.positionId || 'position-1' as UUID,
-      departmentId: newEmployee.departmentId || 'dept-1' as UUID,
-      employmentTypeId: newEmployee.employmentTypeId || 'type-1' as UUID,
-      employmentNatureId: newEmployee.employmentNatureId || 'nature-1' as UUID,
-      gender: newEmployee.gender || '0',
-      nationality: newEmployee.nationality || 'Ethiopian',
-      code: newEmployee.code || `EMP${Date.now().toString().slice(-6)}`,
-      employmentDate: newEmployee.employmentDate || new Date().toISOString().split('T')[0],
-      jobGrade: newEmployee.jobGrade || 'G1',
-      position: newEmployee.position || 'Employee',
-      department: newEmployee.department || 'General',
-      employmentType: newEmployee.employmentType || 'Full-time',
-      employmentNature: newEmployee.employmentNature || 'Permanent',
-      genderStr: newEmployee.genderStr || 'Male',
-      empFullName: newEmployee.empFullName || 'New Employee',
-      empFullNameAm: newEmployee.empFullNameAm || 'አዲስ ሰራተኛ',
-      employmentDateStr: newEmployee.employmentDateStr || new Date().toLocaleDateString(),
-      employmentDateStrAm: newEmployee.employmentDateStrAm || new Date().toLocaleDateString(),
-      status: 'active' as "active" | "on-leave",
-      createdAt: newEmployee.createdAt || new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0],
-      updatedBy: newEmployee.updatedBy || 'System'
-    };
+  // Store current stats as previous stats when component mounts or data changes
+  useEffect(() => {
+    const currentTotal = employees.length;
+    const currentActive = employees.filter(e => e.status === "active").length;
+    const currentOnLeave = employees.filter(e => e.status === "on-leave").length;
+
+    // Only update previous stats if we have actual data to prevent showing changes on initial load
+    if (currentTotal > 0 && previousStats.total === 0) {
+      setPreviousStats({
+        total: currentTotal,
+        active: currentActive,
+        onLeave: currentOnLeave
+      });
+    }
+  }, [employees]);
+
+  const handleAddEmployee = (newEmployee: EmployeeWithStatus) => {
+    // Update previous stats before adding new employee
+    setPreviousStats({
+      total: employees.length,
+      active: employees.filter(e => e.status === "active").length,
+      onLeave: employees.filter(e => e.status === "on-leave").length
+    });
     
-    setEmployees(prev => [employeeWithId, ...prev]); // Add to beginning of list
-    setCurrentPage(1); // Reset to first page to see the new employee
+    setEmployees(prev => [newEmployee, ...prev]);
+    setCurrentPage(1);
     
-    // Show success message or notification
-    console.log('New employee added:', employeeWithId);
+    console.log('New employee added:', newEmployee);
   };
 
   const handleEmployeeUpdate = (updatedEmployee: EmployeeWithStatus) => {
+    // Update previous stats before making changes
+    setPreviousStats({
+      total: employees.length,
+      active: employees.filter(e => e.status === "active").length,
+      onLeave: employees.filter(e => e.status === "on-leave").length
+    });
+
     setEmployees(prev => 
       prev.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp)
     );
   };
 
   const handleEmployeeStatusChange = (employeeId: string, newStatus: "active" | "on-leave") => {
+    // Update previous stats before making changes
+    setPreviousStats({
+      total: employees.length,
+      active: employees.filter(e => e.status === "active").length,
+      onLeave: employees.filter(e => e.status === "on-leave").length
+    });
+
     setEmployees(prev => 
       prev.map(emp => 
-        emp.id === employeeId ? { ...emp, status: newStatus } : emp
+        emp.id === employeeId ? { 
+          ...emp, 
+          status: newStatus,
+          updatedAt: new Date().toISOString().split('T')[0]
+        } : emp
       )
     );
   };
 
   const handleEmployeeTerminate = (employeeId: string) => {
+    // Update previous stats before making changes
+    setPreviousStats({
+      total: employees.length,
+      active: employees.filter(e => e.status === "active").length,
+      onLeave: employees.filter(e => e.status === "on-leave").length
+    });
+
     setEmployees(prev => prev.filter(emp => emp.id !== employeeId));
   };
 
@@ -118,12 +134,17 @@ const EmployeeManagementPage = () => {
     // Simulate API refresh
     setTimeout(() => {
       setLoading(false);
-      // In a real app, you would fetch fresh data from the API
+      // Update previous stats on refresh
+      setPreviousStats({
+        total: employees.length,
+        active: employees.filter(e => e.status === "active").length,
+        onLeave: employees.filter(e => e.status === "on-leave").length
+      });
       console.log('Data refreshed');
     }, 1000);
   };
 
-  // Filter employees based on search and filters
+  // Filter employees based on search only
   const filteredEmployees = employees.filter(employee => {
     const searchLower = searchTerm.toLowerCase();
     
@@ -136,12 +157,8 @@ const EmployeeManagementPage = () => {
       employee.position.toLowerCase().includes(searchLower) ||
       employee.employmentType.toLowerCase().includes(searchLower) ||
       employee.nationality.toLowerCase().includes(searchLower);
-    
-    const matchesDepartment = filters.department ? employee.department === filters.department : true;
-    const matchesStatus = filters.status ? employee.status === filters.status : true;
-    const matchesEmploymentType = filters.employmentType ? employee.employmentType === filters.employmentType : true;
 
-    return matchesSearch && matchesDepartment && matchesStatus && matchesEmploymentType;
+    return matchesSearch;
   });
 
   // Pagination logic
@@ -171,13 +188,16 @@ const EmployeeManagementPage = () => {
             totalEmployees={totalEmployees}
             activeEmployees={activeEmployees}
             onLeaveEmployees={onLeaveEmployees}
+            previousTotal={previousStats.total}
+            previousActive={previousStats.active}
+            previousOnLeave={previousStats.onLeave}
           />
 
           <EmployeeSearchFilters 
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
-            filters={filters}
-            setFilters={setFilters}
+            filters={{ department: '', status: '', employmentType: '' }} // Empty filters
+            setFilters={() => {}} // Empty function
             employees={employees}
             onRefresh={handleRefresh}
             loading={loading}
