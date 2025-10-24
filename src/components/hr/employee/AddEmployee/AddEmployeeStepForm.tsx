@@ -9,6 +9,7 @@ import type { EmployeeAddDto, JobGradeDto, DepartmentDto, EmploymentTypeDto, Emp
 import type { UUID } from 'crypto';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
 import { Input } from '../../../ui/input';
+import { amharicRegex } from '../../../../utils/amharic-regex'; // Import the Amharic regex
 
 // Validation Schemas
 const basicInfoValidationSchema = Yup.object({
@@ -17,15 +18,21 @@ const basicInfoValidationSchema = Yup.object({
     .min(2, 'First name must be at least 2 characters'),
   firstNameAm: Yup.string()
     .required('First name in Amharic is required')
-    .min(2, 'First name must be at least 2 characters'),
+    .min(2, 'First name must be at least 2 characters')
+    .matches(amharicRegex, 'First name must be in Amharic characters'),
   middleName: Yup.string().optional(),
-  middleNameAm: Yup.string().optional(),
+  middleNameAm: Yup.string()
+    .optional()
+    .test('amharic-or-empty', 'Middle name must be in Amharic characters', (value) => 
+      !value || amharicRegex.test(value)
+    ),
   lastName: Yup.string()
     .required('Last name in English is required')
     .min(2, 'Last name must be at least 2 characters'),
   lastNameAm: Yup.string()
     .required('Last name in Amharic is required')
-    .min(2, 'Last name must be at least 2 characters'),
+    .min(2, 'Last name must be at least 2 characters')
+    .matches(amharicRegex, 'Last name must be in Amharic characters'),
   gender: Yup.string()
     .required('Gender is required')
     .oneOf(['0', '1'], 'Please select a valid gender'),
@@ -108,6 +115,18 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   isSubmitting = false,
 }) => {
   const isLastStep = currentStep === totalSteps - 1;
+
+  // Amharic input change handler
+  const handleAmharicChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldName: string,
+    setFieldValue: (field: string, value: any) => void
+  ) => {
+    const value = e.target.value;
+    if (value === '' || amharicRegex.test(value)) {
+      setFieldValue(fieldName, value);
+    }
+  };
 
   const renderStepContent = (formikProps: FormikProps<EmployeeAddDto> & { isSubmitting?: boolean }) => {
     const { errors, touched, values, handleChange, handleBlur, setFieldValue } = formikProps;
@@ -196,7 +215,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                   name="firstNameAm"
                   type="text"
                   value={values.firstNameAm}
-                  onChange={handleChange}
+                  onChange={(e) => handleAmharicChange(e, 'firstNameAm', setFieldValue)}
                   onBlur={handleBlur}
                   className={inputClassName('firstNameAm')}
                   placeholder="ጆን"
@@ -239,11 +258,20 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                   name="middleNameAm"
                   type="text"
                   value={values.middleNameAm}
-                  onChange={handleChange}
+                  onChange={(e) => handleAmharicChange(e, 'middleNameAm', setFieldValue)}
                   onBlur={handleBlur}
                   className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
                   placeholder="ማይክል"
                 />
+                {errors.middleNameAm && touched.middleNameAm && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.middleNameAm}
+                  </motion.div>
+                )}
               </div>
 
               {/* Last Name (English) */}
@@ -282,7 +310,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                   name="lastNameAm"
                   type="text"
                   value={values.lastNameAm}
-                  onChange={handleChange}
+                  onChange={(e) => handleAmharicChange(e, 'lastNameAm', setFieldValue)}
                   onBlur={handleBlur}
                   className={inputClassName('lastNameAm')}
                   placeholder="ዶው"
