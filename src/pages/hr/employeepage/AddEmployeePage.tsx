@@ -1,94 +1,225 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Building } from 'lucide-react';
+import { User, Users, DollarSign, CheckCircle2 } from 'lucide-react';
 import type { UUID } from 'crypto';
 
 // Import components
 import { AddEmployeeStepHeader } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepHeader';
 import { AddEmployeeStepForm } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepForm';
-import type { EmployeeAddDto, JobGradeDto, DepartmentDto, EmploymentTypeDto, EmploymentNatureDto, PositionDto } from '../../../types/hr/employee';
 
-// Mock data for mapping (same as in the form)
-const mockJobGrades: JobGradeDto[] = [
-  { id: '1' as UUID, name: 'Grade 1', nameAm: 'ግሬድ 1' },
-  { id: '2' as UUID, name: 'Grade 2', nameAm: 'ግሬድ 2' },
-  { id: '3' as UUID, name: 'Grade 3', nameAm: 'ግሬድ 3' },
-];
+// Define the extended interface locally to match the form
+interface ExtendedEmployeeData {
+  // Basic info
+  firstName: string;
+  firstNameAm: string;
+  middleName: string;
+  middleNameAm: string;
+  lastName: string;
+  lastNameAm: string;
+  gender: '0' | '1' | '';
+  nationality: string;
+  employmentDate: string;
+  companyId: UUID;
+  branchId: UUID;
+  jobGradeId: UUID;
+  positionId: UUID;
+  departmentId: UUID;
+  employmentTypeId: UUID;
+  employmentNatureId: UUID;
+  
+  // Biographical data
+  birthDate: string;
+  birthLocation: string;
+  motherFullName: string;
+  hasBirthCert: '0' | '1' | '';
+  hasMarriageCert: '0' | '1' | '';
+  maritalStatusId: UUID;
+  addressId: UUID;
+  
+  // Arrays
+  emergencyContacts: Array<{
+    firstName: string;
+    firstNameAm: string;
+    middleName: string;
+    middleNameAm: string;
+    lastName: string;
+    lastNameAm: string;
+    gender: '0' | '1' | '';
+    nationality: string;
+    relationId: UUID;
+    addressId: UUID;
+  }>;
+  familyMembers: Array<{
+    firstName: string;
+    firstNameAm: string;
+    middleName: string;
+    middleNameAm: string;
+    lastName: string;
+    lastNameAm: string;
+    gender: '0' | '1' | '';
+    nationality: string;
+    relationId: UUID;
+  }>;
+  guarantors: Array<{
+    firstName: string;
+    firstNameAm: string;
+    middleName: string;
+    middleNameAm: string;
+    lastName: string;
+    lastNameAm: string;
+    gender: '0' | '1' | '';
+    nationality: string;
+    relationId: UUID;
+    addressId: UUID;
+  }>;
+  
+  // Financial data
+  tin: string;
+  bankAccountNo: string;
+  pensionNumber: string;
+  
+  // File uploads
+  guarantorFiles: File[];
+  stampFiles: File[];
+  signatureFiles: File[];
+  
+  // Employment state
+  isTerminated: '0' | '1';
+  isApproved: '0' | '1';
+  isStandBy: '0' | '1';
+  isRetired: '0' | '1';
+  isUnderProbation: '0' | '1';
+}
 
-const mockDepartments: DepartmentDto[] = [
-  { id: '1' as UUID, name: 'Engineering', nameAm: 'ኢንጂነሪንግ' },
-  { id: '2' as UUID, name: 'Human Resources', nameAm: 'ሰው ሀብት' },
-  { id: '3' as UUID, name: 'Finance', nameAm: 'ፋይናንስ' },
-  { id: '4' as UUID, name: 'Marketing', nameAm: 'ግብይት' },
-  { id: '5' as UUID, name: 'Operations', nameAm: 'ኦፕሬሽን' },
-];
-
-const mockPositions: PositionDto[] = [
-  { id: '1' as UUID, name: 'Software Engineer', nameAm: 'ሶፍትዌር ኢንጂነር' },
-  { id: '2' as UUID, name: 'Senior Software Engineer', nameAm: 'ከፍተኛ ሶፍትዌር ኢንጂነር' },
-  { id: '3' as UUID, name: 'HR Manager', nameAm: 'ሰው ሀብት ማኔጅር' },
-  { id: '4' as UUID, name: 'Finance Analyst', nameAm: 'ፋይናንስ አናላይዝር' },
-  { id: '5' as UUID, name: 'Marketing Specialist', nameAm: 'ግብይት ስፔሻሊስት' },
-  { id: '6' as UUID, name: 'Operations Manager', nameAm: 'ኦፕሬሽንስ ማኔጅር' },
-  { id: '7' as UUID, name: 'Product Manager', nameAm: 'ምርት ማኔጅር' },
-  { id: '8' as UUID, name: 'Data Scientist', nameAm: 'ዳታ ሳይንቲስት' },
-];
-
-const mockEmploymentTypes: EmploymentTypeDto[] = [
-  { id: '1' as UUID, name: 'Full-time', nameAm: 'ሙሉ ጊዜ' },
-  { id: '2' as UUID, name: 'Part-time', nameAm: 'ከፊል ጊዜ' },
-  { id: '3' as UUID, name: 'Contract', nameAm: 'ኮንትራት' },
-];
-
-const mockEmploymentNatures: EmploymentNatureDto[] = [
-  { id: '1' as UUID, name: 'Permanent', nameAm: 'ቋሚ' },
-  { id: '2' as UUID, name: 'Temporary', nameAm: 'ጊዜያዊ' },
-  { id: '3' as UUID, name: 'Probation', nameAm: 'ሙከራ' },
-];
-
-const initialValues: EmployeeAddDto = {
+const initialValues: ExtendedEmployeeData = {
+  // Basic info
   firstName: '',
   firstNameAm: '',
   middleName: '',
   middleNameAm: '',
   lastName: '',
   lastNameAm: '',
-  gender: '' as '0' | '1',
+  gender: '' as '0' | '1' | '',
   nationality: 'Ethiopian',
   employmentDate: new Date().toISOString().split('T')[0],
+  companyId: '' as UUID,
+  branchId: '' as UUID,
   jobGradeId: '' as UUID,
   positionId: '' as UUID,
   departmentId: '' as UUID,
   employmentTypeId: '' as UUID,
   employmentNatureId: '' as UUID,
+  
+  // Biographical data
+  birthDate: '',
+  birthLocation: '',
+  motherFullName: '',
+  hasBirthCert: '' as '0' | '1' | '',
+  hasMarriageCert: '' as '0' | '1' | '',
+  maritalStatusId: '' as UUID,
+  addressId: '' as UUID,
+  
+  // Arrays
+  emergencyContacts: [],
+  familyMembers: [],
+  guarantors: [],
+  
+  // Financial data
+  tin: '',
+  bankAccountNo: '',
+  pensionNumber: '',
+  
+  // File uploads
+  guarantorFiles: [],
+  stampFiles: [],
+  signatureFiles: [],
+  
+  // Employment state
+  isTerminated: '0',
+  isApproved: '0',
+  isStandBy: '0',
+  isRetired: '0',
+  isUnderProbation: '0',
 };
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: User },
-  { id: 2, title: 'Review', icon: Building },
+  { id: 2, title: 'Biographical', icon: Users },
+  { id: 3, title: 'Financial', icon: DollarSign },
+  { id: 4, title: 'Review', icon: CheckCircle2 },
+];
+
+// Mock data for dropdowns (you can move these to a separate file if needed)
+const mockCompanies = [
+  { id: '1' as UUID, name: 'Main Company', nameAm: 'ዋና ኩባንያ' },
+  { id: '2' as UUID, name: 'Subsidiary A', nameAm: 'ንዑስ ኩባንያ አ' },
+  { id: '3' as UUID, name: 'Subsidiary B', nameAm: 'ንዑስ ኩባንያ ለ' },
+];
+
+const mockBranches = [
+  { id: '1' as UUID, name: 'Head Office', nameAm: 'ዋና ቢሮ', companyId: '1' as UUID },
+  { id: '2' as UUID, name: 'Branch A', nameAm: 'ቅርንጫፍ አ', companyId: '1' as UUID },
+  { id: '3' as UUID, name: 'Branch B', nameAm: 'ቅርንጫፍ ለ', companyId: '1' as UUID },
+];
+
+const mockJobGrades = [
+  { id: '1' as UUID, name: 'Grade 1', nameAm: 'ግሬድ 1' },
+  { id: '2' as UUID, name: 'Grade 2', nameAm: 'ግሬድ 2' },
+  { id: '3' as UUID, name: 'Grade 3', nameAm: 'ግሬድ 3' },
+];
+
+const mockDepartments = [
+  { id: '1' as UUID, name: 'Engineering', nameAm: 'ኢንጂነሪንግ', branchId: '1' as UUID },
+  { id: '2' as UUID, name: 'Human Resources', nameAm: 'ሰው ሀብት', branchId: '1' as UUID },
+  { id: '3' as UUID, name: 'Finance', nameAm: 'ፋይናንስ', branchId: '1' as UUID },
+];
+
+const mockPositions = [
+  { id: '1' as UUID, name: 'Software Engineer', nameAm: 'ሶፍትዌር ኢንጂነር', departmentId: '1' as UUID },
+  { id: '2' as UUID, name: 'Senior Software Engineer', nameAm: 'ከፍተኛ ሶፍትዌር ኢንጂነር', departmentId: '1' as UUID },
+  { id: '3' as UUID, name: 'HR Manager', nameAm: 'ሰው ሀብት ማኔጅር', departmentId: '2' as UUID },
+];
+
+const mockEmploymentTypes = [
+  { id: '1' as UUID, name: 'Full-time', nameAm: 'ሙሉ ጊዜ' },
+  { id: '2' as UUID, name: 'Part-time', nameAm: 'ከፊል ጊዜ' },
+  { id: '3' as UUID, name: 'Contract', nameAm: 'ኮንትራት' },
+];
+
+const mockEmploymentNatures = [
+  { id: '1' as UUID, name: 'Permanent', nameAm: 'ቋሚ' },
+  { id: '2' as UUID, name: 'Temporary', nameAm: 'ጊዜያዊ' },
+  { id: '3' as UUID, name: 'Probation', nameAm: 'ሙከራ' },
+];
+
+const mockMaritalStatus = [
+  { id: '1' as UUID, name: 'Single', nameAm: 'ያላገባ' },
+  { id: '2' as UUID, name: 'Married', nameAm: 'ያገባ' },
+  { id: '3' as UUID, name: 'Divorced', nameAm: 'የተፋታ' },
+  { id: '4' as UUID, name: 'Widowed', nameAm: 'የተመሰረተ' },
 ];
 
 const AddEmployeePage: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [snapshot, setSnapshot] = useState<EmployeeAddDto>(initialValues);
+  const [snapshot, setSnapshot] = useState<ExtendedEmployeeData>(initialValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBackToEmployees = () => {
     navigate(-1);
   };
 
-  const handleNext = (values: EmployeeAddDto) => {
+  const handleNext = (values: ExtendedEmployeeData) => {
     setSnapshot(values);
     setCurrentStep(Math.min(currentStep + 1, steps.length - 1));
   };
 
-  const handleBack = (values: EmployeeAddDto) => {
+  const handleBack = (values: ExtendedEmployeeData) => {
     setSnapshot(values);
     setCurrentStep(Math.max(currentStep - 1, 0));
   };
 
-  const handleSubmit = async (values: EmployeeAddDto, actions: any) => {
+  const handleSubmit = async (values: ExtendedEmployeeData, actions: any) => {
     if (currentStep === steps.length - 1) {
       await submitForm(values, actions);
     } else {
@@ -98,27 +229,19 @@ const AddEmployeePage: React.FC = () => {
     }
   };
 
-  const submitForm = async (values: EmployeeAddDto, actions: any) => {
+  const submitForm = async (values: ExtendedEmployeeData, actions: any) => {
     setIsSubmitting(true);
     try {
       console.log('Form submitted:', values);
       
-      // Construct the full names from the individual name parts
+      // Construct the full names
       const empFullName = `${values.firstName}${values.middleName ? ` ${values.middleName}` : ''} ${values.lastName}`.trim();
       const empFullNameAm = `${values.firstNameAm}${values.middleNameAm ? ` ${values.middleNameAm}` : ''} ${values.lastNameAm}`.trim();
-
-      // Get display names from IDs
-      const jobGrade = mockJobGrades.find(g => g.id === values.jobGradeId)?.name || 'G1';
-      const department = mockDepartments.find(d => d.id === values.departmentId)?.name || 'General';
-      const position = mockPositions.find(p => p.id === values.positionId)?.name || 'Employee';
-      const employmentType = mockEmploymentTypes.find(t => t.id === values.employmentTypeId)?.name || 'Full-time';
-      const employmentNature = mockEmploymentNatures.find(n => n.id === values.employmentNatureId)?.name || 'Permanent';
-      const genderStr = values.gender === '1' ? 'Male' : 'Female';
 
       // Generate employee code
       const employeeCode = `EMP${Date.now().toString().slice(-6)}`;
       
-      // Format dates properly
+      // Format dates
       const employmentDateObj = new Date(values.employmentDate);
       const employmentDateStr = employmentDateObj.toLocaleDateString('en-US', { 
         year: 'numeric', 
@@ -130,9 +253,17 @@ const AddEmployeePage: React.FC = () => {
       const createdAt = currentDate.toISOString().split('T')[0];
       const updatedAt = currentDate.toISOString().split('T')[0];
 
-      // Create the employee data in the format expected by EmployeeManagementPage
+      // Get actual values from mock data
+      const company = mockCompanies.find(c => c.id === values.companyId);
+      const branch = mockBranches.find(b => b.id === values.branchId);
+      const department = mockDepartments.find(d => d.id === values.departmentId);
+      const position = mockPositions.find(p => p.id === values.positionId);
+      const jobGrade = mockJobGrades.find(g => g.id === values.jobGradeId);
+      const employmentType = mockEmploymentTypes.find(t => t.id === values.employmentTypeId);
+      const employmentNature = mockEmploymentNatures.find(n => n.id === values.employmentNatureId);
+
+      // Create the employee data
       const newEmployee = {
-        // Basic employee info
         id: `emp-${Date.now()}` as UUID,
         personId: `person-${Date.now()}` as UUID,
         code: employeeCode,
@@ -141,37 +272,66 @@ const AddEmployeePage: React.FC = () => {
         empFullName: empFullName,
         empFullNameAm: empFullNameAm,
         gender: values.gender,
-        genderStr: genderStr,
+        genderStr: values.gender === '1' ? 'Male' : values.gender === '0' ? 'Female' : 'Not specified',
         nationality: values.nationality,
         
         // Employment details
         employmentDate: values.employmentDate,
         employmentDateStr: employmentDateStr,
-        employmentDateStrAm: employmentDateStr, // You might want different formatting for Amharic
+        employmentDateStrAm: employmentDateStr,
+        companyId: values.companyId,
+        companyName: company?.name || '',
+        branchId: values.branchId,
+        branchName: branch?.name || '',
         jobGradeId: values.jobGradeId,
-        jobGrade: jobGrade,
+        jobGrade: jobGrade?.name || '',
         positionId: values.positionId,
-        position: position,
+        position: position?.name || '',
         departmentId: values.departmentId,
-        department: department,
+        department: department?.name || '',
         employmentTypeId: values.employmentTypeId,
-        employmentType: employmentType,
+        employmentType: employmentType?.name || '',
         employmentNatureId: values.employmentNatureId,
-        employmentNature: employmentNature,
+        employmentNature: employmentNature?.name || '',
+        
+        // Additional biographical data
+        birthDate: values.birthDate,
+        birthLocation: values.birthLocation,
+        motherFullName: values.motherFullName,
+        maritalStatusId: values.maritalStatusId,
+        maritalStatus: mockMaritalStatus.find(m => m.id === values.maritalStatusId)?.name || '',
+        addressId: values.addressId,
+        
+        // Financial data
+        tin: values.tin,
+        bankAccountNo: values.bankAccountNo,
+        pensionNumber: values.pensionNumber,
+        
+        // Arrays
+        emergencyContacts: values.emergencyContacts,
+        familyMembers: values.familyMembers,
+        guarantors: values.guarantors,
         
         // System info
-        status: 'active' as "active" | "on-leave",
+        status: 'active' as const,
         createdAt: createdAt,
         updatedAt: updatedAt,
-        updatedBy: 'System'
+        updatedBy: 'System',
+        
+        // Employment state
+        isTerminated: values.isTerminated,
+        isApproved: values.isApproved,
+        isStandBy: values.isStandBy,
+        isRetired: values.isRetired,
+        isUnderProbation: values.isUnderProbation,
       };
 
       console.log('New employee created:', newEmployee);
       
-      // Store the employee data in sessionStorage
+      // Store the employee data
       sessionStorage.setItem('newEmployee', JSON.stringify(newEmployee));
       
-      // Simulate API call delay
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Navigate back to employees list
@@ -185,8 +345,8 @@ const AddEmployeePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header Component */}
         <AddEmployeeStepHeader
           steps={steps}
@@ -197,14 +357,16 @@ const AddEmployeePage: React.FC = () => {
         />
 
         {/* Form Component */}
-        <AddEmployeeStepForm
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          snapshot={snapshot}
-          onSubmit={handleSubmit}
-          onBack={handleBack}
-          isSubmitting={isSubmitting}
-        />
+        <div className="mt-8">
+          <AddEmployeeStepForm
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            snapshot={snapshot}
+            onSubmit={handleSubmit}
+            onBack={handleBack}
+            isSubmitting={isSubmitting}
+          />
+        </div>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export interface EmployeeListDto extends BaseDto {
   gender: '0' | '1'; 
   nationality: string;
   code: string;
-  employmentDate: string; // ISO string from DateTime
+  employmentDate: string;
   jobGrade: string;
   position: string;
   department: string;
@@ -34,7 +34,7 @@ export interface EmployeeAddDto {
   lastNameAm: string;
   gender: '0' | '1';
   nationality: string;
-  employmentDate: string; // ISO string from DateTime
+  employmentDate: string;
   jobGradeId: UUID;
   positionId: UUID;
   departmentId: UUID;
@@ -52,7 +52,7 @@ export interface EmployeeModDto {
   lastNameAm: string;
   gender: '0' | '1';
   nationality: string;
-  employmentDate: string; // ISO string from DateTime
+  employmentDate: string;
   personId: UUID;
   jobGradeId: UUID;
   positionId: UUID;
@@ -62,14 +62,14 @@ export interface EmployeeModDto {
   rowVersion: string;
 }
 
-// You might also want these related types for dropdowns/selects
+// Related types for dropdowns
 export interface JobGradeDto {
   id: UUID;
   name: string;
   nameAm: string;
 }
 
-export interface PositionDto { // Added PositionDto since it's referenced in the DTOs
+export interface PositionDto {
   id: UUID;
   name: string;
   nameAm: string;
@@ -93,7 +93,105 @@ export interface EmploymentNatureDto {
   nameAm: string;
 }
 
-// Filter types for employee lists
+// Additional DTOs
+export interface EmContactAddDto {
+  firstName: string;
+  firstNameAm: string;
+  middleName: string;
+  middleNameAm: string;
+  lastName: string;
+  lastNameAm: string;
+  nationality: string;
+  gender: '0' | '1';
+  relationId: UUID;
+  addressId: UUID;
+  employeeId: UUID;
+}
+
+export interface EmpBioAddDto {
+  birthDate: string;
+  birthLocation: string;
+  motherFullName: string;
+  hasBirthCert: '0' | '1';
+  hasMarriageCert: '0' | '1';
+  maritalStatusId: UUID;
+  addressId: UUID;
+  employeeId: UUID;
+}
+
+export interface EmpFamilyAddDto {
+  firstName: string;
+  firstNameAm: string;
+  middleName: string;
+  middleNameAm: string;
+  lastName: string;
+  lastNameAm: string;
+  gender: '0' | '1';
+  nationality: string;
+  relationId: UUID;
+  employeeId: UUID;
+}
+
+export interface EmpFinanceAddDto {
+  tin: string;
+  bankAccountNo: string;
+  pensionNumber: string;
+  employeeId: UUID;
+}
+
+export interface EmpGuarantorAddDto {
+  firstName: string;
+  firstNameAm: string;
+  middleName: string;
+  middleNameAm: string;
+  lastName: string;
+  lastNameAm: string;
+  gender: '0' | '1';
+  nationality: string;
+  addressId: UUID;
+  relationId: UUID;
+  employeeId: UUID;
+}
+
+export interface EmpPensionCardAddDto {
+  registrationDate: string;
+  sentDate?: string;
+  receivedDate?: string;
+  isReceived: '0' | '1';
+  isSent: '0' | '1';
+  employeeId: UUID;
+}
+
+export interface EmpStateAddDto {
+  isTerminated: '0' | '1';
+  isApproved: '0' | '1';
+  isStandBy: '0' | '1';
+  isRetired: '0' | '1';
+  isUnderProbation: '0' | '1';
+  employeeId: UUID;
+}
+
+// Lookup types
+export interface MaritalStatusDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+}
+
+export interface RelationDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+}
+
+export interface AddressDto {
+  id: UUID;
+  name: string;
+  nameAm: string;
+  fullAddress: string;
+}
+
+// Filter types
 export interface EmployeeFilters {
   searchTerm: string;
   departmentId?: UUID;
@@ -104,7 +202,6 @@ export interface EmployeeFilters {
   gender: '0' | '1' | '';
 }
 
-// Response type for employee details
 export interface EmployeeDetailsData {
   employee: EmployeeListDto;
 }
