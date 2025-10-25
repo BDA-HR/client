@@ -1,10 +1,11 @@
 import type { UUID } from 'crypto';
 import type { BaseDto } from './BaseDto';
+import type { Quarter } from './enum';
 
 export type { UUID };
 
 export interface PeriodListDto extends BaseDto {
-  quarterId: UUID;
+  quarterId: Quarter;
   fiscalYearId: UUID;
   name: string;
   quarter: string;
@@ -24,7 +25,7 @@ export interface AddPeriodDto {
   dateStart: string;
   dateEnd: string;
   isActive: string;
-  quarterId: UUID;
+  quarterId: Quarter;
   fiscalYearId: UUID;
 }
 
@@ -34,7 +35,7 @@ export interface EditPeriodDto {
   dateStart: string;
   dateEnd: string;
   isActive: string;
-  quarterId: UUID;
+  quarterId: Quarter;
   fiscalYearId: UUID;
   rowVersion: string;
 }

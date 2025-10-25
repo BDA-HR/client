@@ -31,12 +31,14 @@ export const DeptStat = {
 } as const;
 export type DeptStat = typeof DeptStat[keyof typeof DeptStat];
 
-// Remove FiscStat since we're using YesNo for fiscal year status
-// export const FiscStat = {
-//   "0": 'Active',
-//   "1": 'Inactive'
-// } as const;
-// export type FiscStat = typeof FiscStat[keyof typeof FiscStat];
+// Period Quarter enum
+export const Quarter = {
+  "0": '1st Quarter',
+  "1": '2nd Quarter',
+  "2": '3rd Quarter',
+  "3": '4th Quarter'
+} as const;
+export type Quarter = typeof Quarter[keyof typeof Quarter];
 
 export const PeriodStat = {
   "0": 'Active',

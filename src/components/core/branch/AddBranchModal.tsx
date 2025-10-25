@@ -171,7 +171,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                     value={branchType}
                     onValueChange={(value: BranchType) => setBranchType(value)}
                   >
-                    <SelectTrigger 
+                    <SelectTrigger
                       id="branchType"
                       className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     >

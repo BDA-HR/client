@@ -1,13 +1,22 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, BadgePlus } from 'lucide-react';
-import { Button } from '../../ui/button';
-import type { AddPeriodDto, UUID } from '../../../types/core/period';
-import toast from 'react-hot-toast';
-import List from '../../List/list';
-import type { ListItem } from '../../../types/List/list';
-import { listService } from '../../../services/List/listservice';
-import { fiscalYearService } from '../../../services/core/fiscservice';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { X, BadgePlus } from "lucide-react";
+import { Button } from "../../ui/button";
+import type { AddPeriodDto, UUID } from "../../../types/core/period";
+import toast from "react-hot-toast";
+import List from "../../List/list";
+import type { ListItem } from "../../../types/List/list";
+// import { listService } from '../../../services/List/listservice';
+import { fiscalYearService } from "../../../services/core/fiscservice";
+import { Quarter } from "../../../types/core/enum";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import { Label } from "@radix-ui/react-label";
 
 interface AddPeriodModalProps {
   open: boolean;
@@ -22,18 +31,24 @@ export const AddPeriodModal = ({
   onOpenChange,
   newPeriod,
   setNewPeriod,
-  onAddPeriod
+  onAddPeriod,
 }: AddPeriodModalProps) => {
   const [loading, setLoading] = useState(false);
   const [fiscalYears, setFiscalYears] = useState<ListItem[]>([]);
-  const [quarters, setQuarters] = useState<ListItem[]>([]);
+  // const [quarters, setQuarters] = useState<ListItem[]>([]);
   const [loadingFiscalYears, setLoadingFiscalYears] = useState(false);
-  const [loadingQuarters, setLoadingQuarters] = useState(false);
+  // const [loadingQuarters, setLoadingQuarters] = useState(false);
+  const [quarter, setQuarter] = useState<Quarter>(Quarter["0"]);
+
+  const quarterOptions = Object.entries(Quarter).map(([key, value]) => ({
+    key,
+    value,
+  }));
 
   useEffect(() => {
     if (open) {
       fetchFiscalYears();
-      fetchQuarters();
+      // fetchQuarters();
     }
   }, [open]);
 
@@ -42,61 +57,61 @@ export const AddPeriodModal = ({
       setLoadingFiscalYears(true);
       const fiscalYearsData = await fiscalYearService.getAllFiscalYears();
       // Convert FiscYearListDto to ListItem
-      const fiscalYearListItems: ListItem[] = fiscalYearsData.map(fy => ({
+      const fiscalYearListItems: ListItem[] = fiscalYearsData.map((fy) => ({
         id: fy.id,
-        name: fy.name
+        name: fy.name,
       }));
       setFiscalYears(fiscalYearListItems);
     } catch (error) {
-      console.error('Error fetching fiscal years:', error);
-      toast.error('Failed to load fiscal years');
+      console.error("Error fetching fiscal years:", error);
+      toast.error("Failed to load fiscal years");
       setFiscalYears([]);
     } finally {
       setLoadingFiscalYears(false);
     }
   };
 
-  const fetchQuarters = async () => {
-    try {
-      setLoadingQuarters(true);
-      const quartersData = await listService.getAllQuarters();
-      setQuarters(quartersData);
-    } catch (error) {
-      console.error('Error fetching quarters:', error);
-      toast.error('Failed to load quarters');
-      setQuarters([]);
-    } finally {
-      setLoadingQuarters(false);
-    }
-  };
+  // const fetchQuarters = async () => {
+  //   try {
+  //     setLoadingQuarters(true);
+  //     const quartersData = await listService.getAllQuarters();
+  //     setQuarters(quartersData);
+  //   } catch (error) {
+  //     console.error("Error fetching quarters:", error);
+  //     toast.error("Failed to load quarters");
+  //     setQuarters([]);
+  //   } finally {
+  //     setLoadingQuarters(false);
+  //   }
+  // };
 
   const handleSelectFiscalYear = (item: ListItem) => {
     setNewPeriod({ ...newPeriod, fiscalYearId: item.id });
   };
 
-  const handleSelectQuarter = (item: ListItem) => {
-    setNewPeriod({ ...newPeriod, quarterId: item.id });
-  };
+  // const handleSelectQuarter = (item: Quarter) => {
+  //   setNewPeriod({ ...newPeriod, quarterId: item });
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newPeriod.name || !newPeriod.dateStart || !newPeriod.dateEnd) {
-      toast.error('Please fill all required fields');
+      toast.error("Please fill all required fields");
       return;
     }
 
     if (!newPeriod.quarterId || !newPeriod.fiscalYearId) {
-      toast.error('Please select a quarter and fiscal year');
+      toast.error("Please select a quarter and fiscal year");
       return;
     }
 
     // Date validation
     const startDate = new Date(newPeriod.dateStart);
     const endDate = new Date(newPeriod.dateEnd);
-    
+
     if (endDate <= startDate) {
-      toast.error('End date must be after start date');
+      toast.error("End date must be after start date");
       return;
     }
 
@@ -104,7 +119,7 @@ export const AddPeriodModal = ({
       setLoading(true);
       await onAddPeriod();
     } catch (error) {
-      console.error('Error adding period:', error);
+      console.error("Error adding period:", error);
     } finally {
       setLoading(false);
     }
@@ -112,12 +127,12 @@ export const AddPeriodModal = ({
 
   const handleCancel = () => {
     setNewPeriod({
-      name: '',
-      dateStart: '',
-      dateEnd: '',
-      isActive: '0',
-      quarterId: '' as UUID,
-      fiscalYearId: '' as UUID
+      name: "",
+      dateStart: "",
+      dateEnd: "",
+      isActive: "0",
+      quarterId: quarter,
+      fiscalYearId: "" as UUID,
     });
     onOpenChange(false);
   };
@@ -156,7 +171,10 @@ export const AddPeriodModal = ({
             <div className="py-4 space-y-4">
               {/* Period Name */}
               <div className="space-y-2">
-                <label htmlFor="periodName" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="periodName"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Period Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -165,7 +183,9 @@ export const AddPeriodModal = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                   placeholder="e.g., January 2024, Q1 Review"
                   value={newPeriod.name}
-                  onChange={(e) => setNewPeriod({ ...newPeriod, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewPeriod({ ...newPeriod, name: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -174,16 +194,30 @@ export const AddPeriodModal = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Quarter Selection */}
                 <div className="space-y-2">
-                  <List
-                    items={quarters}
-                    selectedValue={newPeriod.quarterId}
-                    onSelect={handleSelectQuarter}
-                    label="Quarter"
-                    placeholder="Select a quarter"
-                    required
-                    disabled={loadingQuarters}
-                  />
-                  {loadingQuarters && <p className="text-sm text-gray-500 mt-1">Loading quarters...</p>}
+                  <Label
+                    htmlFor="quarter"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Quarter <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={quarter}
+                    onValueChange={(key: Quarter) => setQuarter(key)}
+                  >
+                    <SelectTrigger
+                      id="branchType"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <SelectValue placeholder="Select Quarter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {quarterOptions.map((option) => (
+                        <SelectItem key={option.key} value={option.key}>
+                          {option.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Fiscal Year Selection */}
@@ -197,14 +231,21 @@ export const AddPeriodModal = ({
                     required
                     disabled={loadingFiscalYears}
                   />
-                  {loadingFiscalYears && <p className="text-sm text-gray-500 mt-1">Loading fiscal years...</p>}
+                  {loadingFiscalYears && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Loading fiscal years...
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* Start and End Dates - Side by Side */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="startDate"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Start Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -212,13 +253,18 @@ export const AddPeriodModal = ({
                     id="startDate"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     value={newPeriod.dateStart}
-                    onChange={(e) => setNewPeriod({ ...newPeriod, dateStart: e.target.value })}
+                    onChange={(e) =>
+                      setNewPeriod({ ...newPeriod, dateStart: e.target.value })
+                    }
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="endDate"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     End Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -226,7 +272,9 @@ export const AddPeriodModal = ({
                     id="endDate"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     value={newPeriod.dateEnd}
-                    onChange={(e) => setNewPeriod({ ...newPeriod, dateEnd: e.target.value })}
+                    onChange={(e) =>
+                      setNewPeriod({ ...newPeriod, dateEnd: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -239,9 +287,9 @@ export const AddPeriodModal = ({
                 <Button
                   type="submit"
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
-                  disabled={loading || loadingFiscalYears || loadingQuarters}
+                  disabled={loading || loadingFiscalYears}
                 >
-                  {loading ? 'Adding...' : 'Save'}
+                  {loading ? "Adding..." : "Save"}
                 </Button>
                 <Button
                   type="button"

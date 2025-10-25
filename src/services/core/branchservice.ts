@@ -3,6 +3,7 @@ import type { Branch, BranchListDto, AddBranchDto, EditBranchDto, BranchCompList
 
 class BranchService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Branch`;
+  private braUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Names`;
 
   // GET: baseurl/AllBranch
   async getAllBranches(): Promise<BranchListDto[]> {
@@ -40,7 +41,7 @@ class BranchService {
   // NEW: GET: baseurl/BranchCompList
   async getBranchCompanyList(): Promise<BranchCompListDto[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/BranchCompList`);
+      const response = await api.get(`${this.braUrl}/BranchCompList`);
       return response.data;
     } catch (error) {
       console.error('Error fetching branch company list:', error);
