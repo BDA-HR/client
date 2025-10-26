@@ -4,7 +4,7 @@ import type { FormikProps } from 'formik';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as Yup from 'yup';
 import { Button } from '../../../../components/ui/button';
-import { ChevronRight, User, Briefcase, CheckCircle2, Users, FileText, DollarSign, Heart, Plus, Trash2, X, Building, GitBranch, File, FileImage, FileText as FileTextIcon } from 'lucide-react';
+import { ChevronRight, User, Briefcase, CheckCircle2, Users, FileText, DollarSign, Heart, Plus, Trash2, X, File, FileImage, FileText as FileTextIcon } from 'lucide-react';
 import type { 
   EmployeeAddDto, 
   JobGradeDto, 
@@ -117,52 +117,48 @@ const basicInfoValidationSchema = Yup.object({
 });
 
 const biographicalValidationSchema = Yup.object({
-  birthDate: Yup.date().required('Birth date is required').max(new Date(), 'Birth date cannot be in the future'),
-  birthLocation: Yup.string().required('Birth location is required'),
-  motherFullName: Yup.string().required('Mother\'s full name is required'),
-  hasBirthCert: Yup.string().required('Please specify if you have a birth certificate').oneOf(['0', '1'], 'Please select a valid option'),
-  hasMarriageCert: Yup.string().required('Please specify if you have a marriage certificate').oneOf(['0', '1'], 'Please select a valid option'),
-  maritalStatusId: Yup.string().required('Marital status is required'),
-  addressId: Yup.string().required('Address is required'),
+  biographicalData: Yup.object({
+    birthDate: Yup.date().required('Birth date is required').max(new Date(), 'Birth date cannot be in the future'),
+    birthLocation: Yup.string().required('Birth location is required'),
+    motherFullName: Yup.string().required('Mother\'s full name is required'),
+    hasBirthCert: Yup.string().required('Please specify if you have a birth certificate').oneOf(['0', '1'], 'Please select a valid option'),
+    hasMarriageCert: Yup.string().required('Please specify if you have a marriage certificate').oneOf(['0', '1'], 'Please select a valid option'),
+    maritalStatusId: Yup.string().required('Marital status is required'),
+    addressId: Yup.string().required('Address is required'),
+  })
 });
 
 const financialValidationSchema = Yup.object({
-  tin: Yup.string().optional().matches(/^\d{10}$/, 'TIN must be 10 digits'),
-  bankAccountNo: Yup.string().optional(),
-  pensionNumber: Yup.string().optional(),
+  financialData: Yup.object({
+    tin: Yup.string().optional().matches(/^\d{10}$/, 'TIN must be 10 digits'),
+    bankAccountNo: Yup.string().optional(),
+    pensionNumber: Yup.string().optional(),
+  })
 });
 
-// Extended interface that builds upon EmployeeAddDto
+// Extended interface that properly uses the DTOs
 interface ExtendedEmployeeData extends EmployeeAddDto {
   // Additional fields not in EmployeeAddDto
   companyId: UUID;
   branchId: UUID;
   
-  // Biographical data (from EmpBioAddDto)
-  birthDate: string;
-  birthLocation: string;
-  motherFullName: string;
-  hasBirthCert: '0' | '1' | '';
-  hasMarriageCert: '0' | '1' | '';
-  maritalStatusId: UUID;
-  addressId: UUID;
+  // Biographical data using EmpBioAddDto (without employeeId)
+  biographicalData: Omit<EmpBioAddDto, 'employeeId'>;
+  
+  // Financial data using EmpFinanceAddDto (without employeeId)
+  financialData: Omit<EmpFinanceAddDto, 'employeeId'>;
   
   // Arrays from other DTOs
   emergencyContacts: Omit<EmContactAddDto, 'employeeId'>[];
   familyMembers: Omit<EmpFamilyAddDto, 'employeeId'>[];
   guarantors: Omit<EmpGuarantorAddDto, 'employeeId'>[];
   
-  // Financial data (from EmpFinanceAddDto)
-  tin: string;
-  bankAccountNo: string;
-  pensionNumber: string;
-  
   // File uploads
   guarantorFiles: File[];
   stampFiles: File[];
   signatureFiles: File[];
   
-  // Employment state (from EmpStateAddDto)
+  // Employment state
   isTerminated: '0' | '1';
   isApproved: '0' | '1';
   isStandBy: '0' | '1';
@@ -238,7 +234,6 @@ const FileUploadArea: React.FC<{
   const isPdfFile = (file: File) => {
     return file.type === 'application/pdf';
   };
-
 
   const getFilePreview = (file: File) => {
     if (isImageFile(file)) {
@@ -568,15 +563,24 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   const renderStepContent = (formikProps: FormikProps<ExtendedEmployeeData> & { isSubmitting?: boolean }) => {
     const { errors, touched, values, handleChange, handleBlur, setFieldValue } = formikProps;
 
-    const inputClassName = (fieldName: keyof ExtendedEmployeeData) => 
+    const inputClassName = (fieldName: string) => 
       `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-        errors[fieldName] && touched[fieldName] ? 'border-red-500' : 'border-gray-300'
+        getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName) ? 'border-red-500' : 'border-gray-300'
       }`;
 
-    const selectTriggerClassName = (fieldName: keyof ExtendedEmployeeData) => 
+    const selectTriggerClassName = (fieldName: string) => 
       `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-        errors[fieldName] && touched[fieldName] ? 'border-red-500' : 'border-gray-300'
+        getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName) ? 'border-red-500' : 'border-gray-300'
       }`;
+
+    // Helper functions to get nested errors and touched
+    const getNestedError = (errorObj: any, path: string) => {
+      return path.split('.').reduce((obj, key) => obj && obj[key], errorObj);
+    };
+
+    const getNestedTouched = (touchedObj: any, path: string) => {
+      return path.split('.').reduce((obj, key) => obj && obj[key], touchedObj);
+    };
 
     switch (currentStep) {
       case 0:
@@ -782,28 +786,28 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {/* Employment Date */}
                 <div className="space-y-2">
-  <label
-    htmlFor="employmentDate"
-    className="block text-sm font-medium text-gray-700 mb-1"
-  >
-    Employment Date <span className="text-red-500">*</span>
-  </label>
-  <input
-    id="employmentDate"
-    name="employmentDate"
-    type="date"
-    value={values.employmentDate}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-       errors.employmentDate && touched.employmentDate ? 'border-red-500' : 'border-gray-300'
-    }`}
-    required
-  />
-  {errors.employmentDate && touched.employmentDate && (
-    <p className="text-red-500 text-sm mt-1">{errors.employmentDate}</p>
-  )}
-</div>
+                  <label
+                    htmlFor="employmentDate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Employment Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="employmentDate"
+                    name="employmentDate"
+                    type="date"
+                    value={values.employmentDate}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                      errors.employmentDate && touched.employmentDate ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    required
+                  />
+                  {errors.employmentDate && touched.employmentDate && (
+                    <p className="text-red-500 text-sm mt-1">{errors.employmentDate}</p>
+                  )}
+                </div>
                 {/* Company */}
                 <div className="space-y-2">
                   <label htmlFor="companyId" className="block text-sm font-medium text-gray-700 mb-1">
@@ -1028,79 +1032,79 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
               {/* Birth Date */}
               <div className="space-y-2">
-                  <label
-    htmlFor="birthDate"
-    className="block text-sm font-medium text-gray-700 mb-1"
-  >
-    Birth Date <span className="text-red-500">*</span>
-  </label>
-  <input
-    id="birthDate"
-    name="birthDate"
-    type="date"
-    value={values.birthDate}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    className={`w-full px-3 py-1.5 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-       errors.birthDate && touched.birthDate ? 'border-red-500' : 'border-gray-300'
-    }`}
-    required
-  />
-  {errors.birthDate && touched.birthDate && (
-    <p className="text-red-500 text-sm mt-1">{errors.birthDate}</p>
-  )}
+                <label
+                  htmlFor="biographicalData.birthDate"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Birth Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="biographicalData.birthDate"
+                  name="biographicalData.birthDate"
+                  type="date"
+                  value={values.biographicalData.birthDate}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full px-3 py-1.5 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                    getNestedError(errors, 'biographicalData.birthDate') && getNestedTouched(touched, 'biographicalData.birthDate') ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  required
+                />
+                {getNestedError(errors, 'biographicalData.birthDate') && getNestedTouched(touched, 'biographicalData.birthDate') && (
+                  <p className="text-red-500 text-sm mt-1">{getNestedError(errors, 'biographicalData.birthDate')}</p>
+                )}
               </div>
 
               {/* Birth Location */}
               <div className="space-y-2">
-                <label htmlFor="birthLocation" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="biographicalData.birthLocation" className="block text-sm font-medium text-gray-700 mb-1">
                   Birth Location *
                 </label>
                 <Input
-                  id="birthLocation"
-                  name="birthLocation"
+                  id="biographicalData.birthLocation"
+                  name="biographicalData.birthLocation"
                   type="text"
-                  value={values.birthLocation}
+                  value={values.biographicalData.birthLocation}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={inputClassName('birthLocation')}
+                  className={inputClassName('biographicalData.birthLocation')}
                   placeholder="Addis Ababa"
                 />
-                {errors.birthLocation && touched.birthLocation && (
-                  <div className="text-red-500 text-xs mt-1">{errors.birthLocation}</div>
+                {getNestedError(errors, 'biographicalData.birthLocation') && getNestedTouched(touched, 'biographicalData.birthLocation') && (
+                  <div className="text-red-500 text-xs mt-1">{getNestedError(errors, 'biographicalData.birthLocation')}</div>
                 )}
               </div>
 
               {/* Mother's Full Name */}
               <div className="space-y-2">
-                <label htmlFor="motherFullName" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="biographicalData.motherFullName" className="block text-sm font-medium text-gray-700 mb-1">
                   Mother's Full Name *
                 </label>
                 <Input
-                  id="motherFullName"
-                  name="motherFullName"
+                  id="biographicalData.motherFullName"
+                  name="biographicalData.motherFullName"
                   type="text"
-                  value={values.motherFullName}
+                  value={values.biographicalData.motherFullName}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={inputClassName('motherFullName')}
+                  className={inputClassName('biographicalData.motherFullName')}
                   placeholder="Mother's full name"
                 />
-                {errors.motherFullName && touched.motherFullName && (
-                  <div className="text-red-500 text-xs mt-1">{errors.motherFullName}</div>
+                {getNestedError(errors, 'biographicalData.motherFullName') && getNestedTouched(touched, 'biographicalData.motherFullName') && (
+                  <div className="text-red-500 text-xs mt-1">{getNestedError(errors, 'biographicalData.motherFullName')}</div>
                 )}
               </div>
 
               {/* Marital Status */}
               <div className="space-y-2">
-                <label htmlFor="maritalStatusId" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="biographicalData.maritalStatusId" className="block text-sm font-medium text-gray-700 mb-1">
                   Marital Status *
                 </label>
                 <Select 
-                  value={values.maritalStatusId} 
-                  onValueChange={(value) => setFieldValue('maritalStatusId', value)}
+                  value={values.biographicalData.maritalStatusId} 
+                  onValueChange={(value) => setFieldValue('biographicalData.maritalStatusId', value)}
                 >
-                  <SelectTrigger className={selectTriggerClassName('maritalStatusId')}>
+                  <SelectTrigger className={selectTriggerClassName('biographicalData.maritalStatusId')}>
                     <SelectValue placeholder="Select Marital Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1111,21 +1115,21 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.maritalStatusId && touched.maritalStatusId && (
-                  <div className="text-red-500 text-xs mt-1">{errors.maritalStatusId}</div>
+                {getNestedError(errors, 'biographicalData.maritalStatusId') && getNestedTouched(touched, 'biographicalData.maritalStatusId') && (
+                  <div className="text-red-500 text-xs mt-1">{getNestedError(errors, 'biographicalData.maritalStatusId')}</div>
                 )}
               </div>
 
               {/* Has Birth Certificate */}
               <div className="space-y-2">
-                <label htmlFor="hasBirthCert" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="biographicalData.hasBirthCert" className="block text-sm font-medium text-gray-700 mb-1">
                   Has Birth Certificate? *
                 </label>
                 <Select 
-                  value={values.hasBirthCert} 
-                  onValueChange={(value) => setFieldValue('hasBirthCert', value)}
+                  value={values.biographicalData.hasBirthCert} 
+                  onValueChange={(value) => setFieldValue('biographicalData.hasBirthCert', value)}
                 >
-                  <SelectTrigger className={selectTriggerClassName('hasBirthCert')}>
+                  <SelectTrigger className={selectTriggerClassName('biographicalData.hasBirthCert')}>
                     <SelectValue placeholder="Select option" />
                   </SelectTrigger>
                   <SelectContent>                    
@@ -1133,43 +1137,43 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                     <SelectItem value="1">No</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.hasBirthCert && touched.hasBirthCert && (
-                  <div className="text-red-500 text-xs mt-1">{errors.hasBirthCert}</div>
+                {getNestedError(errors, 'biographicalData.hasBirthCert') && getNestedTouched(touched, 'biographicalData.hasBirthCert') && (
+                  <div className="text-red-500 text-xs mt-1">{getNestedError(errors, 'biographicalData.hasBirthCert')}</div>
                 )}
               </div>
 
               {/* Has Marriage Certificate */}
               <div className="space-y-2">
-                <label htmlFor="hasMarriageCert" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="biographicalData.hasMarriageCert" className="block text-sm font-medium text-gray-700 mb-1">
                   Has Marriage Certificate? *
                 </label>
                 <Select 
-                  value={values.hasMarriageCert} 
-                  onValueChange={(value) => setFieldValue('hasMarriageCert', value)}
+                  value={values.biographicalData.hasMarriageCert} 
+                  onValueChange={(value) => setFieldValue('biographicalData.hasMarriageCert', value)}
                 >
-                  <SelectTrigger className={selectTriggerClassName('hasMarriageCert')}>
+                  <SelectTrigger className={selectTriggerClassName('biographicalData.hasMarriageCert')}>
                     <SelectValue placeholder="Select option" />
                   </SelectTrigger>
                   <SelectContent>
                   <SelectItem value="0">Yes</SelectItem>
-<SelectItem value="1">No</SelectItem>
+                  <SelectItem value="1">No</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.hasMarriageCert && touched.hasMarriageCert && (
-                  <div className="text-red-500 text-xs mt-1">{errors.hasMarriageCert}</div>
+                {getNestedError(errors, 'biographicalData.hasMarriageCert') && getNestedTouched(touched, 'biographicalData.hasMarriageCert') && (
+                  <div className="text-red-500 text-xs mt-1">{getNestedError(errors, 'biographicalData.hasMarriageCert')}</div>
                 )}
               </div>
 
               {/* Address */}
               <div className="space-y-2">
-                <label htmlFor="addressId" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="biographicalData.addressId" className="block text-sm font-medium text-gray-700 mb-1">
                   Address *
                 </label>
                 <Select 
-                  value={values.addressId} 
-                  onValueChange={(value) => setFieldValue('addressId', value)}
+                  value={values.biographicalData.addressId} 
+                  onValueChange={(value) => setFieldValue('biographicalData.addressId', value)}
                 >
-                  <SelectTrigger className={selectTriggerClassName('addressId')}>
+                  <SelectTrigger className={selectTriggerClassName('biographicalData.addressId')}>
                     <SelectValue placeholder="Select Address" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1180,8 +1184,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.addressId && touched.addressId && (
-                  <div className="text-red-500 text-xs mt-1">{errors.addressId}</div>
+                {getNestedError(errors, 'biographicalData.addressId') && getNestedTouched(touched, 'biographicalData.addressId') && (
+                  <div className="text-red-500 text-xs mt-1">{getNestedError(errors, 'biographicalData.addressId')}</div>
                 )}
               </div>
             </div>
@@ -1544,54 +1548,54 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
               {/* TIN Number */}
               <div className="space-y-2">
-                <label htmlFor="tin" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="financialData.tin" className="block text-sm font-medium text-gray-700 mb-1">
                   TIN Number
                 </label>
                 <Input
-                  id="tin"
-                  name="tin"
+                  id="financialData.tin"
+                  name="financialData.tin"
                   type="text"
-                  value={values.tin}
+                  value={values.financialData.tin}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={inputClassName('tin')}
+                  className={inputClassName('financialData.tin')}
                   placeholder="1234567890"
                 />
-                {errors.tin && touched.tin && (
-                  <div className="text-red-500 text-xs mt-1">{errors.tin}</div>
+                {getNestedError(errors, 'financialData.tin') && getNestedTouched(touched, 'financialData.tin') && (
+                  <div className="text-red-500 text-xs mt-1">{getNestedError(errors, 'financialData.tin')}</div>
                 )}
               </div>
 
               {/* Bank Account Number */}
               <div className="space-y-2">
-                <label htmlFor="bankAccountNo" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="financialData.bankAccountNo" className="block text-sm font-medium text-gray-700 mb-1">
                   Bank Account Number
                 </label>
                 <Input
-                  id="bankAccountNo"
-                  name="bankAccountNo"
+                  id="financialData.bankAccountNo"
+                  name="financialData.bankAccountNo"
                   type="text"
-                  value={values.bankAccountNo}
+                  value={values.financialData.bankAccountNo}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={inputClassName('bankAccountNo')}
+                  className={inputClassName('financialData.bankAccountNo')}
                   placeholder="Account number"
                 />
               </div>
 
               {/* Pension Number */}
               <div className="space-y-2">
-                <label htmlFor="pensionNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="financialData.pensionNumber" className="block text-sm font-medium text-gray-700 mb-1">
                   Pension Number
                 </label>
                 <Input
-                  id="pensionNumber"
-                  name="pensionNumber"
+                  id="financialData.pensionNumber"
+                  name="financialData.pensionNumber"
                   type="text"
-                  value={values.pensionNumber}
+                  value={values.financialData.pensionNumber}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={inputClassName('pensionNumber')}
+                  className={inputClassName('financialData.pensionNumber')}
                   placeholder="Pension number"
                 />
               </div>
@@ -1918,29 +1922,29 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                 <dl className="space-y-3">
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Birth Date</dt>
-                    <dd className="font-semibold text-gray-900">{values.birthDate}</dd>
+                    <dd className="font-semibold text-gray-900">{values.biographicalData.birthDate}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Birth Location</dt>
-                    <dd className="font-semibold text-gray-900">{values.birthLocation}</dd>
+                    <dd className="font-semibold text-gray-900">{values.biographicalData.birthLocation}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Mother's Name</dt>
-                    <dd className="font-semibold text-gray-900">{values.motherFullName}</dd>
+                    <dd className="font-semibold text-gray-900">{values.biographicalData.motherFullName}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Marital Status</dt>
                     <dd className="font-semibold text-gray-900">
-                      {mockMaritalStatus.find(m => m.id === values.maritalStatusId)?.name || 'Not selected'}
+                      {mockMaritalStatus.find(m => m.id === values.biographicalData.maritalStatusId)?.name || 'Not selected'}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Birth Certificate</dt>
-                    <dd className="font-semibold text-gray-900">{values.hasBirthCert === '0' ? 'Yes' : values.hasBirthCert === '1' ? 'No' : 'Not selected'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.biographicalData.hasBirthCert === '0' ? 'Yes' : values.biographicalData.hasBirthCert === '1' ? 'No' : 'Not selected'}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Marriage Certificate</dt>
-                    <dd className="font-semibold text-gray-900">{values.hasMarriageCert === '0' ? 'Yes' : values.hasMarriageCert === '1' ? 'No' : 'Not selected'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.biographicalData.hasMarriageCert === '0' ? 'Yes' : values.biographicalData.hasMarriageCert === '1' ? 'No' : 'Not selected'}</dd>
                   </div>
                 </dl>
               </motion.div>
@@ -1961,15 +1965,15 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                 <dl className="space-y-3">
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">TIN Number</dt>
-                    <dd className="font-semibold text-gray-900">{values.tin || 'Not provided'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.financialData.tin || 'Not provided'}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Bank Account</dt>
-                    <dd className="font-semibold text-gray-900">{values.bankAccountNo || 'Not provided'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.financialData.bankAccountNo || 'Not provided'}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Pension Number</dt>
-                    <dd className="font-semibold text-gray-900">{values.pensionNumber || 'Not provided'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.financialData.pensionNumber || 'Not provided'}</dd>
                   </div>
                 </dl>
               </motion.div>

@@ -7,7 +7,7 @@ import type { UUID } from 'crypto';
 import { AddEmployeeStepHeader } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepHeader';
 import { AddEmployeeStepForm } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepForm';
 
-// Define the extended interface locally to match the form
+// Define the extended interface locally to match the form - UPDATED STRUCTURE
 interface ExtendedEmployeeData {
   // Basic info
   firstName: string;
@@ -27,14 +27,23 @@ interface ExtendedEmployeeData {
   employmentTypeId: UUID;
   employmentNatureId: UUID;
   
-  // Biographical data
-  birthDate: string;
-  birthLocation: string;
-  motherFullName: string;
-  hasBirthCert: '0' | '1' | '';
-  hasMarriageCert: '0' | '1' | '';
-  maritalStatusId: UUID;
-  addressId: UUID;
+  // Biographical data - NESTED STRUCTURE
+  biographicalData: {
+    birthDate: string;
+    birthLocation: string;
+    motherFullName: string;
+    hasBirthCert: '0' | '1' | '';
+    hasMarriageCert: '0' | '1' | '';
+    maritalStatusId: UUID;
+    addressId: UUID;
+  };
+  
+  // Financial data - NESTED STRUCTURE
+  financialData: {
+    tin: string;
+    bankAccountNo: string;
+    pensionNumber: string;
+  };
   
   // Arrays
   emergencyContacts: Array<{
@@ -73,11 +82,6 @@ interface ExtendedEmployeeData {
     addressId: UUID;
   }>;
   
-  // Financial data
-  tin: string;
-  bankAccountNo: string;
-  pensionNumber: string;
-  
   // File uploads
   guarantorFiles: File[];
   stampFiles: File[];
@@ -110,24 +114,28 @@ const initialValues: ExtendedEmployeeData = {
   employmentTypeId: '' as UUID,
   employmentNatureId: '' as UUID,
   
-  // Biographical data
-  birthDate: '',
-  birthLocation: '',
-  motherFullName: '',
-  hasBirthCert: '' as '0' | '1' | '',
-  hasMarriageCert: '' as '0' | '1' | '',
-  maritalStatusId: '' as UUID,
-  addressId: '' as UUID,
+  // Biographical data - NESTED STRUCTURE
+  biographicalData: {
+    birthDate: '',
+    birthLocation: '',
+    motherFullName: '',
+    hasBirthCert: '' as '0' | '1' | '',
+    hasMarriageCert: '' as '0' | '1' | '',
+    maritalStatusId: '' as UUID,
+    addressId: '' as UUID,
+  },
+  
+  // Financial data - NESTED STRUCTURE
+  financialData: {
+    tin: '',
+    bankAccountNo: '',
+    pensionNumber: '',
+  },
   
   // Arrays
   emergencyContacts: [],
   familyMembers: [],
   guarantors: [],
-  
-  // Financial data
-  tin: '',
-  bankAccountNo: '',
-  pensionNumber: '',
   
   // File uploads
   guarantorFiles: [],
@@ -199,6 +207,11 @@ const mockMaritalStatus = [
   { id: '4' as UUID, name: 'Widowed', nameAm: 'የተመሰረተ' },
 ];
 
+const mockAddresses = [
+  { id: '1' as UUID, name: 'Main Office', nameAm: 'ዋና አድራሻ', fullAddress: 'Addis Ababa, Ethiopia' },
+  { id: '2' as UUID, name: 'Branch Office', nameAm: 'ቅርንጫፍ አድራሻ', fullAddress: 'Addis Ababa, Ethiopia' },
+];
+
 const AddEmployeePage: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
@@ -261,6 +274,8 @@ const AddEmployeePage: React.FC = () => {
       const jobGrade = mockJobGrades.find(g => g.id === values.jobGradeId);
       const employmentType = mockEmploymentTypes.find(t => t.id === values.employmentTypeId);
       const employmentNature = mockEmploymentNatures.find(n => n.id === values.employmentNatureId);
+      const maritalStatus = mockMaritalStatus.find(m => m.id === values.biographicalData.maritalStatusId);
+      const address = mockAddresses.find(a => a.id === values.biographicalData.addressId);
 
       // Create the employee data
       const newEmployee = {
@@ -272,7 +287,7 @@ const AddEmployeePage: React.FC = () => {
         empFullName: empFullName,
         empFullNameAm: empFullNameAm,
         gender: values.gender,
-        genderStr: values.gender === '1' ? 'Male' : values.gender === '0' ? 'Female' : 'Not specified',
+        genderStr: values.gender === '0' ? 'Male' : values.gender === '1' ? 'Female' : 'Not specified',
         nationality: values.nationality,
         
         // Employment details
@@ -294,23 +309,31 @@ const AddEmployeePage: React.FC = () => {
         employmentNatureId: values.employmentNatureId,
         employmentNature: employmentNature?.name || '',
         
-        // Additional biographical data
-        birthDate: values.birthDate,
-        birthLocation: values.birthLocation,
-        motherFullName: values.motherFullName,
-        maritalStatusId: values.maritalStatusId,
-        maritalStatus: mockMaritalStatus.find(m => m.id === values.maritalStatusId)?.name || '',
-        addressId: values.addressId,
+        // Additional biographical data - ACCESS NESTED DATA
+        birthDate: values.biographicalData.birthDate,
+        birthLocation: values.biographicalData.birthLocation,
+        motherFullName: values.biographicalData.motherFullName,
+        hasBirthCert: values.biographicalData.hasBirthCert,
+        hasMarriageCert: values.biographicalData.hasMarriageCert,
+        maritalStatusId: values.biographicalData.maritalStatusId,
+        maritalStatus: maritalStatus?.name || '',
+        addressId: values.biographicalData.addressId,
+        address: address?.name || '',
         
-        // Financial data
-        tin: values.tin,
-        bankAccountNo: values.bankAccountNo,
-        pensionNumber: values.pensionNumber,
+        // Financial data - ACCESS NESTED DATA
+        tin: values.financialData.tin,
+        bankAccountNo: values.financialData.bankAccountNo,
+        pensionNumber: values.financialData.pensionNumber,
         
         // Arrays
         emergencyContacts: values.emergencyContacts,
         familyMembers: values.familyMembers,
         guarantors: values.guarantors,
+        
+        // File uploads
+        guarantorFiles: values.guarantorFiles,
+        stampFiles: values.stampFiles,
+        signatureFiles: values.signatureFiles,
         
         // System info
         status: 'active' as const,
@@ -345,8 +368,8 @@ const AddEmployeePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Component */}
         <AddEmployeeStepHeader
           steps={steps}
