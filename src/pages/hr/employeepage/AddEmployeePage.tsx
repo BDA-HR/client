@@ -368,8 +368,8 @@ const AddEmployeePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen">
+      <div className="mx-auto">
         {/* Header Component */}
         <AddEmployeeStepHeader
           steps={steps}
