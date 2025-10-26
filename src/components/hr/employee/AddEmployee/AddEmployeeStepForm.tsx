@@ -742,8 +742,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Female</SelectItem>
-                    <SelectItem value="1">Male</SelectItem>
+                    <SelectItem value="0">Male</SelectItem>
+                    <SelectItem value="1">Female</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.gender && touched.gender && (
@@ -1292,8 +1292,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                           <SelectValue placeholder="Select Gender" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="0">Female</SelectItem>
-                          <SelectItem value="1">Male</SelectItem>
+                          <SelectItem value="0">Male</SelectItem>
+                          <SelectItem value="1">Female</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1465,8 +1465,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                           <SelectValue placeholder="Select Gender" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="0">Female</SelectItem>
-                          <SelectItem value="1">Male</SelectItem>
+                          <SelectItem value="0">Male</SelectItem>
+                          <SelectItem value="1">Female</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1703,8 +1703,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                           <SelectValue placeholder="Select Gender" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="0">Female</SelectItem>
-                          <SelectItem value="1">Male</SelectItem>
+                          <SelectItem value="0">Male</SelectItem>
+                          <SelectItem value="1">Female</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1824,7 +1824,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Gender</dt>
-                    <dd className="font-semibold text-gray-900">{values.gender === '1' ? 'Male' : values.gender === '0' ? 'Female' : 'Not selected'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.gender === '0' ? 'Male' : values.gender === '1' ? 'Female' : 'Not selected'}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Nationality</dt>
@@ -1986,7 +1986,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         {contact.firstName} {contact.lastName}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Gender: {contact.gender === '1' ? 'Male' : contact.gender === '0' ? 'Female' : 'Not selected'} | 
+                        Gender: {contact.gender === '0' ? 'Male' : contact.gender === '1' ? 'Female' : 'Not selected'} | 
                         Nationality: {contact.nationality} | 
                         Relation: {mockRelations.find(r => r.id === contact.relationId)?.name || 'Not specified'}
                       </p>
@@ -2013,7 +2013,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         {member.firstName} {member.lastName}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Gender: {member.gender === '1' ? 'Male' : member.gender === '0' ? 'Female' : 'Not selected'} | 
+                        Gender: {member.gender === '0' ? 'Male' : member.gender === '1' ? 'Female' : 'Not selected'} | 
                         Nationality: {member.nationality} | 
                         Relation: {mockRelations.find(r => r.id === member.relationId)?.name || 'Not specified'}
                       </p>
@@ -2040,7 +2040,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         {guarantor.firstName} {guarantor.lastName}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Gender: {guarantor.gender === '1' ? 'Male' : guarantor.gender === '0' ? 'Female' : 'Not selected'} | 
+                        Gender: {guarantor.gender === '0' ? 'Male' : guarantor.gender === '1' ? 'Female' : 'Not selected'} | 
                         Nationality: {guarantor.nationality} | 
                         Relation: {mockRelations.find(r => r.id === guarantor.relationId)?.name || 'Not specified'}
                       </p>
