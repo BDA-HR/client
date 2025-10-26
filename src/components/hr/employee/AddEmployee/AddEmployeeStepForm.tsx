@@ -779,26 +779,31 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                 <h3 className="text-xl font-semibold text-gray-800">Employment Details</h3>
               </div>
               
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {/* Employment Date */}
                 <div className="space-y-2">
-                  <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-1">
-                    Employment Date *
-                  </label>
-                  <Input
-                    id="employmentDate"
-                    name="employmentDate"
-                    type="date"
-                    value={values.employmentDate}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={inputClassName('employmentDate')}
-                  />
-                  {errors.employmentDate && touched.employmentDate && (
-                    <div className="text-red-500 text-xs mt-1">{errors.employmentDate}</div>
-                  )}
-                </div>
-
+  <label
+    htmlFor="employmentDate"
+    className="block text-sm font-medium text-gray-700 mb-1"
+  >
+    Employment Date <span className="text-red-500">*</span>
+  </label>
+  <input
+    id="employmentDate"
+    name="employmentDate"
+    type="date"
+    value={values.employmentDate}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+       errors.employmentDate && touched.employmentDate ? 'border-red-500' : 'border-gray-300'
+    }`}
+    required
+  />
+  {errors.employmentDate && touched.employmentDate && (
+    <p className="text-red-500 text-sm mt-1">{errors.employmentDate}</p>
+  )}
+</div>
                 {/* Company */}
                 <div className="space-y-2">
                   <label htmlFor="companyId" className="block text-sm font-medium text-gray-700 mb-1">
