@@ -1028,21 +1028,27 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
               {/* Birth Date */}
               <div className="space-y-2">
-                <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Birth Date *
-                </label>
-                <Input
-                  id="birthDate"
-                  name="birthDate"
-                  type="date"
-                  value={values.birthDate}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputClassName('birthDate')}
-                />
-                {errors.birthDate && touched.birthDate && (
-                  <div className="text-red-500 text-xs mt-1">{errors.birthDate}</div>
-                )}
+                  <label
+    htmlFor="birthDate"
+    className="block text-sm font-medium text-gray-700 mb-1"
+  >
+    Birth Date <span className="text-red-500">*</span>
+  </label>
+  <input
+    id="birthDate"
+    name="birthDate"
+    type="date"
+    value={values.birthDate}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    className={`w-full px-3 py-1.5 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+       errors.birthDate && touched.birthDate ? 'border-red-500' : 'border-gray-300'
+    }`}
+    required
+  />
+  {errors.birthDate && touched.birthDate && (
+    <p className="text-red-500 text-sm mt-1">{errors.birthDate}</p>
+  )}
               </div>
 
               {/* Birth Location */}
