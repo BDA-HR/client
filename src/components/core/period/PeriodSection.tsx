@@ -15,6 +15,7 @@ import type {
 import { periodService } from "../../../services/core/periodservice";
 import toast from "react-hot-toast";
 import { motion } from 'framer-motion';
+import type { Quarter } from "../../../types/core/enum";
 
 function PeriodSection() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ function PeriodSection() {
     dateStart: new Date().toISOString().split('T')[0],
     dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     isActive: "0",
-    quarterId: "" as UUID,
+    quarterId: "" as Quarter,
     fiscalYearId: "" as UUID,
   });
 
@@ -100,7 +101,7 @@ function PeriodSection() {
         dateStart: new Date().toISOString().split('T')[0],
         dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         isActive: "0",
-        quarterId: "" as UUID,
+        quarterId: "" as Quarter,
         fiscalYearId: "" as UUID,
       });
       setIsModalOpen(false);

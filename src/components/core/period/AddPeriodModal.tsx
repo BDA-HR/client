@@ -6,7 +6,6 @@ import type { AddPeriodDto, UUID } from "../../../types/core/period";
 import toast from "react-hot-toast";
 import List from "../../List/list";
 import type { ListItem } from "../../../types/List/list";
-// import { listService } from '../../../services/List/listservice';
 import { fiscalYearService } from "../../../services/core/fiscservice";
 import { Quarter } from "../../../types/core/enum";
 import {
@@ -35,10 +34,8 @@ export const AddPeriodModal = ({
 }: AddPeriodModalProps) => {
   const [loading, setLoading] = useState(false);
   const [fiscalYears, setFiscalYears] = useState<ListItem[]>([]);
-  // const [quarters, setQuarters] = useState<ListItem[]>([]);
   const [loadingFiscalYears, setLoadingFiscalYears] = useState(false);
-  // const [loadingQuarters, setLoadingQuarters] = useState(false);
-  const [quarter, setQuarter] = useState<Quarter>(Quarter["0"]);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const quarterOptions = Object.entries(Quarter).map(([key, value]) => ({
     key,
@@ -48,7 +45,7 @@ export const AddPeriodModal = ({
   useEffect(() => {
     if (open) {
       fetchFiscalYears();
-      // fetchQuarters();
+      setFormErrors({});
     }
   }, [open]);
 
@@ -56,7 +53,6 @@ export const AddPeriodModal = ({
     try {
       setLoadingFiscalYears(true);
       const fiscalYearsData = await fiscalYearService.getAllFiscalYears();
-      // Convert FiscYearListDto to ListItem
       const fiscalYearListItems: ListItem[] = fiscalYearsData.map((fy) => ({
         id: fy.id,
         name: fy.name,
@@ -71,74 +67,111 @@ export const AddPeriodModal = ({
     }
   };
 
-  // const fetchQuarters = async () => {
-  //   try {
-  //     setLoadingQuarters(true);
-  //     const quartersData = await listService.getAllQuarters();
-  //     setQuarters(quartersData);
-  //   } catch (error) {
-  //     console.error("Error fetching quarters:", error);
-  //     toast.error("Failed to load quarters");
-  //     setQuarters([]);
-  //   } finally {
-  //     setLoadingQuarters(false);
-  //   }
-  // };
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
 
-  const handleSelectFiscalYear = (item: ListItem) => {
-    setNewPeriod({ ...newPeriod, fiscalYearId: item.id });
+    if (!newPeriod.name?.trim()) {
+      errors.name = "Period name is required";
+    }
+
+    if (!newPeriod.dateStart) {
+      errors.dateStart = "Start date is required";
+    }
+
+    if (!newPeriod.dateEnd) {
+      errors.dateEnd = "End date is required";
+    }
+
+    if (!newPeriod.quarterId) {
+      errors.quarterId = "Quarter is required";
+    }
+
+    if (!newPeriod.fiscalYearId) {
+      errors.fiscalYearId = "Fiscal year is required";
+    }
+
+    // Date validation
+    if (newPeriod.dateStart && newPeriod.dateEnd) {
+      const startDate = new Date(newPeriod.dateStart);
+      const endDate = new Date(newPeriod.dateEnd);
+
+      if (endDate <= startDate) {
+        errors.dateEnd = "End date must be after start date";
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
-
-  // const handleSelectQuarter = (item: Quarter) => {
-  //   setNewPeriod({ ...newPeriod, quarterId: item });
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newPeriod.name || !newPeriod.dateStart || !newPeriod.dateEnd) {
-      toast.error("Please fill all required fields");
-      return;
-    }
-
-    if (!newPeriod.quarterId || !newPeriod.fiscalYearId) {
-      toast.error("Please select a quarter and fiscal year");
-      return;
-    }
-
-    // Date validation
-    const startDate = new Date(newPeriod.dateStart);
-    const endDate = new Date(newPeriod.dateEnd);
-
-    if (endDate <= startDate) {
-      toast.error("End date must be after start date");
+    if (!validateForm()) {
+      toast.error("Please fix the form errors before submitting");
       return;
     }
 
     try {
       setLoading(true);
       await onAddPeriod();
+      // Only close modal if successful
+      onOpenChange(false);
     } catch (error) {
       console.error("Error adding period:", error);
+      // Error is handled in the parent component
     } finally {
       setLoading(false);
     }
   };
 
+  const handleQuarterChange = (value: string) => {
+    // Convert string to Quarter type
+    setNewPeriod({ 
+      ...newPeriod, 
+      quarterId: value as Quarter 
+    });
+    // Clear error for this field
+    if (formErrors.quarterId) {
+      setFormErrors(prev => ({ ...prev, quarterId: '' }));
+    }
+  };
+
+  const handleSelectFiscalYear = (item: ListItem) => {
+    setNewPeriod({ 
+      ...newPeriod, 
+      fiscalYearId: item.id as UUID 
+    });
+    // Clear error for this field
+    if (formErrors.fiscalYearId) {
+      setFormErrors(prev => ({ ...prev, fiscalYearId: '' }));
+    }
+  };
+
+  const handleInputChange = (field: keyof AddPeriodDto, value: string) => {
+    setNewPeriod({ ...newPeriod, [field]: value });
+    // Clear error for this field when user starts typing
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
   const handleCancel = () => {
+    // Reset form
     setNewPeriod({
       name: "",
-      dateStart: "",
-      dateEnd: "",
+      dateStart: new Date().toISOString().split('T')[0],
+      dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       isActive: "0",
-      quarterId: quarter,
+      quarterId: "" as Quarter,
       fiscalYearId: "" as UUID,
     });
+    setFormErrors({});
     onOpenChange(false);
   };
 
   const handleClose = () => {
-    onOpenChange(false);
+    handleCancel();
   };
 
   if (!open) return null;
@@ -180,14 +213,17 @@ export const AddPeriodModal = ({
                 <input
                   type="text"
                   id="periodName"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
+                    formErrors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="e.g., January 2024, Q1 Review"
                   value={newPeriod.name}
-                  onChange={(e) =>
-                    setNewPeriod({ ...newPeriod, name: e.target.value })
-                  }
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   required
                 />
+                {formErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                )}
               </div>
 
               {/* Quarter and Fiscal Year Selection - Side by Side */}
@@ -201,12 +237,14 @@ export const AddPeriodModal = ({
                     Quarter <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    value={quarter}
-                    onValueChange={(key: Quarter) => setQuarter(key)}
+                    value={newPeriod.quarterId}
+                    onValueChange={handleQuarterChange}
                   >
                     <SelectTrigger
-                      id="branchType"
-                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                      id="quarter"
+                      className={`w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
+                        formErrors.quarterId ? 'border-red-500' : ''
+                      }`}
                     >
                       <SelectValue placeholder="Select Quarter" />
                     </SelectTrigger>
@@ -218,6 +256,9 @@ export const AddPeriodModal = ({
                       ))}
                     </SelectContent>
                   </Select>
+                  {formErrors.quarterId && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.quarterId}</p>
+                  )}
                 </div>
 
                 {/* Fiscal Year Selection */}
@@ -236,6 +277,9 @@ export const AddPeriodModal = ({
                       Loading fiscal years...
                     </p>
                   )}
+                  {formErrors.fiscalYearId && !loadingFiscalYears && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.fiscalYearId}</p>
+                  )}
                 </div>
               </div>
 
@@ -251,13 +295,16 @@ export const AddPeriodModal = ({
                   <input
                     type="date"
                     id="startDate"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
+                      formErrors.dateStart ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     value={newPeriod.dateStart}
-                    onChange={(e) =>
-                      setNewPeriod({ ...newPeriod, dateStart: e.target.value })
-                    }
+                    onChange={(e) => handleInputChange('dateStart', e.target.value)}
                     required
                   />
+                  {formErrors.dateStart && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.dateStart}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -270,13 +317,16 @@ export const AddPeriodModal = ({
                   <input
                     type="date"
                     id="endDate"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
+                      formErrors.dateEnd ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     value={newPeriod.dateEnd}
-                    onChange={(e) =>
-                      setNewPeriod({ ...newPeriod, dateEnd: e.target.value })
-                    }
+                    onChange={(e) => handleInputChange('dateEnd', e.target.value)}
                     required
                   />
+                  {formErrors.dateEnd && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.dateEnd}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -289,7 +339,7 @@ export const AddPeriodModal = ({
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
                   disabled={loading || loadingFiscalYears}
                 >
-                  {loading ? "Adding..." : "Save"}
+                  {loading ? "Adding..." : "Save Period"}
                 </Button>
                 <Button
                   type="button"
