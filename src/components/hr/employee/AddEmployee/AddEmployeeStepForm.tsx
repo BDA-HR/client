@@ -1128,9 +1128,9 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                   <SelectTrigger className={selectTriggerClassName('hasBirthCert')}>
                     <SelectValue placeholder="Select option" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">No</SelectItem>
-                    <SelectItem value="1">Yes</SelectItem>
+                  <SelectContent>                    
+                    <SelectItem value="0">Yes</SelectItem>
+                    <SelectItem value="1">No</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.hasBirthCert && touched.hasBirthCert && (
@@ -1151,8 +1151,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                     <SelectValue placeholder="Select option" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">No</SelectItem>
-                    <SelectItem value="1">Yes</SelectItem>
+                  <SelectItem value="0">Yes</SelectItem>
+<SelectItem value="1">No</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.hasMarriageCert && touched.hasMarriageCert && (
@@ -1239,7 +1239,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         value={contact.firstNameAm}
                         onChange={(e) => handleAmharicChange(e, `emergencyContacts[${index}].firstNameAm`, setFieldValue)}
                         className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                        placeholder="መጀመሪያ ስም"
+                        placeholder="አየለ"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1261,7 +1261,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         value={contact.middleNameAm}
                         onChange={(e) => handleAmharicChange(e, `emergencyContacts[${index}].middleNameAm`, setFieldValue)}
                         className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                        placeholder="የአባት ስም"
+                        placeholder="በቀለ"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1283,7 +1283,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         value={contact.lastNameAm}
                         onChange={(e) => handleAmharicChange(e, `emergencyContacts[${index}].lastNameAm`, setFieldValue)}
                         className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                        placeholder="የቤተሰብ ስም"
+                        placeholder="ዮሐንስ"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1650,7 +1650,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         value={guarantor.firstNameAm}
                         onChange={(e) => handleAmharicChange(e, `guarantors[${index}].firstNameAm`, setFieldValue)}
                         className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                        placeholder="መጀመሪያ ስም"
+                        placeholder="አየለ"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1672,7 +1672,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         value={guarantor.middleNameAm}
                         onChange={(e) => handleAmharicChange(e, `guarantors[${index}].middleNameAm`, setFieldValue)}
                         className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                        placeholder="የአባት ስም"
+                        placeholder="በቀለ"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1694,7 +1694,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                         value={guarantor.lastNameAm}
                         onChange={(e) => handleAmharicChange(e, `guarantors[${index}].lastNameAm`, setFieldValue)}
                         className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                        placeholder="የቤተሰብ ስም"
+                        placeholder="ዮሐንስ"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1936,11 +1936,11 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Birth Certificate</dt>
-                    <dd className="font-semibold text-gray-900">{values.hasBirthCert === '1' ? 'Yes' : values.hasBirthCert === '0' ? 'No' : 'Not selected'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.hasBirthCert === '0' ? 'Yes' : values.hasBirthCert === '1' ? 'No' : 'Not selected'}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Marriage Certificate</dt>
-                    <dd className="font-semibold text-gray-900">{values.hasMarriageCert === '1' ? 'Yes' : values.hasMarriageCert === '0' ? 'No' : 'Not selected'}</dd>
+                    <dd className="font-semibold text-gray-900">{values.hasMarriageCert === '0' ? 'Yes' : values.hasMarriageCert === '1' ? 'No' : 'Not selected'}</dd>
                   </div>
                 </dl>
               </motion.div>
