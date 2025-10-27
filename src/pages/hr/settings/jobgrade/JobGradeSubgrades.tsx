@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Briefcase, BadgePlus, Grid, List } from 'lucide-react';
@@ -28,35 +28,36 @@ const JobGradeSubgrades: React.FC = () => {
   const [editingStep, setEditingStep] = useState<JgStepListDto | null>(null);
   const [deletingStep, setDeletingStep] = useState<JgStepListDto | null>(null);
 
-  useEffect(() => {
-    loadJobGradeAndSteps();
-  });
+  // Memoized load function to prevent unnecessary recreations
+  const loadJobGradeAndSteps = useCallback(async () => {
+    if (!gradeId) return;
 
-  const loadJobGradeAndSteps = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Get job grade from location state or fetch if needed
       if (location.state?.jobGrade) {
         setJobGrade(location.state.jobGrade);
       } else if (gradeId) {
-        // You might need to fetch the job grade details here if not passed via state
+        
         console.log('Job grade ID:', gradeId);
       }
 
       // Fetch steps for the job grade
-      if (gradeId) {
-        const stepsData = await jgStepService.getJgStepsByJobGrade(gradeId as UUID);
-        setSteps(stepsData);
-      }
+      const stepsData = await jgStepService.getJgStepsByJobGrade(gradeId as UUID);
+      setSteps(stepsData);
     } catch (err) {
       setError('Failed to load job grade steps');
       console.error('Error loading job grade steps:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [gradeId, location.state]);
+
+  
+  useEffect(() => {
+    loadJobGradeAndSteps();
+  }, [loadJobGradeAndSteps]); // Only re-run when loadJobGradeAndSteps changes
 
   const handleBack = () => {
     navigate('/hr/settings/jobgrade');

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../ui/button';
@@ -15,7 +15,7 @@ interface StepCardProps {
   viewMode: 'grid' | 'list';
 }
 
-const StepCard: React.FC<StepCardProps> = ({
+const StepCard: React.FC<StepCardProps> = memo(({
   step,
   index,
   onEdit,
@@ -27,15 +27,15 @@ const StepCard: React.FC<StepCardProps> = ({
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Format salary with ETB after the amount
-  const formatSalary = (salary: number): string => {
+  // Memoized salary formatter
+  const formatSalary = useCallback((salary: number): string => {
     const formattedAmount = new Intl.NumberFormat('en-ET', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(salary);
     
     return `${formattedAmount} ETB`;
-  };
+  }, []);
 
   // Close menu when clicking outside
   React.useEffect(() => {
@@ -54,19 +54,19 @@ const StepCard: React.FC<StepCardProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleEdit = (e: React.MouseEvent) => {
+  const handleEdit = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(false);
     onEdit(step);
-  };
+  }, [onEdit, step]);
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(false);
     onDelete(step);
-  };
+  }, [onDelete, step]);
 
-  const handleMenuClick = (e: React.MouseEvent) => {
+  const handleMenuClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     
     if (menuButtonRef.current) {
@@ -77,11 +77,11 @@ const StepCard: React.FC<StepCardProps> = ({
       });
     }
     
-    setShowMenu(!showMenu);
-  };
+    setShowMenu(prev => !prev);
+  }, []);
 
-  // Get different colors for different step levels
-  const getStepColor = (index: number) => {
+  // Memoized color getter
+  const getStepColor = useCallback((index: number) => {
     const colors = [
       { bg: 'bg-blue-50', icon: 'text-blue-600', border: 'border-blue-100' },
       { bg: 'bg-green-50', icon: 'text-green-600', border: 'border-green-100' },
@@ -91,12 +91,12 @@ const StepCard: React.FC<StepCardProps> = ({
       { bg: 'bg-pink-50', icon: 'text-pink-600', border: 'border-pink-100' },
     ];
     return colors[index % colors.length];
-  };
+  }, []);
 
   const stepColor = getStepColor(index);
 
   // Dropdown menu component using portal
-  const DropdownMenu = () => {
+  const DropdownMenu = useCallback(() => {
     if (!showMenu) return null;
 
     return createPortal(
@@ -129,7 +129,7 @@ const StepCard: React.FC<StepCardProps> = ({
       </motion.div>,
       document.body
     );
-  };
+  }, [showMenu, menuPosition, handleEdit, handleDelete]);
 
   // List View
   if (viewMode === 'list') {
@@ -226,6 +226,8 @@ const StepCard: React.FC<StepCardProps> = ({
       <DropdownMenu />
     </>
   );
-};
+});
+
+StepCard.displayName = 'StepCard';
 
 export default StepCard;
