@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Settings, Loader2 } from 'lucide-react';
+import { X, Settings } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Label } from '../../../../ui/label';
 import { Input } from '../../../../ui/input';
@@ -12,9 +12,7 @@ import {
   SelectValue,
 } from '../../../../ui/select';
 import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID } from '../../../../../types/hr/position';
-import type { ListItem } from '../../../../../types/List/list';
-import { PositionGender, WorkOption } from '../../../../../types/hr/enum';
-import { listService } from '../../../../../services/List/listservice';
+import { PositionGender, WorkOption, ProfessionType } from '../../../../../types/hr/enum';
 
 interface PositionRequirementsModalProps {
   isOpen: boolean;
@@ -31,19 +29,15 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
   positionId,
   editingRequirement
 }) => {
-  // Initialize with default values - using "3" (None) for work options
+  // Initialize with default values
   const [formData, setFormData] = useState<PositionReqAddDto>({
     positionId,
-    gender: '2', // Default to "Both"
-    saturdayWorkOption: '3', // Default to "None"
-    sundayWorkOption: '3', // Default to "None"
+    gender: '2', 
+    saturdayWorkOption: '3', 
+    sundayWorkOption: '3', 
     workingHours: 8,
-    professionTypeId: '' as UUID,
+    professionTypeId: '0' as UUID, 
   });
-
-  const [professionTypes, setProfessionTypes] = useState<ListItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedProfessionType, setSelectedProfessionType] = useState<UUID | undefined>(undefined);
 
   // Wrap handleClose in useCallback to prevent unnecessary re-renders
   const handleClose = useCallback(() => {
@@ -53,36 +47,10 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
       saturdayWorkOption: '3',
       sundayWorkOption: '3',
       workingHours: 8,
-      professionTypeId: '' as UUID,
+      professionTypeId: '0' as UUID,
     });
-    setSelectedProfessionType(undefined);
     onClose();
   }, [onClose, positionId]);
-
-  // Fetch profession types when modal opens
-  useEffect(() => {
-    const fetchProfessionTypes = async () => {
-      if (!isOpen) return;
-
-      setLoading(true);
-      try {
-        const types = await listService.getAllProfessionTypes();
-        setProfessionTypes(types);
-
-        // Set first profession type as default if none selected and not editing
-        if (types.length > 0 && !selectedProfessionType && !editingRequirement) {
-          setSelectedProfessionType(types[0].id);
-          setFormData((prev) => ({ ...prev, professionTypeId: types[0].id }));
-        }
-      } catch (err) {
-        console.error("Error fetching profession types:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfessionTypes();
-  }, [isOpen, selectedProfessionType, editingRequirement]);
 
   // Reset form when modal opens or editing requirement changes
   useEffect(() => {
@@ -96,7 +64,6 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
           workingHours: editingRequirement.workingHours,
           professionTypeId: editingRequirement.professionTypeId,
         });
-        setSelectedProfessionType(editingRequirement.professionTypeId);
       } else {
         setFormData({
           positionId,
@@ -104,14 +71,11 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
           saturdayWorkOption: '3',
           sundayWorkOption: '3',
           workingHours: 8,
-          professionTypeId: professionTypes.length > 0 ? professionTypes[0].id : ('' as UUID),
+          professionTypeId: '0' as UUID,
         });
-        setSelectedProfessionType(
-          professionTypes.length > 0 ? professionTypes[0].id : undefined
-        );
       }
     }
-  }, [isOpen, editingRequirement, positionId, professionTypes]);
+  }, [isOpen, editingRequirement, positionId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -128,14 +92,10 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     }));
   };
 
-  const handleSelectProfessionType = (value: string) => {
-    const selectedId = value as UUID;
-    setSelectedProfessionType(selectedId);
-    setFormData((prev) => ({ ...prev, professionTypeId: selectedId }));
-  };
-
   const handleSubmit = () => {
-    if (!formData.professionTypeId || formData.workingHours <= 0) return;
+    if (!formData.professionTypeId || formData.workingHours <= 0) {
+      return;
+    }
 
     if (editingRequirement) {
       const modData: PositionReqModDto = {
@@ -152,21 +112,23 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
   };
 
   // Gender options based on your backend enum
-  const genderOptions: ListItem[] = [
-    { id: '0' as UUID, name: PositionGender['0'] }, // Male
-    { id: '1' as UUID, name: PositionGender['1'] }, // Female
-    { id: '2' as UUID, name: PositionGender['2'] }  // Both
-  ];
+  const genderOptions = Object.entries(PositionGender).map(([key, value]) => ({
+    id: key as UUID,
+    name: value
+  }));
 
   // Work options including "None" (3) option
-  const workOptions: ListItem[] = [
-    { id: '0' as UUID, name: WorkOption['0'] }, // Morning
-    { id: '1' as UUID, name: WorkOption['1'] }, // Afternoon
-    { id: '2' as UUID, name: WorkOption['2'] }, // Both
-    { id: '3' as UUID, name: WorkOption['3'] }  // None
-  ];
+  const workOptions = Object.entries(WorkOption).map(([key, value]) => ({
+    id: key as UUID,
+    name: value
+  }));
 
-  // Add escape key to close
+  // Profession type options from enum
+  const professionTypeOptions = Object.entries(ProfessionType).map(([key, value]) => ({
+    id: key as UUID,
+    name: value
+  }));
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -213,32 +175,25 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                 Select Profession Type <span className="text-red-500">*</span>
               </Label>
               <Select
-                value={selectedProfessionType || ""}
-                onValueChange={handleSelectProfessionType}
-                disabled={loading}
+                value={formData.professionTypeId}
+                onValueChange={(value) => handleSelectChange('professionTypeId', value)}
                 required
               >
-                <SelectTrigger className={`
+                <SelectTrigger className="
                   w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                   focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
-                  text-sm transition-colors
-                  ${loading ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-gray-900'}
-                `}>
+                  text-sm bg-white text-gray-900
+                ">
                   <SelectValue placeholder="Choose a profession type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {professionTypes.map((type) => (
+                  {professionTypeOptions.map((type) => (
                     <SelectItem key={type.id} value={type.id} className="text-gray-900">
                       {type.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {loading && (
-                <p className="text-sm text-gray-500">
-                  Loading profession types...
-                </p>
-              )}
             </div>
 
             {/* Working Hours */}
@@ -335,22 +290,14 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!formData.professionTypeId || formData.workingHours <= 0 || loading}
+              disabled={!formData.professionTypeId || formData.workingHours <= 0}
             >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Loading...
-                </>
-              ) : (
-                editingRequirement ? 'Update' : 'Save'
-              )}
+              {editingRequirement ? 'Update' : 'Save'}
             </Button>
             <Button
               variant="outline"
               className="cursor-pointer px-6"
               onClick={handleClose}
-              disabled={loading}
             >
               Cancel
             </Button>
