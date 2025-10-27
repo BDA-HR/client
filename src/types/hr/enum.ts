@@ -67,16 +67,16 @@ export const PerAm = {
 export type PerAm = typeof PerAm[keyof typeof PerAm];
 
 export const ProfessionType = {
-  "0": 'Engineering',
-  "1": 'Healthcare',
-  "2": 'Education',
-  "3": 'Business',
-  "4": 'Technology',
-  "5": 'Arts & Design',
-  "6": 'Science & Research',
-  "7": 'Legal',
-  "8": 'Construction',
-  "9": 'Hospitality'
+  "0": 'Professional',
+  "1": 'Semi-Professional',
+  "2": 'Non-Professional'
+  // "3": 'Business',
+  // "4": 'Technology',
+  // "5": 'Arts & Design',
+  // "6": 'Science & Research',
+  // "7": 'Legal',
+  // "8": 'Construction',
+  // "9": 'Hospitality'
 } as const;
 export type ProfessionType = typeof ProfessionType[keyof typeof ProfessionType];
 

@@ -1,18 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { X, Settings } from 'lucide-react';
-import { Button } from '../../../../ui/button';
-import { Label } from '../../../../ui/label';
-import { Input } from '../../../../ui/input';
+import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { X, Settings } from "lucide-react";
+import { Button } from "../../../../ui/button";
+import { Label } from "../../../../ui/label";
+import { Input } from "../../../../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../../ui/select';
-import type { PositionReqAddDto, PositionReqModDto, PositionReqListDto, UUID } from '../../../../../types/hr/position';
-import { PositionGender, WorkOption, ProfessionType } from '../../../../../types/hr/enum';
+} from "../../../../ui/select";
+import type {
+  PositionReqAddDto,
+  PositionReqModDto,
+  PositionReqListDto,
+  UUID,
+} from "../../../../../types/hr/position";
+import {
+  PositionGender,
+  WorkOption,
+  ProfessionType,
+} from "../../../../../types/hr/enum";
 
 interface PositionRequirementsModalProps {
   isOpen: boolean;
@@ -27,27 +36,27 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
   onClose,
   onSave,
   positionId,
-  editingRequirement
+  editingRequirement,
 }) => {
   // Initialize with default values
   const [formData, setFormData] = useState<PositionReqAddDto>({
     positionId,
-    gender: '2', 
-    saturdayWorkOption: '3', 
-    sundayWorkOption: '3', 
+    gender: "2",
+    saturdayWorkOption: "3",
+    sundayWorkOption: "3",
     workingHours: 8,
-    professionTypeId: '0' as UUID, 
+    professionType: "" as ProfessionType,
   });
 
   // Wrap handleClose in useCallback to prevent unnecessary re-renders
   const handleClose = useCallback(() => {
     setFormData({
       positionId,
-      gender: '2',
-      saturdayWorkOption: '3',
-      sundayWorkOption: '3',
+      gender: "2",
+      saturdayWorkOption: "3",
+      sundayWorkOption: "3",
       workingHours: 8,
-      professionTypeId: '0' as UUID,
+      professionType: "" as ProfessionType,
     });
     onClose();
   }, [onClose, positionId]);
@@ -62,16 +71,16 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
           saturdayWorkOption: editingRequirement.saturdayWorkOption,
           sundayWorkOption: editingRequirement.sundayWorkOption,
           workingHours: editingRequirement.workingHours,
-          professionTypeId: editingRequirement.professionTypeId,
+          professionType: editingRequirement.professionType,
         });
       } else {
         setFormData({
           positionId,
-          gender: '2',
-          saturdayWorkOption: '3',
-          sundayWorkOption: '3',
+          gender: "2",
+          saturdayWorkOption: "3",
+          sundayWorkOption: "3",
           workingHours: 8,
-          professionTypeId: '0' as UUID,
+          professionType: "" as ProfessionType,
         });
       }
     }
@@ -79,21 +88,21 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'workingHours' ? parseFloat(value) || 0 : value
+      [name]: name === "workingHours" ? parseFloat(value) || 0 : value,
     }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = () => {
-    if (!formData.professionTypeId || formData.workingHours <= 0) {
+    if (!formData.professionType || formData.workingHours <= 0) {
       return;
     }
 
@@ -112,32 +121,48 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
   };
 
   // Gender options based on your backend enum
+  // const genderOptions = Object.entries(PositionGender).map(([key, value]) => ({
+  //   id: key as UUID,
+  //   name: value,
+  // }));
   const genderOptions = Object.entries(PositionGender).map(([key, value]) => ({
-    id: key as UUID,
-    name: value
+    key,
+    value,
   }));
 
   // Work options including "None" (3) option
+  // const workOptions = Object.entries(WorkOption).map(([key, value]) => ({
+  //   id: key as UUID,
+  //   name: value,
+  // }));
   const workOptions = Object.entries(WorkOption).map(([key, value]) => ({
-    id: key as UUID,
-    name: value
+    key,
+    value,
   }));
 
   // Profession type options from enum
-  const professionTypeOptions = Object.entries(ProfessionType).map(([key, value]) => ({
-    id: key as UUID,
-    name: value
-  }));
+  // const professionTypeOptions = Object.entries(ProfessionType).map(
+  //   ([key, value]) => ({
+  //     id: key as string,
+  //     name: value,
+  //   })
+  // );
+  const professionTypeOptions = Object.entries(ProfessionType).map(
+    ([key, value]) => ({
+      key,
+      value,
+    })
+  );
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         handleClose();
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
@@ -155,7 +180,7 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
           <div className="flex items-center gap-2">
             <Settings size={20} />
             <h2 className="text-lg font-bold text-gray-800">
-              {editingRequirement ? 'Edit Requirements' : 'Add Requirements'}
+              {editingRequirement ? "Edit Requirements" : "Add Requirements"}
             </h2>
           </div>
           <button
@@ -175,24 +200,39 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                 Select Profession Type <span className="text-red-500">*</span>
               </Label>
               <Select
-                value={formData.professionTypeId}
-                onValueChange={(value) => handleSelectChange('professionTypeId', value)}
+                value={formData.professionType}
+                onValueChange={(value) =>
+                  handleSelectChange("professionType", value)
+                }
                 required
               >
-                <SelectTrigger className="
+                <SelectTrigger
+                  className="
                   w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                   focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
                   text-sm bg-white text-gray-900
-                ">
+                "
+                >
                   <SelectValue placeholder="Choose a profession type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {professionTypeOptions.map((type) => (
-                    <SelectItem key={type.id} value={type.id} className="text-gray-900">
-                      {type.name}
+                  {professionTypeOptions.map((option) => (
+                    <SelectItem key={option.key} value={option.key}>
+                      {option.value}
                     </SelectItem>
                   ))}
                 </SelectContent>
+                {/* <SelectContent>
+                  {professionTypeOptions.map((type) => (
+                    <SelectItem
+                      key={type.id}
+                      value={type.id}
+                      className="text-gray-900"
+                    >
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent> */}
               </Select>
             </div>
 
@@ -223,18 +263,29 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
               </Label>
               <Select
                 value={formData.gender}
-                onValueChange={(value) => handleSelectChange('gender', value)}
+                onValueChange={(value) => handleSelectChange("gender", value)}
               >
                 <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900">
                   <SelectValue placeholder="Select gender preference" />
                 </SelectTrigger>
                 <SelectContent>
                   {genderOptions.map((option) => (
-                    <SelectItem key={option.id} value={option.id} className="text-gray-900">
-                      {option.name}
+                    <SelectItem key={option.key} value={option.key}>
+                      {option.value}
                     </SelectItem>
                   ))}
                 </SelectContent>
+                {/* <SelectContent>
+                  {genderOptions.map((option) => (
+                    <SelectItem
+                      key={option.id}
+                      value={option.id}
+                      className="text-gray-900"
+                    >
+                      {option.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent> */}
               </Select>
             </div>
 
@@ -246,18 +297,31 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                 </Label>
                 <Select
                   value={formData.saturdayWorkOption}
-                  onValueChange={(value) => handleSelectChange('saturdayWorkOption', value)}
+                  onValueChange={(value) =>
+                    handleSelectChange("saturdayWorkOption", value)
+                  }
                 >
                   <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900">
                     <SelectValue placeholder="Select Saturday work" />
                   </SelectTrigger>
                   <SelectContent>
                     {workOptions.map((option) => (
-                      <SelectItem key={option.id} value={option.id} className="text-gray-900">
-                        {option.name}
+                      <SelectItem key={option.key} value={option.key}>
+                        {option.value}
                       </SelectItem>
                     ))}
                   </SelectContent>
+                  {/* <SelectContent>
+                    {workOptions.map((option) => (
+                      <SelectItem
+                        key={option.id}
+                        value={option.id}
+                        className="text-gray-900"
+                      >
+                        {option.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent> */}
                 </Select>
               </div>
               <div className="space-y-2">
@@ -266,18 +330,31 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                 </Label>
                 <Select
                   value={formData.sundayWorkOption}
-                  onValueChange={(value) => handleSelectChange('sundayWorkOption', value)}
+                  onValueChange={(value) =>
+                    handleSelectChange("sundayWorkOption", value)
+                  }
                 >
                   <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900">
                     <SelectValue placeholder="Select Sunday work" />
                   </SelectTrigger>
                   <SelectContent>
                     {workOptions.map((option) => (
-                      <SelectItem key={option.id} value={option.id} className="text-gray-900">
-                        {option.name}
+                      <SelectItem key={option.key} value={option.key}>
+                        {option.value}
                       </SelectItem>
                     ))}
                   </SelectContent>
+                  {/* <SelectContent>
+                    {workOptions.map((option) => (
+                      <SelectItem
+                        key={option.id}
+                        value={option.id}
+                        className="text-gray-900"
+                      >
+                        {option.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent> */}
                 </Select>
               </div>
             </div>
@@ -290,9 +367,9 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!formData.professionTypeId || formData.workingHours <= 0}
+              disabled={!formData.professionType || formData.workingHours <= 0}
             >
-              {editingRequirement ? 'Update' : 'Save'}
+              {editingRequirement ? "Update" : "Save"}
             </Button>
             <Button
               variant="outline"

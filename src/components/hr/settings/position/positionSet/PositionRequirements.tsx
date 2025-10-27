@@ -8,9 +8,13 @@ import type {
   UUID,
 } from "../../../../../types/hr/position";
 import { positionService } from "../../../../../services/hr/settings/positionService";
-import { PositionGender, WorkOption } from "../../../../../types/hr/enum";
-import { listService } from "../../../../../services/List/listservice";
-import type { ListItem } from "../../../../../types/List/list";
+import {
+  PositionGender,
+  ProfessionType,
+  WorkOption,
+} from "../../../../../types/hr/enum";
+// import { listService } from "../../../../../services/List/listservice";
+// import type { ListItem } from "../../../../../types/List/list";
 
 interface PositionRequirementsProps {
   positionId: UUID;
@@ -28,7 +32,7 @@ const PositionRequirements = forwardRef<
   PositionRequirementsProps
 >(({ positionId, onEdit, onRequirementAdded, onRequirementDeleted }, ref) => {
   const [requirements, setRequirements] = useState<PositionReqListDto[]>([]);
-  const [professionTypes, setProfessionTypes] = useState<ListItem[]>([]);
+  // const [professionTypes, setProfessionTypes] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingRequirement, setDeletingRequirement] =
@@ -41,16 +45,16 @@ const PositionRequirements = forwardRef<
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [requirementsData, professionTypesData] = await Promise.all([
+      const [requirementsData] = await Promise.all([
         positionService.getAllPositionRequirements(positionId),
-        listService.getAllProfessionTypes(),
+        // listService.getAllProfessionTypes(),
       ]);
 
       const positionRequirements = requirementsData.filter(
         (req) => req.positionId === positionId
       );
       setRequirements(positionRequirements);
-      setProfessionTypes(professionTypesData);
+      // setProfessionTypes(professionTypesData);
 
       // Notify parent about requirement status
       if (positionRequirements.length > 0 && onRequirementAdded) {
@@ -113,9 +117,6 @@ const PositionRequirements = forwardRef<
     <div className="space-y-6">
       <div className="space-y-4">
         {requirements.map((requirement) => {
-          const professionType = professionTypes.find(
-            (pt) => pt.id === requirement.professionTypeId
-          );
           return (
             <div
               key={requirement.id}
@@ -130,7 +131,11 @@ const PositionRequirements = forwardRef<
                     <div>
                       <p className="text-sm text-gray-500">Profession Type</p>
                       <p className="font-semibold text-gray-900">
-                        {professionType?.name || "Unknown"}
+                        {
+                          ProfessionType[
+                            requirement.professionType as keyof typeof ProfessionType
+                          ]
+                        }
                       </p>
                     </div>
                     <div>

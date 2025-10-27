@@ -1,5 +1,6 @@
 import type { UUID } from 'crypto';
 import type { BaseDto } from './BaseDto';
+import type { ProfessionType } from './enum';
 
 export type { UUID };
 
@@ -105,7 +106,7 @@ export interface PositionEduModDto {
 
 // Position Requirement Types
 export interface PositionReqListDto extends BaseDto {
-  professionTypeId: UUID;
+  professionType: ProfessionType;
   positionId: UUID;
   gender: '0' | '1' | '2';
   saturdayWorkOption: '0' | '1' | '2';
@@ -114,7 +115,7 @@ export interface PositionReqListDto extends BaseDto {
   genderStr: string;
   saturdayWorkOptionStr: string;
   sundayWorkOptionStr: string;
-  professionType: string;
+  professionTypeStr: string;
 }
 
 export interface PositionReqAddDto {
@@ -122,7 +123,7 @@ export interface PositionReqAddDto {
   saturdayWorkOption: '0' | '1' | '2' | '3';
   sundayWorkOption: '0' | '1' | '2' | '3';
   workingHours: number;
-  professionTypeId: UUID;
+  professionType: ProfessionType;
   positionId: UUID;
 }
 
@@ -132,7 +133,7 @@ export interface PositionReqModDto {
   saturdayWorkOption: '0' | '1' | '2' | '3';
   sundayWorkOption: '0' | '1' | '2' | '3';
   workingHours: number;
-  professionTypeId: UUID;
+  professionType: ProfessionType;
   positionId: UUID;
   rowVersion: string;
 }
