@@ -14,7 +14,7 @@ import type {
 } from "../../../types/core/period";
 import { periodService } from "../../../services/core/periodservice";
 import toast from "react-hot-toast";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import type { Quarter } from "../../../types/core/enum";
 
 function PeriodSection() {
@@ -26,7 +26,9 @@ function PeriodSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(
+    null
+  );
   const [periods, setPeriods] = useState<PeriodListDto[]>([]);
   const [filteredPeriods, setFilteredPeriods] = useState<PeriodListDto[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,10 +37,11 @@ function PeriodSection() {
 
   const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
     name: "",
-    dateStart: new Date().toISOString().split('T')[0],
-    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    isActive: "0",
-    quarterId: "" as Quarter,
+    dateStart: new Date().toISOString().split("T")[0],
+    dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
+    quarter: "" as Quarter,
     fiscalYearId: "" as UUID,
   });
 
@@ -50,23 +53,24 @@ function PeriodSection() {
   // Filter periods based on search term - only showing active periods by default
   useEffect(() => {
     let filtered = [...periods];
-    
+
     // Filter to show only active periods in the main view
-    filtered = filtered.filter(period => period.isActive === "0");
-    
+    filtered = filtered.filter((period) => period.isActive === "0");
+
     // Apply search term filter
     if (searchTerm.trim() !== "") {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(period =>
-        period.name?.toLowerCase().includes(term) ||
-        period.quarter?.toLowerCase().includes(term) ||
-        period.fiscYear?.toLowerCase().includes(term) ||
-        period.isActiveStr?.toLowerCase().includes(term) ||
-        (term === "active" && period.isActive === "0") ||
-        (term === "inactive" && period.isActive === "1")
+      filtered = filtered.filter(
+        (period) =>
+          period.name?.toLowerCase().includes(term) ||
+          period.quarter?.toLowerCase().includes(term) ||
+          period.fiscYear?.toLowerCase().includes(term) ||
+          period.isActiveStr?.toLowerCase().includes(term) ||
+          (term === "active" && period.isActive === "0") ||
+          (term === "inactive" && period.isActive === "1")
       );
     }
-    
+
     setFilteredPeriods(filtered);
     setTotalItems(filtered.length);
     setTotalPages(Math.ceil(filtered.length / 10));
@@ -77,7 +81,7 @@ function PeriodSection() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const periodsData = await periodService.getAllPeriods();
       setPeriods(periodsData);
     } catch (err) {
@@ -93,15 +97,16 @@ function PeriodSection() {
     try {
       toast.loading("Adding period...");
       setError(null);
-      
+
       const createdPeriod = await periodService.createPeriod(newPeriod);
       setPeriods((prev) => [createdPeriod, ...prev]);
       setNewPeriod({
         name: "",
-        dateStart: new Date().toISOString().split('T')[0],
-        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        isActive: "0",
-        quarterId: "" as Quarter,
+        dateStart: new Date().toISOString().split("T")[0],
+        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0],
+        quarter: "" as Quarter,
         fiscalYearId: "" as UUID,
       });
       setIsModalOpen(false);
@@ -120,7 +125,7 @@ function PeriodSection() {
     try {
       toast.loading("Updating period...");
       setError(null);
-      
+
       const updatedPeriod = await periodService.updatePeriod(periodData);
       setPeriods((prev) =>
         prev.map((p) => (p.id === updatedPeriod.id ? updatedPeriod : p))
@@ -141,7 +146,7 @@ function PeriodSection() {
     try {
       toast.loading("Deleting period...");
       setError(null);
-      
+
       await periodService.deletePeriod(periodId);
       setPeriods((prev) => prev.filter((p) => p.id !== periodId));
       setIsDeleteModalOpen(false);
@@ -179,7 +184,7 @@ function PeriodSection() {
   };
 
   const handleViewHistory = () => {
-    navigate('/core/fiscal-year/period-history');
+    navigate("/core/fiscal-year/period-history");
   };
 
   const handleClearFilters = () => {
@@ -187,7 +192,10 @@ function PeriodSection() {
   };
 
   // Get current items for display
-  const currentItems = filteredPeriods.slice((currentPage - 1) * 10, currentPage * 10);
+  const currentItems = filteredPeriods.slice(
+    (currentPage - 1) * 10,
+    currentPage * 10
+  );
 
   return (
     <div className="w-full -mt-6 -mx-1 py-4 space-y-6">

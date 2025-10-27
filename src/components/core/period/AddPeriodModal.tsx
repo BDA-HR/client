@@ -82,7 +82,7 @@ export const AddPeriodModal = ({
       errors.dateEnd = "End date is required";
     }
 
-    if (!newPeriod.quarterId) {
+    if (!newPeriod.quarter) {
       errors.quarterId = "Quarter is required";
     }
 
@@ -127,24 +127,21 @@ export const AddPeriodModal = ({
 
   const handleQuarterChange = (value: string) => {
     // Convert string to Quarter type
-    setNewPeriod({ 
-      ...newPeriod, 
-      quarterId: value as Quarter 
-    });
+    setNewPeriod({ ...newPeriod, quarter: value as Quarter });
     // Clear error for this field
     if (formErrors.quarterId) {
-      setFormErrors(prev => ({ ...prev, quarterId: '' }));
+      setFormErrors((prev) => ({ ...prev, quarterId: "" }));
     }
   };
 
   const handleSelectFiscalYear = (item: ListItem) => {
-    setNewPeriod({ 
-      ...newPeriod, 
-      fiscalYearId: item.id as UUID 
+    setNewPeriod({
+      ...newPeriod,
+      fiscalYearId: item.id as UUID,
     });
     // Clear error for this field
     if (formErrors.fiscalYearId) {
-      setFormErrors(prev => ({ ...prev, fiscalYearId: '' }));
+      setFormErrors((prev) => ({ ...prev, fiscalYearId: "" }));
     }
   };
 
@@ -152,7 +149,7 @@ export const AddPeriodModal = ({
     setNewPeriod({ ...newPeriod, [field]: value });
     // Clear error for this field when user starts typing
     if (formErrors[field]) {
-      setFormErrors(prev => ({ ...prev, [field]: '' }));
+      setFormErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -160,10 +157,11 @@ export const AddPeriodModal = ({
     // Reset form
     setNewPeriod({
       name: "",
-      dateStart: new Date().toISOString().split('T')[0],
-      dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      isActive: "0",
-      quarterId: "" as Quarter,
+      dateStart: new Date().toISOString().split("T")[0],
+      dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+      quarter: "" as Quarter,
       fiscalYearId: "" as UUID,
     });
     setFormErrors({});
@@ -214,11 +212,11 @@ export const AddPeriodModal = ({
                   type="text"
                   id="periodName"
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
-                    formErrors.name ? 'border-red-500' : 'border-gray-300'
+                    formErrors.name ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="e.g., January 2024, Q1 Review"
                   value={newPeriod.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                   required
                 />
                 {formErrors.name && (
@@ -237,13 +235,13 @@ export const AddPeriodModal = ({
                     Quarter <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    value={newPeriod.quarterId}
+                    value={newPeriod.quarter}
                     onValueChange={handleQuarterChange}
                   >
                     <SelectTrigger
                       id="quarter"
                       className={`w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
-                        formErrors.quarterId ? 'border-red-500' : ''
+                        formErrors.quarterId ? "border-red-500" : ""
                       }`}
                     >
                       <SelectValue placeholder="Select Quarter" />
@@ -257,7 +255,9 @@ export const AddPeriodModal = ({
                     </SelectContent>
                   </Select>
                   {formErrors.quarterId && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.quarterId}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {formErrors.quarterId}
+                    </p>
                   )}
                 </div>
 
@@ -278,7 +278,9 @@ export const AddPeriodModal = ({
                     </p>
                   )}
                   {formErrors.fiscalYearId && !loadingFiscalYears && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.fiscalYearId}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {formErrors.fiscalYearId}
+                    </p>
                   )}
                 </div>
               </div>
@@ -296,14 +298,20 @@ export const AddPeriodModal = ({
                     type="date"
                     id="startDate"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
-                      formErrors.dateStart ? 'border-red-500' : 'border-gray-300'
+                      formErrors.dateStart
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                     value={newPeriod.dateStart}
-                    onChange={(e) => handleInputChange('dateStart', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("dateStart", e.target.value)
+                    }
                     required
                   />
                   {formErrors.dateStart && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.dateStart}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {formErrors.dateStart}
+                    </p>
                   )}
                 </div>
 
@@ -318,14 +326,18 @@ export const AddPeriodModal = ({
                     type="date"
                     id="endDate"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
-                      formErrors.dateEnd ? 'border-red-500' : 'border-gray-300'
+                      formErrors.dateEnd ? "border-red-500" : "border-gray-300"
                     }`}
                     value={newPeriod.dateEnd}
-                    onChange={(e) => handleInputChange('dateEnd', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("dateEnd", e.target.value)
+                    }
                     required
                   />
                   {formErrors.dateEnd && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.dateEnd}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {formErrors.dateEnd}
+                    </p>
                   )}
                 </div>
               </div>

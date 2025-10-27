@@ -5,10 +5,10 @@ import type { Quarter } from './enum';
 export type { UUID };
 
 export interface PeriodListDto extends BaseDto {
-  quarterId: Quarter;
+  quarter: Quarter;
   fiscalYearId: UUID;
   name: string;
-  quarter: string;
+  quarterStr: string;
   fiscYear: string;
   isActive: string;
   isActiveStr: string;
@@ -24,8 +24,7 @@ export interface AddPeriodDto {
   name: string;
   dateStart: string;
   dateEnd: string;
-  isActive: string;
-  quarterId: Quarter;
+  quarter: Quarter;
   fiscalYearId: UUID;
 }
 
