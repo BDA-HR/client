@@ -244,6 +244,30 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
               )}
             </div>
 
+            {/* Salary Range Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">
+                  Salary Range
+                </span>
+              </div>
+              <div className="text-sm text-blue-700 space-y-1">
+                <div>
+                  Minimum:{" "}
+                  <span className="font-semibold">
+                    {formatCurrency(minSalary)} ETB
+                  </span>
+                </div>
+                <div>
+                  Maximum:{" "}
+                  <span className="font-semibold">
+                    {formatCurrency(maxSalary)} ETB
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {/* Salary Preview */}
             {/* {formData.salary > 0 && (
               <div className={`p-3 rounded-lg border ${
