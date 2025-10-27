@@ -30,6 +30,10 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
     jobGradeId: jobGradeId,
   });
   const [salaryError, setSalaryError] = useState<string>("");
+  const [touched, setTouched] = useState({
+    name: false,
+    salary: false,
+  });
 
   // Reset form when modal opens
   useEffect(() => {
@@ -42,6 +46,10 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
       setSalaryError("");
     }
   }, [isOpen, jobGradeId]);
+
+  const handleBlur = (field: keyof typeof touched) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -69,8 +77,28 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
     }
   };
 
+  const validateSalary = (salaryValue: number) => {
+    if (salaryValue < minSalary) {
+      setSalaryError(`Salary cannot be less than ${formatCurrency(minSalary)}`);
+    } else if (salaryValue > maxSalary) {
+      setSalaryError(`Salary cannot exceed ${formatCurrency(maxSalary)}`);
+    } else {
+      setSalaryError("");
+    }
+  };
+
   const handleSubmit = () => {
+    // Mark all fields as touched
+    setTouched({ name: true, salary: true });
+
     // Final validation before submission
+    if (!formData.name.trim()) return;
+
+    if (formData.salary <= 0) {
+      setSalaryError("Salary is required");
+      return;
+    }
+
     if (formData.salary < minSalary || formData.salary > maxSalary) {
       setSalaryError(
         `Salary must be between ${formatCurrency(
@@ -79,8 +107,6 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
       );
       return;
     }
-
-    if (!formData.name.trim() || formData.salary <= 0) return;
 
     onAddStep({
       ...formData,
@@ -104,6 +130,15 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
   };
 
   const salaryStatus = getSalaryValidationStatus();
+
+  // Form validation
+  const isNameValid = formData.name.trim().length > 0;
+  const isSalaryValid = salaryStatus === "valid";
+  const isFormValid = isNameValid && isSalaryValid;
+
+  // Show error only when field is touched
+  const showNameError = touched.name && !isNameValid;
+  const showSalaryError = touched.salary && salaryError;
 
   if (!isOpen) return null;
 
@@ -144,10 +179,19 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                onBlur={() => handleBlur("name")}
                 placeholder="Eg. Junior Level, Intermediate Level, etc."
-                className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                className={`w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent ${
+                  showNameError ? "border-red-300" : ""
+                }`}
                 required
               />
+              {showNameError && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  Step name is required
+                </p>
+              )}
             </div>
 
             {/* Salary Input */}
@@ -162,6 +206,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
                   type="number"
                   value={formData.salary || ""}
                   onChange={handleChange}
+                  onBlur={() => handleBlur("salary")}
                   placeholder="50000"
                   min={minSalary}
                   max={maxSalary}
@@ -184,7 +229,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
               </div>
 
               {/* Salary Validation Messages */}
-              {salaryError && (
+              {showSalaryError && (
                 <p className="text-sm text-red-600 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
                   {salaryError}
@@ -199,29 +244,33 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
               )}
             </div>
 
-            {/* Salary Range Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">
-                  Salary Range
-                </span>
-              </div>
-              <div className="text-sm text-blue-700 space-y-1">
-                <div>
-                  Minimum:{" "}
-                  <span className="font-semibold">
-                    {formatCurrency(minSalary)} ETB
-                  </span>
+            {/* Salary Preview */}
+            {/* {formData.salary > 0 && (
+              <div className={`p-3 rounded-lg border ${
+                salaryStatus === 'valid' 
+                  ? 'bg-green-50 border-green-100' 
+                  : 'bg-yellow-50 border-yellow-100'
+              }`}>
+                <p className="text-sm font-medium mb-2">
+                  {salaryStatus === 'valid' ? '✓ Salary Preview:' : '⚠ Salary Preview:'}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm">Step Salary</p>
+                    <p className={`font-semibold text-lg ${
+                      salaryStatus === 'valid' ? 'text-green-700' : 'text-yellow-700'
+                    }`}>
+                      {formatCurrency(formData.salary)} ETB
+                    </p>
+                  </div>
+                  {salaryStatus === 'valid' && (
+                    <div className="text-right">
+                      <p className="text-xs text-green-600">✓ Valid</p>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  Maximum:{" "}
-                  <span className="font-semibold">
-                    {formatCurrency(maxSalary)} ETB
-                  </span>
-                </div>
               </div>
-            </div>
+            )} */}
           </div>
         </div>
 
