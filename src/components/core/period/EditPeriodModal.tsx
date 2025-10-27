@@ -1,15 +1,25 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, PenBox } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Label } from '../../ui/label';
-import type { EditPeriodDto, PeriodListDto, UUID } from '../../../types/core/period';
-import toast from 'react-hot-toast';
-import { PeriodStat } from '../../../types/core/enum';
-import List from '../../List/list';
-import type { ListItem } from '../../../types/List/list';
-import { listService } from '../../../services/List/listservice';
-import { fiscalYearService } from '../../../services/core/fiscservice';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { X, PenBox } from "lucide-react";
+import { Button } from "../../ui/button";
+import { Label } from "../../ui/label";
+import type {
+  EditPeriodDto,
+  PeriodListDto,
+  UUID,
+} from "../../../types/core/period";
+import toast from "react-hot-toast";
+import { PeriodStat, Quarter } from "../../../types/core/enum";
+import List from "../../List/list";
+import type { ListItem } from "../../../types/List/list";
+import { fiscalYearService } from "../../../services/core/fiscservice";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 interface EditPeriodModalProps {
   period: PeriodListDto;
@@ -17,29 +27,34 @@ interface EditPeriodModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+const quarterOptions = Object.entries(Quarter).map(([key, value]) => ({
+  key,
+  value,
+}));
 
-const EditPeriodModal: React.FC<EditPeriodModalProps> = ({ 
-  period, 
-  onEditPeriod, 
+const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
+  period,
+  onEditPeriod,
   isOpen,
-  onClose 
+  onClose,
 }) => {
   const [editedPeriod, setEditedPeriod] = useState<EditPeriodDto>({
     id: period.id,
     name: period.name,
-    dateStart: '',
-    dateEnd: '',
+    dateStart: "",
+    dateEnd: "",
     isActive: period.isActive,
-    quarterId: period.quarterId || ('' as UUID),
-    fiscalYearId: period.fiscalYearId || ('' as UUID),
-    rowVersion: period.rowVersion || ''
+    quarter: period.quarter || ("" as UUID),
+    fiscalYearId: period.fiscalYearId || ("" as UUID),
+    rowVersion: period.rowVersion || "",
   });
 
   const [loading, setLoading] = useState(false);
   const [fiscalYears, setFiscalYears] = useState<ListItem[]>([]);
-  const [quarters, setQuarters] = useState<ListItem[]>([]);
+  // const [quarters, setQuarters] = useState<ListItem[]>([]);
   const [loadingFiscalYears, setLoadingFiscalYears] = useState(false);
-  const [loadingQuarters, setLoadingQuarters] = useState(false);
+  // const [loadingQuarters, setLoadingQuarters] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const periodStatusOptions = Object.entries(PeriodStat);
 
@@ -47,38 +62,44 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
     if (isOpen) {
       // Parse the display dates to get actual date values for the input fields
       const parseDisplayDate = (displayDate: string): string => {
-        if (!displayDate) return '';
-        
+        if (!displayDate) return "";
+
         try {
           // Try to parse the display date (e.g., "January 01, 2024")
           const date = new Date(displayDate);
           if (isNaN(date.getTime())) {
             // If parsing fails, try alternative formats or return empty
-            console.warn('Could not parse date:', displayDate);
-            return '';
+            console.warn("Could not parse date:", displayDate);
+            return "";
           }
-          
+
           // Format as YYYY-MM-DD for input[type="date"]
           const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+
           return `${year}-${month}-${day}`;
         } catch (error) {
-          console.error('Error parsing date:', displayDate, error);
-          return '';
+          console.error("Error parsing date:", displayDate, error);
+          return "";
         }
       };
 
       // If the period has raw date values, use them directly
       // Otherwise, parse from the display strings
-      const dateStart = period.dateStart && typeof period.dateStart === 'string' && period.dateStart.includes('-') 
-        ? period.dateStart.split('T')[0] // Already in ISO format, extract date part
-        : parseDisplayDate(period.dateStartStr || '');
+      const dateStart =
+        period.dateStart &&
+        typeof period.dateStart === "string" &&
+        period.dateStart.includes("-")
+          ? period.dateStart.split("T")[0] // Already in ISO format, extract date part
+          : parseDisplayDate(period.dateStartStr || "");
 
-      const dateEnd = period.dateEnd && typeof period.dateEnd === 'string' && period.dateEnd.includes('-')
-        ? period.dateEnd.split('T')[0] // Already in ISO format, extract date part
-        : parseDisplayDate(period.dateEndStr || '');
+      const dateEnd =
+        period.dateEnd &&
+        typeof period.dateEnd === "string" &&
+        period.dateEnd.includes("-")
+          ? period.dateEnd.split("T")[0] // Already in ISO format, extract date part
+          : parseDisplayDate(period.dateEndStr || "");
 
       setEditedPeriod({
         id: period.id,
@@ -86,13 +107,13 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
         dateStart: dateStart,
         dateEnd: dateEnd,
         isActive: period.isActive,
-        quarterId: period.quarterId || ('' as UUID),
-        fiscalYearId: period.fiscalYearId || ('' as UUID),
-        rowVersion: period.rowVersion || ''
+        quarter: period.quarter || ("" as Quarter),
+        fiscalYearId: period.fiscalYearId || ("" as UUID),
+        rowVersion: period.rowVersion || "",
       });
-      
+
       fetchFiscalYears();
-      fetchQuarters();
+      // fetchQuarters();
     }
   }, [period, isOpen]);
 
@@ -100,31 +121,17 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
     try {
       setLoadingFiscalYears(true);
       const fiscalYearsData = await fiscalYearService.getAllFiscalYears();
-      const fiscalYearListItems: ListItem[] = fiscalYearsData.map(fy => ({
+      const fiscalYearListItems: ListItem[] = fiscalYearsData.map((fy) => ({
         id: fy.id,
-        name: fy.name
+        name: fy.name,
       }));
       setFiscalYears(fiscalYearListItems);
     } catch (error) {
-      console.error('Error fetching fiscal years:', error);
-      toast.error('Failed to load fiscal years');
+      console.error("Error fetching fiscal years:", error);
+      toast.error("Failed to load fiscal years");
       setFiscalYears([]);
     } finally {
       setLoadingFiscalYears(false);
-    }
-  };
-
-  const fetchQuarters = async () => {
-    try {
-      setLoadingQuarters(true);
-      const quartersData = await listService.getAllQuarters();
-      setQuarters(quartersData);
-    } catch (error) {
-      console.error('Error fetching quarters:', error);
-      toast.error('Failed to load quarters');
-      setQuarters([]);
-    } finally {
-      setLoadingQuarters(false);
     }
   };
 
@@ -132,8 +139,8 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
     setEditedPeriod((prev) => ({ ...prev, fiscalYearId: item.id }));
   };
 
-  const handleSelectQuarter = (item: ListItem) => {
-    setEditedPeriod((prev) => ({ ...prev, quarterId: item.id }));
+  const handleSelectQuarter = (value: string) => {
+    setEditedPeriod((prev) => ({ ...prev, quarter: value as Quarter }));
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,44 +158,75 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
     setEditedPeriod((prev) => ({ ...prev, dateEnd: value }));
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
+  const handleStatusChange = (value: string) => {
     setEditedPeriod((prev) => ({ ...prev, isActive: value }));
   };
 
-  const handleSubmit = async () => {
-    if (!editedPeriod.name || !editedPeriod.dateStart || !editedPeriod.dateEnd) {
-      toast.error('Please fill all required fields');
-      return;
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!editedPeriod.name?.trim()) {
+      errors.name = "Period name is required";
     }
 
-    if (!editedPeriod.quarterId || !editedPeriod.fiscalYearId) {
-      toast.error('Please select a quarter and fiscal year');
+    if (!editedPeriod.dateStart) {
+      errors.dateStart = "Start date is required";
+    }
+
+    if (!editedPeriod.dateEnd) {
+      errors.dateEnd = "End date is required";
+    }
+
+    if (!editedPeriod.quarter) {
+      errors.quarterId = "Quarter is required";
+    }
+
+    if (!editedPeriod.fiscalYearId) {
+      errors.fiscalYearId = "Fiscal year is required";
+    }
+
+    // Date validation
+    if (editedPeriod.dateStart && editedPeriod.dateEnd) {
+      const startDate = new Date(editedPeriod.dateStart);
+      const endDate = new Date(editedPeriod.dateEnd);
+
+      if (endDate <= startDate) {
+        errors.dateEnd = "End date must be after start date";
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error("Please fix the form errors before submitting");
       return;
     }
 
     // Date validation
     const startDate = new Date(editedPeriod.dateStart);
     const endDate = new Date(editedPeriod.dateEnd);
-    
+
     if (endDate <= startDate) {
-      toast.error('End date must be after start date');
+      toast.error("End date must be after start date");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       // Convert dates to ISO format for backend
       const payload: EditPeriodDto = {
         ...editedPeriod,
         dateStart: new Date(editedPeriod.dateStart).toISOString(),
-        dateEnd: new Date(editedPeriod.dateEnd).toISOString()
+        dateEnd: new Date(editedPeriod.dateEnd).toISOString(),
       };
-      
+
       await onEditPeriod(payload);
     } catch (error) {
-      console.error('Error updating period:', error);
+      console.error("Error updating period:", error);
     } finally {
       setLoading(false);
     }
@@ -239,16 +277,37 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Quarter Selection */}
               <div className="space-y-2">
-                <List
-                  items={quarters}
-                  selectedValue={editedPeriod.quarterId}
-                  onSelect={handleSelectQuarter}
-                  label="Quarter"
-                  placeholder="Select a quarter"
-                  required
-                  disabled={loadingQuarters}
-                />
-                {loadingQuarters && <p className="text-sm text-gray-500 mt-1">Loading quarters...</p>}
+                <Label
+                  htmlFor="quarter"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Quarter <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={editedPeriod.quarter}
+                  onValueChange={handleSelectQuarter}
+                >
+                  <SelectTrigger
+                    id="quarter"
+                    className={`w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
+                      formErrors.quarterId ? "border-red-500" : ""
+                    }`}
+                  >
+                    <SelectValue placeholder="Select Quarter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {quarterOptions.map((option) => (
+                      <SelectItem key={option.key} value={option.key}>
+                        {option.value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formErrors.quarterId && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.quarterId}
+                  </p>
+                )}
               </div>
 
               {/* Fiscal Year Selection */}
@@ -262,14 +321,21 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
                   required
                   disabled={loadingFiscalYears}
                 />
-                {loadingFiscalYears && <p className="text-sm text-gray-500 mt-1">Loading fiscal years...</p>}
+                {loadingFiscalYears && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Loading fiscal years...
+                  </p>
+                )}
               </div>
             </div>
 
             {/* Start and End Dates - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-dateStart" className="text-sm text-gray-500">
+                <Label
+                  htmlFor="edit-dateStart"
+                  className="text-sm text-gray-500"
+                >
                   Start Date <span className="text-red-500">*</span>
                 </Label>
                 <input
@@ -297,6 +363,40 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
 
             {/* Status Selection */}
             <div className="space-y-2">
+              <Label
+                htmlFor="quarter"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={editedPeriod.isActive}
+                onValueChange={handleStatusChange}
+              >
+                <SelectTrigger
+                  id="quarter"
+                  className={`w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
+                    formErrors.quarter ? "border-red-500" : ""
+                  }`}
+                >
+                  <SelectValue placeholder="Select Quarter" />
+                </SelectTrigger>
+                <SelectContent>
+                  {periodStatusOptions.map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formErrors.isActive && (
+                <p className="text-red-500 text-sm mt-1">
+                  {formErrors.isActive}
+                </p>
+              )}
+            </div>
+
+            {/* <div className="space-y-2">
               <Label htmlFor="edit-isActive" className="text-sm text-gray-500">
                 Status <span className="text-red-500">*</span>
               </Label>
@@ -312,7 +412,7 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -322,11 +422,16 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!editedPeriod.name || !editedPeriod.dateStart || 
-                       !editedPeriod.dateEnd || !editedPeriod.quarterId ||
-                       !editedPeriod.fiscalYearId || loading}
+              disabled={
+                !editedPeriod.name ||
+                !editedPeriod.dateStart ||
+                !editedPeriod.dateEnd ||
+                !editedPeriod.quarter ||
+                !editedPeriod.fiscalYearId ||
+                loading
+              }
             >
-              {loading ? 'Updating...' : 'Save Changes'}
+              {loading ? "Updating..." : "Save Changes"}
             </Button>
             <Button
               variant="outline"

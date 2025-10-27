@@ -34,7 +34,7 @@ export interface EditPeriodDto {
   dateStart: string;
   dateEnd: string;
   isActive: string;
-  quarterId: Quarter;
+  quarter: Quarter;
   fiscalYearId: UUID;
   rowVersion: string;
 }
