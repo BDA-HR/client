@@ -345,12 +345,14 @@ const JobGradeSubgrades: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Add Step Modal */}
+        {/* Add Step Modal */}
       <AddJgStepModal
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         onAddStep={handleAddStep}
         jobGradeId={gradeId as UUID || ''}
+        minSalary={jobGrade?.startSalary || 0}
+        maxSalary={jobGrade?.maxSalary || 0}
       />
 
       {/* Edit Step Modal */}

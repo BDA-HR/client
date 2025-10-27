@@ -30,6 +30,10 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
     jobGradeId: jobGradeId,
   });
   const [salaryError, setSalaryError] = useState<string>('');
+  const [touched, setTouched] = useState({
+    name: false,
+    salary: false
+  });
 
   // Reset form when modal opens
   useEffect(() => {
@@ -40,8 +44,13 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
         jobGradeId: jobGradeId,
       });
       setSalaryError('');
+      setTouched({ name: false, salary: false });
     }
   }, [isOpen, jobGradeId]);
+
+  const handleBlur = (field: keyof typeof touched) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -49,14 +58,12 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
     const { name, value } = e.target;
     
     if (name === 'salary') {
-      const salaryValue = Number(value);
+      const salaryValue = value === '' ? 0 : Number(value);
       setFormData(prev => ({ ...prev, [name]: salaryValue }));
       
-      // Validate salary range
-      if (salaryValue < minSalary) {
-        setSalaryError(`Salary cannot be less than ${formatCurrency(minSalary)}`);
-      } else if (salaryValue > maxSalary) {
-        setSalaryError(`Salary cannot exceed ${formatCurrency(maxSalary)}`);
+      // Validate salary range only if value is not empty
+      if (value !== '') {
+        validateSalary(salaryValue);
       } else {
         setSalaryError('');
       }
@@ -65,14 +72,32 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
     }
   };
 
+  const validateSalary = (salaryValue: number) => {
+    if (salaryValue < minSalary) {
+      setSalaryError(`Salary cannot be less than ${formatCurrency(minSalary)}`);
+    } else if (salaryValue > maxSalary) {
+      setSalaryError(`Salary cannot exceed ${formatCurrency(maxSalary)}`);
+    } else {
+      setSalaryError('');
+    }
+  };
+
   const handleSubmit = () => {
+    // Mark all fields as touched
+    setTouched({ name: true, salary: true });
+
     // Final validation before submission
+    if (!formData.name.trim()) return;
+    
+    if (formData.salary <= 0) {
+      setSalaryError('Salary is required');
+      return;
+    }
+
     if (formData.salary < minSalary || formData.salary > maxSalary) {
       setSalaryError(`Salary must be between ${formatCurrency(minSalary)} and ${formatCurrency(maxSalary)}`);
       return;
     }
-
-    if (!formData.name.trim() || formData.salary <= 0) return;
 
     onAddStep({
       ...formData,
@@ -96,6 +121,15 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
   };
 
   const salaryStatus = getSalaryValidationStatus();
+
+  // Form validation
+  const isNameValid = formData.name.trim().length > 0;
+  const isSalaryValid = salaryStatus === 'valid';
+  const isFormValid = isNameValid && isSalaryValid;
+
+  // Show error only when field is touched
+  const showNameError = touched.name && !isNameValid;
+  const showSalaryError = touched.salary && salaryError;
 
   if (!isOpen) return null;
 
@@ -134,10 +168,19 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                onBlur={() => handleBlur('name')}
                 placeholder="Eg. Junior Level, Intermediate Level, etc."
-                className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                className={`w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent ${
+                  showNameError ? 'border-red-300' : ''
+                }`}
                 required
               />
+              {showNameError && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  Step name is required
+                </p>
+              )}
             </div>
 
             {/* Salary Range Info */}
@@ -164,19 +207,20 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
                   type="number"
                   value={formData.salary || ''}
                   onChange={handleChange}
+                  onBlur={() => handleBlur('salary')}
                   placeholder="50000"
                   min={minSalary}
                   max={maxSalary}
                   className={`w-full focus:outline-none focus:ring-1 ${
-                    salaryStatus === 'valid' 
+                    salaryStatus === 'valid' && formData.salary > 0
                       ? 'focus:ring-green-500 border-green-300' 
-                      : salaryStatus === 'empty'
+                      : salaryStatus === 'empty' || formData.salary === 0
                       ? 'focus:ring-green-500'
                       : 'focus:ring-red-500 border-red-300'
                   } focus:border-transparent`}
                   required
                 />
-                {salaryStatus === 'valid' && (
+                {salaryStatus === 'valid' && formData.salary > 0 && (
                   <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-500" />
                 )}
                 {(salaryStatus === 'too-low' || salaryStatus === 'too-high') && (
@@ -185,48 +229,28 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
               </div>
               
               {/* Salary Validation Messages */}
-              {salaryError && (
+              {showSalaryError && (
                 <p className="text-sm text-red-600 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
                   {salaryError}
                 </p>
               )}
               
-              {salaryStatus === 'valid' && (
+              {salaryStatus === 'valid' && formData.salary > 0 && (
                 <p className="text-sm text-green-600 flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" />
                   Salary is within the valid range
                 </p>
               )}
+
+              {touched.salary && formData.salary === 0 && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  Salary is required
+                </p>
+              )}
             </div>
 
-            {/* Salary Preview */}
-            {/* {formData.salary > 0 && (
-              <div className={`p-3 rounded-lg border ${
-                salaryStatus === 'valid' 
-                  ? 'bg-green-50 border-green-100' 
-                  : 'bg-yellow-50 border-yellow-100'
-              }`}>
-                <p className="text-sm font-medium mb-2">
-                  {salaryStatus === 'valid' ? '✓ Salary Preview:' : '⚠ Salary Preview:'}
-                </p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm">Step Salary</p>
-                    <p className={`font-semibold text-lg ${
-                      salaryStatus === 'valid' ? 'text-green-700' : 'text-yellow-700'
-                    }`}>
-                      {formatCurrency(formData.salary)} ETB
-                    </p>
-                  </div>
-                  {salaryStatus === 'valid' && (
-                    <div className="text-right">
-                      <p className="text-xs text-green-600">✓ Valid</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )} */}
           </div>
         </div>
 
@@ -236,7 +260,7 @@ const AddJgStepModal: React.FC<AddJgStepModalProps> = ({
             <Button
               className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!formData.name.trim() || formData.salary <= 0 || salaryStatus !== 'valid'}
+              disabled={!isFormValid}
             >
               Save
             </Button>
