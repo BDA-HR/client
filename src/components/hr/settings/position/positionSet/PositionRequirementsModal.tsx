@@ -120,33 +120,16 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
     handleClose();
   };
 
-  // Gender options based on your backend enum
-  // const genderOptions = Object.entries(PositionGender).map(([key, value]) => ({
-  //   id: key as UUID,
-  //   name: value,
-  // }));
   const genderOptions = Object.entries(PositionGender).map(([key, value]) => ({
     key,
     value,
   }));
 
-  // Work options including "None" (3) option
-  // const workOptions = Object.entries(WorkOption).map(([key, value]) => ({
-  //   id: key as UUID,
-  //   name: value,
-  // }));
   const workOptions = Object.entries(WorkOption).map(([key, value]) => ({
     key,
     value,
   }));
 
-  // Profession type options from enum
-  // const professionTypeOptions = Object.entries(ProfessionType).map(
-  //   ([key, value]) => ({
-  //     id: key as string,
-  //     name: value,
-  //   })
-  // );
   const professionTypeOptions = Object.entries(ProfessionType).map(
     ([key, value]) => ({
       key,
@@ -222,17 +205,6 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                     </SelectItem>
                   ))}
                 </SelectContent>
-                {/* <SelectContent>
-                  {professionTypeOptions.map((type) => (
-                    <SelectItem
-                      key={type.id}
-                      value={type.id}
-                      className="text-gray-900"
-                    >
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent> */}
               </Select>
             </div>
 
@@ -275,17 +247,6 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                     </SelectItem>
                   ))}
                 </SelectContent>
-                {/* <SelectContent>
-                  {genderOptions.map((option) => (
-                    <SelectItem
-                      key={option.id}
-                      value={option.id}
-                      className="text-gray-900"
-                    >
-                      {option.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent> */}
               </Select>
             </div>
 
@@ -311,17 +272,6 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                       </SelectItem>
                     ))}
                   </SelectContent>
-                  {/* <SelectContent>
-                    {workOptions.map((option) => (
-                      <SelectItem
-                        key={option.id}
-                        value={option.id}
-                        className="text-gray-900"
-                      >
-                        {option.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent> */}
                 </Select>
               </div>
               <div className="space-y-2">
@@ -344,17 +294,6 @@ const PositionRequirementsModal: React.FC<PositionRequirementsModalProps> = ({
                       </SelectItem>
                     ))}
                   </SelectContent>
-                  {/* <SelectContent>
-                    {workOptions.map((option) => (
-                      <SelectItem
-                        key={option.id}
-                        value={option.id}
-                        className="text-gray-900"
-                      >
-                        {option.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent> */}
                 </Select>
               </div>
             </div>
