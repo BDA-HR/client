@@ -362,57 +362,41 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
             </div>
 
             {/* Status Selection */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="quarter"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Status <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={editedPeriod.isActive}
-                onValueChange={handleStatusChange}
-              >
-                <SelectTrigger
-                  id="quarter"
-                  className={`w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
-                    formErrors.quarter ? "border-red-500" : ""
-                  }`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="quarter"
+                  className="block text-sm font-medium text-gray-700"
                 >
-                  <SelectValue placeholder="Select Quarter" />
-                </SelectTrigger>
-                <SelectContent>
-                  {periodStatusOptions.map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {formErrors.isActive && (
-                <p className="text-red-500 text-sm mt-1">
-                  {formErrors.isActive}
-                </p>
-              )}
+                  Status <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={editedPeriod.isActive}
+                  onValueChange={handleStatusChange}
+                >
+                  <SelectTrigger
+                    id="quarter"
+                    className={`w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
+                      formErrors.quarter ? "border-red-500" : ""
+                    }`}
+                  >
+                    <SelectValue placeholder="Select Quarter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {periodStatusOptions.map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formErrors.isActive && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.isActive}
+                  </p>
+                )}
+              </div>
             </div>
-
-            {/* <div className="space-y-2">
-              <Label htmlFor="edit-isActive" className="text-sm text-gray-500">
-                Status <span className="text-red-500">*</span>
-              </Label>
-              <select
-                id="edit-isActive"
-                value={editedPeriod.isActive}
-                onChange={handleStatusChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
-              >
-                {periodStatusOptions.map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div> */}
           </div>
         </div>
 
