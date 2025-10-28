@@ -12,7 +12,7 @@ export type GenderAm = typeof GenderAm[keyof typeof GenderAm];
 
 export const PositionGender = {
   "0": 'Male',
-  "1": 'Female', 
+  "1": 'Female',
   "2": 'Male/Female'
 } as const;
 export type PositionGender = typeof PositionGender[keyof typeof PositionGender];
@@ -54,7 +54,7 @@ export type WorkOptionAm = typeof WorkOptionAm[keyof typeof WorkOptionAm];
 
 export const Per = {
   "0": 'Day',
-  "1": 'Month', 
+  "1": 'Month',
   "2": 'Year'
 } as const;
 export type Per = typeof Per[keyof typeof Per];
@@ -70,26 +70,35 @@ export const ProfessionType = {
   "0": 'Professional',
   "1": 'Semi-Professional',
   "2": 'Non-Professional'
-  // "3": 'Business',
-  // "4": 'Technology',
-  // "5": 'Arts & Design',
-  // "6": 'Science & Research',
-  // "7": 'Legal',
-  // "8": 'Construction',
-  // "9": 'Hospitality'
 } as const;
 export type ProfessionType = typeof ProfessionType[keyof typeof ProfessionType];
 
-export const ProfessionTypeAm = {
-  "0": 'ኢንጅነሪንግ',
-  "1": 'ጤና',
-  "2": 'ትምህርት',
-  "3": 'ንግድ',
-  "4": 'ቴክኖሎጂ',
-  "5": 'ኪነጥበብ እና ዲዛይን',
-  "6": 'ሳይንስ እና ምርምር',
-  "7": 'ህግ',
-  "8": 'ግንባታ',
-  "9": 'ሆስፒታሊቲ'
+export const EmpType = {
+  "0": 'Replacement',
+  "1": 'New Opening',
+  "2": 'Additional Required',
+  "3": 'Old Employee'
 } as const;
-export type ProfessionTypeAm = typeof ProfessionTypeAm[keyof typeof ProfessionTypeAm];
+export type EmpType = typeof EmpType[keyof typeof EmpType];
+
+export const EmpNature = {
+  "0": 'Permanent',
+  "1": 'Contract'
+} as const;
+export type EmpNature = typeof EmpNature[keyof typeof EmpNature];
+
+export const MaritalStat = {
+  "0": 'Not Married',
+  "1": 'Single',
+  "2": 'Non-Married',
+  "3": 'Widow/er',
+  "4": 'Divorced',
+  "5": 'Not Mentioned'
+} as const;
+export type MaritalStat = typeof MaritalStat[keyof typeof MaritalStat];
+
+export const AddressType = {
+  "0": 'Residence',
+  "1": 'Work Place'
+} as const;
+export type AddressType = typeof AddressType[keyof typeof AddressType];

@@ -1,23 +1,24 @@
-import type { UUID } from 'crypto';
+import { type UUID } from 'crypto';
 import type { BaseDto } from './BaseDto';
+import type { EmpNature, EmpType, Gender, YesNo } from './enum';
 export type { UUID }
 
 export interface EmployeeListDto extends BaseDto {
-  personId: UUID;
-  jobGradeId: UUID;
-  positionId: UUID;
-  departmentId: UUID;
-  employmentTypeId: UUID;
-  employmentNatureId: UUID;
-  gender: '0' | '1'; 
+  personId: UUID; //Person
+  jobGradeId: UUID;  //Cor.HRMM.JobGrade
+  positionId: UUID;  //Cor.HRMM.Position
+  departmentId: UUID;  //Cor.Module.Department
+  employmentType: EmpType; //enum.EmpType (0/1)
+  employmentNature: EmpNature; //enum.EmpNature (0/1)
+  gender: Gender; // enum.Gender (0/1)
   nationality: string;
   code: string;
   employmentDate: string;
   jobGrade: string;
   position: string;
   department: string;
-  employmentType: string;
-  employmentNature: string;
+  employmentTypeStr: string;
+  employmentNatureStr: string;
   genderStr: string;
   empFullName: string;
   empFullNameAm: string;
@@ -32,14 +33,14 @@ export interface EmployeeAddDto {
   middleNameAm: string;
   lastName: string;
   lastNameAm: string;
-  gender: '0' | '1';
+  gender: Gender; // enum.Gender (0/1)
   nationality: string;
   employmentDate: string;
-  jobGradeId: UUID;
-  positionId: UUID;
-  departmentId: UUID;
-  employmentTypeId: UUID;
-  employmentNatureId: UUID;
+  jobGradeId: UUID;  //Cor.HRMM.JobGrade
+  positionId: UUID;  //Cor.HRMM.Position
+  departmentId: UUID;  //Cor.Module.Department
+  employmentType: EmpType; //enum.EmpType (0/1)
+  employmentNature: EmpNature; //enum.EmpNature (0/1)
 }
 
 export interface EmployeeModDto {
@@ -50,47 +51,15 @@ export interface EmployeeModDto {
   middleNameAm: string;
   lastName: string;
   lastNameAm: string;
-  gender: '0' | '1';
+  gender: Gender; // enum.Gender (0/1)
   nationality: string;
   employmentDate: string;
-  personId: UUID;
-  jobGradeId: UUID;
-  positionId: UUID;
-  departmentId: UUID;
-  employmentTypeId: UUID;
-  employmentNatureId: UUID;
+  jobGradeId: UUID;  //Cor.HRMM.JobGrade
+  positionId: UUID;  //Cor.HRMM.Position
+  departmentId: UUID;  //Cor.Module.Department
+  employmentType: EmpType; //enum.EmpType (0/1)
+  employmentNature: EmpNature; //enum.EmpNature (0/1)
   rowVersion: string;
-}
-
-// Related types for dropdowns
-export interface JobGradeDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
-}
-
-export interface PositionDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
-}
-
-export interface DepartmentDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
-}
-
-export interface EmploymentTypeDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
-}
-
-export interface EmploymentNatureDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
 }
 
 // Additional DTOs
@@ -102,7 +71,7 @@ export interface EmContactAddDto {
   lastName: string;
   lastNameAm: string;
   nationality: string;
-  gender: '0' | '1';
+  gender: Gender; // enum.Gender (0/1)
   relationId: UUID;
   addressId: UUID;
   employeeId: UUID;
@@ -112,9 +81,9 @@ export interface EmpBioAddDto {
   birthDate: string;
   birthLocation: string;
   motherFullName: string;
-  hasBirthCert: '0' | '1';
-  hasMarriageCert: '0' | '1';
-  maritalStatusId: UUID;
+  hasBirthCert: YesNo; // enum.YesNo (0/1)
+  hasMarriageCert: YesNo; // enum.YesNo (0/1)
+  maritalStatus: UUID; // enum.YesNo (0/1)
   addressId: UUID;
   employeeId: UUID;
 }
@@ -126,7 +95,7 @@ export interface EmpFamilyAddDto {
   middleNameAm: string;
   lastName: string;
   lastNameAm: string;
-  gender: '0' | '1';
+  gender: Gender; // enum.Gender (0/1)
   nationality: string;
   relationId: UUID;
   employeeId: UUID;
@@ -146,7 +115,7 @@ export interface EmpGuarantorAddDto {
   middleNameAm: string;
   lastName: string;
   lastNameAm: string;
-  gender: '0' | '1';
+  gender: Gender; // enum.Gender (0/1)
   nationality: string;
   addressId: UUID;
   relationId: UUID;
@@ -157,38 +126,18 @@ export interface EmpPensionCardAddDto {
   registrationDate: string;
   sentDate?: string;
   receivedDate?: string;
-  isReceived: '0' | '1';
-  isSent: '0' | '1';
+  isReceived: YesNo; // enum.YesNo (0/1)
+  isSent: YesNo; // enum.YesNo (0/1)
   employeeId: UUID;
 }
 
 export interface EmpStateAddDto {
-  isTerminated: '0' | '1';
-  isApproved: '0' | '1';
-  isStandBy: '0' | '1';
-  isRetired: '0' | '1';
-  isUnderProbation: '0' | '1';
+  isTerminated: YesNo; // enum.YesNo (0/1)
+  isApproved: YesNo; // enum.YesNo (0/1)
+  isStandBy: YesNo; // enum.YesNo (0/1)
+  isRetired: YesNo; // enum.YesNo (0/1)
+  isUnderProbation: YesNo; // enum.YesNo (0/1)
   employeeId: UUID;
-}
-
-// Lookup types
-export interface MaritalStatusDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
-}
-
-export interface RelationDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
-}
-
-export interface AddressDto {
-  id: UUID;
-  name: string;
-  nameAm: string;
-  fullAddress: string;
 }
 
 // Filter types
@@ -197,8 +146,8 @@ export interface EmployeeFilters {
   departmentId?: UUID;
   positionId?: UUID;
   jobGradeId?: UUID;
-  employmentTypeId?: UUID;
-  employmentNatureId?: UUID;
+  employmentTypeId?: UUID; // Update this
+  employmentNatureId?: UUID; // Update this
   gender: '0' | '1' | '';
 }
 
