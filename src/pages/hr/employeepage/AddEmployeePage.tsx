@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Users, DollarSign, CheckCircle2 } from 'lucide-react';
+import { User, Users, Phone, Shield, CheckCircle } from 'lucide-react';
 import type { UUID } from 'crypto';
+import type { AddressType } from '../../../types/hr/enum';
 
 // Import components
 import { AddEmployeeStepHeader } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepHeader';
 import { AddEmployeeStepForm } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepForm';
 
-// Define the extended interface locally to match the form - UPDATED STRUCTURE
+// Define the extended interface locally to match the form
 interface ExtendedEmployeeData {
   // Basic info
   firstName: string;
@@ -24,8 +25,8 @@ interface ExtendedEmployeeData {
   jobGradeId: UUID;
   positionId: UUID;
   departmentId: UUID;
-  employmentTypeId: UUID;
-  employmentNatureId: UUID;
+  employmentType: '0' | '1' | '2' | '3' | '';
+  employmentNature: '0' | '1' | '';
   
   // Biographical data - NESTED STRUCTURE
   biographicalData: {
@@ -35,7 +36,6 @@ interface ExtendedEmployeeData {
     hasBirthCert: '0' | '1' | '';
     hasMarriageCert: '0' | '1' | '';
     maritalStatusId: UUID;
-    addressId: UUID;
   };
   
   // Financial data - NESTED STRUCTURE
@@ -82,6 +82,23 @@ interface ExtendedEmployeeData {
     addressId: UUID;
   }>;
   
+  // Addresses array
+  addresses: Array<{
+    addressType: AddressType;
+    country: string;
+    region: string;
+    subcity: string;
+    zone: string;
+    woreda: string;
+    kebele: string;
+    houseNo: string;
+    telephone: string;
+    poBox: string;
+    fax: string;
+    email: string;
+    website: string;
+  }>;
+  
   // File uploads
   guarantorFiles: File[];
   stampFiles: File[];
@@ -111,8 +128,8 @@ const initialValues: ExtendedEmployeeData = {
   jobGradeId: '' as UUID,
   positionId: '' as UUID,
   departmentId: '' as UUID,
-  employmentTypeId: '' as UUID,
-  employmentNatureId: '' as UUID,
+  employmentType: '' as '0' | '1' | '2' | '3' | '',
+  employmentNature: '' as '0' | '1' | '',
   
   // Biographical data - NESTED STRUCTURE
   biographicalData: {
@@ -122,7 +139,6 @@ const initialValues: ExtendedEmployeeData = {
     hasBirthCert: '' as '0' | '1' | '',
     hasMarriageCert: '' as '0' | '1' | '',
     maritalStatusId: '' as UUID,
-    addressId: '' as UUID,
   },
   
   // Financial data - NESTED STRUCTURE
@@ -137,6 +153,9 @@ const initialValues: ExtendedEmployeeData = {
   familyMembers: [],
   guarantors: [],
   
+  // Addresses array
+  addresses: [],
+  
   // File uploads
   guarantorFiles: [],
   stampFiles: [],
@@ -150,14 +169,7 @@ const initialValues: ExtendedEmployeeData = {
   isUnderProbation: '0',
 };
 
-const steps = [
-  { id: 1, title: 'Basic Info', icon: User },
-  { id: 2, title: 'Biographical', icon: Users },
-  { id: 3, title: 'Financial', icon: DollarSign },
-  { id: 4, title: 'Review', icon: CheckCircle2 },
-];
-
-// Mock data for dropdowns (you can move these to a separate file if needed)
+// Mock data for dropdowns
 const mockCompanies = [
   { id: '1' as UUID, name: 'Main Company', nameAm: 'ዋና ኩባንያ' },
   { id: '2' as UUID, name: 'Subsidiary A', nameAm: 'ንዑስ ኩባንያ አ' },
@@ -188,18 +200,6 @@ const mockPositions = [
   { id: '3' as UUID, name: 'HR Manager', nameAm: 'ሰው ሀብት ማኔጅር', departmentId: '2' as UUID },
 ];
 
-const mockEmploymentTypes = [
-  { id: '1' as UUID, name: 'Full-time', nameAm: 'ሙሉ ጊዜ' },
-  { id: '2' as UUID, name: 'Part-time', nameAm: 'ከፊል ጊዜ' },
-  { id: '3' as UUID, name: 'Contract', nameAm: 'ኮንትራት' },
-];
-
-const mockEmploymentNatures = [
-  { id: '1' as UUID, name: 'Permanent', nameAm: 'ቋሚ' },
-  { id: '2' as UUID, name: 'Temporary', nameAm: 'ጊዜያዊ' },
-  { id: '3' as UUID, name: 'Probation', nameAm: 'ሙከራ' },
-];
-
 const mockMaritalStatus = [
   { id: '1' as UUID, name: 'Single', nameAm: 'ያላገባ' },
   { id: '2' as UUID, name: 'Married', nameAm: 'ያገባ' },
@@ -207,9 +207,20 @@ const mockMaritalStatus = [
   { id: '4' as UUID, name: 'Widowed', nameAm: 'የተመሰረተ' },
 ];
 
-const mockAddresses = [
-  { id: '1' as UUID, name: 'Main Office', nameAm: 'ዋና አድራሻ', fullAddress: 'Addis Ababa, Ethiopia' },
-  { id: '2' as UUID, name: 'Branch Office', nameAm: 'ቅርንጫፍ አድራሻ', fullAddress: 'Addis Ababa, Ethiopia' },
+const mockRelations = [
+  { id: '1' as UUID, name: 'Spouse', nameAm: 'ባል/ሚስት' },
+  { id: '2' as UUID, name: 'Parent', nameAm: 'ወላጅ' },
+  { id: '3' as UUID, name: 'Sibling', nameAm: 'ወንድም/እህት' },
+  { id: '4' as UUID, name: 'Child', nameAm: 'ልጅ' },
+  { id: '5' as UUID, name: 'Friend', nameAm: 'ጓደኛ' },
+];
+
+const steps = [
+  { id: 1, title: 'Basic Info', subtitle: 'Personal & employment details', icon: User },
+  { id: 2, title: 'Biographical', subtitle: 'Family, background & financial info', icon: Users },
+  { id: 3, title: 'Emergency Contacts', subtitle: 'Emergency contact persons', icon: Phone },
+  { id: 4, title: 'Guarantors', subtitle: 'Employee guarantors', icon: Shield },
+  { id: 5, title: 'Review', subtitle: 'Confirm all information', icon: CheckCircle },
 ];
 
 const AddEmployeePage: React.FC = () => {
@@ -272,10 +283,18 @@ const AddEmployeePage: React.FC = () => {
       const department = mockDepartments.find(d => d.id === values.departmentId);
       const position = mockPositions.find(p => p.id === values.positionId);
       const jobGrade = mockJobGrades.find(g => g.id === values.jobGradeId);
-      const employmentType = mockEmploymentTypes.find(t => t.id === values.employmentTypeId);
-      const employmentNature = mockEmploymentNatures.find(n => n.id === values.employmentNatureId);
       const maritalStatus = mockMaritalStatus.find(m => m.id === values.biographicalData.maritalStatusId);
-      const address = mockAddresses.find(a => a.id === values.biographicalData.addressId);
+
+      // Get enum string values
+      const employmentTypeStr = 
+        values.employmentType === "0" ? "Replacement" :
+        values.employmentType === "1" ? "New Opening" :
+        values.employmentType === "2" ? "Additional Required" :
+        values.employmentType === "3" ? "Old Employee" : "Not specified";
+
+      const employmentNatureStr = 
+        values.employmentNature === "0" ? "Permanent" :
+        values.employmentNature === "1" ? "Contract" : "Not specified";
 
       // Create the employee data
       const newEmployee = {
@@ -304,10 +323,10 @@ const AddEmployeePage: React.FC = () => {
         position: position?.name || '',
         departmentId: values.departmentId,
         department: department?.name || '',
-        employmentTypeId: values.employmentTypeId,
-        employmentType: employmentType?.name || '',
-        employmentNatureId: values.employmentNatureId,
-        employmentNature: employmentNature?.name || '',
+        employmentType: values.employmentType,
+        employmentTypeStr: employmentTypeStr,
+        employmentNature: values.employmentNature,
+        employmentNatureStr: employmentNatureStr,
         
         // Additional biographical data - ACCESS NESTED DATA
         birthDate: values.biographicalData.birthDate,
@@ -317,8 +336,6 @@ const AddEmployeePage: React.FC = () => {
         hasMarriageCert: values.biographicalData.hasMarriageCert,
         maritalStatusId: values.biographicalData.maritalStatusId,
         maritalStatus: maritalStatus?.name || '',
-        addressId: values.biographicalData.addressId,
-        address: address?.name || '',
         
         // Financial data - ACCESS NESTED DATA
         tin: values.financialData.tin,
@@ -329,6 +346,7 @@ const AddEmployeePage: React.FC = () => {
         emergencyContacts: values.emergencyContacts,
         familyMembers: values.familyMembers,
         guarantors: values.guarantors,
+        addresses: values.addresses,
         
         // File uploads
         guarantorFiles: values.guarantorFiles,
@@ -376,7 +394,7 @@ const AddEmployeePage: React.FC = () => {
           currentStep={currentStep}
           onBack={handleBackToEmployees}
           title="Add New Employee"
-          backButtonText="Back to Employees"
+          backButtonText="Back to Employee List"
         />
 
         {/* Form Component */}
