@@ -75,15 +75,6 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
               Emergency Contacts
             </h3>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addEmergencyContact}
-            className="cursor-pointer flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add Contact
-          </Button>
         </div>
 
         {values.emergencyContacts.length === 0 ? (
@@ -96,23 +87,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
           values.emergencyContacts.map((contact, index) => (
             <div
               key={index}
-              className="bg-gray-50 p-6 rounded-lg mb-4 border border-gray-200"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="font-semibold text-gray-700">
-                  Emergency Contact {index + 1}
-                </h4>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => removeEmergencyContact(index)}
-                  className="cursor-pointer text-red-600 hover:text-red-700 flex items-center gap-1"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Remove
-                </Button>
-              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">

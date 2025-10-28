@@ -269,7 +269,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
           <h3 className="text-xl font-semibold text-gray-800">Financial Information</h3>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* TIN Number */}
           <div className="space-y-2">
             <label
@@ -347,7 +347,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Address Type */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
