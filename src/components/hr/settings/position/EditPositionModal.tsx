@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Edit } from 'lucide-react';
+import { X, Edit, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Label } from '../../../ui/label';
 import { Input } from '../../../ui/input';
@@ -106,6 +106,10 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
     }));
   };
 
+  const handleVacancyChange = (value: '0' | '1') => {
+    setFormData(prev => ({ ...prev, isVacant: value }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.nameAm.trim() || formData.noOfPosition <= 0 || !formData.departmentId) {
@@ -115,8 +119,6 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
     onSave(formData);
     handleClose();
   };
-
-  // REMOVED: handleBackdropClick function
 
   // Add escape key to close
   useEffect(() => {
@@ -133,22 +135,18 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
   if (!isOpen || !position) return null;
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen"
-      // REMOVED: onClick={handleBackdropClick}
-    >
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        // REMOVED: onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <Edit size={20} className="" />
-            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
+            <h2 className="text-lg font-bold text-gray-800">Edit Position</h2>
           </div>
           <button
             onClick={handleClose}
@@ -232,26 +230,61 @@ const EditPositionModal: React.FC<EditPositionModalProps> = ({
                   />
                 </div>
                 
+                {/* Enhanced Vacancy Status Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="isVacant" className="text-sm text-gray-700 font-medium">
-                    Is Vacant <span className="text-red-500">*</span>
+                  <Label className="text-sm text-gray-700 font-medium">
+                    Vacancy Status <span className="text-red-500">*</span>
                   </Label>
-                  <select
-                    id="isVacant"
-                    name="isVacant"
-                    value={formData.isVacant}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="0">Yes</option>
-                                        <option value="1">No</option>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Yes (Vacant) Option */}
+                    <button
+                      type="button"
+                      onClick={() => handleVacancyChange('0')}
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
+                        formData.isVacant === '0'
+                          ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
+                          : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-full ${
+                        formData.isVacant === '0' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <CheckCircle className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-sm">Vacant</span>
+                      <span className="text-xs opacity-75">Position is open</span>
+                    </button>
 
-                  </select>
+                    {/* No (Not Vacant) Option */}
+                    <button
+                      type="button"
+                      onClick={() => handleVacancyChange('1')}
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
+                        formData.isVacant === '1'
+                          ? 'border-red-500 bg-red-50 text-red-700 shadow-sm'
+                          : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-full ${
+                        formData.isVacant === '1' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <XCircle className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-sm">Not Vacant</span>
+                      <span className="text-xs opacity-75">Position is filled</span>
+                    </button>
+                  </div>
+                  
+                  {/* Current selection indicator */}
+                  <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                    <p className="text-xs text-blue-700 text-center">
+                      Currently: <span className="font-semibold">
+                        {formData.isVacant === '0' ? 'Vacant' : 'Not Vacant'}
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
-
-
 
               {/* Original Values for Reference */}
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
