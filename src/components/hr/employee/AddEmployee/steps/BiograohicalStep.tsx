@@ -14,6 +14,8 @@ import type { UUID } from "crypto";
 import type { ExtendedEmployeeData } from "../AddEmployeeStepForm";
 import { amharicRegex } from "../../../../../utils/amharic-regex";
 import type { AddressType, YesNo } from "../../../../../types/hr/enum";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 interface BiographicalStepProps {
   formikProps: FormikProps<ExtendedEmployeeData>;
@@ -59,6 +61,38 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
       setFieldValue(fieldName, value);
     }
   };
+
+  const handlePhoneChange = (value: string, fieldName: string) => {
+    setFieldValue(fieldName, value);
+    // Clear error when user starts typing
+    if (getNestedError(errors, fieldName)) {
+      const errorPath = fieldName.replace(/\[(\d+)\]/g, '.$1');
+      const newErrors = { ...errors };
+      delete newErrors[errorPath];
+      formikProps.setErrors(newErrors);
+    }
+  };
+
+  // Initialize addresses array if empty
+  React.useEffect(() => {
+    if (!values.addresses || values.addresses.length === 0) {
+      setFieldValue("addresses", [{
+        addressType: "0" as AddressType,
+        country: "",
+        region: "",
+        subcity: "",
+        zone: "",
+        woreda: "",
+        kebele: "",
+        houseNo: "",
+        telephone: "",
+        poBox: "",
+        fax: "",
+        email: "",
+        website: ""
+      }]);
+    }
+  }, [values.addresses, setFieldValue]);
 
   return (
     <motion.div
@@ -343,23 +377,28 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
           <h3 className="text-xl font-semibold text-gray-800">
-            Address Information
+            Address Information <span className="text-red-500">*</span>
           </h3>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Address Type */}
+          {/* Address Type - REQUIRED */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Address Type
+              Address Type <span className="text-red-500">*</span>
             </label>
             <Select
-              value={values.addresses[0]?.addressType || "0"}
+              value={values.addresses[0]?.addressType || ""}
               onValueChange={(value) =>
                 setFieldValue("addresses[0].addressType", value)
               }
             >
-              <SelectTrigger className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md">
+              <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
+                getNestedError(errors, "addresses[0].addressType") && 
+                getNestedTouched(touched, "addresses[0].addressType") 
+                  ? "border-red-500" 
+                  : "border-gray-300"
+              }`}>
                 <SelectValue placeholder="Select Address Type" />
               </SelectTrigger>
               <SelectContent>
@@ -367,21 +406,89 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
                 <SelectItem value="1">Work Place</SelectItem>
               </SelectContent>
             </Select>
+            {getNestedError(errors, "addresses[0].addressType") &&
+              getNestedTouched(touched, "addresses[0].addressType") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getNestedError(errors, "addresses[0].addressType")}
+                </div>
+              )}
           </div>
 
-          {/* Country */}
+          {/* Country - REQUIRED */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Country
+              Country <span className="text-red-500">*</span>
             </label>
             <Input
               value={values.addresses[0]?.country || ""}
               onChange={(e) =>
                 setFieldValue("addresses[0].country", e.target.value)
               }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
+              onBlur={handleBlur}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
+                getNestedError(errors, "addresses[0].country") && 
+                getNestedTouched(touched, "addresses[0].country") 
+                  ? "border-red-500" 
+                  : "border-gray-300"
+              }`}
               placeholder="Country"
             />
+            {getNestedError(errors, "addresses[0].country") &&
+              getNestedTouched(touched, "addresses[0].country") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getNestedError(errors, "addresses[0].country")}
+                </div>
+              )}
+          </div>
+
+          {/* Telephone - REQUIRED with PhoneInput */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Telephone <span className="text-red-500">*</span>
+            </label>
+            <div className={`w-full ${
+              getNestedError(errors, "addresses[0].telephone") && 
+              getNestedTouched(touched, "addresses[0].telephone") 
+                ? 'border border-red-500 rounded-md' 
+                : ''
+            }`}>
+              <PhoneInput
+                country={'et'} // Default to Ethiopia
+                value={values.addresses[0]?.telephone || ""}
+                onChange={(value) => handlePhoneChange(value, "addresses[0].telephone")}
+                inputProps={{
+                  name: "addresses[0].telephone",
+                  required: true,
+                  onBlur: handleBlur
+                }}
+                inputStyle={{
+                  width: '100%',
+                  height: '42px',
+                  paddingLeft: '48px',
+                  outline: 'none',
+                  fontSize: '14px',
+                  borderRadius: '6px'
+                }}
+                buttonStyle={{
+                  border: 'none',
+                  borderRight: '1px solid #ccc',
+                  borderRadius: '6px 0 0 6px',
+                  backgroundColor: '#f8f9fa'
+                }}
+                containerStyle={{
+                  width: '100%'
+                }}
+                dropdownStyle={{
+                  borderRadius: '6px'
+                }}
+              />
+            </div>
+            {getNestedError(errors, "addresses[0].telephone") &&
+              getNestedTouched(touched, "addresses[0].telephone") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getNestedError(errors, "addresses[0].telephone")}
+                </div>
+              )}
           </div>
 
           {/* Region */}
@@ -471,21 +578,6 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="House Number"
-            />
-          </div>
-
-          {/* Telephone */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Telephone
-            </label>
-            <Input
-              value={values.addresses[0]?.telephone || ""}
-              onChange={(e) =>
-                setFieldValue("addresses[0].telephone", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Telephone"
             />
           </div>
 

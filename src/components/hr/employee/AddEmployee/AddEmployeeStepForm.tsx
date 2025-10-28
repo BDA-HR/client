@@ -230,6 +230,47 @@ const biographicalValidationSchema = Yup.object({
       .oneOf(["0", "1"], "Please select a valid option"),
     maritalStatusId: Yup.string().required("Marital status is required"),
   }),
+  // Add address validation for step 2
+  addresses: Yup.array().of(
+    Yup.object({
+      addressType: Yup.string()
+        .required("Address type is required")
+        .oneOf(["0", "1"], "Please select a valid address type"),
+      country: Yup.string()
+        .required("Country is required")
+        .min(2, "Country must be at least 2 characters"),
+      telephone: Yup.string()
+        .required("Telephone number is required")
+        .min(5, "Telephone number must be at least 5 characters"),
+      region: Yup.string().optional(),
+      subcity: Yup.string().optional(),
+      zone: Yup.string().optional(),
+      woreda: Yup.string().optional(),
+      kebele: Yup.string().optional(),
+      houseNo: Yup.string().optional(),
+      poBox: Yup.string().optional(),
+      fax: Yup.string().optional(),
+      email: Yup.string()
+        .optional()
+        .email("Please enter a valid email address"),
+      website: Yup.string().optional(),
+    })
+  ).min(1, "At least one address is required"),
+  // Add financial data validation
+  financialData: Yup.object({
+    tin: Yup.string()
+      .optional()
+      .matches(/^\d{10}$/, "TIN must be exactly 10 digits")
+      .nullable(),
+    bankAccountNo: Yup.string()
+      .optional()
+      .min(5, "Bank account number must be at least 5 characters")
+      .nullable(),
+    pensionNumber: Yup.string()
+      .optional()
+      .min(3, "Pension number must be at least 3 characters")
+      .nullable(),
+  }),
 });
 
 const emergencyContactValidationSchema = Yup.object({
@@ -241,6 +282,8 @@ const emergencyContactValidationSchema = Yup.object({
       lastNameAm: Yup.string().required("Last name in Amharic is required"),
       gender: Yup.string().required("Gender is required"),
       relationId: Yup.string().required("Relation is required"),
+      nationality: Yup.string().optional(),
+      addressId: Yup.string().optional(),
     })
   ).min(1, "At least one emergency contact is required"),
 });
@@ -254,6 +297,8 @@ const guarantorValidationSchema = Yup.object({
       lastNameAm: Yup.string().required("Last name in Amharic is required"),
       gender: Yup.string().required("Gender is required"),
       relationId: Yup.string().required("Relation is required"),
+      nationality: Yup.string().optional(),
+      addressId: Yup.string().optional(),
     })
   ),
 });
@@ -296,6 +341,7 @@ interface ExtendedEmployeeData extends EmployeeAddDto {
   guarantorFiles: File[];
   stampFiles: File[];
   signatureFiles: File[];
+  profilePicture: File | null;
 
   // Employment state
   isTerminated: "0" | "1";

@@ -114,6 +114,7 @@ interface ExtendedEmployeeData {
 
 const initialValues: ExtendedEmployeeData = {
   // Basic info
+    profilePicture: null,
   firstName: '',
   firstNameAm: '',
   middleName: '',

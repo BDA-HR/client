@@ -1,3 +1,4 @@
+// components/hr/employee/AddEmployee/steps/BasicInfoStep.tsx
 import React from "react";
 import { motion } from "framer-motion";
 import type { FormikProps } from "formik";
@@ -16,6 +17,7 @@ import type {
 } from "../../../../../types/hr/employee";
 import type { ExtendedEmployeeData } from "../AddEmployeeStepForm";
 import { amharicRegex } from "../../../../../utils/amharic-regex";
+import { ProfilePictureUpload } from "./ProfileUpload";
 
 interface BasicInfoStepProps {
   formikProps: FormikProps<ExtendedEmployeeData>;
@@ -68,6 +70,14 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     }
   };
 
+  const handleProfilePictureSelect = (file: File) => {
+    setFieldValue("profilePicture", file);
+  };
+
+  const handleProfilePictureRemove = () => {
+    setFieldValue("profilePicture", null);
+  };
+
   const filteredBranches = values.companyId
     ? mockBranches.filter((branch) => branch.companyId === values.companyId)
     : [];
@@ -86,6 +96,15 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
+      {/* Profile Picture Section */}
+      <div className="flex flex-col items-center mb-8">
+        <ProfilePictureUpload
+          profilePicture={values.profilePicture}
+          onProfilePictureSelect={handleProfilePictureSelect}
+          onProfilePictureRemove={handleProfilePictureRemove}
+        />
+      </div>
+
       {/* Personal Information Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="lg:col-span-2">
