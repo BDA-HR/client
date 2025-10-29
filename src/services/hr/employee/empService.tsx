@@ -1,4 +1,3 @@
-import type { UUID } from "crypto";
 import type { EmpAddRes, Step1Dto, Step2Dto, Step3Dto, Step4Dto } from "../../../types/hr/employee/empAddDto";
 import { api } from "../../api";
 
@@ -50,15 +49,6 @@ class EmpService {
         }
     }
 
-    // DELETE: baseurl/DelBranch/{id}
-    async deleteBranch(id: UUID): Promise<void> {
-        try {
-            await api.delete(`${this.baseUrl}/DelBranch/${id}`);
-        } catch (error) {
-            console.error("Error deleting Employee:", error);
-            throw error;
-        }
-    }
 }
 
 export const empService = new EmpService();
