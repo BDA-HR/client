@@ -1,4 +1,3 @@
-// components/hr/employee/AddEmployee/steps/BasicInfoStep.tsx
 import React from "react";
 import { motion } from "framer-motion";
 import type { FormikProps } from "formik";
@@ -10,59 +9,103 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../../ui/select";
-import type {
-  JobGradeDto,
-  DepartmentDto,
-  PositionDto,
-} from "../../../../../types/hr/employee";
-import type { ExtendedEmployeeData } from "../AddEmployeeStepForm";
+import type { Step1Dto } from "../../../../../types/hr/employee/empAddDto";
 import { amharicRegex } from "../../../../../utils/amharic-regex";
 import { ProfilePictureUpload } from "./ProfileUpload";
 
 interface BasicInfoStepProps {
-  formikProps: FormikProps<ExtendedEmployeeData>;
-  mockCompanies: any[];
-  mockBranches: any[];
-  mockJobGrades: JobGradeDto[];
-  mockDepartments: DepartmentDto[];
-  mockPositions: PositionDto[];
+  formikProps: FormikProps<Step1Dto>;
 }
 
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   formikProps,
-  mockCompanies,
-  mockBranches,
-  mockJobGrades,
-  mockDepartments,
-  mockPositions,
 }) => {
   const { errors, touched, values, handleChange, handleBlur, setFieldValue } = formikProps;
 
-  const inputClassName = (fieldName: string) =>
+  // Integrated Dummy Data
+  const mockCompanies = [
+    { id: "1", name: "Ethio Telecom" },
+    { id: "2", name: "Commercial Bank of Ethiopia" },
+    { id: "3", name: "Ethiopian Airlines" },
+  ];
+
+  const mockBranches = [
+    { id: "1", name: "Head Office", companyId: "1" },
+    { id: "2", name: "Addis Ababa Branch", companyId: "1" },
+    { id: "3", name: "Dire Dawa Branch", companyId: "1" },
+    { id: "4", name: "Main Branch", companyId: "2" },
+    { id: "5", name: "Bole Branch", companyId: "2" },
+    { id: "6", name: "HQ Office", companyId: "3" },
+    { id: "7", name: "Maintenance Base", companyId: "3" },
+  ];
+
+  const mockDepartments = [
+    { id: "1", name: "IT Department", branchId: "1" },
+    { id: "2", name: "HR Department", branchId: "1" },
+    { id: "3", name: "Finance Department", branchId: "1" },
+    { id: "4", name: "Sales Department", branchId: "2" },
+    { id: "5", name: "Customer Service", branchId: "2" },
+    { id: "6", name: "Operations", branchId: "4" },
+    { id: "7", name: "Flight Operations", branchId: "6" },
+    { id: "8", name: "Engineering", branchId: "7" },
+  ];
+
+  const mockPositions = [
+    { id: "1", name: "Software Developer", departmentId: "1" },
+    { id: "2", name: "System Administrator", departmentId: "1" },
+    { id: "3", name: "HR Manager", departmentId: "2" },
+    { id: "4", name: "Recruitment Specialist", departmentId: "2" },
+    { id: "5", name: "Accountant", departmentId: "3" },
+    { id: "6", name: "Sales Representative", departmentId: "4" },
+    { id: "7", name: "Customer Support Agent", departmentId: "5" },
+    { id: "8", name: "Operations Manager", departmentId: "6" },
+    { id: "9", name: "Pilot", departmentId: "7" },
+    { id: "10", name: "Flight Attendant", departmentId: "7" },
+    { id: "11", name: "Aircraft Engineer", departmentId: "8" },
+  ];
+
+  const mockJobGrades = [
+    { id: "1", name: "Grade 1 - Entry Level" },
+    { id: "2", name: "Grade 2 - Junior" },
+    { id: "3", name: "Grade 3 - Intermediate" },
+    { id: "4", name: "Grade 4 - Senior" },
+    { id: "5", name: "Grade 5 - Lead" },
+    { id: "6", name: "Grade 6 - Manager" },
+    { id: "7", name: "Grade 7 - Director" },
+  ];
+
+  // Filter branches based on selected company
+  const filteredBranches = mockBranches.filter(
+    (branch) => branch.companyId === values.companyId
+  );
+
+  // Filter departments based on selected branch
+  const filteredDepartments = mockDepartments.filter(
+    (dept) => dept.branchId === values.branchId
+  );
+
+  // Filter positions based on selected department
+  const filteredPositions = mockPositions.filter(
+    (position) => position.departmentId === values.departmentId
+  );
+
+  const inputClassName = (fieldName: keyof Step1Dto) =>
     `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-      getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName)
+      errors[fieldName] && touched[fieldName]
         ? "border-red-500"
         : "border-gray-300"
     }`;
 
-  const selectTriggerClassName = (fieldName: string) =>
+  const selectTriggerClassName = (fieldName: keyof Step1Dto) =>
     `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-      getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName)
+      errors[fieldName] && touched[fieldName]
         ? "border-red-500"
         : "border-gray-300"
     }`;
-
-  const getNestedError = (errorObj: any, path: string) => {
-    return path.split(".").reduce((obj, key) => obj && obj[key], errorObj);
-  };
-
-  const getNestedTouched = (touchedObj: any, path: string) => {
-    return path.split(".").reduce((obj, key) => obj && obj[key], touchedObj);
-  };
 
   const handleAmharicChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: string
+    fieldName: keyof Step1Dto
   ) => {
     const value = e.target.value;
     if (value === "" || amharicRegex.test(value)) {
@@ -71,22 +114,33 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   };
 
   const handleProfilePictureSelect = (file: File) => {
-    setFieldValue("profilePicture", file);
+    setFieldValue("File", file);
   };
 
   const handleProfilePictureRemove = () => {
-    setFieldValue("profilePicture", null);
+    setFieldValue("File", null);
   };
 
-  const filteredBranches = values.companyId
-    ? mockBranches.filter((branch) => branch.companyId === values.companyId)
-    : [];
-  const filteredDepartments = values.branchId
-    ? mockDepartments.filter((dept) => dept.branchId === values.branchId)
-    : [];
-  const filteredPositions = values.departmentId
-    ? mockPositions.filter((position) => position.departmentId === values.departmentId)
-    : [];
+  const handleCompanyChange = (companyId: string) => {
+    setFieldValue("companyId", companyId);
+    // Reset dependent fields when company changes
+    setFieldValue("branchId", "");
+    setFieldValue("departmentId", "");
+    setFieldValue("positionId", "");
+  };
+
+  const handleBranchChange = (branchId: string) => {
+    setFieldValue("branchId", branchId);
+    // Reset dependent fields when branch changes
+    setFieldValue("departmentId", "");
+    setFieldValue("positionId", "");
+  };
+
+  const handleDepartmentChange = (departmentId: string) => {
+    setFieldValue("departmentId", departmentId);
+    // Reset position when department changes
+    setFieldValue("positionId", "");
+  };
 
   return (
     <motion.div
@@ -99,7 +153,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       {/* Profile Picture Section */}
       <div className="flex flex-col items-center mb-8">
         <ProfilePictureUpload
-          profilePicture={values.profilePicture}
+          profilePicture={values.File}
           onProfilePictureSelect={handleProfilePictureSelect}
           onProfilePictureRemove={handleProfilePictureRemove}
         />
@@ -239,10 +293,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             Gender *
           </label>
           <Select
-            value={values.gender}
-            onValueChange={(value) => setFieldValue("gender", value)}
+            value={values.gender?.toString() || ""}
+            onValueChange={(value) => setFieldValue("gender", parseInt(value))}
           >
-            <SelectTrigger className={selectTriggerClassName("gender")}>
+            <SelectTrigger className={selectTriggerClassName("gender" as keyof Step1Dto)}>
               <SelectValue placeholder="Select Gender" />
             </SelectTrigger>
             <SelectContent>
@@ -284,6 +338,130 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Company */}
+          <div className="space-y-2">
+            <label htmlFor="companyId" className="block text-sm font-medium text-gray-700 mb-1">
+              Company *
+            </label>
+            <Select
+              value={values.companyId}
+              onValueChange={handleCompanyChange}
+            >
+              <SelectTrigger className={selectTriggerClassName("companyId" as keyof Step1Dto)}>
+                <SelectValue placeholder="Select Company" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockCompanies.map((company) => (
+                  <SelectItem key={company.id} value={company.id}>
+                    {company.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.companyId && touched.companyId && (
+              <div className="text-red-500 text-xs mt-1">{errors.companyId}</div>
+            )}
+          </div>
+
+          {/* Branch */}
+          <div className="space-y-2">
+            <label htmlFor="branchId" className="block text-sm font-medium text-gray-700 mb-1">
+              Branch *
+            </label>
+            <Select
+              value={values.branchId}
+              onValueChange={handleBranchChange}
+              disabled={!values.companyId}
+            >
+              <SelectTrigger className={selectTriggerClassName("branchId" as keyof Step1Dto)}>
+                <SelectValue placeholder={
+                  !values.companyId ? "Select Company First" : "Select Branch"
+                } />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredBranches.map((branch) => (
+                  <SelectItem key={branch.id} value={branch.id}>
+                    {branch.name}
+                  </SelectItem>
+                ))}
+                {filteredBranches.length === 0 && values.companyId && (
+                  <SelectItem value="no-branches" disabled>
+                    No branches available
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            {errors.branchId && touched.branchId && (
+              <div className="text-red-500 text-xs mt-1">{errors.branchId}</div>
+            )}
+          </div>
+
+          {/* Department */}
+          <div className="space-y-2">
+            <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700 mb-1">
+              Department *
+            </label>
+            <Select
+              value={values.departmentId}
+              onValueChange={handleDepartmentChange}
+              disabled={!values.branchId}
+            >
+              <SelectTrigger className={selectTriggerClassName("departmentId" as keyof Step1Dto)}>
+                <SelectValue placeholder={
+                  !values.branchId ? "Select Branch First" : "Select Department"
+                } />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredDepartments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </SelectItem>
+                ))}
+                {filteredDepartments.length === 0 && values.branchId && (
+                  <SelectItem value="no-departments" disabled>
+                    No departments available
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            {errors.departmentId && touched.departmentId && (
+              <div className="text-red-500 text-xs mt-1">{errors.departmentId}</div>
+            )}
+          </div>
+
+          {/* Position */}
+          <div className="space-y-2">
+            <label htmlFor="positionId" className="block text-sm font-medium text-gray-700 mb-1">
+              Position *
+            </label>
+            <Select
+              value={values.positionId}
+              onValueChange={(value) => setFieldValue("positionId", value)}
+              disabled={!values.departmentId}
+            >
+              <SelectTrigger className={selectTriggerClassName("positionId" as keyof Step1Dto)}>
+                <SelectValue placeholder={
+                  !values.departmentId ? "Select Department First" : "Select Position"
+                } />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredPositions.map((position) => (
+                  <SelectItem key={position.id} value={position.id}>
+                    {position.name}
+                  </SelectItem>
+                ))}
+                {filteredPositions.length === 0 && values.departmentId && (
+                  <SelectItem value="no-positions" disabled>
+                    No positions available
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            {errors.positionId && touched.positionId && (
+              <div className="text-red-500 text-xs mt-1">{errors.positionId}</div>
+            )}
+          </div>
+
           {/* Employment Date */}
           <div className="space-y-2">
             <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-1">
@@ -308,121 +486,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             )}
           </div>
 
-          {/* Company */}
-          <div className="space-y-2">
-            <label htmlFor="companyId" className="block text-sm font-medium text-gray-700 mb-1">
-              Company *
-            </label>
-            <Select
-              value={values.companyId}
-              onValueChange={(value) => {
-                setFieldValue("companyId", value);
-                setFieldValue("branchId", "");
-                setFieldValue("departmentId", "");
-                setFieldValue("positionId", "");
-              }}
-            >
-              <SelectTrigger className={selectTriggerClassName("companyId")}>
-                <SelectValue placeholder="Select Company" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockCompanies.map((company) => (
-                  <SelectItem key={company.id} value={company.id}>
-                    {company.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.companyId && touched.companyId && (
-              <div className="text-red-500 text-xs mt-1">{errors.companyId}</div>
-            )}
-          </div>
-
-          {/* Branch */}
-          <div className="space-y-2">
-            <label htmlFor="branchId" className="block text-sm font-medium text-gray-700 mb-1">
-              Branch *
-            </label>
-            <Select
-              value={values.branchId}
-              onValueChange={(value) => {
-                setFieldValue("branchId", value);
-                setFieldValue("departmentId", "");
-                setFieldValue("positionId", "");
-              }}
-              disabled={!values.companyId}
-            >
-              <SelectTrigger className={selectTriggerClassName("branchId")}>
-                <SelectValue placeholder="Select Branch" />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredBranches.map((branch) => (
-                  <SelectItem key={branch.id} value={branch.id}>
-                    {branch.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.branchId && touched.branchId && (
-              <div className="text-red-500 text-xs mt-1">{errors.branchId}</div>
-            )}
-          </div>
-
-          {/* Department */}
-          <div className="space-y-2">
-            <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700 mb-1">
-              Department *
-            </label>
-            <Select
-              value={values.departmentId}
-              onValueChange={(value) => {
-                setFieldValue("departmentId", value);
-                setFieldValue("positionId", "");
-              }}
-              disabled={!values.branchId}
-            >
-              <SelectTrigger className={selectTriggerClassName("departmentId")}>
-                <SelectValue placeholder="Select Department" />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredDepartments.map((dept) => (
-                  <SelectItem key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.departmentId && touched.departmentId && (
-              <div className="text-red-500 text-xs mt-1">{errors.departmentId}</div>
-            )}
-          </div>
-
-          {/* Position */}
-          <div className="space-y-2">
-            <label htmlFor="positionId" className="block text-sm font-medium text-gray-700 mb-1">
-              Position *
-            </label>
-            <Select
-              value={values.positionId}
-              onValueChange={(value) => setFieldValue("positionId", value)}
-              disabled={!values.departmentId}
-            >
-              <SelectTrigger className={selectTriggerClassName("positionId")}>
-                <SelectValue placeholder="Select Position" />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredPositions.map((position) => (
-                  <SelectItem key={position.id} value={position.id}>
-                    {position.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.positionId && touched.positionId && (
-              <div className="text-red-500 text-xs mt-1">{errors.positionId}</div>
-            )}
-          </div>
-
           {/* Job Grade */}
           <div className="space-y-2">
             <label htmlFor="jobGradeId" className="block text-sm font-medium text-gray-700 mb-1">
@@ -432,7 +495,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={values.jobGradeId}
               onValueChange={(value) => setFieldValue("jobGradeId", value)}
             >
-              <SelectTrigger className={selectTriggerClassName("jobGradeId")}>
+              <SelectTrigger className={selectTriggerClassName("jobGradeId" as keyof Step1Dto)}>
                 <SelectValue placeholder="Select Job Grade" />
               </SelectTrigger>
               <SelectContent>
@@ -454,10 +517,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               Employment Type *
             </label>
             <Select
-              value={values.employmentType}
-              onValueChange={(value) => setFieldValue("employmentType", value)}
+              value={values.employmentType?.toString() || ""}
+              onValueChange={(value) => setFieldValue("employmentType", parseInt(value))}
             >
-              <SelectTrigger className={selectTriggerClassName("employmentType")}>
+              <SelectTrigger className={selectTriggerClassName("employmentType" as keyof Step1Dto)}>
                 <SelectValue placeholder="Select Employment Type" />
               </SelectTrigger>
               <SelectContent>
@@ -478,10 +541,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               Employment Nature *
             </label>
             <Select
-              value={values.employmentNature}
-              onValueChange={(value) => setFieldValue("employmentNature", value)}
+              value={values.employmentNature?.toString() || ""}
+              onValueChange={(value) => setFieldValue("employmentNature", parseInt(value))}
             >
-              <SelectTrigger className={selectTriggerClassName("employmentNature")}>
+              <SelectTrigger className={selectTriggerClassName("employmentNature" as keyof Step1Dto)}>
                 <SelectValue placeholder="Select Employment Nature" />
               </SelectTrigger>
               <SelectContent>

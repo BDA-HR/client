@@ -1,4 +1,3 @@
-// components/hr/employee/AddEmployee/ProfilePictureUpload.tsx - SIMPLE VERSION
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Camera } from "lucide-react";
