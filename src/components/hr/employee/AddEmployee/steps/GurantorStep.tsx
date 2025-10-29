@@ -15,6 +15,7 @@ import { amharicRegex } from "../../../../../utils/amharic-regex";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import type { AddressType } from "../../../../../types/hr/enum";
+import { GuarantorProfileUpload } from "./GuarantorProfileUpload";
 
 interface GuarantorStepProps {
   formikProps: FormikProps<ExtendedEmployeeData>;
@@ -72,6 +73,14 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     }
   };
 
+  const handleGuarantorFileSelect = (file: File) => {
+    setFieldValue("guarantorFiles[0]", file);
+  };
+
+  const handleGuarantorFileRemove = () => {
+    setFieldValue("guarantorFiles[0]", null);
+  };
+
   // Initialize guarantor address if empty
   React.useEffect(() => {
     if (!values.guarantors[0]?.address) {
@@ -92,6 +101,25 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       });
     }
   }, [values.guarantors, setFieldValue]);
+
+  // Get guarantor full name for the upload component
+  const getGuarantorFullName = () => {
+    const guarantor = values.guarantors[0];
+    if (!guarantor) return "Guarantor";
+    
+    const firstName = guarantor.firstName || "";
+    const lastName = guarantor.lastName || "";
+    return `${firstName} ${lastName}`.trim() || "Guarantor";
+  };
+
+  const getGuarantorFullNameAm = () => {
+    const guarantor = values.guarantors[0];
+    if (!guarantor) return "ዋሚ";
+    
+    const firstNameAm = guarantor.firstNameAm || "";
+    const lastNameAm = guarantor.lastNameAm || "";
+    return `${firstNameAm} ${lastNameAm}`.trim() || "ዋሚ";
+  };
 
   return (
     <motion.div
@@ -249,7 +277,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       {/* Guarantor Address Section */}
       <div className="mt-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
+          <div className="w-2 h-8 bg-gradient-to-b from-green-400 to-green-600 rounded-full"></div>
           <h3 className="text-xl font-semibold text-gray-800">
             Guarantor Address Information
           </h3>
@@ -515,6 +543,35 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
             />
           </div>
         </div>
+      </div>
+
+      {/* Guarantor File Upload Section */}
+      <div className="mt-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-2 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full"></div>
+          <h3 className="text-xl font-semibold text-gray-800">
+            Guarantor Document Upload
+          </h3>
+        </div>
+
+        <div className="flex justify-center">
+          <GuarantorProfileUpload
+            guarantorFile={values.guarantorFiles[0] || null}
+            onGuarantorFileSelect={handleGuarantorFileSelect}
+            onGuarantorFileRemove={handleGuarantorFileRemove}
+            guarantorName={getGuarantorFullName()}
+            guarantorNameAm={getGuarantorFullNameAm()}
+          />
+        </div>
+
+        {/* File upload validation error */}
+        {getNestedError(errors, "guarantorFiles[0]") && (
+          <div className="text-red-500 text-xs mt-2 text-center">
+            {getNestedError(errors, "guarantorFiles[0]")}
+          </div>
+        )}
+
+
       </div>
     </motion.div>
   );
