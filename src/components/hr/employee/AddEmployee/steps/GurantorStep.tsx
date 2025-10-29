@@ -134,7 +134,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-8 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full"></div>
           <h3 className="text-xl font-semibold text-gray-800">
-            Guarantor
+            Guarantors
           </h3>
         </div>
 
