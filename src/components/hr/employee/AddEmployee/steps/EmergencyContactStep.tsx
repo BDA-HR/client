@@ -16,8 +16,8 @@ import type { UUID } from "crypto";
 import type { ExtendedEmployeeData } from "../AddEmployeeStepForm";
 import { amharicRegex } from "../../../../../utils/amharic-regex";
 import type { AddressType } from "../../../../../types/hr/enum";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 interface EmergencyContactStepProps {
   formikProps: FormikProps<ExtendedEmployeeData>;
@@ -66,7 +66,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
     setFieldValue(fieldName, value);
     // Clear error when user starts typing
     if (getNestedError(errors, fieldName)) {
-      const errorPath = fieldName.replace(/\[(\d+)\]/g, ".$1");
+      const errorPath = fieldName.replace(/\[(\d+)\]/g, '.$1');
       const newErrors = { ...errors };
       delete newErrors[errorPath];
       formikProps.setErrors(newErrors);
@@ -116,7 +116,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
       className="space-y-8"
     >
       {/* Emergency Contacts Section */}
-      <div>
+      <div className="mt-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-2 h-8 bg-gradient-to-b from-orange-400 to-orange-600 rounded-full"></div>
@@ -124,11 +124,16 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
               Emergency Contact
             </h3>
           </div>
+          {/* Removed the Add Contact button */}
         </div>
 
         {/* Always show exactly one emergency contact form */}
         {values.emergencyContacts.map((contact, index) => (
-          <div key={index}>
+          <div
+            key={index}
+            className="bg-white rounded-lg mb-6 relative"
+          >
+
             {/* Personal Information */}
             <div className="mb-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -145,9 +150,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       )
                     }
                     onBlur={handleBlur}
-                    className={inputClassName(
-                      `emergencyContacts[${index}].firstName`
-                    )}
+                    className={inputClassName(`emergencyContacts[${index}].firstName`)}
                     placeholder="First name"
                   />
                 </div>
@@ -164,9 +167,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       )
                     }
                     onBlur={handleBlur}
-                    className={inputClassName(
-                      `emergencyContacts[${index}].firstNameAm`
-                    )}
+                    className={inputClassName(`emergencyContacts[${index}].firstNameAm`)}
                     placeholder="አየለ"
                   />
                 </div>
@@ -183,9 +184,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       )
                     }
                     onBlur={handleBlur}
-                    className={inputClassName(
-                      `emergencyContacts[${index}].middleName`
-                    )}
+                    className={inputClassName(`emergencyContacts[${index}].middleName`)}
                     placeholder="Middle name"
                   />
                 </div>
@@ -202,9 +201,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       )
                     }
                     onBlur={handleBlur}
-                    className={inputClassName(
-                      `emergencyContacts[${index}].middleNameAm`
-                    )}
+                    className={inputClassName(`emergencyContacts[${index}].middleNameAm`)}
                     placeholder="በቀለ"
                   />
                 </div>
@@ -221,9 +218,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       )
                     }
                     onBlur={handleBlur}
-                    className={inputClassName(
-                      `emergencyContacts[${index}].lastName`
-                    )}
+                    className={inputClassName(`emergencyContacts[${index}].lastName`)}
                     placeholder="Last name"
                   />
                 </div>
@@ -240,9 +235,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       )
                     }
                     onBlur={handleBlur}
-                    className={inputClassName(
-                      `emergencyContacts[${index}].lastNameAm`
-                    )}
+                    className={inputClassName(`emergencyContacts[${index}].lastNameAm`)}
                     placeholder="ዮሐንስ"
                   />
                 </div>
@@ -256,11 +249,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       setFieldValue(`emergencyContacts[${index}].gender`, value)
                     }
                   >
-                    <SelectTrigger
-                      className={selectTriggerClassName(
-                        `emergencyContacts[${index}].gender`
-                      )}
-                    >
+                    <SelectTrigger className={selectTriggerClassName(`emergencyContacts[${index}].gender`)}>
                       <SelectValue placeholder="Select Gender" />
                     </SelectTrigger>
                     <SelectContent>
@@ -282,9 +271,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       )
                     }
                     onBlur={handleBlur}
-                    className={inputClassName(
-                      `emergencyContacts[${index}].nationality`
-                    )}
+                    className={inputClassName(`emergencyContacts[${index}].nationality`)}
                     placeholder="Ethiopian"
                   />
                 </div>
@@ -295,17 +282,10 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Select
                     value={contact.relationId}
                     onValueChange={(value) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].relationId`,
-                        value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].relationId`, value)
                     }
                   >
-                    <SelectTrigger
-                      className={selectTriggerClassName(
-                        `emergencyContacts[${index}].relationId`
-                      )}
-                    >
+                    <SelectTrigger className={selectTriggerClassName(`emergencyContacts[${index}].relationId`)}>
                       <SelectValue placeholder="Select Relation" />
                     </SelectTrigger>
                     <SelectContent>
@@ -339,26 +319,15 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Select
                     value={contact.address?.addressType || ""}
                     onValueChange={(value) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.addressType`,
-                        value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.addressType`, value)
                     }
                   >
-                    <SelectTrigger
-                      className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                        getNestedError(
-                          errors,
-                          `emergencyContacts[${index}].address.addressType`
-                        ) &&
-                        getNestedTouched(
-                          touched,
-                          `emergencyContacts[${index}].address.addressType`
-                        )
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      }`}
-                    >
+                    <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
+                      getNestedError(errors, `emergencyContacts[${index}].address.addressType`) && 
+                      getNestedTouched(touched, `emergencyContacts[${index}].address.addressType`) 
+                        ? "border-red-500" 
+                        : "border-gray-300"
+                    }`}>
                       <SelectValue placeholder="Select Address Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -366,19 +335,10 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                       <SelectItem value="1">Work Place</SelectItem>
                     </SelectContent>
                   </Select>
-                  {getNestedError(
-                    errors,
-                    `emergencyContacts[${index}].address.addressType`
-                  ) &&
-                    getNestedTouched(
-                      touched,
-                      `emergencyContacts[${index}].address.addressType`
-                    ) && (
+                  {getNestedError(errors, `emergencyContacts[${index}].address.addressType`) &&
+                    getNestedTouched(touched, `emergencyContacts[${index}].address.addressType`) && (
                       <div className="text-red-500 text-xs mt-1">
-                        {getNestedError(
-                          errors,
-                          `emergencyContacts[${index}].address.addressType`
-                        )}
+                        {getNestedError(errors, `emergencyContacts[${index}].address.addressType`)}
                       </div>
                     )}
                 </div>
@@ -391,39 +351,21 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.country || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.country`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.country`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                      getNestedError(
-                        errors,
-                        `emergencyContacts[${index}].address.country`
-                      ) &&
-                      getNestedTouched(
-                        touched,
-                        `emergencyContacts[${index}].address.country`
-                      )
-                        ? "border-red-500"
+                      getNestedError(errors, `emergencyContacts[${index}].address.country`) && 
+                      getNestedTouched(touched, `emergencyContacts[${index}].address.country`) 
+                        ? "border-red-500" 
                         : "border-gray-300"
                     }`}
                     placeholder="Country"
                   />
-                  {getNestedError(
-                    errors,
-                    `emergencyContacts[${index}].address.country`
-                  ) &&
-                    getNestedTouched(
-                      touched,
-                      `emergencyContacts[${index}].address.country`
-                    ) && (
+                  {getNestedError(errors, `emergencyContacts[${index}].address.country`) &&
+                    getNestedTouched(touched, `emergencyContacts[${index}].address.country`) && (
                       <div className="text-red-500 text-xs mt-1">
-                        {getNestedError(
-                          errors,
-                          `emergencyContacts[${index}].address.country`
-                        )}
+                        {getNestedError(errors, `emergencyContacts[${index}].address.country`)}
                       </div>
                     )}
                 </div>
@@ -433,69 +375,47 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Telephone <span className="text-red-500">*</span>
                   </label>
-                  <div
-                    className={`w-full ${
-                      getNestedError(
-                        errors,
-                        `emergencyContacts[${index}].address.telephone`
-                      ) &&
-                      getNestedTouched(
-                        touched,
-                        `emergencyContacts[${index}].address.telephone`
-                      )
-                        ? "border border-red-500 rounded-md"
-                        : ""
-                    }`}
-                  >
+                  <div className={`w-full ${
+                    getNestedError(errors, `emergencyContacts[${index}].address.telephone`) && 
+                    getNestedTouched(touched, `emergencyContacts[${index}].address.telephone`) 
+                      ? 'border border-red-500 rounded-md' 
+                      : ''
+                  }`}>
                     <PhoneInput
-                      country={"et"} // Default to Ethiopia
+                      country={'et'} // Default to Ethiopia
                       value={contact.address?.telephone || ""}
-                      onChange={(value) =>
-                        handlePhoneChange(
-                          value,
-                          `emergencyContacts[${index}].address.telephone`
-                        )
-                      }
+                      onChange={(value) => handlePhoneChange(value, `emergencyContacts[${index}].address.telephone`)}
                       inputProps={{
                         name: `emergencyContacts[${index}].address.telephone`,
                         required: true,
-                        onBlur: handleBlur,
+                        onBlur: handleBlur
                       }}
                       inputStyle={{
-                        width: "100%",
-                        height: "42px",
-                        paddingLeft: "48px",
-                        outline: "none",
-                        fontSize: "14px",
-                        borderRadius: "6px",
+                        width: '100%',
+                        height: '42px',
+                        paddingLeft: '48px',
+                        outline: 'none',
+                        fontSize: '14px',
+                        borderRadius: '6px'
                       }}
                       buttonStyle={{
-                        border: "none",
-                        borderRight: "1px solid #ccc",
-                        borderRadius: "6px 0 0 6px",
-                        backgroundColor: "#f8f9fa",
+                        border: 'none',
+                        borderRight: '1px solid #ccc',
+                        borderRadius: '6px 0 0 6px',
+                        backgroundColor: '#f8f9fa'
                       }}
                       containerStyle={{
-                        width: "100%",
+                        width: '100%'
                       }}
                       dropdownStyle={{
-                        borderRadius: "6px",
+                        borderRadius: '6px'
                       }}
                     />
                   </div>
-                  {getNestedError(
-                    errors,
-                    `emergencyContacts[${index}].address.telephone`
-                  ) &&
-                    getNestedTouched(
-                      touched,
-                      `emergencyContacts[${index}].address.telephone`
-                    ) && (
+                  {getNestedError(errors, `emergencyContacts[${index}].address.telephone`) &&
+                    getNestedTouched(touched, `emergencyContacts[${index}].address.telephone`) && (
                       <div className="text-red-500 text-xs mt-1">
-                        {getNestedError(
-                          errors,
-                          `emergencyContacts[${index}].address.telephone`
-                        )}
+                        {getNestedError(errors, `emergencyContacts[${index}].address.telephone`)}
                       </div>
                     )}
                 </div>
@@ -508,10 +428,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.region || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.region`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.region`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -527,10 +444,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.subcity || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.subcity`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.subcity`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -546,10 +460,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.zone || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.zone`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.zone`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -565,10 +476,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.woreda || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.woreda`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.woreda`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -584,10 +492,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.kebele || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.kebele`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.kebele`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -603,10 +508,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.houseNo || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.houseNo`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.houseNo`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -622,10 +524,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.poBox || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.poBox`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.poBox`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -641,10 +540,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.fax || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.fax`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.fax`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -660,10 +556,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.email || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.email`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.email`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
@@ -680,10 +573,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   <Input
                     value={contact.address?.website || ""}
                     onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].address.website`,
-                        e.target.value
-                      )
+                      setFieldValue(`emergencyContacts[${index}].address.website`, e.target.value)
                     }
                     onBlur={handleBlur}
                     className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"

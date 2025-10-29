@@ -4,7 +4,9 @@ import type { FormikProps } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
 import * as Yup from "yup";
 import { Button } from "../../../../components/ui/button";
-import { ChevronRight } from "lucide-react";
+import {
+  ChevronRight,
+} from "lucide-react";
 import type {
   EmployeeAddDto,
   JobGradeDto,
@@ -26,7 +28,7 @@ import { amharicRegex } from "../../../../utils/amharic-regex";
 import { BasicInfoStep } from "./steps/BasicInfoStep";
 import { BiographicalStep } from "./steps/BiograohicalStep";
 import { EmergencyContactStep } from "./steps/EmergencyContactStep";
-// import { GuarantorStep } from "./steps/GurantorStep";
+import { GuarantorStep } from "./steps/GurantorStep";
 import { ReviewStep } from "./steps/ReviewStep";
 
 // Mock data
@@ -229,9 +231,81 @@ const biographicalValidationSchema = Yup.object({
     maritalStatusId: Yup.string().required("Marital status is required"),
   }),
   // Add address validation for step 2
-  addresses: Yup.array()
-    .of(
-      Yup.object({
+  addresses: Yup.array().of(
+    Yup.object({
+      addressType: Yup.string()
+        .required("Address type is required")
+        .oneOf(["0", "1"], "Please select a valid address type"),
+      country: Yup.string()
+        .required("Country is required")
+        .min(2, "Country must be at least 2 characters"),
+      telephone: Yup.string()
+        .required("Telephone number is required")
+        .min(5, "Telephone number must be at least 5 characters"),
+      region: Yup.string().optional(),
+      subcity: Yup.string().optional(),
+      zone: Yup.string().optional(),
+      woreda: Yup.string().optional(),
+      kebele: Yup.string().optional(),
+      houseNo: Yup.string().optional(),
+      poBox: Yup.string().optional(),
+      fax: Yup.string().optional(),
+      email: Yup.string()
+        .optional()
+        .email("Please enter a valid email address"),
+      website: Yup.string().optional(),
+    })
+  ).min(1, "At least one address is required"),
+  // Add financial data validation
+  financialData: Yup.object({
+    tin: Yup.string()
+      .optional()
+      .matches(/^\d{10}$/, "TIN must be exactly 10 digits")
+      .nullable(),
+    bankAccountNo: Yup.string()
+      .optional()
+      .min(5, "Bank account number must be at least 5 characters")
+      .nullable(),
+    pensionNumber: Yup.string()
+      .optional()
+      .min(3, "Pension number must be at least 3 characters")
+      .nullable(),
+  }),
+});
+
+const emergencyContactValidationSchema = Yup.object({
+  emergencyContacts: Yup.array().of(
+    Yup.object({
+      firstName: Yup.string()
+        .required("First name is required")
+        .min(2, "First name must be at least 2 characters"),
+      firstNameAm: Yup.string()
+        .required("First name in Amharic is required")
+        .min(2, "First name must be at least 2 characters")
+        .matches(amharicRegex, "First name must be in Amharic characters"),
+      middleName: Yup.string().optional(),
+      middleNameAm: Yup.string()
+        .optional()
+        .test(
+          "amharic-or-empty",
+          "Middle name must be in Amharic characters",
+          (value) => !value || amharicRegex.test(value)
+        ),
+      lastName: Yup.string()
+        .required("Last name is required")
+        .min(2, "Last name must be at least 2 characters"),
+      lastNameAm: Yup.string()
+        .required("Last name in Amharic is required")
+        .min(2, "Last name must be at least 2 characters")
+        .matches(amharicRegex, "Last name must be in Amharic characters"),
+      gender: Yup.string()
+        .required("Gender is required")
+        .oneOf(["0", "1"], "Please select a valid gender"),
+      relationId: Yup.string().required("Relation is required"),
+      nationality: Yup.string()
+        .optional()
+        .min(2, "Nationality must be at least 2 characters"),
+      address: Yup.object({
         addressType: Yup.string()
           .required("Address type is required")
           .oneOf(["0", "1"], "Please select a valid address type"),
@@ -253,56 +327,68 @@ const biographicalValidationSchema = Yup.object({
           .optional()
           .email("Please enter a valid email address"),
         website: Yup.string().optional(),
-      })
-    )
-    .min(1, "At least one address is required"),
-  // Add financial data validation
-  financialData: Yup.object({
-    tin: Yup.string()
-      .optional()
-      .matches(/^\d{10}$/, "TIN must be exactly 10 digits")
-      .nullable(),
-    bankAccountNo: Yup.string()
-      .optional()
-      .min(5, "Bank account number must be at least 5 characters")
-      .nullable(),
-    pensionNumber: Yup.string()
-      .optional()
-      .min(3, "Pension number must be at least 3 characters")
-      .nullable(),
-  }),
-});
-
-const emergencyContactValidationSchema = Yup.object({
-  emergencyContacts: Yup.array()
-    .of(
-      Yup.object({
-        firstName: Yup.string().required("First name is required"),
-        firstNameAm: Yup.string().required("First name in Amharic is required"),
-        lastName: Yup.string().required("Last name is required"),
-        lastNameAm: Yup.string().required("Last name in Amharic is required"),
-        gender: Yup.string().required("Gender is required"),
-        relationId: Yup.string().required("Relation is required"),
-        nationality: Yup.string().optional(),
-        addressId: Yup.string().optional(),
-      })
-    )
-    .min(1, "At least one emergency contact is required"),
+      }).required("Address information is required"),
+    })
+  ).min(1, "At least one emergency contact is required"),
 });
 
 const guarantorValidationSchema = Yup.object({
   guarantors: Yup.array().of(
     Yup.object({
-      firstName: Yup.string().required("First name is required"),
-      firstNameAm: Yup.string().required("First name in Amharic is required"),
-      lastName: Yup.string().required("Last name is required"),
-      lastNameAm: Yup.string().required("Last name in Amharic is required"),
-      gender: Yup.string().required("Gender is required"),
+      firstName: Yup.string()
+        .required("First name is required")
+        .min(2, "First name must be at least 2 characters"),
+      firstNameAm: Yup.string()
+        .required("First name in Amharic is required")
+        .min(2, "First name must be at least 2 characters")
+        .matches(amharicRegex, "First name must be in Amharic characters"),
+      middleName: Yup.string().optional(),
+      middleNameAm: Yup.string()
+        .optional()
+        .test(
+          "amharic-or-empty",
+          "Middle name must be in Amharic characters",
+          (value) => !value || amharicRegex.test(value)
+        ),
+      lastName: Yup.string()
+        .required("Last name is required")
+        .min(2, "Last name must be at least 2 characters"),
+      lastNameAm: Yup.string()
+        .required("Last name in Amharic is required")
+        .min(2, "Last name must be at least 2 characters")
+        .matches(amharicRegex, "Last name must be in Amharic characters"),
+      gender: Yup.string()
+        .required("Gender is required")
+        .oneOf(["0", "1"], "Please select a valid gender"),
       relationId: Yup.string().required("Relation is required"),
-      nationality: Yup.string().optional(),
-      addressId: Yup.string().optional(),
+      nationality: Yup.string()
+        .optional()
+        .min(2, "Nationality must be at least 2 characters"),
+      address: Yup.object({
+        addressType: Yup.string()
+          .required("Address type is required")
+          .oneOf(["0", "1"], "Please select a valid address type"),
+        country: Yup.string()
+          .required("Country is required")
+          .min(2, "Country must be at least 2 characters"),
+        telephone: Yup.string()
+          .required("Telephone number is required")
+          .min(5, "Telephone number must be at least 5 characters"),
+        region: Yup.string().optional(),
+        subcity: Yup.string().optional(),
+        zone: Yup.string().optional(),
+        woreda: Yup.string().optional(),
+        kebele: Yup.string().optional(),
+        houseNo: Yup.string().optional(),
+        poBox: Yup.string().optional(),
+        fax: Yup.string().optional(),
+        email: Yup.string()
+          .optional()
+          .email("Please enter a valid email address"),
+        website: Yup.string().optional(),
+      }).required("Address information is required"),
     })
-  ),
+  ).min(1, "At least one guarantor is required"),
 });
 
 // Extended interface that properly uses the DTOs
@@ -318,10 +404,42 @@ interface ExtendedEmployeeData extends EmployeeAddDto {
   financialData: Omit<EmpFinanceAddDto, "employeeId">;
 
   // Arrays from other DTOs
-  emergencyContacts: Omit<EmContactAddDto, "employeeId">[];
+  emergencyContacts: Array<Omit<EmContactAddDto, "employeeId"> & {
+    address?: {
+      addressType: AddressType;
+      country: string;
+      region: string;
+      subcity: string;
+      zone: string;
+      woreda: string;
+      kebele: string;
+      houseNo: string;
+      telephone: string;
+      poBox: string;
+      fax: string;
+      email: string;
+      website: string;
+    };
+  }>;
   familyMembers: Omit<EmpFamilyAddDto, "employeeId">[];
-  guarantors: Omit<EmpGuarantorAddDto, "employeeId">[];
-
+  guarantors: Array<Omit<EmpGuarantorAddDto, "employeeId"> & {
+    address?: {
+      addressType: AddressType;
+      country: string;
+      region: string;
+      subcity: string;
+      zone: string;
+      woreda: string;
+      kebele: string;
+      houseNo: string;
+      telephone: string;
+      poBox: string;
+      fax: string;
+      email: string;
+      website: string;
+    };
+  }>;
+  
   // Addresses array
   addresses: Array<{
     addressType: AddressType;
