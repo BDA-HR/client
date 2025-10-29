@@ -1,590 +1,442 @@
-import React from "react";
-import { motion } from "framer-motion";
-import type { FormikProps } from "formik";
-import { Input } from "../../../../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../../ui/select";
-import { Button } from "../../../../../components/ui/button";
-import { Plus, Trash2, Users, MapPin } from "lucide-react";
-import type { RelationDto } from "../../../../../types/hr/employee";
-import type { UUID } from "crypto";
-import type { ExtendedEmployeeData } from "../AddEmployeeStepForm";
-import { amharicRegex } from "../../../../../utils/amharic-regex";
-import type { AddressType } from "../../../../../types/hr/enum";
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
+import React from 'react';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { motion } from 'framer-motion';
+import { Input } from '../../../../../components/ui/input';
+import { Label } from '../../../../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/select';
+import { Gender, AddressType } from '../../../../../types/hr/enum';
 
 interface EmergencyContactStepProps {
-  formikProps: FormikProps<ExtendedEmployeeData>;
-  mockRelations: RelationDto[];
+  data: any;
+  onNext: (data: any) => void;
+  onBack: () => void;
 }
 
-export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
-  formikProps,
-  mockRelations,
-}) => {
-  const { values, errors, touched, handleBlur, setFieldValue } = formikProps;
+const validationSchema = yup.object({
+  firstName: yup.string().required('First name is required'),
+  firstNameAm: yup.string().required('First name (Amharic) is required'),
+  middleName: yup.string().required('Middle name is required'),
+  middleNameAm: yup.string().required('Middle name (Amharic) is required'),
+  lastName: yup.string().required('Last name is required'),
+  lastNameAm: yup.string().required('Last name (Amharic) is required'),
+  nationality: yup.string().required('Nationality is required'),
+  gender: yup.string().required('Gender is required'),
+  relationId: yup.string().required('Relation is required'),
+  addressType: yup.string().required('Address type is required'),
+  country: yup.string().required('Country is required'),
+  region: yup.string().required('Region is required'),
+  telephone: yup.string().required('Telephone is required'),
+});
 
-  const inputClassName = (fieldName: string) =>
-    `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-      getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName)
-        ? "border-red-500"
-        : "border-gray-300"
-    }`;
+export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({ data, onNext, onBack }) => {
+  const formik = useFormik({
+    initialValues: {
+      firstName: data.firstName || '',
+      firstNameAm: data.firstNameAm || '',
+      middleName: data.middleName || '',
+      middleNameAm: data.middleNameAm || '',
+      lastName: data.lastName || '',
+      lastNameAm: data.lastNameAm || '',
+      nationality: data.nationality || '',
+      gender: data.gender || '',
+      relationId: data.relationId || '',
+      employeeId: data.employeeId || '',
+      addressType: data.addressType || '',
+      addressTypeStr: data.addressTypeStr || '',
+      country: data.country || '',
+      region: data.region || '',
+      subcity: data.subcity || '',
+      zone: data.zone || '',
+      woreda: data.woreda || '',
+      kebele: data.kebele || '',
+      houseNo: data.houseNo || '',
+      telephone: data.telephone || '',
+      poBox: data.poBox || '',
+      fax: data.fax || '',
+      email: data.email || '',
+      website: data.website || '',
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      onNext(values);
+    },
+  });
 
-  const selectTriggerClassName = (fieldName: string) =>
-    `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-      getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName)
-        ? "border-red-500"
-        : "border-gray-300"
-    }`;
+  const isFormValid = formik.isValid && formik.dirty;
 
-  const getNestedError = (errorObj: any, path: string) => {
-    return path.split(".").reduce((obj, key) => obj && obj[key], errorObj);
-  };
-
-  const getNestedTouched = (touchedObj: any, path: string) => {
-    return path.split(".").reduce((obj, key) => obj && obj[key], touchedObj);
-  };
-
-  const handleAmharicChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: string
-  ) => {
-    const value = e.target.value;
-    if (value === "" || amharicRegex.test(value)) {
-      setFieldValue(fieldName, value);
+  // Helper function to safely get error messages
+  const getErrorMessage = (fieldName: string): string => {
+    const error = formik.errors[fieldName as keyof typeof formik.errors];
+    const touched = formik.touched[fieldName as keyof typeof formik.touched];
+    
+    if (touched && error) {
+      return typeof error === 'string' ? error : 'Invalid value';
     }
+    return '';
   };
-
-  const handlePhoneChange = (value: string, fieldName: string) => {
-    setFieldValue(fieldName, value);
-    // Clear error when user starts typing
-    if (getNestedError(errors, fieldName)) {
-      const errorPath = fieldName.replace(/\[(\d+)\]/g, '.$1');
-      const newErrors = { ...errors };
-      delete newErrors[errorPath];
-      formikProps.setErrors(newErrors);
-    }
-  };
-
-  // Ensure there's always exactly one emergency contact
-  React.useEffect(() => {
-    if (values.emergencyContacts.length === 0) {
-      const defaultContact = {
-        firstName: "",
-        firstNameAm: "",
-        middleName: "",
-        middleNameAm: "",
-        lastName: "",
-        lastNameAm: "",
-        gender: "" as "0" | "1",
-        nationality: "Ethiopian",
-        relationId: "" as UUID,
-        addressId: "" as UUID,
-        address: {
-          addressType: "0" as AddressType,
-          country: "Ethiopia",
-          region: "",
-          subcity: "",
-          zone: "",
-          woreda: "",
-          kebele: "",
-          houseNo: "",
-          telephone: "",
-          poBox: "",
-          fax: "",
-          email: "",
-          website: "",
-        },
-      };
-      setFieldValue("emergencyContacts", [defaultContact]);
-    }
-  }, [values.emergencyContacts.length, setFieldValue]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-8"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="space-y-6"
     >
-      {/* Emergency Contacts Section */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-8 bg-gradient-to-b from-orange-400 to-orange-600 rounded-full"></div>
-            <h3 className="text-xl font-semibold text-gray-800">
-              Emergency Contact
-            </h3>
+      <form onSubmit={formik.handleSubmit} className="space-y-8">
+        {/* Contact Person Information */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Emergency Contact Person Information</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* English Names */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-700">English Names</h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name *</Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  value={formik.values.firstName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('firstName') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('firstName') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('firstName')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="middleName">Middle Name *</Label>
+                <Input
+                  id="middleName"
+                  name="middleName"
+                  value={formik.values.middleName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('middleName') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('middleName') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('middleName')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name *</Label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  value={formik.values.lastName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('lastName') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('lastName') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('lastName')}</div>
+                )}
+              </div>
+            </div>
+
+            {/* Amharic Names */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-700">Amharic Names</h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="firstNameAm">First Name (Amharic) *</Label>
+                <Input
+                  id="firstNameAm"
+                  name="firstNameAm"
+                  value={formik.values.firstNameAm}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('firstNameAm') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('firstNameAm') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('firstNameAm')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="middleNameAm">Middle Name (Amharic) *</Label>
+                <Input
+                  id="middleNameAm"
+                  name="middleNameAm"
+                  value={formik.values.middleNameAm}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('middleNameAm') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('middleNameAm') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('middleNameAm')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastNameAm">Last Name (Amharic) *</Label>
+                <Input
+                  id="lastNameAm"
+                  name="lastNameAm"
+                  value={formik.values.lastNameAm}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('lastNameAm') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('lastNameAm') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('lastNameAm')}</div>
+                )}
+              </div>
+            </div>
           </div>
-          {/* Removed the Add Contact button */}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="space-y-2">
+              <Label htmlFor="nationality">Nationality *</Label>
+              <Input
+                id="nationality"
+                name="nationality"
+                value={formik.values.nationality}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('nationality') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('nationality') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('nationality')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="gender">Gender *</Label>
+              <Select
+                value={formik.values.gender}
+                onValueChange={(value) => formik.setFieldValue('gender', value)}
+              >
+                <SelectTrigger className={getErrorMessage('gender') ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(Gender).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {getErrorMessage('gender') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('gender')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="relationId">Relation *</Label>
+              <Input
+                id="relationId"
+                name="relationId"
+                value={formik.values.relationId}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('relationId') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('relationId') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('relationId')}</div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Always show exactly one emergency contact form */}
-        {values.emergencyContacts.map((contact, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg mb-6 relative"
-          >
-
-            {/* Personal Information */}
-            <div className="mb-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
-                  </label>
-                  <Input
-                    value={contact.firstName}
-                    onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].firstName`,
-                        e.target.value
-                      )
-                    }
-                    onBlur={handleBlur}
-                    className={inputClassName(`emergencyContacts[${index}].firstName`)}
-                    placeholder="First name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ስም
-                  </label>
-                  <Input
-                    value={contact.firstNameAm}
-                    onChange={(e) =>
-                      handleAmharicChange(
-                        e,
-                        `emergencyContacts[${index}].firstNameAm`
-                      )
-                    }
-                    onBlur={handleBlur}
-                    className={inputClassName(`emergencyContacts[${index}].firstNameAm`)}
-                    placeholder="አየለ"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Middle Name
-                  </label>
-                  <Input
-                    value={contact.middleName}
-                    onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].middleName`,
-                        e.target.value
-                      )
-                    }
-                    onBlur={handleBlur}
-                    className={inputClassName(`emergencyContacts[${index}].middleName`)}
-                    placeholder="Middle name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    የአባት ስም
-                  </label>
-                  <Input
-                    value={contact.middleNameAm}
-                    onChange={(e) =>
-                      handleAmharicChange(
-                        e,
-                        `emergencyContacts[${index}].middleNameAm`
-                      )
-                    }
-                    onBlur={handleBlur}
-                    className={inputClassName(`emergencyContacts[${index}].middleNameAm`)}
-                    placeholder="በቀለ"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                  </label>
-                  <Input
-                    value={contact.lastName}
-                    onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].lastName`,
-                        e.target.value
-                      )
-                    }
-                    onBlur={handleBlur}
-                    className={inputClassName(`emergencyContacts[${index}].lastName`)}
-                    placeholder="Last name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    የአያት ስም
-                  </label>
-                  <Input
-                    value={contact.lastNameAm}
-                    onChange={(e) =>
-                      handleAmharicChange(
-                        e,
-                        `emergencyContacts[${index}].lastNameAm`
-                      )
-                    }
-                    onBlur={handleBlur}
-                    className={inputClassName(`emergencyContacts[${index}].lastNameAm`)}
-                    placeholder="ዮሐንስ"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Gender
-                  </label>
-                  <Select
-                    value={contact.gender}
-                    onValueChange={(value) =>
-                      setFieldValue(`emergencyContacts[${index}].gender`, value)
-                    }
-                  >
-                    <SelectTrigger className={selectTriggerClassName(`emergencyContacts[${index}].gender`)}>
-                      <SelectValue placeholder="Select Gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Male</SelectItem>
-                      <SelectItem value="1">Female</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nationality
-                  </label>
-                  <Input
-                    value={contact.nationality}
-                    onChange={(e) =>
-                      setFieldValue(
-                        `emergencyContacts[${index}].nationality`,
-                        e.target.value
-                      )
-                    }
-                    onBlur={handleBlur}
-                    className={inputClassName(`emergencyContacts[${index}].nationality`)}
-                    placeholder="Ethiopian"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Relation
-                  </label>
-                  <Select
-                    value={contact.relationId}
-                    onValueChange={(value) =>
-                      setFieldValue(`emergencyContacts[${index}].relationId`, value)
-                    }
-                  >
-                    <SelectTrigger className={selectTriggerClassName(`emergencyContacts[${index}].relationId`)}>
-                      <SelectValue placeholder="Select Relation" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockRelations.map((relation) => (
-                        <SelectItem key={relation.id} value={relation.id}>
-                          {relation.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+        {/* Address Information */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Contact Address Information</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="addressType">Address Type *</Label>
+              <Select
+                value={formik.values.addressType}
+                onValueChange={(value) => formik.setFieldValue('addressType', value)}
+              >
+                <SelectTrigger className={getErrorMessage('addressType') ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select address type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(AddressType).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {getErrorMessage('addressType') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('addressType')}</div>
+              )}
             </div>
 
-            {/* Address Information - ONLY HEADER UPDATED */}
-            <div>
-              {/* Updated Header to match GuarantorStep */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
-                <h3 className="text-xl font-semibold text-gray-800">
-                  Address Information <span className="text-red-500">*</span>
-                </h3>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="country">Country *</Label>
+              <Input
+                id="country"
+                name="country"
+                value={formik.values.country}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('country') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('country') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('country')}</div>
+              )}
+            </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Address Type - REQUIRED */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Address Type <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={contact.address?.addressType || ""}
-                    onValueChange={(value) =>
-                      setFieldValue(`emergencyContacts[${index}].address.addressType`, value)
-                    }
-                  >
-                    <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                      getNestedError(errors, `emergencyContacts[${index}].address.addressType`) && 
-                      getNestedTouched(touched, `emergencyContacts[${index}].address.addressType`) 
-                        ? "border-red-500" 
-                        : "border-gray-300"
-                    }`}>
-                      <SelectValue placeholder="Select Address Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Residence</SelectItem>
-                      <SelectItem value="1">Work Place</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {getNestedError(errors, `emergencyContacts[${index}].address.addressType`) &&
-                    getNestedTouched(touched, `emergencyContacts[${index}].address.addressType`) && (
-                      <div className="text-red-500 text-xs mt-1">
-                        {getNestedError(errors, `emergencyContacts[${index}].address.addressType`)}
-                      </div>
-                    )}
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="region">Region *</Label>
+              <Input
+                id="region"
+                name="region"
+                value={formik.values.region}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('region') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('region') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('region')}</div>
+              )}
+            </div>
 
-                {/* Country - REQUIRED */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Country <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    value={contact.address?.country || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.country`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                      getNestedError(errors, `emergencyContacts[${index}].address.country`) && 
-                      getNestedTouched(touched, `emergencyContacts[${index}].address.country`) 
-                        ? "border-red-500" 
-                        : "border-gray-300"
-                    }`}
-                    placeholder="Country"
-                  />
-                  {getNestedError(errors, `emergencyContacts[${index}].address.country`) &&
-                    getNestedTouched(touched, `emergencyContacts[${index}].address.country`) && (
-                      <div className="text-red-500 text-xs mt-1">
-                        {getNestedError(errors, `emergencyContacts[${index}].address.country`)}
-                      </div>
-                    )}
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="subcity">Subcity</Label>
+              <Input
+                id="subcity"
+                name="subcity"
+                value={formik.values.subcity}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* Telephone - REQUIRED with PhoneInput */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Telephone <span className="text-red-500">*</span>
-                  </label>
-                  <div className={`w-full ${
-                    getNestedError(errors, `emergencyContacts[${index}].address.telephone`) && 
-                    getNestedTouched(touched, `emergencyContacts[${index}].address.telephone`) 
-                      ? 'border border-red-500 rounded-md' 
-                      : ''
-                  }`}>
-                    <PhoneInput
-                      country={'et'} // Default to Ethiopia
-                      value={contact.address?.telephone || ""}
-                      onChange={(value) => handlePhoneChange(value, `emergencyContacts[${index}].address.telephone`)}
-                      inputProps={{
-                        name: `emergencyContacts[${index}].address.telephone`,
-                        required: true,
-                        onBlur: handleBlur
-                      }}
-                      inputStyle={{
-                        width: '100%',
-                        height: '42px',
-                        paddingLeft: '48px',
-                        outline: 'none',
-                        fontSize: '14px',
-                        borderRadius: '6px'
-                      }}
-                      buttonStyle={{
-                        border: 'none',
-                        borderRight: '1px solid #ccc',
-                        borderRadius: '6px 0 0 6px',
-                        backgroundColor: '#f8f9fa'
-                      }}
-                      containerStyle={{
-                        width: '100%'
-                      }}
-                      dropdownStyle={{
-                        borderRadius: '6px'
-                      }}
-                    />
-                  </div>
-                  {getNestedError(errors, `emergencyContacts[${index}].address.telephone`) &&
-                    getNestedTouched(touched, `emergencyContacts[${index}].address.telephone`) && (
-                      <div className="text-red-500 text-xs mt-1">
-                        {getNestedError(errors, `emergencyContacts[${index}].address.telephone`)}
-                      </div>
-                    )}
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="zone">Zone</Label>
+              <Input
+                id="zone"
+                name="zone"
+                value={formik.values.zone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* Region */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Region
-                  </label>
-                  <Input
-                    value={contact.address?.region || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.region`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Region"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="woreda">Woreda</Label>
+              <Input
+                id="woreda"
+                name="woreda"
+                value={formik.values.woreda}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* Subcity */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Subcity
-                  </label>
-                  <Input
-                    value={contact.address?.subcity || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.subcity`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Subcity"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="kebele">Kebele</Label>
+              <Input
+                id="kebele"
+                name="kebele"
+                value={formik.values.kebele}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* Zone */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Zone
-                  </label>
-                  <Input
-                    value={contact.address?.zone || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.zone`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Zone"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="houseNo">House Number</Label>
+              <Input
+                id="houseNo"
+                name="houseNo"
+                value={formik.values.houseNo}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* Woreda */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Woreda
-                  </label>
-                  <Input
-                    value={contact.address?.woreda || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.woreda`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Woreda"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="telephone">Telephone *</Label>
+              <Input
+                id="telephone"
+                name="telephone"
+                value={formik.values.telephone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('telephone') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('telephone') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('telephone')}</div>
+              )}
+            </div>
 
-                {/* Kebele */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Kebele
-                  </label>
-                  <Input
-                    value={contact.address?.kebele || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.kebele`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Kebele"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="poBox">P.O. Box</Label>
+              <Input
+                id="poBox"
+                name="poBox"
+                value={formik.values.poBox}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* House Number */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    House Number
-                  </label>
-                  <Input
-                    value={contact.address?.houseNo || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.houseNo`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="House Number"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="fax">Fax</Label>
+              <Input
+                id="fax"
+                name="fax"
+                value={formik.values.fax}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* P.O. Box */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    P.O. Box
-                  </label>
-                  <Input
-                    value={contact.address?.poBox || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.poBox`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="P.O. Box"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
 
-                {/* Fax */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Fax
-                  </label>
-                  <Input
-                    value={contact.address?.fax || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.fax`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Fax"
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <Input
-                    value={contact.address?.email || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.email`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Email"
-                    type="email"
-                  />
-                </div>
-
-                {/* Website */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Website
-                  </label>
-                  <Input
-                    value={contact.address?.website || ""}
-                    onChange={(e) =>
-                      setFieldValue(`emergencyContacts[${index}].address.website`, e.target.value)
-                    }
-                    onBlur={handleBlur}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-                    placeholder="Website"
-                  />
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                name="website"
+                value={formik.values.website}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between pt-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            disabled={!isFormValid}
+            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            Save & Continue
+          </button>
+        </div>
+      </form>
     </motion.div>
   );
 };

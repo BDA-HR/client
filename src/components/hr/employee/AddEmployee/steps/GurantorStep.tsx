@@ -1,578 +1,407 @@
-import React from "react";
-import { motion } from "framer-motion";
-import type { FormikProps } from "formik";
-import { Input } from "../../../../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../../ui/select";
-import type { Step4Dto } from "../../../../../types/hr/employee/empAddDto";
-import { amharicRegex } from "../../../../../utils/amharic-regex";
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
-import type { AddressType, Gender } from "../../../../../types/hr/enum";
-import { GuarantorProfileUpload } from "./GuarantorProfileUpload";
-
-// Define the form data structure that includes guarantors array
-interface GuarantorFormData {
-  guarantors: Step4Dto[];
-  guarantorFiles: File[];
-}
+import React from 'react';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { motion } from 'framer-motion';
+import { GuarantorProfileUpload } from './GuarantorProfileUpload';
+import { Input } from '../../../../../components/ui/input';
+import { Label } from '../../../../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/select';
+import { Gender, AddressType } from '../../../../../types/hr/enum';
 
 interface GuarantorStepProps {
-  formikProps: FormikProps<GuarantorFormData>;
-  mockRelations: Array<{ id: string; name: string }>;
+  data: any;
+  onNext: (data: any) => void;
+  onBack: () => void;
 }
 
-export const GuarantorStep: React.FC<GuarantorStepProps> = ({
-  formikProps,
-  mockRelations,
-}) => {
-  const { errors, touched, values, handleBlur, setFieldValue } = formikProps;
+const validationSchema = yup.object({
+  firstName: yup.string().required('First name is required'),
+  firstNameAm: yup.string().required('First name (Amharic) is required'),
+  middleName: yup.string().required('Middle name is required'),
+  middleNameAm: yup.string().required('Middle name (Amharic) is required'),
+  lastName: yup.string().required('Last name is required'),
+  lastNameAm: yup.string().required('Last name (Amharic) is required'),
+  nationality: yup.string().required('Nationality is required'),
+  gender: yup.string().required('Gender is required'),
+  relationId: yup.string().required('Relation is required'),
+  addressType: yup.string().required('Address type is required'),
+  country: yup.string().required('Country is required'),
+  region: yup.string().required('Region is required'),
+  telephone: yup.string().required('Telephone is required'),
+});
 
-
-  const getNestedError = (errorObj: any, path: string) => {
-    return path.split(".").reduce((obj, key) => obj && obj[key], errorObj);
-  };
-
-  const getNestedTouched = (touchedObj: any, path: string) => {
-    return path.split(".").reduce((obj, key) => obj && obj[key], touchedObj);
-  };
-
-  const handleAmharicChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: string
-  ) => {
-    const value = e.target.value;
-    if (value === "" || amharicRegex.test(value)) {
-      setFieldValue(fieldName, value);
-    }
-  };
-
-  const handlePhoneChange = (value: string, fieldName: string) => {
-    setFieldValue(fieldName, value);
-    // Clear error when user starts typing
-    if (getNestedError(errors, fieldName)) {
-      const errorPath = fieldName.replace(/\[(\d+)\]/g, '.$1');
-      const newErrors = { ...errors };
-      delete newErrors[errorPath];
-      formikProps.setErrors(newErrors);
-    }
-  };
+export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBack }) => {
+  const formik = useFormik({
+    initialValues: {
+      firstName: data.firstName || '',
+      firstNameAm: data.firstNameAm || '',
+      middleName: data.middleName || '',
+      middleNameAm: data.middleNameAm || '',
+      lastName: data.lastName || '',
+      lastNameAm: data.lastNameAm || '',
+      nationality: data.nationality || '',
+      gender: data.gender || '',
+      relationId: data.relationId || '',
+      employeeId: data.employeeId || '',
+      addressType: data.addressType || '',
+      addressTypeStr: data.addressTypeStr || '',
+      country: data.country || '',
+      region: data.region || '',
+      subcity: data.subcity || '',
+      zone: data.zone || '',
+      woreda: data.woreda || '',
+      kebele: data.kebele || '',
+      houseNo: data.houseNo || '',
+      telephone: data.telephone || '',
+      poBox: data.poBox || '',
+      fax: data.fax || '',
+      email: data.email || '',
+      website: data.website || '',
+      File: data.File || null,
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      onNext(values);
+    },
+  });
 
   const handleGuarantorFileSelect = (file: File) => {
-    setFieldValue("guarantorFiles[0]", file);
+    formik.setFieldValue('File', file);
   };
 
   const handleGuarantorFileRemove = () => {
-    setFieldValue("guarantorFiles[0]", null);
+    formik.setFieldValue('File', null);
   };
 
-  // Initialize guarantor if empty
-  React.useEffect(() => {
-    if (!values.guarantors[0]) {
-      setFieldValue("guarantors[0]", {
-        firstName: "",
-        firstNameAm: "",
-        middleName: "",
-        middleNameAm: "",
-        lastName: "",
-        lastNameAm: "",
-        nationality: "",
-        gender: "" as Gender,
-        relationId: "",
-        employeeId: "",
-        addressType: "0" as AddressType,
-        addressTypeStr: "",
-        country: "",
-        region: "",
-        subcity: "",
-        zone: "",
-        woreda: "",
-        kebele: "",
-        houseNo: "",
-        telephone: "",
-        poBox: "",
-        fax: "",
-        email: "",
-        website: "",
-        File: null
-      });
+  const isFormValid = formik.isValid && formik.dirty;
+
+  // Helper function to safely get error messages
+  const getErrorMessage = (fieldName: string): string => {
+    const error = formik.errors[fieldName as keyof typeof formik.errors];
+    const touched = formik.touched[fieldName as keyof typeof formik.touched];
+    
+    if (touched && error) {
+      return typeof error === 'string' ? error : 'Invalid value';
     }
-  }, [values.guarantors, setFieldValue]);
-
-  // Get guarantor full name for the upload component
-  const getGuarantorFullName = () => {
-    const guarantor = values.guarantors[0];
-    if (!guarantor) return "Guarantor";
-    
-    const firstName = guarantor.firstName || "";
-    const lastName = guarantor.lastName || "";
-    return `${firstName} ${lastName}`.trim() || "Guarantor";
-  };
-
-  const getGuarantorFullNameAm = () => {
-    const guarantor = values.guarantors[0];
-    if (!guarantor) return "ዋሚ";
-    
-    const firstNameAm = guarantor.firstNameAm || "";
-    const lastNameAm = guarantor.lastNameAm || "";
-    return `${firstNameAm} ${lastNameAm}`.trim() || "ዋሚ";
+    return '';
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-8"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="space-y-6"
     >
-      {/* Guarantors Section */}
-      <div className="mt-4">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-2 h-8 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full"></div>
-          <h3 className="text-xl font-semibold text-gray-800">
-            Guarantors
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
-            <Input
-              value={values.guarantors[0]?.firstName || ""}
-              onChange={(e) =>
-                setFieldValue(`guarantors[0].firstName`, e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="First name"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              ስም
-            </label>
-            <Input
-              value={values.guarantors[0]?.firstNameAm || ""}
-              onChange={(e) =>
-                handleAmharicChange(e, `guarantors[0].firstNameAm`)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="አየለ"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Middle Name
-            </label>
-            <Input
-              value={values.guarantors[0]?.middleName || ""}
-              onChange={(e) =>
-                setFieldValue(`guarantors[0].middleName`, e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Middle name"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              የአባት ስም
-            </label>
-            <Input
-              value={values.guarantors[0]?.middleNameAm || ""}
-              onChange={(e) =>
-                handleAmharicChange(e, `guarantors[0].middleNameAm`)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="በቀለ"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
-            <Input
-              value={values.guarantors[0]?.lastName || ""}
-              onChange={(e) =>
-                setFieldValue(`guarantors[0].lastName`, e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Last name"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              የአያት ስም
-            </label>
-            <Input
-              value={values.guarantors[0]?.lastNameAm || ""}
-              onChange={(e) =>
-                handleAmharicChange(e, `guarantors[0].lastNameAm`)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="ዮሐንስ"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Gender
-            </label>
-            <Select
-              value={values.guarantors[0]?.gender || ""}
-              onValueChange={(value) =>
-                setFieldValue(`guarantors[0].gender`, value)
-              }
-            >
-              <SelectTrigger className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md">
-                <SelectValue placeholder="Select Gender" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Male</SelectItem>
-                <SelectItem value="1">Female</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nationality
-            </label>
-            <Input
-              value={values.guarantors[0]?.nationality || ""}
-              onChange={(e) =>
-                setFieldValue(`guarantors[0].nationality`, e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Ethiopian"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Relation
-            </label>
-            <Select
-              value={values.guarantors[0]?.relationId || ""}
-              onValueChange={(value) =>
-                setFieldValue(`guarantors[0].relationId`, value)
-              }
-            >
-              <SelectTrigger className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md">
-                <SelectValue placeholder="Select Relation" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockRelations.map((relation) => (
-                  <SelectItem key={relation.id} value={relation.id}>
-                    {relation.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      {/* Guarantor Address Section */}
-      <div className="mt-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-2 h-8 bg-gradient-to-b from-green-400 to-green-600 rounded-full"></div>
-          <h3 className="text-xl font-semibold text-gray-800">
-            Guarantor Address Information
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Address Type */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Address Type
-            </label>
-            <Select
-              value={values.guarantors[0]?.addressType || ""}
-              onValueChange={(value) =>
-                setFieldValue("guarantors[0].addressType", value)
-              }
-            >
-              <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                getNestedError(errors, "guarantors[0].addressType") && 
-                getNestedTouched(touched, "guarantors[0].addressType") 
-                  ? "border-red-500" 
-                  : "border-gray-300"
-              }`}>
-                <SelectValue placeholder="Select Address Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Residence</SelectItem>
-                <SelectItem value="1">Work Place</SelectItem>
-              </SelectContent>
-            </Select>
-            {getNestedError(errors, "guarantors[0].addressType") &&
-              getNestedTouched(touched, "guarantors[0].addressType") && (
-                <div className="text-red-500 text-xs mt-1">
-                  {getNestedError(errors, "guarantors[0].addressType")}
-                </div>
-              )}
-          </div>
-
-          {/* Country */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Country
-            </label>
-            <Input
-              value={values.guarantors[0]?.country || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].country", e.target.value)
-              }
-              onBlur={handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                getNestedError(errors, "guarantors[0].country") && 
-                getNestedTouched(touched, "guarantors[0].country") 
-                  ? "border-red-500" 
-                  : "border-gray-300"
-              }`}
-              placeholder="Country"
-            />
-            {getNestedError(errors, "guarantors[0].country") &&
-              getNestedTouched(touched, "guarantors[0].country") && (
-                <div className="text-red-500 text-xs mt-1">
-                  {getNestedError(errors, "guarantors[0].country")}
-                </div>
-              )}
-          </div>
-
-          {/* Telephone with PhoneInput */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Telephone
-            </label>
-            <div className={`w-full ${
-              getNestedError(errors, "guarantors[0].telephone") && 
-              getNestedTouched(touched, "guarantors[0].telephone") 
-                ? 'border border-red-500 rounded-md' 
-                : ''
-            }`}>
-              <PhoneInput
-                country={'et'} // Default to Ethiopia
-                value={values.guarantors[0]?.telephone || ""}
-                onChange={(value) => handlePhoneChange(value, "guarantors[0].telephone")}
-                inputProps={{
-                  name: "guarantors[0].telephone",
-                  onBlur: handleBlur
-                }}
-                inputStyle={{
-                  width: '100%',
-                  height: '42px',
-                  paddingLeft: '48px',
-                  outline: 'none',
-                  fontSize: '14px',
-                  borderRadius: '6px'
-                }}
-                buttonStyle={{
-                  border: 'none',
-                  borderRight: '1px solid #ccc',
-                  borderRadius: '6px 0 0 6px',
-                  backgroundColor: '#f8f9fa'
-                }}
-                containerStyle={{
-                  width: '100%'
-                }}
-                dropdownStyle={{
-                  borderRadius: '6px'
-                }}
-              />
-            </div>
-            {getNestedError(errors, "guarantors[0].telephone") &&
-              getNestedTouched(touched, "guarantors[0].telephone") && (
-                <div className="text-red-500 text-xs mt-1">
-                  {getNestedError(errors, "guarantors[0].telephone")}
-                </div>
-              )}
-          </div>
-
-          {/* Region */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Region
-            </label>
-            <Input
-              value={values.guarantors[0]?.region || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].region", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Region"
-            />
-          </div>
-
-          {/* Subcity */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Subcity
-            </label>
-            <Input
-              value={values.guarantors[0]?.subcity || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].subcity", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Subcity"
-            />
-          </div>
-
-          {/* Zone */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Zone
-            </label>
-            <Input
-              value={values.guarantors[0]?.zone || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].zone", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Zone"
-            />
-          </div>
-
-          {/* Woreda */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Woreda
-            </label>
-            <Input
-              value={values.guarantors[0]?.woreda || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].woreda", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Woreda"
-            />
-          </div>
-
-          {/* Kebele */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Kebele
-            </label>
-            <Input
-              value={values.guarantors[0]?.kebele || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].kebele", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Kebele"
-            />
-          </div>
-
-          {/* House Number */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              House Number
-            </label>
-            <Input
-              value={values.guarantors[0]?.houseNo || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].houseNo", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="House Number"
-            />
-          </div>
-
-          {/* P.O. Box */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              P.O. Box
-            </label>
-            <Input
-              value={values.guarantors[0]?.poBox || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].poBox", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="P.O. Box"
-            />
-          </div>
-
-          {/* Fax */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Fax
-            </label>
-            <Input
-              value={values.guarantors[0]?.fax || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].fax", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Fax"
-            />
-          </div>
-
-          {/* Email */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <Input
-              value={values.guarantors[0]?.email || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].email", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Email"
-              type="email"
-            />
-          </div>
-
-          {/* Website */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Website
-            </label>
-            <Input
-              value={values.guarantors[0]?.website || ""}
-              onChange={(e) =>
-                setFieldValue("guarantors[0].website", e.target.value)
-              }
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
-              placeholder="Website"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Guarantor File Upload Section */}
-      <div className="mt-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-2 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full"></div>
-          <h3 className="text-xl font-semibold text-gray-800">
-            Guarantor Document Upload
-          </h3>
-        </div>
-
-        <div className="flex justify-center">
+      <form onSubmit={formik.handleSubmit} className="space-y-8">
+        {/* Guarantor Document Upload */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Guarantor Document</h3>
           <GuarantorProfileUpload
-            guarantorFile={values.guarantorFiles[0] || null}
+            guarantorFile={formik.values.File}
             onGuarantorFileSelect={handleGuarantorFileSelect}
             onGuarantorFileRemove={handleGuarantorFileRemove}
-            guarantorName={getGuarantorFullName()}
-            guarantorNameAm={getGuarantorFullNameAm()}
           />
         </div>
 
-        {/* File upload validation error */}
-        {getNestedError(errors, "guarantorFiles[0]") && (
-          <div className="text-red-500 text-xs mt-2 text-center">
-            {getNestedError(errors, "guarantorFiles[0]")}
+        {/* Guarantor Information */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Guarantor Information</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* English Names */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-700">English Names</h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name *</Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  value={formik.values.firstName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('firstName') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('firstName') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('firstName')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="middleName">Middle Name *</Label>
+                <Input
+                  id="middleName"
+                  name="middleName"
+                  value={formik.values.middleName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('middleName') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('middleName') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('middleName')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name *</Label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  value={formik.values.lastName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('lastName') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('lastName') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('lastName')}</div>
+                )}
+              </div>
+            </div>
+
+            {/* Amharic Names */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-700">Amharic Names</h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="firstNameAm">First Name (Amharic) *</Label>
+                <Input
+                  id="firstNameAm"
+                  name="firstNameAm"
+                  value={formik.values.firstNameAm}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('firstNameAm') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('firstNameAm') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('firstNameAm')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="middleNameAm">Middle Name (Amharic) *</Label>
+                <Input
+                  id="middleNameAm"
+                  name="middleNameAm"
+                  value={formik.values.middleNameAm}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('middleNameAm') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('middleNameAm') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('middleNameAm')}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastNameAm">Last Name (Amharic) *</Label>
+                <Input
+                  id="lastNameAm"
+                  name="lastNameAm"
+                  value={formik.values.lastNameAm}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={getErrorMessage('lastNameAm') ? 'border-red-500' : ''}
+                />
+                {getErrorMessage('lastNameAm') && (
+                  <div className="text-red-500 text-sm">{getErrorMessage('lastNameAm')}</div>
+                )}
+              </div>
+            </div>
           </div>
-        )}
-      </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="space-y-2">
+              <Label htmlFor="nationality">Nationality *</Label>
+              <Input
+                id="nationality"
+                name="nationality"
+                value={formik.values.nationality}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('nationality') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('nationality') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('nationality')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="gender">Gender *</Label>
+              <Select
+                value={formik.values.gender}
+                onValueChange={(value) => formik.setFieldValue('gender', value)}
+              >
+                <SelectTrigger className={getErrorMessage('gender') ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(Gender).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {getErrorMessage('gender') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('gender')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="relationId">Relation *</Label>
+              <Input
+                id="relationId"
+                name="relationId"
+                value={formik.values.relationId}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('relationId') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('relationId') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('relationId')}</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Address Information */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Guarantor Address Information</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="addressType">Address Type *</Label>
+              <Select
+                value={formik.values.addressType}
+                onValueChange={(value) => formik.setFieldValue('addressType', value)}
+              >
+                <SelectTrigger className={getErrorMessage('addressType') ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select address type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(AddressType).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {getErrorMessage('addressType') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('addressType')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="country">Country *</Label>
+              <Input
+                id="country"
+                name="country"
+                value={formik.values.country}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('country') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('country') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('country')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="region">Region *</Label>
+              <Input
+                id="region"
+                name="region"
+                value={formik.values.region}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('region') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('region') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('region')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telephone">Telephone *</Label>
+              <Input
+                id="telephone"
+                name="telephone"
+                value={formik.values.telephone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={getErrorMessage('telephone') ? 'border-red-500' : ''}
+              />
+              {getErrorMessage('telephone') && (
+                <div className="text-red-500 text-sm">{getErrorMessage('telephone')}</div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="subcity">Subcity</Label>
+              <Input
+                id="subcity"
+                name="subcity"
+                value={formik.values.subcity}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="zone">Zone</Label>
+              <Input
+                id="zone"
+                name="zone"
+                value={formik.values.zone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="woreda">Woreda</Label>
+              <Input
+                id="woreda"
+                name="woreda"
+                value={formik.values.woreda}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between pt-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            disabled={!isFormValid}
+            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            Save & Continue
+          </button>
+        </div>
+      </form>
     </motion.div>
   );
 };
