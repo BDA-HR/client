@@ -9,40 +9,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../../ui/select";
-import type { RelationDto, AddressDto } from "../../../../../types/hr/employee";
-import type { ExtendedEmployeeData } from "../AddEmployeeStepForm";
+import type { Step4Dto } from "../../../../../types/hr/employee/empAddDto";
 import { amharicRegex } from "../../../../../utils/amharic-regex";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
-import type { AddressType } from "../../../../../types/hr/enum";
+import type { AddressType, Gender } from "../../../../../types/hr/enum";
 import { GuarantorProfileUpload } from "./GuarantorProfileUpload";
 
+// Define the form data structure that includes guarantors array
+interface GuarantorFormData {
+  guarantors: Step4Dto[];
+  guarantorFiles: File[];
+}
+
 interface GuarantorStepProps {
-  formikProps: FormikProps<ExtendedEmployeeData>;
-  mockRelations: RelationDto[];
-  mockAddresses: AddressDto[];
+  formikProps: FormikProps<GuarantorFormData>;
+  mockRelations: Array<{ id: string; name: string }>;
 }
 
 export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   formikProps,
   mockRelations,
-  mockAddresses,
 }) => {
-  const { errors, touched, values, handleChange, handleBlur, setFieldValue } = formikProps;
+  const { errors, touched, values, handleBlur, setFieldValue } = formikProps;
 
-  const inputClassName = (fieldName: string) =>
-    `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-      getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName)
-        ? "border-red-500"
-        : "border-gray-300"
-    }`;
-
-  const selectTriggerClassName = (fieldName: string) =>
-    `w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-      getNestedError(errors, fieldName) && getNestedTouched(touched, fieldName)
-        ? "border-red-500"
-        : "border-gray-300"
-    }`;
 
   const getNestedError = (errorObj: any, path: string) => {
     return path.split(".").reduce((obj, key) => obj && obj[key], errorObj);
@@ -81,11 +71,22 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     setFieldValue("guarantorFiles[0]", null);
   };
 
-  // Initialize guarantor address if empty
+  // Initialize guarantor if empty
   React.useEffect(() => {
-    if (!values.guarantors[0]?.address) {
-      setFieldValue("guarantors[0].address", {
+    if (!values.guarantors[0]) {
+      setFieldValue("guarantors[0]", {
+        firstName: "",
+        firstNameAm: "",
+        middleName: "",
+        middleNameAm: "",
+        lastName: "",
+        lastNameAm: "",
+        nationality: "",
+        gender: "" as Gender,
+        relationId: "",
+        employeeId: "",
         addressType: "0" as AddressType,
+        addressTypeStr: "",
         country: "",
         region: "",
         subcity: "",
@@ -97,7 +98,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
         poBox: "",
         fax: "",
         email: "",
-        website: ""
+        website: "",
+        File: null
       });
     }
   }, [values.guarantors, setFieldValue]);
@@ -290,14 +292,14 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Address Type
             </label>
             <Select
-              value={values.guarantors[0]?.address?.addressType || ""}
+              value={values.guarantors[0]?.addressType || ""}
               onValueChange={(value) =>
-                setFieldValue("guarantors[0].address.addressType", value)
+                setFieldValue("guarantors[0].addressType", value)
               }
             >
               <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                getNestedError(errors, "guarantors[0].address.addressType") && 
-                getNestedTouched(touched, "guarantors[0].address.addressType") 
+                getNestedError(errors, "guarantors[0].addressType") && 
+                getNestedTouched(touched, "guarantors[0].addressType") 
                   ? "border-red-500" 
                   : "border-gray-300"
               }`}>
@@ -308,10 +310,10 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 <SelectItem value="1">Work Place</SelectItem>
               </SelectContent>
             </Select>
-            {getNestedError(errors, "guarantors[0].address.addressType") &&
-              getNestedTouched(touched, "guarantors[0].address.addressType") && (
+            {getNestedError(errors, "guarantors[0].addressType") &&
+              getNestedTouched(touched, "guarantors[0].addressType") && (
                 <div className="text-red-500 text-xs mt-1">
-                  {getNestedError(errors, "guarantors[0].address.addressType")}
+                  {getNestedError(errors, "guarantors[0].addressType")}
                 </div>
               )}
           </div>
@@ -322,23 +324,23 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Country
             </label>
             <Input
-              value={values.guarantors[0]?.address?.country || ""}
+              value={values.guarantors[0]?.country || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.country", e.target.value)
+                setFieldValue("guarantors[0].country", e.target.value)
               }
               onBlur={handleBlur}
               className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md ${
-                getNestedError(errors, "guarantors[0].address.country") && 
-                getNestedTouched(touched, "guarantors[0].address.country") 
+                getNestedError(errors, "guarantors[0].country") && 
+                getNestedTouched(touched, "guarantors[0].country") 
                   ? "border-red-500" 
                   : "border-gray-300"
               }`}
               placeholder="Country"
             />
-            {getNestedError(errors, "guarantors[0].address.country") &&
-              getNestedTouched(touched, "guarantors[0].address.country") && (
+            {getNestedError(errors, "guarantors[0].country") &&
+              getNestedTouched(touched, "guarantors[0].country") && (
                 <div className="text-red-500 text-xs mt-1">
-                  {getNestedError(errors, "guarantors[0].address.country")}
+                  {getNestedError(errors, "guarantors[0].country")}
                 </div>
               )}
           </div>
@@ -349,17 +351,17 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Telephone
             </label>
             <div className={`w-full ${
-              getNestedError(errors, "guarantors[0].address.telephone") && 
-              getNestedTouched(touched, "guarantors[0].address.telephone") 
+              getNestedError(errors, "guarantors[0].telephone") && 
+              getNestedTouched(touched, "guarantors[0].telephone") 
                 ? 'border border-red-500 rounded-md' 
                 : ''
             }`}>
               <PhoneInput
                 country={'et'} // Default to Ethiopia
-                value={values.guarantors[0]?.address?.telephone || ""}
-                onChange={(value) => handlePhoneChange(value, "guarantors[0].address.telephone")}
+                value={values.guarantors[0]?.telephone || ""}
+                onChange={(value) => handlePhoneChange(value, "guarantors[0].telephone")}
                 inputProps={{
-                  name: "guarantors[0].address.telephone",
+                  name: "guarantors[0].telephone",
                   onBlur: handleBlur
                 }}
                 inputStyle={{
@@ -384,10 +386,10 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 }}
               />
             </div>
-            {getNestedError(errors, "guarantors[0].address.telephone") &&
-              getNestedTouched(touched, "guarantors[0].address.telephone") && (
+            {getNestedError(errors, "guarantors[0].telephone") &&
+              getNestedTouched(touched, "guarantors[0].telephone") && (
                 <div className="text-red-500 text-xs mt-1">
-                  {getNestedError(errors, "guarantors[0].address.telephone")}
+                  {getNestedError(errors, "guarantors[0].telephone")}
                 </div>
               )}
           </div>
@@ -398,9 +400,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Region
             </label>
             <Input
-              value={values.guarantors[0]?.address?.region || ""}
+              value={values.guarantors[0]?.region || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.region", e.target.value)
+                setFieldValue("guarantors[0].region", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Region"
@@ -413,9 +415,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Subcity
             </label>
             <Input
-              value={values.guarantors[0]?.address?.subcity || ""}
+              value={values.guarantors[0]?.subcity || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.subcity", e.target.value)
+                setFieldValue("guarantors[0].subcity", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Subcity"
@@ -428,9 +430,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Zone
             </label>
             <Input
-              value={values.guarantors[0]?.address?.zone || ""}
+              value={values.guarantors[0]?.zone || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.zone", e.target.value)
+                setFieldValue("guarantors[0].zone", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Zone"
@@ -443,9 +445,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Woreda
             </label>
             <Input
-              value={values.guarantors[0]?.address?.woreda || ""}
+              value={values.guarantors[0]?.woreda || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.woreda", e.target.value)
+                setFieldValue("guarantors[0].woreda", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Woreda"
@@ -458,9 +460,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Kebele
             </label>
             <Input
-              value={values.guarantors[0]?.address?.kebele || ""}
+              value={values.guarantors[0]?.kebele || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.kebele", e.target.value)
+                setFieldValue("guarantors[0].kebele", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Kebele"
@@ -473,9 +475,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               House Number
             </label>
             <Input
-              value={values.guarantors[0]?.address?.houseNo || ""}
+              value={values.guarantors[0]?.houseNo || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.houseNo", e.target.value)
+                setFieldValue("guarantors[0].houseNo", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="House Number"
@@ -488,9 +490,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               P.O. Box
             </label>
             <Input
-              value={values.guarantors[0]?.address?.poBox || ""}
+              value={values.guarantors[0]?.poBox || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.poBox", e.target.value)
+                setFieldValue("guarantors[0].poBox", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="P.O. Box"
@@ -503,9 +505,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Fax
             </label>
             <Input
-              value={values.guarantors[0]?.address?.fax || ""}
+              value={values.guarantors[0]?.fax || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.fax", e.target.value)
+                setFieldValue("guarantors[0].fax", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Fax"
@@ -518,9 +520,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Email
             </label>
             <Input
-              value={values.guarantors[0]?.address?.email || ""}
+              value={values.guarantors[0]?.email || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.email", e.target.value)
+                setFieldValue("guarantors[0].email", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Email"
@@ -534,9 +536,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               Website
             </label>
             <Input
-              value={values.guarantors[0]?.address?.website || ""}
+              value={values.guarantors[0]?.website || ""}
               onChange={(e) =>
-                setFieldValue("guarantors[0].address.website", e.target.value)
+                setFieldValue("guarantors[0].website", e.target.value)
               }
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md"
               placeholder="Website"
@@ -570,8 +572,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
             {getNestedError(errors, "guarantorFiles[0]")}
           </div>
         )}
-
-
       </div>
     </motion.div>
   );
