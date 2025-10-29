@@ -219,8 +219,8 @@ const mockRelations = [
 const steps = [
   { id: 1, title: 'Basic Info', subtitle: 'Personal & employment details', icon: User },
   { id: 2, title: 'Biographical', subtitle: 'Family, background & financial info', icon: Users },
-  { id: 3, title: 'Emergency Contacts', subtitle: 'Emergency contact persons', icon: Phone },
-  { id: 4, title: 'Guarantors', subtitle: 'Employee guarantors', icon: Shield },
+  { id: 3, title: 'Emergency Contact', subtitle: 'Emergency contact person', icon: Phone },
+  { id: 4, title: 'Guarantor', subtitle: 'Employee guarantor', icon: Shield },
   { id: 5, title: 'Review', subtitle: 'Confirm all information', icon: CheckCircle },
 ];
 
