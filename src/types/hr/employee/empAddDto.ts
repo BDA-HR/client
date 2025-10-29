@@ -5,33 +5,33 @@ export interface Step1Dto {
     firstName: string;
     firstNameAm: string;
     middleName: string;
-    liddleNameAm: string;
+    middleNameAm: string; // Fixed: was liddleNameAm
     lastName: string;
     lastNameAm: string;
     nationality: string;
-    gender: Gender; //enum.Gender (0/1)
+    gender: Gender;
 
     employmentDate: string;
-    jobGradeId: UUID; //Cor.HRMM.JobGrade
-    positionId: UUID; //Cor.HRMM.Position
-    departmentId: UUID; //Cor.Module.Department
-    employmentType: EmpType; //enum.EmpType (0/1)
-    employmentNature: EmpNature; //enum.EmpNature (0/1)
-    // IFormFile File { get; set; } = default!; for employee photo input id/name should be 'File'
+    jobGradeId: UUID;
+    positionId: UUID;
+    departmentId: UUID;
+    employmentType: EmpType;
+    employmentNature: EmpNature;
+    File: File | null; // Fixed: proper File type
 }
 
 export interface Step2Dto {
     birthDate: string;
     birthLocation: string;
     motherFullName: string;
-    hasBirthCert: YesNo; //enum.YesNo (0/1)
-    hasMarriageCert: YesNo; //enum.YesNo (0/1)
-    maritalStatus: MaritalStat; //enum.MaritalStat (0/1)
-    employeeId: UUID; //Employee 
+    hasBirthCert: YesNo;
+    hasMarriageCert: YesNo;
+    maritalStatus: MaritalStat;
+    employeeId: UUID;
     tin: string;
     bankAccountNo: string;
     pensionNumber: string;
-    addressType: AddressType; //enum.AddressType (0/1)
+    addressType: AddressType;
     addressTypeStr: string;
     country: string;
     region: string;
@@ -51,14 +51,14 @@ export interface Step3Dto {
     firstName: string;
     firstNameAm: string;
     middleName: string;
-    liddleNameAm: string;
+    middleNameAm: string; // Fixed: was liddleNameAm
     lastName: string;
     lastNameAm: string;
     nationality: string;
-    gender: Gender; //enum.Gender (0/1)
-    relationId: UUID; //lup.Relation 
-    employeeId: UUID; //Employee 
-    addressType: AddressType; //enum.AddressType (0/1)
+    gender: Gender;
+    relationId: UUID;
+    employeeId: UUID;
+    addressType: AddressType;
     addressTypeStr: string;
     country: string;
     region: string;
@@ -78,14 +78,14 @@ export interface Step4Dto {
     firstName: string;
     firstNameAm: string;
     middleName: string;
-    liddleNameAm: string;
+    middleNameAm: string; // Fixed: was liddleNameAm
     lastName: string;
     lastNameAm: string;
     nationality: string;
-    gender: Gender; //enum.Gender (0/1)
-    relationId: UUID; //lup.Relation 
-    employeeId: UUID; //Employee 
-    addressType: AddressType; //enum.AddressType (0/1)
+    gender: Gender;
+    relationId: UUID;
+    employeeId: UUID;
+    addressType: AddressType;
     addressTypeStr: string;
     country: string;
     region: string;
@@ -99,9 +99,9 @@ export interface Step4Dto {
     fax: string;
     email: string;
     website: string;
-    // IFormFile File { get; set; } = default!; for Guarantor file input id/name should be 'File'
+    File: File | null; // Fixed: proper File type
 }
 
 export interface EmpAddRes {
-    id: UUID; //Employee Id
+    id: UUID;
 }
