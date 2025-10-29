@@ -3,7 +3,7 @@ import type { NameListItem } from '../../types/NameList/nameList';
 import type { UUID } from '../../types/List/list';
 
 class NameListService {
-  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/Names`;
+  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || '/core/hrmm/v1'}/Names`;
 
   // Address Name endpoints
   async getAllAddressNames(): Promise<NameListItem[]> {
@@ -69,25 +69,25 @@ class NameListService {
   }
 
   // Job Grade Step Name endpoints
-//   async getAllJgStepNames(): Promise<JgStepNameItem[]> {
-//     try {
-//       const response = await api.get(`${this.baseUrl}/AllJgStepName`);
-//       return response.data;
-//     } catch (error) {
-//       console.error('Error fetching job grade step names:', error);
-//       throw error;
-//     }
-//   }
+  //   async getAllJgStepNames(): Promise<JgStepNameItem[]> {
+  //     try {
+  //       const response = await api.get(`${this.baseUrl}/AllJgStepName`);
+  //       return response.data;
+  //     } catch (error) {
+  //       console.error('Error fetching job grade step names:', error);
+  //       throw error;
+  //     }
+  //   }
 
-//   async getJgStepNameById(id: UUID): Promise<JgStepNameItem> {
-//     try {
-//       const response = await api.get(`${this.baseUrl}/GetJgStepName/${id}`);
-//       return response.data;
-//     } catch (error) {
-//       console.error('Error fetching job grade step name:', error);
-//       throw error;
-//     }
-//   }
+  //   async getJgStepNameById(id: UUID): Promise<JgStepNameItem> {
+  //     try {
+  //       const response = await api.get(`${this.baseUrl}/GetJgStepName/${id}`);
+  //       return response.data;
+  //     } catch (error) {
+  //       console.error('Error fetching job grade step name:', error);
+  //       throw error;
+  //     }
+  //   }
 
   // Position Name endpoints
   async getAllPositionNames(): Promise<NameListItem[]> {
@@ -100,15 +100,6 @@ class NameListService {
     }
   }
 
-  async getPositionNameById(id: UUID): Promise<NameListItem> {
-    try {
-      const response = await api.get(`${this.baseUrl}/GetPositionName/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching position name:', error);
-      throw error;
-    }
-  }
 }
 
 export const nameListService = new NameListService();
