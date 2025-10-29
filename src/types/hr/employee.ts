@@ -4,43 +4,17 @@ import type { EmpNature, EmpType, Gender, YesNo } from './enum';
 export type { UUID }
 
 export interface EmployeeListDto extends BaseDto {
-  personId: UUID; //Person
-  jobGradeId: UUID;  //Cor.HRMM.JobGrade
-  positionId: UUID;  //Cor.HRMM.Position
-  departmentId: UUID;  //Cor.Module.Department
-  employmentType: EmpType; //enum.EmpType (0/1)
-  employmentNature: EmpNature; //enum.EmpNature (0/1)
-  gender: Gender; // enum.Gender (0/1)
-  nationality: string;
-  code: string;
-  employmentDate: string;
-  jobGrade: string;
-  position: string;
-  department: string;
-  employmentTypeStr: string;
-  employmentNatureStr: string;
-  genderStr: string;
   empFullName: string;
   empFullNameAm: string;
-  employmentDateStr: string;
-  employmentDateStrAm: string;
-}
-
-export interface EmployeeAddDto {
-  firstName: string;
-  firstNameAm: string;
-  middleName: string;
-  middleNameAm: string;
-  lastName: string;
-  lastNameAm: string;
-  gender: Gender; // enum.Gender (0/1)
-  nationality: string;
-  employmentDate: string;
-  jobGradeId: UUID;  //Cor.HRMM.JobGrade
-  positionId: UUID;  //Cor.HRMM.Position
-  departmentId: UUID;  //Cor.Module.Department
-  employmentType: EmpType; //enum.EmpType (0/1)
-  employmentNature: EmpNature; //enum.EmpNature (0/1)
+  code: string;
+  gender: string;
+  branch: string;
+  department: string;
+  position: string;
+  jobGrade: string;
+  empType: string;
+  empNature: string;
+  photo: string;
 }
 
 export interface EmployeeModDto {
