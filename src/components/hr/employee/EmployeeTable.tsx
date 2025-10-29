@@ -96,29 +96,102 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   };
 
   const getEmploymentTypeColor = (type: string): string => {
-    switch (type) {
-      case "Full-time": return "bg-green-100 text-green-800";
-      case "Part-time": return "bg-blue-100 text-blue-800";
-      case "Freelance": return "bg-purple-100 text-purple-800";
-      case "Internship": return "bg-yellow-100 text-yellow-800";
+    const typeStr = type?.toString() || '';
+    switch (typeStr) {
+      case "0":
+      case "Replacement": return "bg-green-100 text-green-800";
+      case "1":
+      case "New Opening": return "bg-blue-100 text-blue-800";
+      case "2":
+      case "Additional Required": return "bg-purple-100 text-purple-800";
+      case "3":
+      case "Old Employee": return "bg-yellow-100 text-yellow-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
 
   const getDepartmentColor = (dept: string): string => {
-    switch (dept) {
-      case "Finance": return "text-red-600";
-      case "Engineering": return "text-green-600";
-      case "Product": return "text-amber-600";
-      case "Marketing": return "text-emerald-600";
-      case "HR": return "text-indigo-600";
-      case "Operations": return "text-blue-600";
+    const deptStr = dept?.toString() || '';
+    switch (deptStr) {
+      case "1":
+      case "Human Resources": return "text-red-600";
+      case "2":
+      case "Finance": return "text-green-600";
+      case "3":
+      case "IT": return "text-amber-600";
+      case "4":
+      case "Production": return "text-emerald-600";
+      case "5":
+      case "Quality Control": return "text-indigo-600";
+      case "6":
+      case "Software Development": return "text-blue-600";
+      case "7":
+      case "DevOps": return "text-purple-600";
+      case "8":
+      case "Research": return "text-pink-600";
+      case "9":
+      case "Innovation": return "text-orange-600";
+      case "10":
+      case "Customer Service": return "text-teal-600";
       default: return "text-gray-600";
     }
   };
 
   const getStatusColor = (status: "active" | "on-leave"): string => {
     return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+  };
+
+  // Helper function to get display value for department
+  const getDepartmentDisplay = (dept: string): string => {
+    const deptStr = dept?.toString() || '';
+    switch (deptStr) {
+      case "1": return "Human Resources";
+      case "2": return "Finance";
+      case "3": return "IT";
+      case "4": return "Production";
+      case "5": return "Quality Control";
+      case "6": return "Software Development";
+      case "7": return "DevOps";
+      case "8": return "Research";
+      case "9": return "Innovation";
+      case "10": return "Customer Service";
+      default: return deptStr || "Not specified";
+    }
+  };
+
+  // Helper function to get display value for position
+  const getPositionDisplay = (position: string): string => {
+    const positionStr = position?.toString() || '';
+    switch (positionStr) {
+      case "1": return "HR Manager";
+      case "2": return "Recruitment Specialist";
+      case "3": return "Finance Director";
+      case "4": return "Accountant";
+      case "5": return "IT Manager";
+      case "6": return "System Administrator";
+      case "7": return "Production Supervisor";
+      case "8": return "Production Worker";
+      case "9": return "Quality Analyst";
+      case "10": return "Senior Developer";
+      case "11": return "Junior Developer";
+      case "12": return "DevOps Engineer";
+      case "13": return "Research Scientist";
+      case "14": return "Innovation Lead";
+      case "15": return "Customer Support Agent";
+      default: return positionStr || "Not specified";
+    }
+  };
+
+  // Helper function to get display value for employment type
+  const getEmploymentTypeDisplay = (type: string): string => {
+    const typeStr = type?.toString() || '';
+    switch (typeStr) {
+      case "0": return "Replacement";
+      case "1": return "New Opening";
+      case "2": return "Additional Required";
+      case "3": return "Old Employee";
+      default: return typeStr || "Not specified";
+    }
   };
 
   return (
@@ -194,9 +267,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
                           {employee.empFullName}
                         </div>
-                        {/* <div className="text-xs text-gray-500 truncate max-w-[120px] md:max-w-none">
-                          {employee.code}
-                        </div> */}
                         <div className="text-xs text-gray-400 truncate max-w-[120px] md:max-w-none">
                           {employee.empFullNameAm}
                         </div>
@@ -209,12 +279,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </span>
                   </td>
                   <td className={`px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell ${getDepartmentColor(employee.department)}`}>
-                    {employee.department}
+                    {getDepartmentDisplay(employee.department)}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
                       <Briefcase className="text-gray-400 mr-2 h-4 w-4" />
-                      <span className="truncate max-w-[120px]">{employee.position}</span>
+                      <span className="truncate max-w-[120px]">{getPositionDisplay(employee.position)}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
@@ -226,9 +296,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <td className="px-4 py-4 whitespace-nowrap">
                     <motion.span 
                       whileHover={{ scale: 1.05 }}
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.employmentType)}`}
+                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.employmentTypeStr || employee.employmentType)}`}
                     >
-                      {employee.employmentType}
+                      {getEmploymentTypeDisplay(employee.employmentTypeStr || employee.employmentType)}
                     </motion.span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -348,7 +418,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
               <div>
                 <h2 className="text-2xl font-bold">{selectedEmployee.empFullName}</h2>
-                <p className="text-gray-600">{selectedEmployee.position} • {selectedEmployee.department}</p>
+                <p className="text-gray-600">{getPositionDisplay(selectedEmployee.position)} • {getDepartmentDisplay(selectedEmployee.department)}</p>
                 <p className="text-sm text-gray-500">{selectedEmployee.empFullNameAm}</p>
               </div>
               <button
@@ -382,7 +452,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employment Nature</p>
-                      <p className="font-medium">{selectedEmployee.employmentNature}</p>
+                      <p className="font-medium">{selectedEmployee.employmentNatureStr || selectedEmployee.employmentNature}</p>
                     </div>
                   </div>
                 </div>
@@ -395,11 +465,11 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Department</p>
-                      <p className="font-medium">{selectedEmployee.department}</p>
+                      <p className="font-medium">{getDepartmentDisplay(selectedEmployee.department)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Position</p>
-                      <p className="font-medium">{selectedEmployee.position}</p>
+                      <p className="font-medium">{getPositionDisplay(selectedEmployee.position)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Job Grade</p>
@@ -407,8 +477,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employment Type</p>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentType)}`}>
-                        {selectedEmployee.employmentType}
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType)}`}>
+                        {getEmploymentTypeDisplay(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType)}
                       </span>
                     </div>
                   </div>
@@ -426,7 +496,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     <div>
                       <p className="text-sm text-gray-500">Employment Date</p>
                       <p className="font-medium">{selectedEmployee.employmentDateStr || selectedEmployee.employmentDate}</p>
-                      <p className="text-sm text-gray-500">{selectedEmployee.employmentDateStrAm}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Status</p>

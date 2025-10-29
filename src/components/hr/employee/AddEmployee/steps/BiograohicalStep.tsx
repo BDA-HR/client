@@ -2,14 +2,17 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { motion } from 'framer-motion';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import { Input } from '../../../../../components/ui/input';
-import { Label } from '../../../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/select';
 import { YesNo, MaritalStat, AddressType } from '../../../../../types/hr/enum';
+import type { Step2Dto } from '../../../../../types/hr/employee/empAddDto';
+import type { UUID } from 'crypto';
 
 interface BiographicalStepProps {
-  data: any;
-  onNext: (data: any) => void;
+  data: Partial<Step2Dto>;
+  onNext: (data: Step2Dto) => void;
   onBack: () => void;
 }
 
@@ -30,19 +33,19 @@ const validationSchema = yup.object({
 });
 
 export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext, onBack }) => {
-  const formik = useFormik({
+  const formik = useFormik<Step2Dto>({
     initialValues: {
       birthDate: data.birthDate || '',
       birthLocation: data.birthLocation || '',
       motherFullName: data.motherFullName || '',
-      hasBirthCert: data.hasBirthCert || '',
-      hasMarriageCert: data.hasMarriageCert || '',
-      maritalStatus: data.maritalStatus || '',
-      employeeId: data.employeeId || '',
+      hasBirthCert: data.hasBirthCert || '' as YesNo,
+      hasMarriageCert: data.hasMarriageCert || '' as YesNo,
+      maritalStatus: data.maritalStatus || '' as MaritalStat,
+      employeeId: data.employeeId || '' as UUID,
       tin: data.tin || '',
       bankAccountNo: data.bankAccountNo || '',
       pensionNumber: data.pensionNumber || '',
-      addressType: data.addressType || '',
+      addressType: data.addressType || '' as AddressType,
       addressTypeStr: data.addressTypeStr || '',
       country: data.country || '',
       region: data.region || '',
@@ -58,12 +61,40 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
       website: data.website || '',
     },
     validationSchema,
+    enableReinitialize: true,
+    validateOnMount: true,
     onSubmit: (values) => {
       onNext(values);
     },
   });
 
-  const isFormValid = formik.isValid && formik.dirty;
+  // Handle phone input change
+  const handlePhoneChange = (value: string) => {
+    formik.setFieldValue('telephone', value);
+  };
+
+  // Smart form validation that works with pre-filled data
+  const isFormValid = React.useMemo(() => {
+    if (!formik.isValid) return false;
+    
+    // Check if all required fields have values (for pre-filled forms)
+    const hasAllRequiredFields = 
+      formik.values.birthDate &&
+      formik.values.birthLocation &&
+      formik.values.motherFullName &&
+      formik.values.hasBirthCert &&
+      formik.values.hasMarriageCert &&
+      formik.values.maritalStatus &&
+      formik.values.tin &&
+      formik.values.bankAccountNo &&
+      formik.values.pensionNumber &&
+      formik.values.addressType &&
+      formik.values.country &&
+      formik.values.region &&
+      formik.values.telephone;
+
+    return formik.dirty || hasAllRequiredFields;
+  }, [formik.isValid, formik.dirty, formik.values]);
 
   // Helper function to safely get error messages
   const getErrorMessage = (fieldName: string): string => {
@@ -78,19 +109,26 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="space-y-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-8"
     >
       <form onSubmit={formik.handleSubmit} className="space-y-8">
-        {/* Personal Details */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Personal Details</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Biographical Details Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-2 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full"></div>
+            <h3 className="text-xl font-semibold text-gray-800">Biographical Details</h3>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {/* Birth Date */}
             <div className="space-y-2">
-              <Label htmlFor="birthDate">Birth Date *</Label>
+              <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">
+                Birth Date *
+              </label>
               <Input
                 id="birthDate"
                 name="birthDate"
@@ -98,50 +136,69 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 value={formik.values.birthDate}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('birthDate') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('birthDate') ? "border-red-500" : "border-gray-300"
+                }`}
               />
               {getErrorMessage('birthDate') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('birthDate')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('birthDate')}</div>
               )}
             </div>
 
+            {/* Birth Location */}
             <div className="space-y-2">
-              <Label htmlFor="birthLocation">Birth Location *</Label>
+              <label htmlFor="birthLocation" className="block text-sm font-medium text-gray-700 mb-1">
+                Birth Location *
+              </label>
               <Input
                 id="birthLocation"
                 name="birthLocation"
                 value={formik.values.birthLocation}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('birthLocation') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('birthLocation') ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Addis Ababa"
               />
               {getErrorMessage('birthLocation') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('birthLocation')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('birthLocation')}</div>
               )}
             </div>
 
+            {/* Mother's Full Name */}
             <div className="space-y-2">
-              <Label htmlFor="motherFullName">Mother's Full Name *</Label>
+              <label htmlFor="motherFullName" className="block text-sm font-medium text-gray-700 mb-1">
+                Mother's Full Name *
+              </label>
               <Input
                 id="motherFullName"
                 name="motherFullName"
                 value={formik.values.motherFullName}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('motherFullName') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('motherFullName') ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Aster Kebede"
               />
               {getErrorMessage('motherFullName') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('motherFullName')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('motherFullName')}</div>
               )}
             </div>
 
+            {/* Marital Status */}
             <div className="space-y-2">
-              <Label htmlFor="maritalStatus">Marital Status *</Label>
+              <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 mb-1">
+                Marital Status *
+              </label>
               <Select
                 value={formik.values.maritalStatus}
-                onValueChange={(value) => formik.setFieldValue('maritalStatus', value)}
+                onValueChange={(value: MaritalStat) => formik.setFieldValue('maritalStatus', value)}
               >
-                <SelectTrigger className={getErrorMessage('maritalStatus') ? 'border-red-500' : ''}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('maritalStatus') ? "border-red-500" : "border-gray-300"
+                }`}>
                   <SelectValue placeholder="Select marital status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -153,17 +210,22 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 </SelectContent>
               </Select>
               {getErrorMessage('maritalStatus') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('maritalStatus')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('maritalStatus')}</div>
               )}
             </div>
 
+            {/* Has Birth Certificate */}
             <div className="space-y-2">
-              <Label htmlFor="hasBirthCert">Has Birth Certificate? *</Label>
+              <label htmlFor="hasBirthCert" className="block text-sm font-medium text-gray-700 mb-1">
+                Has Birth Certificate? *
+              </label>
               <Select
                 value={formik.values.hasBirthCert}
-                onValueChange={(value) => formik.setFieldValue('hasBirthCert', value)}
+                onValueChange={(value: YesNo) => formik.setFieldValue('hasBirthCert', value)}
               >
-                <SelectTrigger className={getErrorMessage('hasBirthCert') ? 'border-red-500' : ''}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('hasBirthCert') ? "border-red-500" : "border-gray-300"
+                }`}>
                   <SelectValue placeholder="Select option" />
                 </SelectTrigger>
                 <SelectContent>
@@ -175,17 +237,22 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 </SelectContent>
               </Select>
               {getErrorMessage('hasBirthCert') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('hasBirthCert')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('hasBirthCert')}</div>
               )}
             </div>
 
+            {/* Has Marriage Certificate */}
             <div className="space-y-2">
-              <Label htmlFor="hasMarriageCert">Has Marriage Certificate? *</Label>
+              <label htmlFor="hasMarriageCert" className="block text-sm font-medium text-gray-700 mb-1">
+                Has Marriage Certificate? *
+              </label>
               <Select
                 value={formik.values.hasMarriageCert}
-                onValueChange={(value) => formik.setFieldValue('hasMarriageCert', value)}
+                onValueChange={(value: YesNo) => formik.setFieldValue('hasMarriageCert', value)}
               >
-                <SelectTrigger className={getErrorMessage('hasMarriageCert') ? 'border-red-500' : ''}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('hasMarriageCert') ? "border-red-500" : "border-gray-300"
+                }`}>
                   <SelectValue placeholder="Select option" />
                 </SelectTrigger>
                 <SelectContent>
@@ -197,76 +264,105 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 </SelectContent>
               </Select>
               {getErrorMessage('hasMarriageCert') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('hasMarriageCert')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('hasMarriageCert')}</div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Financial Information */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Financial Information</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Financial Information Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
+            <h3 className="text-xl font-semibold text-gray-800">Financial Information</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* TIN */}
             <div className="space-y-2">
-              <Label htmlFor="tin">TIN (Tax Identification Number) *</Label>
+              <label htmlFor="tin" className="block text-sm font-medium text-gray-700 mb-1">
+                TIN (Tax Identification Number) *
+              </label>
               <Input
                 id="tin"
                 name="tin"
                 value={formik.values.tin}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('tin') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('tin') ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="000123456789"
               />
               {getErrorMessage('tin') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('tin')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('tin')}</div>
               )}
             </div>
 
+            {/* Bank Account Number */}
             <div className="space-y-2">
-              <Label htmlFor="bankAccountNo">Bank Account Number *</Label>
+              <label htmlFor="bankAccountNo" className="block text-sm font-medium text-gray-700 mb-1">
+                Bank Account Number *
+              </label>
               <Input
                 id="bankAccountNo"
                 name="bankAccountNo"
                 value={formik.values.bankAccountNo}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('bankAccountNo') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('bankAccountNo') ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="100023456789"
               />
               {getErrorMessage('bankAccountNo') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('bankAccountNo')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('bankAccountNo')}</div>
               )}
             </div>
 
+            {/* Pension Number */}
             <div className="space-y-2">
-              <Label htmlFor="pensionNumber">Pension Number *</Label>
+              <label htmlFor="pensionNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                Pension Number *
+              </label>
               <Input
                 id="pensionNumber"
                 name="pensionNumber"
                 value={formik.values.pensionNumber}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('pensionNumber') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('pensionNumber') ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="PEN123456789"
               />
               {getErrorMessage('pensionNumber') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('pensionNumber')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('pensionNumber')}</div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Address Information */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Address Information</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Address Information Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-2 h-8 bg-gradient-to-b from-green-400 to-green-600 rounded-full"></div>
+            <h3 className="text-xl font-semibold text-gray-800">Address Information</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {/* Address Type - Required */}
             <div className="space-y-2">
-              <Label htmlFor="addressType">Address Type *</Label>
+              <label htmlFor="addressType" className="block text-sm font-medium text-gray-700 mb-1">
+                Address Type *
+              </label>
               <Select
                 value={formik.values.addressType}
-                onValueChange={(value) => formik.setFieldValue('addressType', value)}
+                onValueChange={(value: AddressType) => formik.setFieldValue('addressType', value)}
               >
-                <SelectTrigger className={getErrorMessage('addressType') ? 'border-red-500' : ''}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
+                }`}>
                   <SelectValue placeholder="Select address type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -278,134 +374,214 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 </SelectContent>
               </Select>
               {getErrorMessage('addressType') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('addressType')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('addressType')}</div>
               )}
             </div>
 
+            {/* Country - Required */}
             <div className="space-y-2">
-              <Label htmlFor="country">Country *</Label>
+              <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+                Country *
+              </label>
               <Input
                 id="country"
                 name="country"
                 value={formik.values.country}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('country') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('country') ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Ethiopia"
               />
               {getErrorMessage('country') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('country')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('country')}</div>
               )}
             </div>
 
+            {/* Region - Required */}
             <div className="space-y-2">
-              <Label htmlFor="region">Region *</Label>
+              <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-1">
+                Region *
+              </label>
               <Input
                 id="region"
                 name="region"
                 value={formik.values.region}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={getErrorMessage('region') ? 'border-red-500' : ''}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('region') ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Addis Ababa"
               />
               {getErrorMessage('region') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('region')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('region')}</div>
               )}
             </div>
 
+            {/* Subcity - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="subcity">Subcity</Label>
+              <label htmlFor="subcity" className="block text-sm font-medium text-gray-700 mb-1">
+                Subcity
+              </label>
               <Input
                 id="subcity"
                 name="subcity"
                 value={formik.values.subcity}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="Kirkos"
               />
             </div>
 
+            {/* Zone - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="zone">Zone</Label>
+              <label htmlFor="zone" className="block text-sm font-medium text-gray-700 mb-1">
+                Zone
+              </label>
               <Input
                 id="zone"
                 name="zone"
                 value={formik.values.zone}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="Zone 3"
               />
             </div>
 
+            {/* Woreda - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="woreda">Woreda</Label>
+              <label htmlFor="woreda" className="block text-sm font-medium text-gray-700 mb-1">
+                Woreda
+              </label>
               <Input
                 id="woreda"
                 name="woreda"
                 value={formik.values.woreda}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="08"
               />
             </div>
 
+            {/* Kebele - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="kebele">Kebele</Label>
+              <label htmlFor="kebele" className="block text-sm font-medium text-gray-700 mb-1">
+                Kebele
+              </label>
               <Input
                 id="kebele"
                 name="kebele"
                 value={formik.values.kebele}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="09"
               />
             </div>
 
+            {/* House Number - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="houseNo">House Number</Label>
+              <label htmlFor="houseNo" className="block text-sm font-medium text-gray-700 mb-1">
+                House Number
+              </label>
               <Input
                 id="houseNo"
                 name="houseNo"
                 value={formik.values.houseNo}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="H-123"
               />
             </div>
 
+            {/* Telephone - Required with PhoneInput */}
             <div className="space-y-2">
-              <Label htmlFor="telephone">Telephone *</Label>
-              <Input
-                id="telephone"
-                name="telephone"
-                value={formik.values.telephone}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={getErrorMessage('telephone') ? 'border-red-500' : ''}
-              />
+              <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
+                Telephone *
+              </label>
+              <div className={`w-full border rounded-md transition-colors duration-200 ${
+                getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
+              }`}>
+                <PhoneInput
+                  country={'et'} // Default to Ethiopia
+                  value={formik.values.telephone}
+                  onChange={handlePhoneChange}
+                  inputProps={{
+                    name: "telephone",
+                    required: true,
+                    onBlur: formik.handleBlur
+                  }}
+                  inputStyle={{
+                    width: '100%',
+                    height: '42px',
+                    paddingLeft: '48px',
+                    outline: 'none',
+                    fontSize: '14px',
+                    borderRadius: '6px',
+                    border: 'none'
+                  }}
+                  buttonStyle={{
+                    border: 'none',
+                    borderRight: '1px solid #ccc',
+                    borderRadius: '6px 0 0 6px',
+                    backgroundColor: '#f8f9fa'
+                  }}
+                  containerStyle={{
+                    width: '100%'
+                  }}
+                  dropdownStyle={{
+                    borderRadius: '6px'
+                  }}
+                />
+              </div>
               {getErrorMessage('telephone') && (
-                <div className="text-red-500 text-sm">{getErrorMessage('telephone')}</div>
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('telephone')}</div>
               )}
             </div>
 
+            {/* P.O. Box - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="poBox">P.O. Box</Label>
+              <label htmlFor="poBox" className="block text-sm font-medium text-gray-700 mb-1">
+                P.O. Box
+              </label>
               <Input
                 id="poBox"
                 name="poBox"
                 value={formik.values.poBox}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="1234"
               />
             </div>
 
+            {/* Fax - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="fax">Fax</Label>
+              <label htmlFor="fax" className="block text-sm font-medium text-gray-700 mb-1">
+                Fax
+              </label>
               <Input
                 id="fax"
                 name="fax"
                 value={formik.values.fax}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="+251111223344"
               />
             </div>
 
+            {/* Email - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <Input
                 id="email"
                 name="email"
@@ -413,17 +589,24 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="example@email.com"
               />
             </div>
 
+            {/* Website - Optional */}
             <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
+              <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+                Website
+              </label>
               <Input
                 id="website"
                 name="website"
                 value={formik.values.website}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="https://example.com"
               />
             </div>
           </div>

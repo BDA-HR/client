@@ -51,9 +51,10 @@ export const AddEmployeeStepHeader: React.FC<AddEmployeeStepHeaderProps> = ({
         <div className="flex items-center justify-between">
           {steps.map((step, index) => {
             const IconComponent = step.icon;
-            const isCompleted = currentStep > index;
-            const isCurrent = currentStep === index;
-            const isUpcoming = currentStep < index;
+            const stepNumber = index + 1;
+            const isCompleted = currentStep > stepNumber; // Fixed: currentStep should be greater than step number
+            const isCurrent = currentStep === stepNumber; // Fixed: currentStep should equal step number
+            const isUpcoming = currentStep < stepNumber; // Fixed: currentStep should be less than step number
             
             return (
               <React.Fragment key={step.id}>
@@ -115,7 +116,7 @@ export const AddEmployeeStepHeader: React.FC<AddEmployeeStepHeaderProps> = ({
                             : 'bg-gray-200 text-gray-500 border-gray-300'
                         }`}
                       >
-                        {step.id}
+                        {stepNumber}
                       </div>
                     </div>
                   </div>

@@ -24,16 +24,38 @@ const EmployeeManagementPage = () => {
     onLeave: 0
   });
 
+  // Load employees from localStorage on component mount
+  useEffect(() => {
+    const loadEmployees = () => {
+      try {
+        const savedEmployees = localStorage.getItem('employees');
+        if (savedEmployees) {
+          const parsedEmployees = JSON.parse(savedEmployees);
+          if (Array.isArray(parsedEmployees) && parsedEmployees.length > 0) {
+            setEmployees(parsedEmployees);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading employees from localStorage:', error);
+      }
+    };
+
+    loadEmployees();
+  }, []);
+
   // Check for new employee data when component mounts or when returning from add employee page
   useEffect(() => {
     const checkForNewEmployee = () => {
       const newEmployeeData = sessionStorage.getItem('newEmployee');
-      if (newEmployeeData) {
+      const employeeAdded = sessionStorage.getItem('employeeAdded');
+      
+      if (newEmployeeData && employeeAdded === 'true') {
         try {
           const newEmployee = JSON.parse(newEmployeeData);
           handleAddEmployee(newEmployee);
           // Clear the stored data
           sessionStorage.removeItem('newEmployee');
+          sessionStorage.removeItem('employeeAdded');
         } catch (error) {
           console.error('Error parsing new employee data:', error);
         }
@@ -73,6 +95,8 @@ const EmployeeManagementPage = () => {
   }, [employees]);
 
   const handleAddEmployee = (newEmployee: EmployeeWithStatus) => {
+    console.log('Adding new employee to state:', newEmployee);
+    
     // Update previous stats before adding new employee
     setPreviousStats({
       total: employees.length,
@@ -80,10 +104,16 @@ const EmployeeManagementPage = () => {
       onLeave: employees.filter(e => e.status === "on-leave").length
     });
     
-    setEmployees(prev => [newEmployee, ...prev]);
+    const updatedEmployees = [newEmployee, ...employees];
+    setEmployees(updatedEmployees);
     setCurrentPage(1);
     
-    console.log('New employee added:', newEmployee);
+    // Update localStorage
+    try {
+      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
+    } catch (error) {
+      console.error('Error updating localStorage:', error);
+    }
   };
 
   const handleEmployeeUpdate = (updatedEmployee: EmployeeWithStatus) => {
@@ -94,9 +124,18 @@ const EmployeeManagementPage = () => {
       onLeave: employees.filter(e => e.status === "on-leave").length
     });
 
-    setEmployees(prev => 
-      prev.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp)
+    const updatedEmployees = employees.map(emp => 
+      emp.id === updatedEmployee.id ? updatedEmployee : emp
     );
+    
+    setEmployees(updatedEmployees);
+    
+    // Update localStorage
+    try {
+      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
+    } catch (error) {
+      console.error('Error updating localStorage:', error);
+    }
   };
 
   const handleEmployeeStatusChange = (employeeId: string, newStatus: "active" | "on-leave") => {
@@ -107,15 +146,22 @@ const EmployeeManagementPage = () => {
       onLeave: employees.filter(e => e.status === "on-leave").length
     });
 
-    setEmployees(prev => 
-      prev.map(emp => 
-        emp.id === employeeId ? { 
-          ...emp, 
-          status: newStatus,
-          updatedAt: new Date().toISOString().split('T')[0]
-        } : emp
-      )
+    const updatedEmployees = employees.map(emp => 
+      emp.id === employeeId ? { 
+        ...emp, 
+        status: newStatus,
+        updatedAt: new Date().toISOString().split('T')[0]
+      } : emp
     );
+    
+    setEmployees(updatedEmployees);
+    
+    // Update localStorage
+    try {
+      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
+    } catch (error) {
+      console.error('Error updating localStorage:', error);
+    }
   };
 
   const handleEmployeeTerminate = (employeeId: string) => {
@@ -126,7 +172,15 @@ const EmployeeManagementPage = () => {
       onLeave: employees.filter(e => e.status === "on-leave").length
     });
 
-    setEmployees(prev => prev.filter(emp => emp.id !== employeeId));
+    const updatedEmployees = employees.filter(emp => emp.id !== employeeId);
+    setEmployees(updatedEmployees);
+    
+    // Update localStorage
+    try {
+      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
+    } catch (error) {
+      console.error('Error updating localStorage:', error);
+    }
   };
 
   const handleRefresh = () => {
@@ -150,13 +204,13 @@ const EmployeeManagementPage = () => {
     
     // Search through available fields
     const matchesSearch = 
-      employee.empFullName.toLowerCase().includes(searchLower) ||
-      employee.empFullNameAm.toLowerCase().includes(searchLower) ||
-      employee.code.toLowerCase().includes(searchLower) ||
-      employee.department.toLowerCase().includes(searchLower) ||
-      employee.position.toLowerCase().includes(searchLower) ||
-      employee.employmentType.toLowerCase().includes(searchLower) ||
-      employee.nationality.toLowerCase().includes(searchLower);
+      (employee.empFullName?.toLowerCase() || '').includes(searchLower) ||
+      (employee.empFullNameAm?.toLowerCase() || '').includes(searchLower) ||
+      (employee.code?.toLowerCase() || '').includes(searchLower) ||
+      (employee.department?.toLowerCase() || '').includes(searchLower) ||
+      (employee.position?.toLowerCase() || '').includes(searchLower) ||
+      (employee.employmentTypeStr?.toLowerCase() || '').includes(searchLower) ||
+      (employee.nationality?.toLowerCase() || '').includes(searchLower);
 
     return matchesSearch;
   });

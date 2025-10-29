@@ -25,8 +25,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   onBackToEmployees,
   onEmployeeAdded,
 }) => {
-  const [currentStep, setCurrentStep] = useState(1); // Start from step 1 (Basic Info)
-
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     step1: {},
     step2: {},
@@ -35,10 +34,15 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   });
 
   const handleNext = (stepData: any) => {
-    setFormData(prev => ({
-      ...prev,
+    const updatedFormData = {
+      ...formData,
       [`step${currentStep}`]: stepData,
-    }));
+    };
+    
+    setFormData(updatedFormData);
+    
+    // Save to localStorage for persistence
+    localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
     
     if (currentStep < steps.length) {
       setCurrentStep(prev => prev + 1);
@@ -55,7 +59,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
   const handleSubmit = async () => {
     try {
-      // Here you would typically make an API call to submit all the data
+      // Combine all form data
       const finalData = {
         ...formData.step1,
         ...formData.step2,
@@ -66,14 +70,30 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       console.log('Submitting employee data:', finalData);
       
       // Simulate API call
-      // const result = await employeeApi.addEmployee(finalData);
-      const mockResult = { id: '123e4567-e89b-12d3-a456-426614174000' };
+      const mockResult = { 
+        id: `emp-${Date.now()}`,
+        code: `EMP${Date.now().toString().slice(-6)}`,
+        ...finalData 
+      };
       
       onEmployeeAdded(mockResult);
     } catch (error) {
       console.error('Error submitting employee:', error);
     }
   };
+
+  // Load saved form data on component mount
+  React.useEffect(() => {
+    const savedFormData = localStorage.getItem('employeeFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+      } catch (error) {
+        console.error('Error loading saved form data:', error);
+      }
+    }
+  }, []);
 
   const renderStep = () => {
     switch (currentStep) {
