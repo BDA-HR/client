@@ -101,3 +101,7 @@ export interface Step4Dto {
     website: string;
     // IFormFile File { get; set; } = default!; for Guarantor file input id/name should be 'File'
 }
+
+export interface EmpAddRes {
+    id: UUID; //Employee Id
+}
