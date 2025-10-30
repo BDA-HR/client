@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { motion } from 'framer-motion';
@@ -10,7 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Gender, AddressType } from '../../../../../types/hr/enum';
 import type { Step4Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
-import { amharicRegex } from '../../../../../utils/amharic-regex'; // Import the Amharic regex
+import { amharicRegex } from '../../../../../utils/amharic-regex';
+import List from '../../../../List/list';
+import { listService } from '../../../../../services/List/listservice';
+import type { ListItem } from '../../../../../types/List/list';
 
 interface GuarantorStepProps {
   data: Partial<Step4Dto>;
@@ -27,7 +30,6 @@ const validationSchema = yup.object({
   lastNameAm: yup.string().required('Last name (Amharic) is required'),
   nationality: yup.string().required('Nationality is required'),
   gender: yup.string().required('Gender is required'),
-  relationId: yup.string().required('Relation is required'),
   addressType: yup.string().required('Address type is required'),
   country: yup.string().required('Country is required'),
   region: yup.string().required('Region is required'),
@@ -35,6 +37,9 @@ const validationSchema = yup.object({
 });
 
 export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBack }) => {
+  const [relations, setRelations] = useState<ListItem[]>([]);
+  const [loadingRelations, setLoadingRelations] = useState(false);
+
   const formik = useFormik<Step4Dto>({
     initialValues: {
       firstName: data.firstName || '',
@@ -71,6 +76,33 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
     },
   });
 
+  // Fetch relations when component mounts
+  useEffect(() => {
+    const fetchRelations = async () => {
+      setLoadingRelations(true);
+      try {
+        const relationsData = await listService.getAllRelations();
+        setRelations(relationsData);
+        
+        // Auto-select first relation if none is selected and we have relations
+        if (!formik.values.relationId && relationsData.length > 0) {
+          formik.setFieldValue('relationId', relationsData[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching relations:', error);
+      } finally {
+        setLoadingRelations(false);
+      }
+    };
+
+    fetchRelations();
+  }, []);
+
+  // Handle relation selection
+  const handleRelationSelect = (item: ListItem) => {
+    formik.setFieldValue('relationId', item.id);
+  };
+
   // Amharic input handlers
   const handleAmharicInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -95,28 +127,14 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
     formik.setFieldValue('File', null);
   };
 
-  // Smart form validation that works with pre-filled data
+  // Simplified form validation - only check if form is valid and relations are loaded
   const isFormValid = React.useMemo(() => {
-    if (!formik.isValid) return false;
+    // Don't enable until relations are loaded
+    if (loadingRelations) return false;
     
-    // Check if all required fields have values (for pre-filled forms)
-    const hasAllRequiredFields = 
-      formik.values.firstName &&
-      formik.values.firstNameAm &&
-      formik.values.middleName &&
-      formik.values.middleNameAm &&
-      formik.values.lastName &&
-      formik.values.lastNameAm &&
-      formik.values.nationality &&
-      formik.values.gender &&
-      formik.values.relationId &&
-      formik.values.addressType &&
-      formik.values.country &&
-      formik.values.region &&
-      formik.values.telephone;
-
-    return formik.dirty || hasAllRequiredFields;
-  }, [formik.isValid, formik.dirty, formik.values]);
+    // Use formik's built-in validation
+    return formik.isValid;
+  }, [formik.isValid, loadingRelations]);
 
   // Helper function to safely get error messages
   const getErrorMessage = (fieldName: string): string => {
@@ -128,6 +146,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
     }
     return '';
   };
+
+  // Get the selected relation name for display
+  const selectedRelation = relations.find(relation => relation.id === formik.values.relationId);
 
   return (
     <motion.div
@@ -322,22 +343,22 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="relationId" className="block text-sm font-medium text-gray-700 mb-1">
-                Relation *
-              </label>
-              <Input
-                id="relationId"
-                name="relationId"
-                value={formik.values.relationId}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('relationId') ? "border-red-500" : "border-gray-300"
-                }`}
-                placeholder="Family, Friend, Colleague, etc."
+              <List
+                items={relations}
+                selectedValue={formik.values.relationId}
+                onSelect={handleRelationSelect}
+                label="Select Relation"
+                placeholder="Choose a relation"
+                disabled={loadingRelations}
               />
+              {loadingRelations && (
+                <p className="text-sm text-gray-500">Loading relations...</p>
+              )}
               {getErrorMessage('relationId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('relationId')}</div>
+              )}
+              {selectedRelation && (
+                <p className="text-sm text-green-600 mt-1">Selected: {selectedRelation.name}</p>
               )}
             </div>
           </div>
@@ -429,7 +450,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
               }`}>
                 <PhoneInput
-                  country={'et'} // Default to Ethiopia
+                  country={'et'}
                   value={formik.values.telephone}
                   onChange={handlePhoneChange}
                   inputProps={{

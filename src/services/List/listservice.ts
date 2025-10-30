@@ -25,6 +25,17 @@ class ListService {
       throw error;
     }
   }
+
+  // Relation services
+  async getAllRelations(): Promise<ListItem[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/Relation`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching relations:', error);
+      throw error;
+    }
+  }
 }
 
 export const listService = new ListService();

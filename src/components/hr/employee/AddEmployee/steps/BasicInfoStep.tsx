@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { motion } from 'framer-motion';
@@ -8,63 +8,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Gender, EmpType, EmpNature } from '../../../../../types/hr/enum';
 import type { Step1Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
-import { amharicRegex } from '../../../../../utils/amharic-regex'; // Import the Amharic regex
+import { amharicRegex } from '../../../../../utils/amharic-regex';
+import List from '../../../../List/list';
+import { branchService } from '../../../../../services/core/branchservice';
+import { departmentService } from '../../../../../services/core/deptservice';
+import { positionService } from '../../../../../services/hr/settings/positionService';
+import { jobGradeService } from '../../../../../services/hr/settings/JobGradeServives';
+import type { ListItem } from '../../../../../types/List/list';
+import type { BranchCompListDto } from '../../../../../types/core/branch';
+import type { NameListDto } from '../../../../../types/hr/NameListDto';
+import type { PositionListDto } from '../../../../../types/hr/position';
+import type { JobGradeListDto } from '../../../../../types/hr/jobgrade';
 
 interface BasicInfoStepProps {
   data: Partial<Step1Dto & { branchId: UUID }>;
   onNext: (data: Step1Dto & { branchId: UUID }) => void;
   onBack: () => void;
 }
-
-// Dummy data with proper typing
-const dummyBranches = [
-  { id: '1' as UUID, name: 'Head Office' },
-  { id: '2' as UUID, name: 'Production Facility' },
-  { id: '3' as UUID, name: 'Tech Center' },
-  { id: '4' as UUID, name: 'R&D Lab' },
-  { id: '5' as UUID, name: 'Service Center' },
-];
-
-const dummyJobGrades = [
-  { id: '1' as UUID, name: 'Grade 1 - Entry Level' },
-  { id: '2' as UUID, name: 'Grade 2 - Junior' },
-  { id: '3' as UUID, name: 'Grade 3 - Intermediate' },
-  { id: '4' as UUID, name: 'Grade 4 - Senior' },
-  { id: '5' as UUID, name: 'Grade 5 - Lead' },
-  { id: '6' as UUID, name: 'Grade 6 - Manager' },
-  { id: '7' as UUID, name: 'Grade 7 - Director' },
-];
-
-const dummyDepartments = [
-  { id: '1' as UUID, branchId: '1' as UUID, name: 'Human Resources' },
-  { id: '2' as UUID, branchId: '1' as UUID, name: 'Finance' },
-  { id: '3' as UUID, branchId: '1' as UUID, name: 'IT' },
-  { id: '4' as UUID, branchId: '2' as UUID, name: 'Production' },
-  { id: '5' as UUID, branchId: '2' as UUID, name: 'Quality Control' },
-  { id: '6' as UUID, branchId: '3' as UUID, name: 'Software Development' },
-  { id: '7' as UUID, branchId: '3' as UUID, name: 'DevOps' },
-  { id: '8' as UUID, branchId: '4' as UUID, name: 'Research' },
-  { id: '9' as UUID, branchId: '4' as UUID, name: 'Innovation' },
-  { id: '10' as UUID, branchId: '5' as UUID, name: 'Customer Service' },
-];
-
-const dummyPositions = [
-  { id: '1' as UUID, departmentId: '1' as UUID, name: 'HR Manager' },
-  { id: '2' as UUID, departmentId: '1' as UUID, name: 'Recruitment Specialist' },
-  { id: '3' as UUID, departmentId: '2' as UUID, name: 'Finance Director' },
-  { id: '4' as UUID, departmentId: '2' as UUID, name: 'Accountant' },
-  { id: '5' as UUID, departmentId: '3' as UUID, name: 'IT Manager' },
-  { id: '6' as UUID, departmentId: '3' as UUID, name: 'System Administrator' },
-  { id: '7' as UUID, departmentId: '4' as UUID, name: 'Production Supervisor' },
-  { id: '8' as UUID, departmentId: '4' as UUID, name: 'Production Worker' },
-  { id: '9' as UUID, departmentId: '5' as UUID, name: 'Quality Analyst' },
-  { id: '10' as UUID, departmentId: '6' as UUID, name: 'Senior Developer' },
-  { id: '11' as UUID, departmentId: '6' as UUID, name: 'Junior Developer' },
-  { id: '12' as UUID, departmentId: '7' as UUID, name: 'DevOps Engineer' },
-  { id: '13' as UUID, departmentId: '8' as UUID, name: 'Research Scientist' },
-  { id: '14' as UUID, departmentId: '9' as UUID, name: 'Innovation Lead' },
-  { id: '15' as UUID, departmentId: '10' as UUID, name: 'Customer Support Agent' },
-];
 
 const validationSchema = yup.object({
   firstName: yup.string().required('First name is required'),
@@ -76,15 +36,24 @@ const validationSchema = yup.object({
   nationality: yup.string().required('Nationality is required'),
   gender: yup.string().required('Gender is required'),
   employmentDate: yup.string().required('Employment date is required'),
-  branchId: yup.string().required('Branch is required'),
-  jobGradeId: yup.string().required('Job grade is required'),
-  positionId: yup.string().required('Position is required'),
-  departmentId: yup.string().required('Department is required'),
+  // branchId: yup.string().required('Branch is required'),
+  // jobGradeId: yup.string().required('Job grade is required'),
+  // positionId: yup.string().required('Position is required'),
+  // departmentId: yup.string().required('Department is required'),
   employmentType: yup.string().required('Employment type is required'),
   employmentNature: yup.string().required('Employment nature is required'),
 });
 
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBack }) => {
+  const [branches, setBranches] = useState<BranchCompListDto[]>([]);
+  const [departments, setDepartments] = useState<NameListDto[]>([]);
+  const [positions, setPositions] = useState<PositionListDto[]>([]);
+  const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
+  const [loadingBranches, setLoadingBranches] = useState(false);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [loadingPositions, setLoadingPositions] = useState(false);
+  const [loadingJobGrades, setLoadingJobGrades] = useState(false);
+
   // Set default employment date to today if not provided
   const getDefaultEmploymentDate = () => {
     return data.employmentDate || new Date().toISOString().split('T')[0];
@@ -117,6 +86,138 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
     },
   });
 
+  // Fetch branches when component mounts
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        setLoadingBranches(true);
+        const branchesData = await branchService.getBranchCompanyList();
+        setBranches(branchesData);
+        
+        // Auto-select first branch if none is selected and we have branches
+        if (!formik.values.branchId && branchesData.length > 0) {
+          formik.setFieldValue('branchId', branchesData[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching branches:', error);
+      } finally {
+        setLoadingBranches(false);
+      }
+    };
+
+    fetchBranches();
+  }, []);
+
+  // Fetch departments when component mounts
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        setLoadingDepartments(true);
+        const departmentsData = await departmentService.getAllDepartments();
+        setDepartments(departmentsData);
+        
+        // Auto-select first department if none is selected and we have departments
+        if (!formik.values.departmentId && departmentsData.length > 0) {
+          formik.setFieldValue('departmentId', departmentsData[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
+  // Fetch positions when component mounts
+  useEffect(() => {
+    const fetchPositions = async () => {
+      try {
+        setLoadingPositions(true);
+        const positionsData = await positionService.getAllPositions();
+        setPositions(positionsData);
+        
+        // Auto-select first position if none is selected and we have positions
+        if (!formik.values.positionId && positionsData.length > 0) {
+          formik.setFieldValue('positionId', positionsData[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching positions:', error);
+      } finally {
+        setLoadingPositions(false);
+      }
+    };
+
+    fetchPositions();
+  }, []);
+
+  // Fetch job grades when component mounts
+  useEffect(() => {
+    const fetchJobGrades = async () => {
+      try {
+        setLoadingJobGrades(true);
+        const jobGradesData = await jobGradeService.getAllJobGrades();
+        setJobGrades(jobGradesData);
+        
+        // Auto-select first job grade if none is selected and we have job grades
+        if (!formik.values.jobGradeId && jobGradesData.length > 0) {
+          formik.setFieldValue('jobGradeId', jobGradesData[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching job grades:', error);
+      } finally {
+        setLoadingJobGrades(false);
+      }
+    };
+
+    fetchJobGrades();
+  }, []);
+
+  // Convert branches to ListItem format
+  const branchListItems: ListItem[] = branches.map(branch => ({
+    id: branch.id,
+    name: branch.name
+  }));
+
+  // Convert departments to ListItem format
+  const departmentListItems: ListItem[] = departments.map(dept => ({
+    id: dept.id,
+    name: dept.name
+  }));
+
+  // Convert positions to ListItem format
+  const positionListItems: ListItem[] = positions.map(position => ({
+    id: position.id,
+    name: position.name
+  }));
+
+  // Convert job grades to ListItem format
+  const jobGradeListItems: ListItem[] = jobGrades.map(grade => ({
+    id: grade.id,
+    name: grade.name
+  }));
+
+  // Handle branch selection
+  const handleBranchSelect = (item: ListItem) => {
+    formik.setFieldValue('branchId', item.id);
+  };
+
+  // Handle department selection
+  const handleDepartmentSelect = (item: ListItem) => {
+    formik.setFieldValue('departmentId', item.id);
+  };
+
+  // Handle position selection
+  const handlePositionSelect = (item: ListItem) => {
+    formik.setFieldValue('positionId', item.id);
+  };
+
+  // Handle job grade selection
+  const handleJobGradeSelect = (item: ListItem) => {
+    formik.setFieldValue('jobGradeId', item.id);
+  };
+
   // Amharic input handlers
   const handleAmharicInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -136,52 +237,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
     formik.setFieldValue('File', null);
   };
 
-  // Filter departments based on selected branch
-  const filteredDepartments = dummyDepartments.filter(
-    department => department.branchId === formik.values.branchId
-  );
-
-  // Filter positions based on selected department
-  const filteredPositions = dummyPositions.filter(
-    position => position.departmentId === formik.values.departmentId
-  );
-
-  // Reset dependent fields when parent field changes
-  const handleBranchChange = (value: UUID) => {
-    formik.setFieldValue('branchId', value);
-    formik.setFieldValue('departmentId', '');
-    formik.setFieldValue('positionId', '');
-  };
-
-  const handleDepartmentChange = (value: UUID) => {
-    formik.setFieldValue('departmentId', value);
-    formik.setFieldValue('positionId', '');
-  };
-
-  // Smart form validation that works with pre-filled data
+  // Simplified form validation - only check if form is valid
   const isFormValid = React.useMemo(() => {
-    if (!formik.isValid) return false;
-    
-    // Check if all required fields have values (for pre-filled forms)
-    const hasAllRequiredFields = 
-      formik.values.firstName &&
-      formik.values.firstNameAm &&
-      formik.values.middleName &&
-      formik.values.middleNameAm &&
-      formik.values.lastName &&
-      formik.values.lastNameAm &&
-      formik.values.nationality &&
-      formik.values.gender &&
-      formik.values.employmentDate &&
-      formik.values.branchId &&
-      formik.values.jobGradeId &&
-      formik.values.positionId &&
-      formik.values.departmentId &&
-      formik.values.employmentType &&
-      formik.values.employmentNature;
-
-    return formik.dirty || hasAllRequiredFields;
-  }, [formik.isValid, formik.dirty, formik.values]);
+    return formik.isValid;
+  }, [formik.isValid]);
 
   // Helper function to safely get error messages
   const getErrorMessage = (fieldName: string): string => {
@@ -435,125 +494,77 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
               )}
             </div>
 
-            {/* Branch */}
+            {/* Branch - Using List Component */}
             <div className="space-y-2">
-              <label htmlFor="branchId" className="block text-sm font-medium text-gray-700 mb-1">
-                Branch *
-              </label>
-              <Select
-                value={formik.values.branchId}
-                onValueChange={handleBranchChange}
-              >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('branchId') ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <SelectValue placeholder="Select Branch" />
-                </SelectTrigger>
-                <SelectContent>
-                  {dummyBranches.map((branch) => (
-                    <SelectItem key={branch.id} value={branch.id}>
-                      {branch.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <List
+                items={branchListItems}
+                selectedValue={formik.values.branchId}
+                onSelect={handleBranchSelect}
+                label="Select Branch"
+                placeholder="Select a branch"
+                // required
+                disabled={loadingBranches}
+              />
+              {loadingBranches && (
+                <p className="text-sm text-gray-500">Loading branches...</p>
+              )}
               {getErrorMessage('branchId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('branchId')}</div>
               )}
             </div>
 
-            {/* Department */}
+            {/* Department - Using List Component */}
             <div className="space-y-2">
-              <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700 mb-1">
-                Department *
-              </label>
-              <Select
-                value={formik.values.departmentId}
-                onValueChange={handleDepartmentChange}
-                disabled={!formik.values.branchId}
-              >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('departmentId') ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <SelectValue placeholder={
-                    !formik.values.branchId ? "Select Branch First" : "Select Department"
-                  } />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredDepartments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                  {filteredDepartments.length === 0 && formik.values.branchId && (
-                    <SelectItem value="no-departments" disabled>
-                      No departments available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
+              <List
+                items={departmentListItems}
+                selectedValue={formik.values.departmentId}
+                onSelect={handleDepartmentSelect}
+                label="Select Department"
+                placeholder="Select a department"
+                // required
+                disabled={loadingDepartments}
+              />
+              {loadingDepartments && (
+                <p className="text-sm text-gray-500">Loading departments...</p>
+              )}
               {getErrorMessage('departmentId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('departmentId')}</div>
               )}
             </div>
 
-            {/* Position */}
+            {/* Position - Using List Component */}
             <div className="space-y-2">
-              <label htmlFor="positionId" className="block text-sm font-medium text-gray-700 mb-1">
-                Position *
-              </label>
-              <Select
-                value={formik.values.positionId}
-                onValueChange={(value: UUID) => formik.setFieldValue('positionId', value)}
-                disabled={!formik.values.departmentId}
-              >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('positionId') ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <SelectValue placeholder={
-                    !formik.values.departmentId ? "Select Department First" : "Select Position"
-                  } />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredPositions.map((position) => (
-                    <SelectItem key={position.id} value={position.id}>
-                      {position.name}
-                    </SelectItem>
-                  ))}
-                  {filteredPositions.length === 0 && formik.values.departmentId && (
-                    <SelectItem value="no-positions" disabled>
-                      No positions available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
+              <List
+                items={positionListItems}
+                selectedValue={formik.values.positionId}
+                onSelect={handlePositionSelect}
+                label="Select Position"
+                placeholder="Select a position"
+                // required
+                disabled={loadingPositions}
+              />
+              {loadingPositions && (
+                <p className="text-sm text-gray-500">Loading positions...</p>
+              )}
               {getErrorMessage('positionId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('positionId')}</div>
               )}
             </div>
 
-            {/* Job Grade */}
+            {/* Job Grade - Using List Component */}
             <div className="space-y-2">
-              <label htmlFor="jobGradeId" className="block text-sm font-medium text-gray-700 mb-1">
-                Job Grade *
-              </label>
-              <Select
-                value={formik.values.jobGradeId}
-                onValueChange={(value: UUID) => formik.setFieldValue('jobGradeId', value)}
-              >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('jobGradeId') ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <SelectValue placeholder="Select Job Grade" />
-                </SelectTrigger>
-                <SelectContent>
-                  {dummyJobGrades.map((grade) => (
-                    <SelectItem key={grade.id} value={grade.id}>
-                      {grade.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <List
+                items={jobGradeListItems}
+                selectedValue={formik.values.jobGradeId}
+                onSelect={handleJobGradeSelect}
+                label="Select Job Grade"
+                placeholder="Select a job grade"
+                // required
+                disabled={loadingJobGrades}
+              />
+              {loadingJobGrades && (
+                <p className="text-sm text-gray-500">Loading job grades...</p>
+              )}
               {getErrorMessage('jobGradeId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('jobGradeId')}</div>
               )}
