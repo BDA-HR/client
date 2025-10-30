@@ -11,24 +11,18 @@ import type { UUID } from 'crypto';
 import { amharicRegex } from '../../../../../utils/amharic-regex'; // Import the Amharic regex
 
 interface BasicInfoStepProps {
-  data: Partial<Step1Dto & { companyId: UUID; branchId: UUID }>;
-  onNext: (data: Step1Dto & { companyId: UUID; branchId: UUID }) => void;
+  data: Partial<Step1Dto & { branchId: UUID }>;
+  onNext: (data: Step1Dto & { branchId: UUID }) => void;
   onBack: () => void;
 }
 
 // Dummy data with proper typing
-const dummyCompanies = [
-  { id: '1' as UUID, name: 'Main Company HQ' },
-  { id: '2' as UUID, name: 'Tech Solutions Inc.' },
-  { id: '3' as UUID, name: 'Global Services Ltd.' },
-];
-
 const dummyBranches = [
-  { id: '1' as UUID, companyId: '1' as UUID, name: 'Head Office' },
-  { id: '2' as UUID, companyId: '1' as UUID, name: 'Production Facility' },
-  { id: '3' as UUID, companyId: '2' as UUID, name: 'Tech Center' },
-  { id: '4' as UUID, companyId: '2' as UUID, name: 'R&D Lab' },
-  { id: '5' as UUID, companyId: '3' as UUID, name: 'Service Center' },
+  { id: '1' as UUID, name: 'Head Office' },
+  { id: '2' as UUID, name: 'Production Facility' },
+  { id: '3' as UUID, name: 'Tech Center' },
+  { id: '4' as UUID, name: 'R&D Lab' },
+  { id: '5' as UUID, name: 'Service Center' },
 ];
 
 const dummyJobGrades = [
@@ -82,7 +76,6 @@ const validationSchema = yup.object({
   nationality: yup.string().required('Nationality is required'),
   gender: yup.string().required('Gender is required'),
   employmentDate: yup.string().required('Employment date is required'),
-  companyId: yup.string().required('Company is required'),
   branchId: yup.string().required('Branch is required'),
   jobGradeId: yup.string().required('Job grade is required'),
   positionId: yup.string().required('Position is required'),
@@ -97,7 +90,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
     return data.employmentDate || new Date().toISOString().split('T')[0];
   };
 
-  const formik = useFormik<Step1Dto & { companyId: UUID; branchId: UUID }>({
+  const formik = useFormik<Step1Dto & { branchId: UUID }>({
     initialValues: {
       firstName: data.firstName || '',
       firstNameAm: data.firstNameAm || '',
@@ -108,7 +101,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
       nationality: data.nationality || '',
       gender: data.gender || '' as Gender,
       employmentDate: getDefaultEmploymentDate(),
-      companyId: data.companyId || '' as UUID,
       branchId: data.branchId || '' as UUID,
       jobGradeId: data.jobGradeId || '' as UUID,
       positionId: data.positionId || '' as UUID,
@@ -144,11 +136,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
     formik.setFieldValue('File', null);
   };
 
-  // Filter branches based on selected company
-  const filteredBranches = dummyBranches.filter(
-    branch => branch.companyId === formik.values.companyId
-  );
-
   // Filter departments based on selected branch
   const filteredDepartments = dummyDepartments.filter(
     department => department.branchId === formik.values.branchId
@@ -160,13 +147,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
   );
 
   // Reset dependent fields when parent field changes
-  const handleCompanyChange = (value: UUID) => {
-    formik.setFieldValue('companyId', value);
-    formik.setFieldValue('branchId', '');
-    formik.setFieldValue('departmentId', '');
-    formik.setFieldValue('positionId', '');
-  };
-
   const handleBranchChange = (value: UUID) => {
     formik.setFieldValue('branchId', value);
     formik.setFieldValue('departmentId', '');
@@ -193,7 +173,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
       formik.values.nationality &&
       formik.values.gender &&
       formik.values.employmentDate &&
-      formik.values.companyId &&
       formik.values.branchId &&
       formik.values.jobGradeId &&
       formik.values.positionId &&
@@ -456,33 +435,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
               )}
             </div>
 
-            {/* Company */}
-            <div className="space-y-2">
-              <label htmlFor="companyId" className="block text-sm font-medium text-gray-700 mb-1">
-                Company *
-              </label>
-              <Select
-                value={formik.values.companyId}
-                onValueChange={handleCompanyChange}
-              >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('companyId') ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <SelectValue placeholder="Select Company" />
-                </SelectTrigger>
-                <SelectContent>
-                  {dummyCompanies.map((company) => (
-                    <SelectItem key={company.id} value={company.id}>
-                      {company.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {getErrorMessage('companyId') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('companyId')}</div>
-              )}
-            </div>
-
             {/* Branch */}
             <div className="space-y-2">
               <label htmlFor="branchId" className="block text-sm font-medium text-gray-700 mb-1">
@@ -491,26 +443,18 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
               <Select
                 value={formik.values.branchId}
                 onValueChange={handleBranchChange}
-                disabled={!formik.values.companyId}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('branchId') ? "border-red-500" : "border-gray-300"
                 }`}>
-                  <SelectValue placeholder={
-                    !formik.values.companyId ? "Select Company First" : "Select Branch"
-                  } />
+                  <SelectValue placeholder="Select Branch" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filteredBranches.map((branch) => (
+                  {dummyBranches.map((branch) => (
                     <SelectItem key={branch.id} value={branch.id}>
                       {branch.name}
                     </SelectItem>
                   ))}
-                  {filteredBranches.length === 0 && formik.values.companyId && (
-                    <SelectItem value="no-branches" disabled>
-                      No branches available
-                    </SelectItem>
-                  )}
                 </SelectContent>
               </Select>
               {getErrorMessage('branchId') && (
