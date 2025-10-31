@@ -45,11 +45,11 @@ const validationSchema = yup.object({
   employmentNature: yup.string().required('Employment nature is required'),
 });
 
-export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ 
-  data, 
-  onNext, 
+export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
+  data,
+  onNext,
   onBack,
-  loading = false 
+  loading = false
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [departments, setDepartments] = useState<BranchDeptList[]>([]);
@@ -105,14 +105,14 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     validateOnMount: true,
     onSubmit: async (values) => {
       setSubmitError(null);
-      
+
       // Prepare the data to send to backend
       const submitData = {
         ...values,
         // Convert file to base64 if exists
-        photoData: photoData || null
+        // File: File || null
       };
-      
+
       onNext(submitData);
     },
   });
@@ -124,7 +124,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         setLoadingBranches(true);
         const branchesData = await branchService.getBranchCompanyList();
         setBranches(branchesData);
-        
+
         // Auto-select first branch if none is selected and we have branches
         if (!formik.values.branchId && branchesData.length > 0) {
           const firstBranchId = branchesData[0].id;
@@ -153,10 +153,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         setLoadingDepartments(true);
         formik.setFieldValue('departmentId', '');
         formik.setFieldValue('positionId', '');
-        
+
         const departmentsData = await departmentService.getBranchDepartmentNames(formik.values.branchId);
         setDepartments(departmentsData);
-        
+
         // Auto-select first department if we have departments
         if (departmentsData.length > 0) {
           formik.setFieldValue('departmentId', departmentsData[0].id);
@@ -185,11 +185,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         setLoadingPositions(true);
         // Clear current position selection when fetching new positions
         formik.setFieldValue('positionId', '');
-        
+
         // Use nameListService to get department positions
         const positionsData = await nameListService.getDepartmentPositions(formik.values.departmentId);
         setPositions(positionsData);
-        
+
         // Auto-select first position if we have positions
         if (positionsData.length > 0) {
           formik.setFieldValue('positionId', positionsData[0].id);
@@ -213,7 +213,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         setLoadingJobGrades(true);
         const jobGradesData = await jobGradeService.getAllJobGrades();
         setJobGrades(jobGradesData);
-        
+
         if (!formik.values.jobGradeId && jobGradesData.length > 0) {
           formik.setFieldValue('jobGradeId', jobGradesData[0].id);
         }
@@ -299,7 +299,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const handleProfilePictureSelect = async (file: File) => {
     try {
       formik.setFieldValue('File', file);
-      
+
       // Convert the file to base64
       const base64String = await fileToBase64(file);
       setPhotoData(base64String);
@@ -324,7 +324,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const getErrorMessage = (fieldName: string): string => {
     const error = formik.errors[fieldName as keyof typeof formik.errors];
     const touched = formik.touched[fieldName as keyof typeof formik.touched];
-    
+
     if (touched && error) {
       return typeof error === 'string' ? error : 'Invalid value';
     }
@@ -334,7 +334,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Handle form submission with validation
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     formik.validateForm().then(errors => {
       if (Object.keys(errors).length === 0) {
         formik.handleSubmit();
@@ -427,9 +427,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.firstName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder="John"
               disabled={loading}
             />
@@ -450,9 +449,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.firstNameAm}
               onChange={(e) => handleAmharicInputChange(e, 'firstNameAm')}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder="አየለ"
               disabled={loading}
             />
@@ -473,9 +471,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.middleName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder="Michael"
               disabled={loading}
             />
@@ -496,9 +493,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.middleNameAm}
               onChange={(e) => handleAmharicInputChange(e, 'middleNameAm')}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder="በቀለ"
               disabled={loading}
             />
@@ -519,9 +515,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.lastName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder="Doe"
               disabled={loading}
             />
@@ -542,9 +537,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.lastNameAm}
               onChange={(e) => handleAmharicInputChange(e, 'lastNameAm')}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder="ዮሐንስ"
               disabled={loading}
             />
@@ -563,9 +557,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               onValueChange={(value: Gender) => formik.setFieldValue('gender', value)}
               disabled={loading}
             >
-              <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
-              }`}>
+              <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
+                }`}>
                 <SelectValue placeholder="Select Gender" />
               </SelectTrigger>
               <SelectContent>
@@ -593,9 +586,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.nationality}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
+                }`}
               placeholder="Ethiopian"
               disabled={loading}
             />
@@ -625,9 +617,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 value={formik.values.employmentDate}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('employmentDate') ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentDate') ? "border-red-500" : "border-gray-300"
+                  }`}
                 required
                 disabled={loading}
               />
@@ -662,11 +653,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 onSelect={handleDepartmentSelect}
                 label="Select Department"
                 placeholder={
-                  !formik.values.branchId 
-                    ? "Select a branch first" 
-                    : departments.length === 0 
-                    ? "No departments available" 
-                    : "Select a department"
+                  !formik.values.branchId
+                    ? "Select a branch first"
+                    : departments.length === 0
+                      ? "No departments available"
+                      : "Select a department"
                 }
                 disabled={loadingDepartments || loading || !formik.values.branchId || departments.length === 0}
               />
@@ -688,11 +679,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 onSelect={handlePositionSelect}
                 label="Select Position"
                 placeholder={
-                  !formik.values.departmentId 
-                    ? "Select a department first" 
-                    : positions.length === 0 
-                    ? "No positions available" 
-                    : "Select a position"
+                  !formik.values.departmentId
+                    ? "Select a department first"
+                    : positions.length === 0
+                      ? "No positions available"
+                      : "Select a position"
                 }
                 disabled={loadingPositions || loading || !formik.values.departmentId || positions.length === 0}
               />
@@ -735,9 +726,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 onValueChange={(value: EmpType) => formik.setFieldValue('employmentType', value)}
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('employmentType') ? "border-red-500" : "border-gray-300"
-                }`}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentType') ? "border-red-500" : "border-gray-300"
+                  }`}>
                   <SelectValue placeholder="Select Employment Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -763,9 +753,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 onValueChange={(value: EmpNature) => formik.setFieldValue('employmentNature', value)}
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('employmentNature') ? "border-red-500" : "border-gray-300"
-                }`}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentNature') ? "border-red-500" : "border-gray-300"
+                  }`}>
                   <SelectValue placeholder="Select Employment Nature" />
                 </SelectTrigger>
                 <SelectContent>

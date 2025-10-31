@@ -39,7 +39,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const file = e.dataTransfer.files?.[0];
     if (file && isImageFile(file)) {
       onProfilePictureSelect(file);
@@ -68,15 +68,16 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             type="file"
             className="hidden"
             accept="image/*"
+            id="file"
+            name="file"
             onChange={handleFileChange}
           />
           <div
             className={`
               w-32 h-32 rounded-2xl border-2 border-dashed transition-all duration-200
-              ${
-                isDragging
-                  ? "border-green-500 bg-green-50 scale-105"
-                  : profilePicture
+              ${isDragging
+                ? "border-green-500 bg-green-50 scale-105"
+                : profilePicture
                   ? "border-gray-300"
                   : "border-gray-300 hover:border-green-400 bg-gray-50"
               }
@@ -102,7 +103,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             )}
           </div>
         </label>
-        
+
         {profilePicture && (
           <button
             type="button"
@@ -113,7 +114,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
           </button>
         )}
       </div>
-      
+
       {profilePicture && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

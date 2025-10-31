@@ -8,7 +8,9 @@ class EmpService {
     // POST: api/hrm/profile/v1/Step1
     async empAddStep1(step1: Step1Dto): Promise<EmpAddRes> {
         try {
-            const response = await api.post(`${this.baseUrl}/Step1`, step1);
+            const response = await api.post(`${this.baseUrl}/Step1`, step1, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             return response.data.id;
         } catch (error) {
             console.error("Failed to create Employee :", error);
@@ -16,7 +18,7 @@ class EmpService {
         }
     }
 
-    // POST: api/hrm/profile/v1/Step1
+    // POST: api/hrm/profile/v1/Step2
     async empAddStep2(step2: Step2Dto): Promise<EmpAddRes> {
         try {
             const response = await api.post(`${this.baseUrl}/Step2`, step2);
@@ -27,7 +29,7 @@ class EmpService {
         }
     }
 
-    // POST: api/hrm/profile/v1/Step1
+    // POST: api/hrm/profile/v1/Step3
     async empAddStep3(step3: Step3Dto): Promise<EmpAddRes> {
         try {
             const response = await api.post(`${this.baseUrl}/Step3`, step3);
@@ -38,10 +40,12 @@ class EmpService {
         }
     }
 
-    // POST: api/hrm/profile/v1/Step1
+    // POST: api/hrm/profile/v1/Step4
     async empAddStep4(step4: Step4Dto): Promise<EmpAddRes> {
         try {
-            const response = await api.post(`${this.baseUrl}/Step4`, step4);
+            const response = await api.post(`${this.baseUrl}/Step4`, step4, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             return response.data.id;
         } catch (error) {
             console.error("Failed to create Employee :", error);
