@@ -92,7 +92,12 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     onSubmit: (values) => {
       // Clear previous errors when submitting
       setSubmitError(null);
-      onNext(values);
+      
+      const submitData: Step1Dto & { branchId: UUID } = {
+        ...values,
+      };
+      
+      onNext(submitData);
     },
   });
 
