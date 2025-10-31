@@ -3,7 +3,6 @@ import type { BaseDto } from './BaseDto';
 
 export type { UUID };
 
-
 export interface DeptListDto extends BaseDto {
   branchId: UUID;
   name: string;
@@ -27,4 +26,11 @@ export interface EditDeptDto {
   deptStat: string;
   branchId: UUID;
   rowVersion: string;
+}
+
+export interface BranchDeptList {
+  id: UUID;
+  branchId: UUID;
+  dept: string;
+  branch: string;
 }

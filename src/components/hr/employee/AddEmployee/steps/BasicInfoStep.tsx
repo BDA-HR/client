@@ -16,9 +16,9 @@ import { positionService } from '../../../../../services/hr/settings/positionSer
 import { jobGradeService } from '../../../../../services/hr/settings/JobGradeServives';
 import type { ListItem } from '../../../../../types/List/list';
 import type { BranchCompListDto } from '../../../../../types/core/branch';
-import type { NameListDto } from '../../../../../types/hr/NameListDto';
 import type { PositionListDto } from '../../../../../types/hr/position';
 import type { JobGradeListDto } from '../../../../../types/hr/jobgrade';
+import type { BranchDeptList } from '../../../../../types/core/dept';
 
 interface BasicInfoStepProps {
   data: Partial<Step1Dto & { branchId: UUID }>;
@@ -52,7 +52,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   loading = false 
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
-  const [departments, setDepartments] = useState<NameListDto[]>([]);
+  const [allBranchDepartments, setAllBranchDepartments] = useState<BranchDeptList[]>([]);
+  const [filteredDepartments, setFilteredDepartments] = useState<BranchDeptList[]>([]);
   const [positions, setPositions] = useState<PositionListDto[]>([]);
   const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(false);
@@ -105,7 +106,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         
         // Auto-select first branch if none is selected and we have branches
         if (!formik.values.branchId && branchesData.length > 0) {
-          formik.setFieldValue('branchId', branchesData[0].id);
+          const firstBranchId = branchesData[0].id;
+          formik.setFieldValue('branchId', firstBranchId);
         }
       } catch (error) {
         console.error('Error fetching branches:', error);
@@ -118,28 +120,57 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     fetchBranches();
   }, []);
 
-  // Fetch departments when component mounts
+  // Fetch all branch-department relationships when component mounts
   useEffect(() => {
-    const fetchDepartments = async () => {
+    const fetchAllBranchDepartments = async () => {
       try {
         setLoadingDepartments(true);
-        const departmentsData = await departmentService.getAllDepartments();
-        setDepartments(departmentsData);
-        
-        // Auto-select first department if none is selected and we have departments
-        if (!formik.values.departmentId && departmentsData.length > 0) {
-          formik.setFieldValue('departmentId', departmentsData[0].id);
-        }
+        const branchDeptData = await departmentService.getBranchDepartmentNames();
+        setAllBranchDepartments(branchDeptData);
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error('Error fetching branch departments:', error);
         setSubmitError('Failed to load departments');
+        setAllBranchDepartments([]);
       } finally {
         setLoadingDepartments(false);
       }
     };
 
-    fetchDepartments();
+    fetchAllBranchDepartments();
   }, []);
+
+  // Filter departments when branch selection changes
+  useEffect(() => {
+    if (formik.values.branchId && allBranchDepartments.length > 0) {
+      const departmentsForBranch = allBranchDepartments.filter(
+        dept => dept.branchId === formik.values.branchId
+      );
+      setFilteredDepartments(departmentsForBranch);
+      
+      // Auto-select first department if none is selected and we have departments for this branch
+      if (!formik.values.departmentId && departmentsForBranch.length > 0) {
+        formik.setFieldValue('departmentId', departmentsForBranch[0].id);
+      } else if (departmentsForBranch.length === 0) {
+        // Clear department selection if no departments for this branch
+        formik.setFieldValue('departmentId', '');
+      }
+      
+      // Check if current department selection is valid for the selected branch
+      if (formik.values.departmentId && departmentsForBranch.length > 0) {
+        const currentDeptExists = departmentsForBranch.some(dept => dept.id === formik.values.departmentId);
+        if (!currentDeptExists) {
+          // Clear invalid department selection
+          formik.setFieldValue('departmentId', '');
+        }
+      }
+    } else {
+      setFilteredDepartments([]);
+      // Clear department selection if no branch is selected
+      if (formik.values.departmentId) {
+        formik.setFieldValue('departmentId', '');
+      }
+    }
+  }, [formik.values.branchId, allBranchDepartments, formik.values.departmentId]);
 
   // Fetch positions when component mounts
   useEffect(() => {
@@ -193,10 +224,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     name: branch.name
   }));
 
-  // Convert departments to ListItem format
-  const departmentListItems: ListItem[] = departments.map(dept => ({
+  // Convert filtered departments to ListItem format
+  const departmentListItems: ListItem[] = filteredDepartments.map(dept => ({
     id: dept.id,
-    name: dept.name
+    name: dept.dept // Using 'dept' field from BranchDeptList which contains department name
   }));
 
   // Convert positions to ListItem format
@@ -614,11 +645,20 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 selectedValue={formik.values.departmentId}
                 onSelect={handleDepartmentSelect}
                 label="Select Department"
-                placeholder="Select a department"
-                disabled={loadingDepartments || loading}
+                placeholder={
+                  !formik.values.branchId 
+                    ? "Select a branch first" 
+                    : filteredDepartments.length === 0 
+                    ? "No departments available" 
+                    : "Select a department"
+                }
+                disabled={loadingDepartments || loading || !formik.values.branchId || filteredDepartments.length === 0}
               />
               {loadingDepartments && (
                 <p className="text-sm text-gray-500">Loading departments...</p>
+              )}
+              {formik.values.branchId && filteredDepartments.length === 0 && !loadingDepartments && (
+                <p className="text-sm text-gray-500">No departments available for this branch</p>
               )}
               {getErrorMessage('departmentId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('departmentId')}</div>

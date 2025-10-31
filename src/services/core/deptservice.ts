@@ -1,8 +1,10 @@
 import { api } from '../api';
-import type { DeptListDto, AddDeptDto, EditDeptDto, UUID } from '../../types/core/dept';
+import type { DeptListDto, AddDeptDto, EditDeptDto, UUID, BranchDeptList } from '../../types/core/dept';
 
 class DepartmentService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Department`;
+    private listUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Names`;
+
 
   async getAllDepartments(): Promise<DeptListDto[]> {
     try {
@@ -49,6 +51,16 @@ class DepartmentService {
       await api.delete(`${this.baseUrl}/DelDept/${id}`);
     } catch (error) {
       console.error('Error deleting department:', error);
+      throw error;
+    }
+  }
+
+  async getBranchDepartmentNames(): Promise<BranchDeptList[]> {
+    try {
+      const response = await api.get(`${this.listUrl}/BranchDept`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching branch department names:', error);
       throw error;
     }
   }
