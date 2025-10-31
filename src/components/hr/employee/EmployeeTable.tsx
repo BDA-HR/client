@@ -9,7 +9,8 @@ import {
   User,
   X,
   MapPin,
-  Loader2
+  Loader2,
+  Building
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { EmployeeListDto } from '../../../types/hr/employee';
@@ -163,6 +164,23 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     }
   };
 
+  const getBranchColor = (branch: string | undefined): string => {
+    const branchStr = branch?.toString() || '';
+    switch (branchStr) {
+      case "Main Branch":
+      case "Head Office": return "bg-blue-100 text-blue-800";
+      case "Branch 1":
+      case "North Branch": return "bg-green-100 text-green-800";
+      case "Branch 2":
+      case "South Branch": return "bg-purple-100 text-purple-800";
+      case "Branch 3":
+      case "East Branch": return "bg-orange-100 text-orange-800";
+      case "Branch 4":
+      case "West Branch": return "bg-pink-100 text-pink-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
   const getStatusColor = (status: "active" | "on-leave" | undefined): string => {
     return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
   };
@@ -182,6 +200,19 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
       case "9": return "Innovation";
       case "10": return "Customer Service";
       default: return deptStr || "Not specified";
+    }
+  };
+
+  // Helper function to get display value for branch
+  const getBranchDisplay = (branch: string | undefined): string => {
+    const branchStr = branch?.toString() || '';
+    switch (branchStr) {
+      case "1": return "Main Branch";
+      case "2": return "Branch 1";
+      case "3": return "Branch 2";
+      case "4": return "Branch 3";
+      case "5": return "Branch 4";
+      default: return branchStr || "Not specified";
     }
   };
 
@@ -301,7 +332,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   Employee
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                  Status
+                  Branch
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Department
@@ -356,9 +387,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status || 'active')}`}>
-                        {employee.status === "on-leave" ? "On Leave" : "Active"}
-                      </span>
+                      <div className="flex items-center">
+                        <Building className="text-gray-400 mr-2 h-4 w-4" />
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchColor(employee.branch)}`}>
+                          {getBranchDisplay(employee.branch)}
+                        </span>
+                      </div>
                     </td>
                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell ${getDepartmentColor(employee.department)}`}>
                       {getDepartmentDisplay(employee.department)}
@@ -550,6 +584,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     Employment Details
                   </h3>
                   <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Branch</p>
+                      <p className="font-medium">{getBranchDisplay(selectedEmployee.branch)}</p>
+                    </div>
                     <div>
                       <p className="text-sm text-gray-500">Department</p>
                       <p className="font-medium">{getDepartmentDisplay(selectedEmployee.department)}</p>
