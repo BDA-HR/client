@@ -24,6 +24,7 @@ interface BasicInfoStepProps {
   data: Partial<Step1Dto & { branchId: UUID }>;
   onNext: (data: Step1Dto & { branchId: UUID }) => void;
   onBack: () => void;
+  loading?: boolean;
 }
 
 const validationSchema = yup.object({
@@ -44,7 +45,12 @@ const validationSchema = yup.object({
   employmentNature: yup.string().required('Employment nature is required'),
 });
 
-export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBack }) => {
+export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ 
+  data, 
+  onNext, 
+  onBack,
+  loading = false 
+}) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [departments, setDepartments] = useState<NameListDto[]>([]);
   const [positions, setPositions] = useState<PositionListDto[]>([]);
@@ -53,6 +59,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [loadingPositions, setLoadingPositions] = useState(false);
   const [loadingJobGrades, setLoadingJobGrades] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Set default employment date to today if not provided
   const getDefaultEmploymentDate = () => {
@@ -82,6 +89,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
     enableReinitialize: true,
     validateOnMount: true,
     onSubmit: (values) => {
+      // Clear previous errors when submitting
+      setSubmitError(null);
       onNext(values);
     },
   });
@@ -100,6 +109,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
         }
       } catch (error) {
         console.error('Error fetching branches:', error);
+        setSubmitError('Failed to load branches');
       } finally {
         setLoadingBranches(false);
       }
@@ -122,6 +132,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
         }
       } catch (error) {
         console.error('Error fetching departments:', error);
+        setSubmitError('Failed to load departments');
       } finally {
         setLoadingDepartments(false);
       }
@@ -144,6 +155,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
         }
       } catch (error) {
         console.error('Error fetching positions:', error);
+        setSubmitError('Failed to load positions');
       } finally {
         setLoadingPositions(false);
       }
@@ -166,6 +178,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
         }
       } catch (error) {
         console.error('Error fetching job grades:', error);
+        setSubmitError('Failed to load job grades');
       } finally {
         setLoadingJobGrades(false);
       }
@@ -201,21 +214,37 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
   // Handle branch selection
   const handleBranchSelect = (item: ListItem) => {
     formik.setFieldValue('branchId', item.id);
+    // Clear error when user selects a branch
+    if (submitError && formik.errors.branchId) {
+      setSubmitError(null);
+    }
   };
 
   // Handle department selection
   const handleDepartmentSelect = (item: ListItem) => {
     formik.setFieldValue('departmentId', item.id);
+    // Clear error when user selects a department
+    if (submitError && formik.errors.departmentId) {
+      setSubmitError(null);
+    }
   };
 
   // Handle position selection
   const handlePositionSelect = (item: ListItem) => {
     formik.setFieldValue('positionId', item.id);
+    // Clear error when user selects a position
+    if (submitError && formik.errors.positionId) {
+      setSubmitError(null);
+    }
   };
 
   // Handle job grade selection
   const handleJobGradeSelect = (item: ListItem) => {
     formik.setFieldValue('jobGradeId', item.id);
+    // Clear error when user selects a job grade
+    if (submitError && formik.errors.jobGradeId) {
+      setSubmitError(null);
+    }
   };
 
   // Amharic input handlers
@@ -237,10 +266,12 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
     formik.setFieldValue('File', null);
   };
 
-  // Simplified form validation - only check if form is valid
+  // Simplified form validation
   const isFormValid = React.useMemo(() => {
-    return formik.isValid;
-  }, [formik.isValid]);
+    if (loading) return false;
+    
+    return formik.isValid && formik.dirty;
+  }, [formik.isValid, formik.dirty, loading]);
 
   // Helper function to safely get error messages
   const getErrorMessage = (fieldName: string): string => {
@@ -253,6 +284,30 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
     return '';
   };
 
+  // Handle form submission with validation
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate all fields
+    formik.validateForm().then(errors => {
+      if (Object.keys(errors).length === 0) {
+        // No errors, submit the form
+        formik.handleSubmit();
+      } else {
+        // Set a general error message
+        setSubmitError('Please fill in all required fields correctly before submitting.');
+        
+        // Mark all fields as touched to show errors
+        const allFields = Object.keys(formik.values) as Array<keyof (Step1Dto & { branchId: UUID })>;
+        const touchedFields: Partial<Record<keyof (Step1Dto & { branchId: UUID }), boolean>> = {};
+        allFields.forEach(field => {
+          touchedFields[field] = true;
+        });
+        formik.setTouched(touchedFields);
+      }
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -261,7 +316,38 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
-      <form onSubmit={formik.handleSubmit} className="space-y-8">
+      {/* Error Display */}
+      {submitError && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4"
+        >
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <p className="text-sm text-red-700 mt-1">{submitError}</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <button
+                onClick={() => setSubmitError(null)}
+                className="text-red-800 hover:text-red-900"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-8">
         {/* Profile Picture Section */}
         <div className="flex flex-col items-center mb-8">
           <ProfilePictureUpload
@@ -298,6 +384,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="John"
+              disabled={loading}
             />
             {getErrorMessage('firstName') && (
               <div className="text-red-500 text-xs mt-1">{getErrorMessage('firstName')}</div>
@@ -320,6 +407,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="አየለ"
+              disabled={loading}
             />
             {getErrorMessage('firstNameAm') && (
               <div className="text-red-500 text-xs mt-1">{getErrorMessage('firstNameAm')}</div>
@@ -342,6 +430,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Michael"
+              disabled={loading}
             />
             {getErrorMessage('middleName') && (
               <div className="text-red-500 text-xs mt-1">{getErrorMessage('middleName')}</div>
@@ -364,6 +453,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="በቀለ"
+              disabled={loading}
             />
             {getErrorMessage('middleNameAm') && (
               <div className="text-red-500 text-xs mt-1">{getErrorMessage('middleNameAm')}</div>
@@ -386,6 +476,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Doe"
+              disabled={loading}
             />
             {getErrorMessage('lastName') && (
               <div className="text-red-500 text-xs mt-1">{getErrorMessage('lastName')}</div>
@@ -408,6 +499,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="ዮሐንስ"
+              disabled={loading}
             />
             {getErrorMessage('lastNameAm') && (
               <div className="text-red-500 text-xs mt-1">{getErrorMessage('lastNameAm')}</div>
@@ -422,6 +514,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
             <Select
               value={formik.values.gender}
               onValueChange={(value: Gender) => formik.setFieldValue('gender', value)}
+              disabled={loading}
             >
               <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                 getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
@@ -457,6 +550,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Ethiopian"
+              disabled={loading}
             />
             {getErrorMessage('nationality') && (
               <div className="text-red-500 text-xs mt-1">{getErrorMessage('nationality')}</div>
@@ -488,6 +582,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                   getErrorMessage('employmentDate') ? "border-red-500" : "border-gray-300"
                 }`}
                 required
+                disabled={loading}
               />
               {getErrorMessage('employmentDate') && (
                 <p className="text-red-500 text-sm mt-1">{getErrorMessage('employmentDate')}</p>
@@ -502,8 +597,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 onSelect={handleBranchSelect}
                 label="Select Branch"
                 placeholder="Select a branch"
-                // required
-                disabled={loadingBranches}
+                disabled={loadingBranches || loading}
               />
               {loadingBranches && (
                 <p className="text-sm text-gray-500">Loading branches...</p>
@@ -521,8 +615,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 onSelect={handleDepartmentSelect}
                 label="Select Department"
                 placeholder="Select a department"
-                // required
-                disabled={loadingDepartments}
+                disabled={loadingDepartments || loading}
               />
               {loadingDepartments && (
                 <p className="text-sm text-gray-500">Loading departments...</p>
@@ -540,8 +633,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 onSelect={handlePositionSelect}
                 label="Select Position"
                 placeholder="Select a position"
-                // required
-                disabled={loadingPositions}
+                disabled={loadingPositions || loading}
               />
               {loadingPositions && (
                 <p className="text-sm text-gray-500">Loading positions...</p>
@@ -559,8 +651,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
                 onSelect={handleJobGradeSelect}
                 label="Select Job Grade"
                 placeholder="Select a job grade"
-                // required
-                disabled={loadingJobGrades}
+                disabled={loadingJobGrades || loading}
               />
               {loadingJobGrades && (
                 <p className="text-sm text-gray-500">Loading job grades...</p>
@@ -578,6 +669,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
               <Select
                 value={formik.values.employmentType}
                 onValueChange={(value: EmpType) => formik.setFieldValue('employmentType', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('employmentType') ? "border-red-500" : "border-gray-300"
@@ -605,6 +697,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
               <Select
                 value={formik.values.employmentNature}
                 onValueChange={(value: EmpNature) => formik.setFieldValue('employmentNature', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('employmentNature') ? "border-red-500" : "border-gray-300"
@@ -631,16 +724,24 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onNext, onBa
           <button
             type="button"
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            disabled={loading}
+            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
             Back
           </button>
           <button
             type="submit"
-            disabled={!isFormValid}
-            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={!isFormValid || loading}
+            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Save & Continue
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Saving...
+              </>
+            ) : (
+              'Save & Continue'
+            )}
           </button>
         </div>
       </form>

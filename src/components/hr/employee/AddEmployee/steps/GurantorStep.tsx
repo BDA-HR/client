@@ -19,6 +19,8 @@ interface GuarantorStepProps {
   data: Partial<Step4Dto>;
   onNext: (data: Step4Dto) => void;
   onBack: () => void;
+  employeeId?: UUID;
+  loading?: boolean;
 }
 
 const validationSchema = yup.object({
@@ -30,15 +32,23 @@ const validationSchema = yup.object({
   lastNameAm: yup.string().required('Last name (Amharic) is required'),
   nationality: yup.string().required('Nationality is required'),
   gender: yup.string().required('Gender is required'),
+  relationId: yup.string().required('Relation is required'),
   addressType: yup.string().required('Address type is required'),
   country: yup.string().required('Country is required'),
   region: yup.string().required('Region is required'),
   telephone: yup.string().required('Telephone is required'),
 });
 
-export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBack }) => {
+export const GuarantorStep: React.FC<GuarantorStepProps> = ({ 
+  data, 
+  onNext, 
+  onBack,
+  employeeId,
+  loading = false 
+}) => {
   const [relations, setRelations] = useState<ListItem[]>([]);
   const [loadingRelations, setLoadingRelations] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const formik = useFormik<Step4Dto>({
     initialValues: {
@@ -51,7 +61,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
       nationality: data.nationality || '',
       gender: data.gender || '' as Gender,
       relationId: data.relationId || '' as UUID,
-      employeeId: data.employeeId || '' as UUID,
+      employeeId: employeeId || data.employeeId || '' as UUID,
       addressType: data.addressType || '' as AddressType,
       addressTypeStr: data.addressTypeStr || '',
       country: data.country || '',
@@ -72,9 +82,18 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
     enableReinitialize: true,
     validateOnMount: true,
     onSubmit: (values) => {
+      // Clear previous errors when submitting
+      setSubmitError(null);
       onNext(values);
     },
   });
+
+  // Update employeeId when prop changes
+  useEffect(() => {
+    if (employeeId && employeeId !== formik.values.employeeId) {
+      formik.setFieldValue('employeeId', employeeId);
+    }
+  }, [employeeId]);
 
   // Fetch relations when component mounts
   useEffect(() => {
@@ -90,6 +109,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
         }
       } catch (error) {
         console.error('Error fetching relations:', error);
+        setSubmitError('Failed to load relations');
       } finally {
         setLoadingRelations(false);
       }
@@ -101,6 +121,10 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
   // Handle relation selection
   const handleRelationSelect = (item: ListItem) => {
     formik.setFieldValue('relationId', item.id);
+    // Clear error when user selects a relation
+    if (submitError && formik.errors.relationId) {
+      setSubmitError(null);
+    }
   };
 
   // Amharic input handlers
@@ -127,14 +151,13 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
     formik.setFieldValue('File', null);
   };
 
-  // Simplified form validation - only check if form is valid and relations are loaded
+  // Simplified form validation
   const isFormValid = React.useMemo(() => {
-    // Don't enable until relations are loaded
-    if (loadingRelations) return false;
+    if (loadingRelations || loading) return false;
+    if (!employeeId && !formik.values.employeeId) return false;
     
-    // Use formik's built-in validation
-    return formik.isValid;
-  }, [formik.isValid, loadingRelations]);
+    return formik.isValid && formik.dirty;
+  }, [formik.isValid, formik.dirty, loadingRelations, loading, employeeId, formik.values.employeeId]);
 
   // Helper function to safely get error messages
   const getErrorMessage = (fieldName: string): string => {
@@ -150,6 +173,30 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
   // Get the selected relation name for display
   const selectedRelation = relations.find(relation => relation.id === formik.values.relationId);
 
+  // Handle form submission with validation
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate all fields
+    formik.validateForm().then(errors => {
+      if (Object.keys(errors).length === 0) {
+        // No errors, submit the form
+        formik.handleSubmit();
+      } else {
+        // Set a general error message
+        setSubmitError('Please fill in all required fields correctly before submitting.');
+        
+        // Mark all fields as touched to show errors
+        const allFields = Object.keys(formik.values) as Array<keyof Step4Dto>;
+        const touchedFields: Partial<Record<keyof Step4Dto, boolean>> = {};
+        allFields.forEach(field => {
+          touchedFields[field] = true;
+        });
+        formik.setTouched(touchedFields);
+      }
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -158,7 +205,38 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
-      <form onSubmit={formik.handleSubmit} className="space-y-8">
+      {/* Error Display - Similar to Step 3 */}
+      {submitError && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4"
+        >
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <p className="text-sm text-red-700 mt-1">{submitError}</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <button
+                onClick={() => setSubmitError(null)}
+                className="text-red-800 hover:text-red-900"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-8">
         {/* Guarantor Information Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-3">
@@ -183,6 +261,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                     getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="John"
+                  disabled={loading}
                 />
                 {getErrorMessage('firstName') && (
                   <div className="text-red-500 text-xs mt-1">{getErrorMessage('firstName')}</div>
@@ -203,6 +282,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                     getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Michael"
+                  disabled={loading}
                 />
                 {getErrorMessage('middleName') && (
                   <div className="text-red-500 text-xs mt-1">{getErrorMessage('middleName')}</div>
@@ -223,6 +303,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                     getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Doe"
+                  disabled={loading}
                 />
                 {getErrorMessage('lastName') && (
                   <div className="text-red-500 text-xs mt-1">{getErrorMessage('lastName')}</div>
@@ -246,6 +327,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                     getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="አየለ"
+                  disabled={loading}
                 />
                 {getErrorMessage('firstNameAm') && (
                   <div className="text-red-500 text-xs mt-1">{getErrorMessage('firstNameAm')}</div>
@@ -266,6 +348,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                     getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="በቀለ"
+                  disabled={loading}
                 />
                 {getErrorMessage('middleNameAm') && (
                   <div className="text-red-500 text-xs mt-1">{getErrorMessage('middleNameAm')}</div>
@@ -286,6 +369,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                     getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="ዮሐንስ"
+                  disabled={loading}
                 />
                 {getErrorMessage('lastNameAm') && (
                   <div className="text-red-500 text-xs mt-1">{getErrorMessage('lastNameAm')}</div>
@@ -310,6 +394,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                   getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Ethiopian"
+                disabled={loading}
               />
               {getErrorMessage('nationality') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('nationality')}</div>
@@ -323,6 +408,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
               <Select
                 value={formik.values.gender}
                 onValueChange={(value: Gender) => formik.setFieldValue('gender', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
@@ -349,7 +435,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onSelect={handleRelationSelect}
                 label="Select Relation"
                 placeholder="Choose a relation"
-                disabled={loadingRelations}
+                disabled={loadingRelations || loading}
               />
               {loadingRelations && (
                 <p className="text-sm text-gray-500">Loading relations...</p>
@@ -380,6 +466,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
               <Select
                 value={formik.values.addressType}
                 onValueChange={(value: AddressType) => formik.setFieldValue('addressType', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
@@ -414,6 +501,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                   getErrorMessage('country') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Ethiopia"
+                disabled={loading}
               />
               {getErrorMessage('country') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('country')}</div>
@@ -435,6 +523,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                   getErrorMessage('region') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Addis Ababa"
+                disabled={loading}
               />
               {getErrorMessage('region') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('region')}</div>
@@ -453,10 +542,12 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                   country={'et'}
                   value={formik.values.telephone}
                   onChange={handlePhoneChange}
+                  disabled={loading}
                   inputProps={{
                     name: "telephone",
                     required: true,
-                    onBlur: formik.handleBlur
+                    onBlur: formik.handleBlur,
+                    disabled: loading
                   }}
                   inputStyle={{
                     width: '100%',
@@ -465,13 +556,15 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                     outline: 'none',
                     fontSize: '14px',
                     borderRadius: '6px',
-                    border: 'none'
+                    border: 'none',
+                    ...(loading && { backgroundColor: '#f3f4f6', cursor: 'not-allowed' })
                   }}
                   buttonStyle={{
                     border: 'none',
                     borderRight: '1px solid #ccc',
                     borderRadius: '6px 0 0 6px',
-                    backgroundColor: '#f8f9fa'
+                    backgroundColor: '#f8f9fa',
+                    ...(loading && { cursor: 'not-allowed' })
                   }}
                   containerStyle={{
                     width: '100%'
@@ -500,6 +593,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="example@email.com"
+                disabled={loading}
               />
             </div>
 
@@ -516,6 +610,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="Kirkos"
+                disabled={loading}
               />
             </div>
 
@@ -532,6 +627,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="Zone 3"
+                disabled={loading}
               />
             </div>
 
@@ -548,6 +644,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="08"
+                disabled={loading}
               />
             </div>
 
@@ -564,6 +661,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="09"
+                disabled={loading}
               />
             </div>
 
@@ -580,6 +678,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="H-123"
+                disabled={loading}
               />
             </div>
 
@@ -596,6 +695,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="1234"
+                disabled={loading}
               />
             </div>
 
@@ -612,6 +712,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="+251111223344"
+                disabled={loading}
               />
             </div>
 
@@ -628,6 +729,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="https://example.com"
+                disabled={loading}
               />
             </div>
           </div>
@@ -647,16 +749,24 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({ data, onNext, onBa
           <button
             type="button"
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            disabled={loading}
+            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
             Back
           </button>
           <button
             type="submit"
-            disabled={!isFormValid}
-            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={!isFormValid || loading}
+            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Save & Continue
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Saving...
+              </>
+            ) : (
+              'Save & Continue'
+            )}
           </button>
         </div>
       </form>

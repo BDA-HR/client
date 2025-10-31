@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { motion } from 'framer-motion';
@@ -14,6 +14,8 @@ interface BiographicalStepProps {
   data: Partial<Step2Dto>;
   onNext: (data: Step2Dto) => void;
   onBack: () => void;
+  employeeId?: UUID;
+  loading?: boolean;
 }
 
 const validationSchema = yup.object({
@@ -32,7 +34,15 @@ const validationSchema = yup.object({
   telephone: yup.string().required('Telephone is required'),
 });
 
-export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext, onBack }) => {
+export const BiographicalStep: React.FC<BiographicalStepProps> = ({ 
+  data, 
+  onNext, 
+  onBack,
+  employeeId,
+  loading = false 
+}) => {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const formik = useFormik<Step2Dto>({
     initialValues: {
       birthDate: data.birthDate || '',
@@ -41,7 +51,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
       hasBirthCert: data.hasBirthCert || '' as YesNo,
       hasMarriageCert: data.hasMarriageCert || '' as YesNo,
       maritalStatus: data.maritalStatus || '' as MaritalStat,
-      employeeId: data.employeeId || '' as UUID,
+      employeeId: employeeId || data.employeeId || '' as UUID,
       tin: data.tin || '',
       bankAccountNo: data.bankAccountNo || '',
       pensionNumber: data.pensionNumber || '',
@@ -64,6 +74,8 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
     enableReinitialize: true,
     validateOnMount: true,
     onSubmit: (values) => {
+      // Clear previous errors when submitting
+      setSubmitError(null);
       onNext(values);
     },
   });
@@ -75,6 +87,8 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
 
   // Smart form validation that works with pre-filled data
   const isFormValid = React.useMemo(() => {
+    if (loading) return false;
+    if (!employeeId && !formik.values.employeeId) return false;
     if (!formik.isValid) return false;
     
     // Check if all required fields have values (for pre-filled forms)
@@ -94,7 +108,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
       formik.values.telephone;
 
     return formik.dirty || hasAllRequiredFields;
-  }, [formik.isValid, formik.dirty, formik.values]);
+  }, [formik.isValid, formik.dirty, formik.values, loading, employeeId]);
 
   // Helper function to safely get error messages
   const getErrorMessage = (fieldName: string): string => {
@@ -107,6 +121,30 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
     return '';
   };
 
+  // Handle form submission with validation
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate all fields
+    formik.validateForm().then(errors => {
+      if (Object.keys(errors).length === 0) {
+        // No errors, submit the form
+        formik.handleSubmit();
+      } else {
+        // Set a general error message
+        setSubmitError('Please fill in all required fields correctly before submitting.');
+        
+        // Mark all fields as touched to show errors
+        const allFields = Object.keys(formik.values) as Array<keyof Step2Dto>;
+        const touchedFields: Partial<Record<keyof Step2Dto, boolean>> = {};
+        allFields.forEach(field => {
+          touchedFields[field] = true;
+        });
+        formik.setTouched(touchedFields);
+      }
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -115,7 +153,38 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
-      <form onSubmit={formik.handleSubmit} className="space-y-8">
+      {/* Error Display */}
+      {submitError && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4"
+        >
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <p className="text-sm text-red-700 mt-1">{submitError}</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <button
+                onClick={() => setSubmitError(null)}
+                className="text-red-800 hover:text-red-900"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-8">
         {/* Biographical Details Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-3">
@@ -139,6 +208,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('birthDate') ? "border-red-500" : "border-gray-300"
                 }`}
+                disabled={loading}
               />
               {getErrorMessage('birthDate') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('birthDate')}</div>
@@ -160,6 +230,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                   getErrorMessage('birthLocation') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Addis Ababa"
+                disabled={loading}
               />
               {getErrorMessage('birthLocation') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('birthLocation')}</div>
@@ -181,6 +252,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                   getErrorMessage('motherFullName') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Aster Kebede"
+                disabled={loading}
               />
               {getErrorMessage('motherFullName') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('motherFullName')}</div>
@@ -195,6 +267,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
               <Select
                 value={formik.values.maritalStatus}
                 onValueChange={(value: MaritalStat) => formik.setFieldValue('maritalStatus', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('maritalStatus') ? "border-red-500" : "border-gray-300"
@@ -222,6 +295,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
               <Select
                 value={formik.values.hasBirthCert}
                 onValueChange={(value: YesNo) => formik.setFieldValue('hasBirthCert', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('hasBirthCert') ? "border-red-500" : "border-gray-300"
@@ -249,6 +323,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
               <Select
                 value={formik.values.hasMarriageCert}
                 onValueChange={(value: YesNo) => formik.setFieldValue('hasMarriageCert', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('hasMarriageCert') ? "border-red-500" : "border-gray-300"
@@ -293,6 +368,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                   getErrorMessage('tin') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="000123456789"
+                disabled={loading}
               />
               {getErrorMessage('tin') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('tin')}</div>
@@ -314,6 +390,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                   getErrorMessage('bankAccountNo') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="100023456789"
+                disabled={loading}
               />
               {getErrorMessage('bankAccountNo') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('bankAccountNo')}</div>
@@ -335,6 +412,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                   getErrorMessage('pensionNumber') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="PEN123456789"
+                disabled={loading}
               />
               {getErrorMessage('pensionNumber') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('pensionNumber')}</div>
@@ -359,6 +437,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
               <Select
                 value={formik.values.addressType}
                 onValueChange={(value: AddressType) => formik.setFieldValue('addressType', value)}
+                disabled={loading}
               >
                 <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
                   getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
@@ -393,6 +472,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                   getErrorMessage('country') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Ethiopia"
+                disabled={loading}
               />
               {getErrorMessage('country') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('country')}</div>
@@ -414,9 +494,59 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                   getErrorMessage('region') ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Addis Ababa"
+                disabled={loading}
               />
               {getErrorMessage('region') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('region')}</div>
+              )}
+            </div>
+
+            {/* Telephone - Required with PhoneInput */}
+            <div className="space-y-2">
+              <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
+                Telephone *
+              </label>
+              <div className={`w-full border rounded-md transition-colors duration-200 ${
+                getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
+              }`}>
+                <PhoneInput
+                  country={'et'} // Default to Ethiopia
+                  value={formik.values.telephone}
+                  onChange={handlePhoneChange}
+                  disabled={loading}
+                  inputProps={{
+                    name: "telephone",
+                    required: true,
+                    onBlur: formik.handleBlur,
+                    disabled: loading
+                  }}
+                  inputStyle={{
+                    width: '100%',
+                    height: '42px',
+                    paddingLeft: '48px',
+                    outline: 'none',
+                    fontSize: '14px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    ...(loading && { backgroundColor: '#f3f4f6', cursor: 'not-allowed' })
+                  }}
+                  buttonStyle={{
+                    border: 'none',
+                    borderRight: '1px solid #ccc',
+                    borderRadius: '6px 0 0 6px',
+                    backgroundColor: '#f8f9fa',
+                    ...(loading && { cursor: 'not-allowed' })
+                  }}
+                  containerStyle={{
+                    width: '100%'
+                  }}
+                  dropdownStyle={{
+                    borderRadius: '6px'
+                  }}
+                />
+              </div>
+              {getErrorMessage('telephone') && (
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('telephone')}</div>
               )}
             </div>
 
@@ -433,6 +563,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="Kirkos"
+                disabled={loading}
               />
             </div>
 
@@ -449,6 +580,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="Zone 3"
+                disabled={loading}
               />
             </div>
 
@@ -465,6 +597,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="08"
+                disabled={loading}
               />
             </div>
 
@@ -481,6 +614,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="09"
+                disabled={loading}
               />
             </div>
 
@@ -497,52 +631,8 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="H-123"
+                disabled={loading}
               />
-            </div>
-
-            {/* Telephone - Required with PhoneInput */}
-            <div className="space-y-2">
-              <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
-                Telephone *
-              </label>
-              <div className={`w-full border rounded-md transition-colors duration-200 ${
-                getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
-              }`}>
-                <PhoneInput
-                  country={'et'} // Default to Ethiopia
-                  value={formik.values.telephone}
-                  onChange={handlePhoneChange}
-                  inputProps={{
-                    name: "telephone",
-                    required: true,
-                    onBlur: formik.handleBlur
-                  }}
-                  inputStyle={{
-                    width: '100%',
-                    height: '42px',
-                    paddingLeft: '48px',
-                    outline: 'none',
-                    fontSize: '14px',
-                    borderRadius: '6px',
-                    border: 'none'
-                  }}
-                  buttonStyle={{
-                    border: 'none',
-                    borderRight: '1px solid #ccc',
-                    borderRadius: '6px 0 0 6px',
-                    backgroundColor: '#f8f9fa'
-                  }}
-                  containerStyle={{
-                    width: '100%'
-                  }}
-                  dropdownStyle={{
-                    borderRadius: '6px'
-                  }}
-                />
-              </div>
-              {getErrorMessage('telephone') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('telephone')}</div>
-              )}
             </div>
 
             {/* P.O. Box - Optional */}
@@ -558,6 +648,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="1234"
+                disabled={loading}
               />
             </div>
 
@@ -574,6 +665,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="+251111223344"
+                disabled={loading}
               />
             </div>
 
@@ -591,6 +683,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="example@email.com"
+                disabled={loading}
               />
             </div>
 
@@ -607,6 +700,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="https://example.com"
+                disabled={loading}
               />
             </div>
           </div>
@@ -617,16 +711,24 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({ data, onNext
           <button
             type="button"
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            disabled={loading}
+            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
             Back
           </button>
           <button
             type="submit"
-            disabled={!isFormValid}
-            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={!isFormValid || loading}
+            className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Save & Continue
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Saving...
+              </>
+            ) : (
+              'Save & Continue'
+            )}
           </button>
         </div>
       </form>
