@@ -41,9 +41,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onPageChange,
   loading = false
 }) => {
-  const [] = useState<'view' | 'edit' | 'status' | 'terminate' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
-
   const sortedEmployees = [...employees].sort((a, b) => {
     // Use createdAt as fallback for sorting if employmentDate doesn't exist
     const dateA = a.employmentDate || a.createdAt || '';
