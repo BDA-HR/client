@@ -8,14 +8,27 @@ import {
   MoreVertical,
   User,
   X,
-  MapPin
+  MapPin,
+  Loader2
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { EmployeeListDto } from '../../../types/hr/employee';
 
-// Simplified Employee type based on EmployeeListDto
+// Extended Employee type based on EmployeeListDto with optional fields
 type Employee = EmployeeListDto & {
-  status?: "active" | "on-leave"; // Optional status field
+  status?: "active" | "on-leave";
+  // Add optional fields that might not exist in the base type
+  employmentDate?: string;
+  employmentType?: string;
+  employmentNature?: string;
+  nationality?: string;
+  genderStr?: string;
+  employmentTypeStr?: string;
+  employmentNatureStr?: string;
+  employmentDateStr?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 };
 
 interface EmployeeTableProps {
@@ -27,6 +40,7 @@ interface EmployeeTableProps {
   onEmployeeUpdate: (updatedEmployee: Employee) => void;
   onEmployeeStatusChange: (employeeId: string, newStatus: "active" | "on-leave") => void;
   onEmployeeTerminate: (employeeId: string) => void;
+  loading?: boolean;
 }
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({
@@ -37,14 +51,19 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onPageChange,
   onEmployeeUpdate,
   onEmployeeStatusChange,
-  onEmployeeTerminate
+  onEmployeeTerminate,
+  loading = false
 }) => {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'status' | 'terminate' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
+  const [terminating, setTerminating] = useState<string | null>(null);
 
   const sortedEmployees = [...employees].sort((a, b) => {
-    return new Date(b.employmentDate).getTime() - new Date(a.employmentDate).getTime();
+    // Use createdAt as fallback for sorting if employmentDate doesn't exist
+    const dateA = a.employmentDate || a.createdAt || '';
+    const dateB = b.employmentDate || b.createdAt || '';
+    return new Date(dateB).getTime() - new Date(dateA).getTime();
   });
 
   const handleViewDetails = (employee: Employee) => {
@@ -83,10 +102,17 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     }
   };
 
-  const confirmTermination = () => {
+  const confirmTermination = async () => {
     if (selectedEmployee) {
-      onEmployeeTerminate(selectedEmployee.id);
-      setModalType(null);
+      setTerminating(selectedEmployee.id);
+      try {
+        await onEmployeeTerminate(selectedEmployee.id);
+        setModalType(null);
+      } catch (error) {
+        console.error('Error terminating employee:', error);
+      } finally {
+        setTerminating(null);
+      }
     }
   };
 
@@ -95,7 +121,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     setModalType(null);
   };
 
-  const getEmploymentTypeColor = (type: string): string => {
+  const getEmploymentTypeColor = (type: string | undefined): string => {
     const typeStr = type?.toString() || '';
     switch (typeStr) {
       case "0":
@@ -110,7 +136,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     }
   };
 
-  const getDepartmentColor = (dept: string): string => {
+  const getDepartmentColor = (dept: string | undefined): string => {
     const deptStr = dept?.toString() || '';
     switch (deptStr) {
       case "1":
@@ -137,12 +163,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     }
   };
 
-  const getStatusColor = (status: "active" | "on-leave"): string => {
+  const getStatusColor = (status: "active" | "on-leave" | undefined): string => {
     return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
   };
 
   // Helper function to get display value for department
-  const getDepartmentDisplay = (dept: string): string => {
+  const getDepartmentDisplay = (dept: string | undefined): string => {
     const deptStr = dept?.toString() || '';
     switch (deptStr) {
       case "1": return "Human Resources";
@@ -160,7 +186,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   };
 
   // Helper function to get display value for position
-  const getPositionDisplay = (position: string): string => {
+  const getPositionDisplay = (position: string | undefined): string => {
     const positionStr = position?.toString() || '';
     switch (positionStr) {
       case "1": return "HR Manager";
@@ -183,7 +209,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   };
 
   // Helper function to get display value for employment type
-  const getEmploymentTypeDisplay = (type: string): string => {
+  const getEmploymentTypeDisplay = (type: string | undefined): string => {
     const typeStr = type?.toString() || '';
     switch (typeStr) {
       case "0": return "Replacement";
@@ -193,6 +219,55 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
       default: return typeStr || "Not specified";
     }
   };
+
+  // Helper function to get display value for gender
+  const getGenderDisplay = (gender: string | undefined): string => {
+    const genderStr = gender?.toString() || '';
+    switch (genderStr) {
+      case "0": return "Male";
+      case "1": return "Female";
+      case "Male": return "Male";
+      case "Female": return "Female";
+      default: return genderStr || "Not specified";
+    }
+  };
+
+  // Helper function to get display value for employment nature
+  const getEmploymentNatureDisplay = (nature: string | undefined): string => {
+    const natureStr = nature?.toString() || '';
+    switch (natureStr) {
+      case "0": return "Permanent";
+      case "1": return "Contract";
+      case "Permanent": return "Permanent";
+      case "Contract": return "Contract";
+      default: return natureStr || "Not specified";
+    }
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string | undefined): string => {
+    if (!dateString) return "Not specified";
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (loading && employees.length === 0) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-8 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <p className="text-gray-600">Loading employees...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -246,104 +321,116 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
               </motion.tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {sortedEmployees.map((employee, index) => (
-                <motion.tr 
-                  key={employee.id}
-                  custom={index}
-                  initial="hidden"
-                  animate="visible"
-                  whileHover="hover"
-                  className="hover:bg-gray-50"
-                >
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <motion.div 
-                        whileHover={{ rotate: 10 }}
-                        className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center"
-                      >
-                        <User className="text-green-600 h-5 w-5" />
-                      </motion.div>
-                      <div className="ml-3">
-                        <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
-                          {employee.empFullName}
-                        </div>
-                        <div className="text-xs text-gray-400 truncate max-w-[120px] md:max-w-none">
-                          {employee.empFullNameAm}
+              {sortedEmployees.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    {loading ? 'Loading employees...' : 'No employees found'}
+                  </td>
+                </tr>
+              ) : (
+                sortedEmployees.map((employee, index) => (
+                  <motion.tr 
+                    key={employee.id}
+                    custom={index}
+                    initial="hidden"
+                    animate="visible"
+                    whileHover="hover"
+                    className="hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <motion.div 
+                          whileHover={{ rotate: 10 }}
+                          className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center"
+                        >
+                          <User className="text-green-600 h-5 w-5" />
+                        </motion.div>
+                        <div className="ml-3">
+                          <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
+                            {employee.empFullName || "No Name"}
+                          </div>
+                          <div className="text-xs text-gray-400 truncate max-w-[120px] md:max-w-none">
+                            {employee.empFullNameAm || employee.empFullName || "No Name"}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status || 'active')}`}>
-                      {employee.status === "on-leave" ? "On Leave" : "Active"}
-                    </span>
-                  </td>
-                  <td className={`px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell ${getDepartmentColor(employee.department)}`}>
-                    {getDepartmentDisplay(employee.department)}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                    <div className="flex items-center">
-                      <Briefcase className="text-gray-400 mr-2 h-4 w-4" />
-                      <span className="truncate max-w-[120px]">{getPositionDisplay(employee.position)}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
-                    <div className="flex items-center">
-                      <Calendar className="text-gray-400 mr-2 h-4 w-4" />
-                      <span>{employee.employmentDateStr || employee.employmentDate}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <motion.span 
-                      whileHover={{ scale: 1.05 }}
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.employmentTypeStr || employee.employmentType)}`}
-                    >
-                      {getEmploymentTypeDisplay(employee.employmentTypeStr || employee.employmentType)}
-                    </motion.span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Popover open={popoverOpen === employee.id} onOpenChange={(open) => setPopoverOpen(open ? employee.id : null)}>
-                      <PopoverTrigger asChild>
-                        <motion.button 
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
-                        >
-                          <MoreVertical className="h-5 w-5 cursor-pointer" />
-                        </motion.button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48 p-0" align="end">
-                        <div className="py-1">
-                          <button 
-                            onClick={() => handleViewDetails(employee)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status || 'active')}`}>
+                        {employee.status === "on-leave" ? "On Leave" : "Active"}
+                      </span>
+                    </td>
+                    <td className={`px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell ${getDepartmentColor(employee.department)}`}>
+                      {getDepartmentDisplay(employee.department)}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                      <div className="flex items-center">
+                        <Briefcase className="text-gray-400 mr-2 h-4 w-4" />
+                        <span className="truncate max-w-[120px]">{getPositionDisplay(employee.position)}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                      <div className="flex items-center">
+                        <Calendar className="text-gray-400 mr-2 h-4 w-4" />
+                        <span>{formatDate(employee.employmentDateStr || employee.employmentDate || employee.createdAt)}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <motion.span 
+                        whileHover={{ scale: 1.05 }}
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.employmentTypeStr || employee.employmentType || employee.empType)}`}
+                      >
+                        {getEmploymentTypeDisplay(employee.employmentTypeStr || employee.employmentType || employee.empType)}
+                      </motion.span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Popover open={popoverOpen === employee.id} onOpenChange={(open) => setPopoverOpen(open ? employee.id : null)}>
+                        <PopoverTrigger asChild>
+                          <motion.button 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
                           >
-                            View Details
-                          </button>
-                          <button 
-                            onClick={() => handleEdit(employee)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            onClick={() => handleStatusChange(employee)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
-                          >
-                            {employee.status === 'on-leave' ? 'Mark as Active' : 'Mark as On Leave'}
-                          </button>
-                          <button 
-                            onClick={() => handleTerminate(employee)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded"
-                          >
-                            Terminate
-                          </button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </td>
-                </motion.tr>
-              ))}
+                            <MoreVertical className="h-5 w-5 cursor-pointer" />
+                          </motion.button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-48 p-0" align="end">
+                          <div className="py-1">
+                            <button 
+                              onClick={() => handleViewDetails(employee)}
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                            >
+                              View Details
+                            </button>
+                            <button 
+                              onClick={() => handleEdit(employee)}
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleStatusChange(employee)}
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700"
+                            >
+                              {employee.status === 'on-leave' ? 'Mark as Active' : 'Mark as On Leave'}
+                            </button>
+                            <button 
+                              onClick={() => handleTerminate(employee)}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center justify-between"
+                              disabled={terminating === employee.id}
+                            >
+                              Terminate
+                              {terminating === employee.id && (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              )}
+                            </button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -417,9 +504,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
           <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
               <div>
-                <h2 className="text-2xl font-bold">{selectedEmployee.empFullName}</h2>
+                <h2 className="text-2xl font-bold">{selectedEmployee.empFullName || "Employee"}</h2>
                 <p className="text-gray-600">{getPositionDisplay(selectedEmployee.position)} • {getDepartmentDisplay(selectedEmployee.department)}</p>
-                <p className="text-sm text-gray-500">{selectedEmployee.empFullNameAm}</p>
+                <p className="text-sm text-gray-500">{selectedEmployee.empFullNameAm || selectedEmployee.empFullName || "No Name"}</p>
               </div>
               <button
                 onClick={() => setModalType(null)}
@@ -440,19 +527,19 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Employee Code</p>
-                      <p className="font-medium">{selectedEmployee.code}</p>
+                      <p className="font-medium">{selectedEmployee.code || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Gender</p>
-                      <p className="font-medium">{selectedEmployee.genderStr}</p>
+                      <p className="font-medium">{getGenderDisplay(selectedEmployee.genderStr || selectedEmployee.gender)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Nationality</p>
-                      <p className="font-medium">{selectedEmployee.nationality}</p>
+                      <p className="font-medium">{selectedEmployee.nationality || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employment Nature</p>
-                      <p className="font-medium">{selectedEmployee.employmentNatureStr || selectedEmployee.employmentNature}</p>
+                      <p className="font-medium">{getEmploymentNatureDisplay(selectedEmployee.employmentNatureStr || selectedEmployee.employmentNature || selectedEmployee.empNature)}</p>
                     </div>
                   </div>
                 </div>
@@ -473,12 +560,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Job Grade</p>
-                      <p className="font-medium">{selectedEmployee.jobGrade}</p>
+                      <p className="font-medium">{selectedEmployee.jobGrade || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employment Type</p>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType)}`}>
-                        {getEmploymentTypeDisplay(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType)}
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType || selectedEmployee.empType)}`}>
+                        {getEmploymentTypeDisplay(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType || selectedEmployee.empType)}
                       </span>
                     </div>
                   </div>
@@ -495,7 +582,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Employment Date</p>
-                      <p className="font-medium">{selectedEmployee.employmentDateStr || selectedEmployee.employmentDate}</p>
+                      <p className="font-medium">{formatDate(selectedEmployee.employmentDateStr || selectedEmployee.employmentDate || selectedEmployee.createdAt)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Status</p>
@@ -514,15 +601,15 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Created</p>
-                      <p className="font-medium">{selectedEmployee.createdAt}</p>
+                      <p className="font-medium">{formatDate(selectedEmployee.createdAt)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Last Updated</p>
-                      <p className="font-medium">{selectedEmployee.updatedAt}</p>
+                      <p className="font-medium">{formatDate(selectedEmployee.updatedAt)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Updated By</p>
-                      <p className="font-medium">{selectedEmployee.updatedBy}</p>
+                      <p className="font-medium">{selectedEmployee.updatedBy || "System"}</p>
                     </div>
                   </div>
                 </div>
@@ -628,9 +715,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 </button>
                 <button
                   onClick={confirmTermination}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white"
+                  disabled={terminating === selectedEmployee.id}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white disabled:bg-red-400 disabled:cursor-not-allowed flex items-center space-x-2"
                 >
-                  Terminate
+                  {terminating === selectedEmployee.id && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  <span>{terminating === selectedEmployee.id ? 'Terminating...' : 'Terminate'}</span>
                 </button>
               </div>
             </div>

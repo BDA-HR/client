@@ -5,43 +5,64 @@ import EmployeeStatsCards from '../../../components/hr/employee/EmployeeStatsCar
 import EmployeeSearchFilters from '../../../components/hr/employee/EmployeeSearchFilters';
 import EmployeeTable from '../../../components/hr/employee/EmployeeTable';
 import type { EmployeeListDto } from '../../../types/hr/employee';
-import { initialEmployees } from '../../../data/hr/employee';
+import { employeeService } from '../../../services/hr/employee/employees';
+import type { UUID } from 'crypto';
 
 // Extended type for local state management
 type EmployeeWithStatus = EmployeeListDto & {
   status?: "active" | "on-leave";
+  employmentTypeStr?: string;
+  nationality?: string;
 };
 
 const EmployeeManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const itemsPerPage = 10;
-  const [employees, setEmployees] = useState<EmployeeWithStatus[]>(initialEmployees);
+  const [employees, setEmployees] = useState<EmployeeWithStatus[]>([]);
   const [previousStats, setPreviousStats] = useState({
     total: 0,
     active: 0,
     onLeave: 0
   });
+  const [error, setError] = useState<string | null>(null);
 
-  // Load employees from localStorage on component mount
+  // Load employees from API on component mount
   useEffect(() => {
-    const loadEmployees = () => {
-      try {
-        const savedEmployees = localStorage.getItem('employees');
-        if (savedEmployees) {
-          const parsedEmployees = JSON.parse(savedEmployees);
-          if (Array.isArray(parsedEmployees) && parsedEmployees.length > 0) {
-            setEmployees(parsedEmployees);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading employees from localStorage:', error);
-      }
-    };
-
-    loadEmployees();
+    loadEmployeesFromAPI();
   }, []);
+
+  // Load employees from API
+  const loadEmployeesFromAPI = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const employeesData = await employeeService.getAllEmployees();
+      
+      // Add status and other required fields to employees
+      const employeesWithStatus: EmployeeWithStatus[] = employeesData.map((emp: EmployeeListDto) => ({
+        ...emp,
+        status: "active", // Default status, you can modify this based on your business logic
+        employmentTypeStr: emp.empType, // Map empType to employmentTypeStr
+        nationality: "Ethiopian" // Default nationality, you can modify this based on your data
+      }));
+      
+      setEmployees(employeesWithStatus);
+      
+      // Update previous stats
+      setPreviousStats({
+        total: employeesWithStatus.length,
+        active: employeesWithStatus.filter(e => e.status === "active").length,
+        onLeave: employeesWithStatus.filter(e => e.status === "on-leave").length
+      });
+      
+    } catch (error) {
+      console.error('Error fetching employees from API:', error);
+      setError('Failed to load employees. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Check for new employee data when component mounts or when returning from add employee page
   useEffect(() => {
@@ -58,6 +79,7 @@ const EmployeeManagementPage = () => {
           sessionStorage.removeItem('employeeAdded');
         } catch (error) {
           console.error('Error parsing new employee data:', error);
+          setError('Error adding new employee data.');
         }
       }
     };
@@ -107,13 +129,6 @@ const EmployeeManagementPage = () => {
     const updatedEmployees = [newEmployee, ...employees];
     setEmployees(updatedEmployees);
     setCurrentPage(1);
-    
-    // Update localStorage
-    try {
-      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
-    } catch (error) {
-      console.error('Error updating localStorage:', error);
-    }
   };
 
   const handleEmployeeUpdate = (updatedEmployee: EmployeeWithStatus) => {
@@ -129,13 +144,6 @@ const EmployeeManagementPage = () => {
     );
     
     setEmployees(updatedEmployees);
-    
-    // Update localStorage
-    try {
-      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
-    } catch (error) {
-      console.error('Error updating localStorage:', error);
-    }
   };
 
   const handleEmployeeStatusChange = (employeeId: string, newStatus: "active" | "on-leave") => {
@@ -149,53 +157,49 @@ const EmployeeManagementPage = () => {
     const updatedEmployees = employees.map(emp => 
       emp.id === employeeId ? { 
         ...emp, 
-        status: newStatus,
-        updatedAt: new Date().toISOString().split('T')[0]
+        status: newStatus
       } : emp
     );
     
     setEmployees(updatedEmployees);
-    
-    // Update localStorage
-    try {
-      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
-    } catch (error) {
-      console.error('Error updating localStorage:', error);
-    }
   };
 
-  const handleEmployeeTerminate = (employeeId: string) => {
-    // Update previous stats before making changes
-    setPreviousStats({
-      total: employees.length,
-      active: employees.filter(e => e.status === "active").length,
-      onLeave: employees.filter(e => e.status === "on-leave").length
-    });
-
-    const updatedEmployees = employees.filter(emp => emp.id !== employeeId);
-    setEmployees(updatedEmployees);
-    
-    // Update localStorage
+  const handleEmployeeTerminate = async (employeeId: string) => {
     try {
-      localStorage.setItem('employees', JSON.stringify(updatedEmployees));
-    } catch (error) {
-      console.error('Error updating localStorage:', error);
-    }
-  };
-
-  const handleRefresh = () => {
-    setLoading(true);
-    // Simulate API refresh
-    setTimeout(() => {
-      setLoading(false);
-      // Update previous stats on refresh
+      setError(null);
+      // Call the API to delete the employee
+      await employeeService.deleteEmployee(employeeId as UUID);
+      
+      // Update previous stats before making changes
       setPreviousStats({
         total: employees.length,
         active: employees.filter(e => e.status === "active").length,
         onLeave: employees.filter(e => e.status === "on-leave").length
       });
-      console.log('Data refreshed');
-    }, 1000);
+
+      // Remove employee from local state
+      const updatedEmployees = employees.filter(emp => emp.id !== employeeId);
+      setEmployees(updatedEmployees);
+      
+      console.log('Employee terminated successfully');
+    } catch (error) {
+      console.error('Error terminating employee:', error);
+      setError('Failed to terminate employee. Please try again.');
+    }
+  };
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await loadEmployeesFromAPI();
+      console.log('Data refreshed from API');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      setError('Failed to refresh data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Filter employees based on search only
@@ -216,6 +220,7 @@ const EmployeeManagementPage = () => {
   });
 
   // Pagination logic
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
   const paginatedEmployees = filteredEmployees.slice(
     (currentPage - 1) * itemsPerPage,
@@ -238,35 +243,95 @@ const EmployeeManagementPage = () => {
         <div className="flex flex-col space-y-6">
           <EmployeeManagementHeader />
           
-          <EmployeeStatsCards 
-            totalEmployees={totalEmployees}
-            activeEmployees={activeEmployees}
-            onLeaveEmployees={onLeaveEmployees}
-            previousTotal={previousStats.total}
-            previousActive={previousStats.active}
-            previousOnLeave={previousStats.onLeave}
-          />
+          {/* Error Display */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+            >
+              <div className="flex justify-between items-center">
+                <span className="font-medium">
+                  {error.includes("load") ? (
+                    <>
+                      Failed to load employees.{" "}
+                      <button
+                        onClick={loadEmployeesFromAPI}
+                        className="underline hover:text-red-800 font-semibold focus:outline-none"
+                      >
+                        Try again
+                      </button>{" "}
+                      later.
+                    </>
+                  ) : error.includes("terminate") ? (
+                    "Failed to terminate employee. Please try again."
+                  ) : error.includes("refresh") ? (
+                    "Failed to refresh data. Please try again."
+                  ) : error.includes("adding") ? (
+                    "Error adding new employee data."
+                  ) : (
+                    error
+                  )}
+                </span>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+                >
+                  ×
+                </button>
+              </div>
+            </motion.div>
+          )}
 
-          <EmployeeSearchFilters 
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filters={{ department: '', status: '', employmentType: '' }} // Empty filters
-            setFilters={() => {}} // Empty function
-            employees={employees}
-            onRefresh={handleRefresh}
-            loading={loading}
-          />
+          {/* Loading State for Stats and Table */}
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-center items-center py-8"
+            >
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading employees...</p>
+              </div>
+            </motion.div>
+          )}
 
-          <EmployeeTable 
-            employees={paginatedEmployees}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={filteredEmployees.length}
-            onPageChange={setCurrentPage}
-            onEmployeeUpdate={handleEmployeeUpdate}
-            onEmployeeStatusChange={handleEmployeeStatusChange}
-            onEmployeeTerminate={handleEmployeeTerminate}
-          />
+          {/* Content Area - Only show when not loading */}
+          {!loading && (
+            <>
+              <EmployeeStatsCards 
+                totalEmployees={totalEmployees}
+                activeEmployees={activeEmployees}
+                onLeaveEmployees={onLeaveEmployees}
+                previousTotal={previousStats.total}
+                previousActive={previousStats.active}
+                previousOnLeave={previousStats.onLeave}
+              />
+
+              <EmployeeSearchFilters 
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filters={{ department: '', status: '', employmentType: '' }}
+                setFilters={() => {}}
+                employees={employees}
+                onRefresh={handleRefresh}
+                loading={loading}
+              />
+
+              <EmployeeTable 
+                employees={paginatedEmployees}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredEmployees.length}
+                onPageChange={setCurrentPage}
+                onEmployeeUpdate={handleEmployeeUpdate}
+                onEmployeeStatusChange={handleEmployeeStatusChange}
+                onEmployeeTerminate={handleEmployeeTerminate}
+                loading={loading}
+              />
+            </>
+          )}
         </div>
       </div>
     </motion.div>
