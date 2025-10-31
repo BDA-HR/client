@@ -60,10 +60,25 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const [loadingPositions, setLoadingPositions] = useState(false);
   const [loadingJobGrades, setLoadingJobGrades] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [photoData, setPhotoData] = useState<string | null>(null);
 
   // Set default employment date to today if not provided
   const getDefaultEmploymentDate = () => {
     return data.employmentDate || new Date().toISOString().split('T')[0];
+  };
+
+  // Function to convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // Remove the data:image/[type];base64, prefix to get just the base64 data
+        const base64 = (reader.result as string).split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = error => reject(error);
+    });
   };
 
   const formik = useFormik<Step1Dto & { branchId: UUID }>({
@@ -88,9 +103,17 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     validationSchema,
     enableReinitialize: true,
     validateOnMount: true,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       setSubmitError(null);
-      onNext(values);
+      
+      // Prepare the data to send to backend
+      const submitData = {
+        ...values,
+        // Convert file to base64 if exists
+        photoData: photoData || null
+      };
+      
+      onNext(submitData);
     },
   });
 
@@ -272,12 +295,23 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     }
   };
 
-  const handleProfilePictureSelect = (file: File) => {
-    formik.setFieldValue('File', file);
+  // Handle profile picture selection and convert to base64
+  const handleProfilePictureSelect = async (file: File) => {
+    try {
+      formik.setFieldValue('File', file);
+      
+      // Convert the file to base64
+      const base64String = await fileToBase64(file);
+      setPhotoData(base64String);
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      setSubmitError('Failed to process the image. Please try again.');
+    }
   };
 
   const handleProfilePictureRemove = () => {
     formik.setFieldValue('File', null);
+    setPhotoData(null);
   };
 
   // Simplified form validation
@@ -363,6 +397,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             onProfilePictureSelect={handleProfilePictureSelect}
             onProfilePictureRemove={handleProfilePictureRemove}
           />
+          {photoData && (
+            <div className="mt-2 text-xs text-green-600">
+              ✓ Image ready to upload
+            </div>
+          )}
         </div>
 
         {/* Personal Information Section */}
