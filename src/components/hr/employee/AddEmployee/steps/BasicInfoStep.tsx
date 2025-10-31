@@ -52,8 +52,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   loading = false 
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
-  const [allBranchDepartments, setAllBranchDepartments] = useState<BranchDeptList[]>([]);
-  const [filteredDepartments, setFilteredDepartments] = useState<BranchDeptList[]>([]);
+  const [departments, setDepartments] = useState<BranchDeptList[]>([]);
   const [positions, setPositions] = useState<PositionListDto[]>([]);
   const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(false);
@@ -90,14 +89,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     enableReinitialize: true,
     validateOnMount: true,
     onSubmit: (values) => {
-      // Clear previous errors when submitting
       setSubmitError(null);
-      
-      const submitData: Step1Dto & { branchId: UUID } = {
-        ...values,
-      };
-      
-      onNext(submitData);
+      onNext(values);
     },
   });
 
@@ -125,57 +118,37 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     fetchBranches();
   }, []);
 
-  // Fetch all branch-department relationships when component mounts
+  // Fetch departments when branch selection changes
   useEffect(() => {
-    const fetchAllBranchDepartments = async () => {
+    const fetchDepartmentsByBranch = async () => {
+      if (!formik.values.branchId) {
+        setDepartments([]);
+        return;
+      }
+
       try {
         setLoadingDepartments(true);
-        const branchDeptData = await departmentService.getBranchDepartmentNames();
-        setAllBranchDepartments(branchDeptData);
+        // Clear current department selection when fetching new departments
+        formik.setFieldValue('departmentId', '');
+        
+        const departmentsData = await departmentService.getBranchDepartmentNames(formik.values.branchId);
+        setDepartments(departmentsData);
+        
+        // Auto-select first department if we have departments
+        if (departmentsData.length > 0) {
+          formik.setFieldValue('departmentId', departmentsData[0].id);
+        }
       } catch (error) {
-        console.error('Error fetching branch departments:', error);
+        console.error('Error fetching departments by branch:', error);
         setSubmitError('Failed to load departments');
-        setAllBranchDepartments([]);
+        setDepartments([]);
       } finally {
         setLoadingDepartments(false);
       }
     };
 
-    fetchAllBranchDepartments();
-  }, []);
-
-  // Filter departments when branch selection changes
-  useEffect(() => {
-    if (formik.values.branchId && allBranchDepartments.length > 0) {
-      const departmentsForBranch = allBranchDepartments.filter(
-        dept => dept.branchId === formik.values.branchId
-      );
-      setFilteredDepartments(departmentsForBranch);
-      
-      // Auto-select first department if none is selected and we have departments for this branch
-      if (!formik.values.departmentId && departmentsForBranch.length > 0) {
-        formik.setFieldValue('departmentId', departmentsForBranch[0].id);
-      } else if (departmentsForBranch.length === 0) {
-        // Clear department selection if no departments for this branch
-        formik.setFieldValue('departmentId', '');
-      }
-      
-      // Check if current department selection is valid for the selected branch
-      if (formik.values.departmentId && departmentsForBranch.length > 0) {
-        const currentDeptExists = departmentsForBranch.some(dept => dept.id === formik.values.departmentId);
-        if (!currentDeptExists) {
-          // Clear invalid department selection
-          formik.setFieldValue('departmentId', '');
-        }
-      }
-    } else {
-      setFilteredDepartments([]);
-      // Clear department selection if no branch is selected
-      if (formik.values.departmentId) {
-        formik.setFieldValue('departmentId', '');
-      }
-    }
-  }, [formik.values.branchId, allBranchDepartments, formik.values.departmentId]);
+    fetchDepartmentsByBranch();
+  }, [formik.values.branchId]);
 
   // Fetch positions when component mounts
   useEffect(() => {
@@ -185,7 +158,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         const positionsData = await positionService.getAllPositions();
         setPositions(positionsData);
         
-        // Auto-select first position if none is selected and we have positions
         if (!formik.values.positionId && positionsData.length > 0) {
           formik.setFieldValue('positionId', positionsData[0].id);
         }
@@ -208,7 +180,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         const jobGradesData = await jobGradeService.getAllJobGrades();
         setJobGrades(jobGradesData);
         
-        // Auto-select first job grade if none is selected and we have job grades
         if (!formik.values.jobGradeId && jobGradesData.length > 0) {
           formik.setFieldValue('jobGradeId', jobGradesData[0].id);
         }
@@ -229,10 +200,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     name: branch.name
   }));
 
-  // Convert filtered departments to ListItem format
-  const departmentListItems: ListItem[] = filteredDepartments.map(dept => ({
+  // Convert departments to ListItem format
+  const departmentListItems: ListItem[] = departments.map(dept => ({
     id: dept.id,
-    name: dept.dept // Using 'dept' field from BranchDeptList which contains department name
+    name: dept.dept
   }));
 
   // Convert positions to ListItem format
@@ -250,7 +221,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Handle branch selection
   const handleBranchSelect = (item: ListItem) => {
     formik.setFieldValue('branchId', item.id);
-    // Clear error when user selects a branch
     if (submitError && formik.errors.branchId) {
       setSubmitError(null);
     }
@@ -259,7 +229,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Handle department selection
   const handleDepartmentSelect = (item: ListItem) => {
     formik.setFieldValue('departmentId', item.id);
-    // Clear error when user selects a department
     if (submitError && formik.errors.departmentId) {
       setSubmitError(null);
     }
@@ -268,7 +237,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Handle position selection
   const handlePositionSelect = (item: ListItem) => {
     formik.setFieldValue('positionId', item.id);
-    // Clear error when user selects a position
     if (submitError && formik.errors.positionId) {
       setSubmitError(null);
     }
@@ -277,7 +245,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Handle job grade selection
   const handleJobGradeSelect = (item: ListItem) => {
     formik.setFieldValue('jobGradeId', item.id);
-    // Clear error when user selects a job grade
     if (submitError && formik.errors.jobGradeId) {
       setSubmitError(null);
     }
@@ -305,7 +272,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Simplified form validation
   const isFormValid = React.useMemo(() => {
     if (loading) return false;
-    
     return formik.isValid && formik.dirty;
   }, [formik.isValid, formik.dirty, loading]);
 
@@ -324,16 +290,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields
     formik.validateForm().then(errors => {
       if (Object.keys(errors).length === 0) {
-        // No errors, submit the form
         formik.handleSubmit();
       } else {
-        // Set a general error message
         setSubmitError('Please fill in all required fields correctly before submitting.');
-        
-        // Mark all fields as touched to show errors
         const allFields = Object.keys(formik.values) as Array<keyof (Step1Dto & { branchId: UUID })>;
         const touchedFields: Partial<Record<keyof (Step1Dto & { branchId: UUID }), boolean>> = {};
         allFields.forEach(field => {
@@ -653,16 +614,16 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 placeholder={
                   !formik.values.branchId 
                     ? "Select a branch first" 
-                    : filteredDepartments.length === 0 
+                    : departments.length === 0 
                     ? "No departments available" 
                     : "Select a department"
                 }
-                disabled={loadingDepartments || loading || !formik.values.branchId || filteredDepartments.length === 0}
+                disabled={loadingDepartments || loading || !formik.values.branchId || departments.length === 0}
               />
               {loadingDepartments && (
                 <p className="text-sm text-gray-500">Loading departments...</p>
               )}
-              {formik.values.branchId && filteredDepartments.length === 0 && !loadingDepartments && (
+              {formik.values.branchId && departments.length === 0 && !loadingDepartments && (
                 <p className="text-sm text-gray-500">No departments available for this branch</p>
               )}
               {getErrorMessage('departmentId') && (

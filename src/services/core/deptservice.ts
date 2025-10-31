@@ -3,8 +3,7 @@ import type { DeptListDto, AddDeptDto, EditDeptDto, UUID, BranchDeptList } from 
 
 class DepartmentService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Department`;
-    private listUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Names`;
-
+  private listUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/module/v1'}/Names`;
 
   async getAllDepartments(): Promise<DeptListDto[]> {
     try {
@@ -55,9 +54,9 @@ class DepartmentService {
     }
   }
 
-  async getBranchDepartmentNames(): Promise<BranchDeptList[]> {
+  async getBranchDepartmentNames(branchId: UUID): Promise<BranchDeptList[]> {
     try {
-      const response = await api.get(`${this.listUrl}/BranchDept`);
+      const response = await api.get(`${this.listUrl}/BranchDept/${branchId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching branch department names:', error);
