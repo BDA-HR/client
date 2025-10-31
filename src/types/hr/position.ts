@@ -186,7 +186,5 @@ export interface PositionFilters {
 }
 export interface DeptPositionList {
   id: UUID;
-  departmentId: UUID;
   position: string;
-  department: string;
 }
