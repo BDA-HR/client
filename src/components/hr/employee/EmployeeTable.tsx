@@ -116,44 +116,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     setModalType(null);
   };
 
-  const getEmploymentTypeColor = (type: string | undefined): string => {
-    const typeStr = type?.toString() || '';
-    switch (typeStr.toLowerCase()) {
-      case "replacement": return "bg-green-100 text-green-800";
-      case "new opening": return "bg-blue-100 text-blue-800";
-      case "additional required": return "bg-purple-100 text-purple-800";
-      case "old employee": return "bg-yellow-100 text-yellow-800";
-      case "permanent": return "bg-green-100 text-green-800";
-      case "contract": return "bg-blue-100 text-blue-800";
-      case "temporary": return "bg-orange-100 text-orange-800";
-      case "probation": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getDepartmentColor = (dept: string | undefined): string => {
-    const deptStr = dept?.toString() || '';
-    switch (deptStr.toLowerCase()) {
-      case "human resources": return "text-red-600";
-      case "finance": return "text-green-600";
-      case "it": return "text-amber-600";
-      case "production": return "text-emerald-600";
-      case "quality control": return "text-indigo-600";
-      case "software development": return "text-blue-600";
-      case "devops": return "text-purple-600";
-      case "research": return "text-pink-600";
-      case "innovation": return "text-orange-600";
-      case "customer service": return "text-teal-600";
-      case "sales": return "text-cyan-600";
-      case "marketing": return "text-rose-600";
-      case "operations": return "text-violet-600";
-      default: return "text-gray-600";
-    }
-  };
-
-  const getStatusColor = (status: "active" | "on-leave" | undefined): string => {
-    return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
-  };
 
   // Helper function to get display value for gender
   const getGenderDisplay = (gender: string | undefined): string => {
@@ -305,7 +267,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                           {employee.branch || "Not specified"}
                       </div>
                     </td>
-                    <td className={`px-4 py-2 whitespace-nowrap text-sm font-medium hidden lg:table-cell ${getDepartmentColor(employee.department)}`}>
+                    <td className={`px-4 py-2 whitespace-nowrap text-sm font-medium hidden lg:table-cell`}>
                       {employee.department || "Not specified"}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden xl:table-cell">
@@ -319,7 +281,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     <td className="px-4 py-2 whitespace-nowrap">
                       <motion.span 
                         whileHover={{ scale: 1.05 }}
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.empType)}`}
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full $`}
                       >
                         {employee.empType || "Not specified"}
                       </motion.span>
@@ -512,7 +474,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employment Type</p>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.empType)}`}>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full $`}>
                         {selectedEmployee.empType || "Not specified"}
                       </span>
                     </div>
@@ -531,12 +493,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     <div>
                       <p className="text-sm text-gray-500">Employment Date</p>
                       <p className="font-medium">{formatDate(selectedEmployee.employmentDate || selectedEmployee.createdAt)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Status</p>
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status || 'active')}`}>
-                        {selectedEmployee.status === "on-leave" ? "On Leave" : "Active"}
-                      </span>
                     </div>
                   </div>
                 </div>
