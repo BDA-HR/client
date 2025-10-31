@@ -61,6 +61,118 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     }
   };
 
+  const handleEdit = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setModalType('edit');
+    setPopoverOpen(null);
+  };
+
+  const handleStatusChange = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setModalType('status');
+    setPopoverOpen(null);
+  };
+
+  const handleTerminate = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setModalType('terminate');
+    setPopoverOpen(null);
+  };
+
+  const confirmStatusChange = () => {
+    if (selectedEmployee) {
+      const newStatus = selectedEmployee.status === 'active' ? 'on-leave' : 'active';
+      onEmployeeStatusChange(selectedEmployee.id, newStatus);
+      setModalType(null);
+    }
+  };
+
+  const confirmTermination = async () => {
+    if (selectedEmployee) {
+      setTerminating(selectedEmployee.id);
+      try {
+        await onEmployeeTerminate(selectedEmployee.id);
+        setModalType(null);
+      } catch (error) {
+        console.error('Error terminating employee:', error);
+      } finally {
+        setTerminating(null);
+      }
+    }
+  };
+
+  const handleSaveChanges = (updatedEmployee: Employee) => {
+    onEmployeeUpdate(updatedEmployee);
+    setModalType(null);
+  };
+
+  const getEmploymentTypeColor = (type: string | undefined): string => {
+    const typeStr = type?.toString() || '';
+    switch (typeStr.toLowerCase()) {
+      case "replacement": return "bg-green-100 text-green-800";
+      case "new opening": return "bg-blue-100 text-blue-800";
+      case "additional required": return "bg-purple-100 text-purple-800";
+      case "old employee": return "bg-yellow-100 text-yellow-800";
+      case "permanent": return "bg-green-100 text-green-800";
+      case "contract": return "bg-blue-100 text-blue-800";
+      case "temporary": return "bg-orange-100 text-orange-800";
+      case "probation": return "bg-yellow-100 text-yellow-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getDepartmentColor = (dept: string | undefined): string => {
+    const deptStr = dept?.toString() || '';
+    switch (deptStr.toLowerCase()) {
+      case "human resources": return "text-red-600";
+      case "finance": return "text-green-600";
+      case "it": return "text-amber-600";
+      case "production": return "text-emerald-600";
+      case "quality control": return "text-indigo-600";
+      case "software development": return "text-blue-600";
+      case "devops": return "text-purple-600";
+      case "research": return "text-pink-600";
+      case "innovation": return "text-orange-600";
+      case "customer service": return "text-teal-600";
+      case "sales": return "text-cyan-600";
+      case "marketing": return "text-rose-600";
+      case "operations": return "text-violet-600";
+      default: return "text-gray-600";
+    }
+  };
+
+  const getStatusColor = (status: "active" | "on-leave" | undefined): string => {
+    return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+  };
+
+  // Helper function to get display value for gender
+  const getGenderDisplay = (gender: string | undefined): string => {
+    const genderStr = gender?.toString() || '';
+    switch (genderStr.toLowerCase()) {
+      case "0":
+      case "male": return "Male";
+      case "1":
+      case "female": return "Female";
+      case "m": return "Male";
+      case "f": return "Female";
+      default: return genderStr || "Not specified";
+    }
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string | undefined): string => {
+    if (!dateString) return "Not specified";
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
   if (loading && employees.length === 0) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-8 flex items-center justify-center">
@@ -185,10 +297,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         <span className="truncate max-w-[120px]">{employee.branch || "Not specified"}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden xl:table-cell">
-                      <div className="flex items-center">
-                        <span className="truncate max-w-[120px]">{employee.department || "Not specified"}</span>
-                      </div>
+                    <td className={`px-4 py-2 whitespace-nowrap text-sm font-medium hidden lg:table-cell ${getDepartmentColor(employee.department)}`}>
+                      {employee.department || "Not specified"}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden xl:table-cell">
                       <div className="flex items-center">
@@ -200,10 +310,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         <span className="truncate max-w-[120px]">{employee.jobGrade || "Not specified"}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden xl:table-cell">
-                      <div className="flex items-center">
-                        <span className="truncate max-w-[120px]">{employee.empType || "Not specified"}</span>
-                      </div>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <motion.span
+                        whileHover={{ scale: 1.05 }}
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.empType)}`}
+                      >
+                        {employee.empType || "Not specified"}
+                      </motion.span>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden xl:table-cell">
                       <div className="flex items-center">
@@ -301,6 +414,241 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
           </div>
         </div>
       </motion.div>
+
+      {/* Simplified Employee Details Modal */}
+      {selectedEmployee && modalType === 'view' && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
+              <div>
+                <h2 className="text-2xl font-bold">{selectedEmployee.empFullName || "Employee"}</h2>
+                <p className="text-gray-600">{selectedEmployee.position} • {selectedEmployee.department}</p>
+                <p className="text-sm text-gray-500">{selectedEmployee.empFullNameAm || selectedEmployee.empFullName || "No Name"}</p>
+              </div>
+              <button
+                onClick={() => setModalType(null)}
+                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Basic Information */}
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <User className="mr-2 text-blue-500" size={20} />
+                    Basic Information
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Employee Code</p>
+                      <p className="font-medium">{selectedEmployee.code || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Gender</p>
+                      <p className="font-medium">{getGenderDisplay(selectedEmployee.gender)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Nationality</p>
+                      <p className="font-medium">{selectedEmployee.nationality || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Employment Nature</p>
+                      <p className="font-medium">{selectedEmployee.empNature || "Not specified"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Briefcase className="mr-2 text-green-500" size={20} />
+                    Employment Details
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Branch</p>
+                      <p className="font-medium">{selectedEmployee.branch || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Department</p>
+                      <p className="font-medium">{selectedEmployee.department || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Position</p>
+                      <p className="font-medium">{selectedEmployee.position || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Job Grade</p>
+                      <p className="font-medium">{selectedEmployee.jobGrade || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Employment Type</p>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.empType)}`}>
+                        {selectedEmployee.empType || "Not specified"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dates & System Information */}
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Calendar className="mr-2 text-purple-500" size={20} />
+                    Employment Dates
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Employment Date</p>
+                      <p className="font-medium">{formatDate(selectedEmployee.employmentDate || selectedEmployee.createdAt)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Status</p>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status || 'active')}`}>
+                        {selectedEmployee.status === "on-leave" ? "On Leave" : "Active"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <MapPin className="mr-2 text-amber-500" size={20} />
+                    System Information
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Created</p>
+                      <p className="font-medium">{formatDate(selectedEmployee.createdAt)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Last Updated</p>
+                      <p className="font-medium">{formatDate(selectedEmployee.updatedAt)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Updated By</p>
+                      <p className="font-medium">{selectedEmployee.updatedBy || "System"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t p-4 flex justify-end sticky bottom-0 bg-white/90">
+              <button
+                onClick={() => setModalType(null)}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {selectedEmployee && modalType === 'edit' && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-bold">Edit Employee Details</h2>
+              <button
+                onClick={() => setModalType(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-600">Edit form implementation would go here...</p>
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  This would contain a form to edit the employee's basic information.
+                  The form would include fields for position, department, employment type, etc.
+                </p>
+              </div>
+            </div>
+            <div className="border-t p-4 flex justify-end space-x-3 sticky bottom-0 bg-white">
+              <button
+                onClick={() => setModalType(null)}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleSaveChanges(selectedEmployee)}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status Change Confirmation Modal */}
+      {selectedEmployee && modalType === 'status' && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <h2 className="text-xl font-bold mb-4">Confirm Status Change</h2>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to change {selectedEmployee.empFullName}'s status to{' '}
+                {selectedEmployee.status === 'active' ? 'On Leave' : 'Active'}?
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setModalType(null)}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmStatusChange}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Termination Confirmation Modal */}
+      {selectedEmployee && modalType === 'terminate' && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <h2 className="text-xl font-bold mb-4">Confirm Termination</h2>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to terminate {selectedEmployee.empFullName}'s employment? This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setModalType(null)}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmTermination}
+                  disabled={terminating === selectedEmployee.id}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white disabled:bg-red-400 disabled:cursor-not-allowed flex items-center space-x-2"
+                >
+                  {terminating === selectedEmployee.id && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  <span>{terminating === selectedEmployee.id ? 'Terminating...' : 'Terminate'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

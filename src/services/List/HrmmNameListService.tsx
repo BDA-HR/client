@@ -1,6 +1,7 @@
 import { api } from '../api';
 import type { NameListItem } from '../../types/NameList/nameList';
 import type { UUID } from '../../types/List/list';
+import type { NameListDto } from '../../types/hr/NameListDto';
 
 class NameListService {
   private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || '/core/hrmm/v1'}/Names`;
@@ -96,6 +97,17 @@ class NameListService {
       return response.data;
     } catch (error) {
       console.error('Error fetching position names:', error);
+      throw error;
+    }
+  }
+
+  // Department Position endpoints
+  async getDepartmentPositions(departmentId: UUID): Promise<NameListDto[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/DeptPosition/${departmentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching department positions:', error);
       throw error;
     }
   }
