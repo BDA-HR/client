@@ -184,3 +184,9 @@ export interface PositionFilters {
   minPositions?: number;
   maxPositions?: number;
 }
+export interface DeptPositionList {
+  id: UUID;
+  departmentId: UUID;
+  position: string;
+  department: string;
+}

@@ -16,7 +16,7 @@ import { positionService } from '../../../../../services/hr/settings/positionSer
 import { jobGradeService } from '../../../../../services/hr/settings/JobGradeServives';
 import type { ListItem } from '../../../../../types/List/list';
 import type { BranchCompListDto } from '../../../../../types/core/branch';
-import type { PositionListDto } from '../../../../../types/hr/position';
+import type { DeptPositionList } from '../../../../../types/hr/position';
 import type { JobGradeListDto } from '../../../../../types/hr/jobgrade';
 import type { BranchDeptList } from '../../../../../types/core/dept';
 
@@ -37,10 +37,10 @@ const validationSchema = yup.object({
   nationality: yup.string().required('Nationality is required'),
   gender: yup.string().required('Gender is required'),
   employmentDate: yup.string().required('Employment date is required'),
-  // branchId: yup.string().required('Branch is required'),
-  // jobGradeId: yup.string().required('Job grade is required'),
-  // positionId: yup.string().required('Position is required'),
-  // departmentId: yup.string().required('Department is required'),
+  branchId: yup.string().required('Branch is required'),
+  jobGradeId: yup.string().required('Job grade is required'),
+  positionId: yup.string().required('Position is required'),
+  departmentId: yup.string().required('Department is required'),
   employmentType: yup.string().required('Employment type is required'),
   employmentNature: yup.string().required('Employment nature is required'),
 });
@@ -53,7 +53,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [departments, setDepartments] = useState<BranchDeptList[]>([]);
-  const [positions, setPositions] = useState<PositionListDto[]>([]);
+  const [positions, setPositions] = useState<DeptPositionList[]>([]);
   const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(false);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
@@ -128,8 +128,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
       try {
         setLoadingDepartments(true);
-        // Clear current department selection when fetching new departments
         formik.setFieldValue('departmentId', '');
+        formik.setFieldValue('positionId', '');
         
         const departmentsData = await departmentService.getBranchDepartmentNames(formik.values.branchId);
         setDepartments(departmentsData);
@@ -150,27 +150,37 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     fetchDepartmentsByBranch();
   }, [formik.values.branchId]);
 
-  // Fetch positions when component mounts
+  // Fetch positions when department selection changes
   useEffect(() => {
-    const fetchPositions = async () => {
+    const fetchPositionsByDepartment = async () => {
+      if (!formik.values.departmentId) {
+        setPositions([]);
+        return;
+      }
+
       try {
         setLoadingPositions(true);
-        const positionsData = await positionService.getAllPositions();
+        // Clear current position selection when fetching new positions
+        formik.setFieldValue('positionId', '');
+        
+        const positionsData = await positionService.getDepartmentPositions(formik.values.departmentId);
         setPositions(positionsData);
         
-        if (!formik.values.positionId && positionsData.length > 0) {
+        // Auto-select first position if we have positions
+        if (positionsData.length > 0) {
           formik.setFieldValue('positionId', positionsData[0].id);
         }
       } catch (error) {
-        console.error('Error fetching positions:', error);
+        console.error('Error fetching positions by department:', error);
         setSubmitError('Failed to load positions');
+        setPositions([]);
       } finally {
         setLoadingPositions(false);
       }
     };
 
-    fetchPositions();
-  }, []);
+    fetchPositionsByDepartment();
+  }, [formik.values.departmentId]);
 
   // Fetch job grades when component mounts
   useEffect(() => {
@@ -206,10 +216,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     name: dept.dept
   }));
 
-  // Convert positions to ListItem format
+  // Convert positions to ListItem format (using DeptPositionList)
   const positionListItems: ListItem[] = positions.map(position => ({
     id: position.id,
-    name: position.name
+    name: position.position // Using 'position' field from DeptPositionList
   }));
 
   // Convert job grades to ListItem format
@@ -631,18 +641,26 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               )}
             </div>
 
-            {/* Position - Using List Component */}
             <div className="space-y-2">
               <List
                 items={positionListItems}
                 selectedValue={formik.values.positionId}
                 onSelect={handlePositionSelect}
                 label="Select Position"
-                placeholder="Select a position"
-                disabled={loadingPositions || loading}
+                placeholder={
+                  !formik.values.departmentId 
+                    ? "Select a department first" 
+                    : positions.length === 0 
+                    ? "No positions available" 
+                    : "Select a position"
+                }
+                disabled={loadingPositions || loading || !formik.values.departmentId || positions.length === 0}
               />
               {loadingPositions && (
                 <p className="text-sm text-gray-500">Loading positions...</p>
+              )}
+              {formik.values.departmentId && positions.length === 0 && !loadingPositions && (
+                <p className="text-sm text-gray-500">No positions available for this department</p>
               )}
               {getErrorMessage('positionId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('positionId')}</div>
