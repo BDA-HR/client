@@ -16,7 +16,6 @@ import type {
   PositionReqListDto,
   PositionReqAddDto,
   PositionReqModDto,
-  DeptPositionList,
 } from "../../../types/hr/position";
 
 class PositionService {
@@ -35,8 +34,6 @@ class PositionService {
   private reqUrl = `${
     import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
   }/PositionReq`;
-  private namesUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"}/Names`;
-
   // ============ POSITION CRUD OPERATIONS ============
 
   // GET: /api/core/hrmm/v1/Position/AllPosition
@@ -314,16 +311,6 @@ class PositionService {
       await api.delete(`${this.reqUrl}/DelPositionReq/${id}`);
     } catch (error) {
       console.error("Error deleting position requirement:", error);
-      throw error;
-    }
-  }
-    // GET: /api/core/hrmm/v1/Names/DeptPosition/{departmentId}
-  async getDepartmentPositions(departmentId: UUID): Promise<DeptPositionList[]> {
-    try {
-      const response = await api.get(`${this.namesUrl}/DeptPosition/${departmentId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching department positions:", error);
       throw error;
     }
   }

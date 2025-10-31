@@ -12,11 +12,11 @@ import { amharicRegex } from '../../../../../utils/amharic-regex';
 import List from '../../../../List/list';
 import { branchService } from '../../../../../services/core/branchservice';
 import { departmentService } from '../../../../../services/core/deptservice';
-import { positionService } from '../../../../../services/hr/settings/positionService';
+import { nameListService } from '../../../../../services/List/HrmmNameListService';
 import { jobGradeService } from '../../../../../services/hr/settings/JobGradeServives';
 import type { ListItem } from '../../../../../types/List/list';
 import type { BranchCompListDto } from '../../../../../types/core/branch';
-import type { DeptPositionList } from '../../../../../types/hr/position';
+import type { NameListDto } from '../../../../../types/hr/NameListDto';
 import type { JobGradeListDto } from '../../../../../types/hr/jobgrade';
 import type { BranchDeptList } from '../../../../../types/core/dept';
 
@@ -53,7 +53,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [departments, setDepartments] = useState<BranchDeptList[]>([]);
-  const [positions, setPositions] = useState<DeptPositionList[]>([]);
+  const [positions, setPositions] = useState<NameListDto[]>([]);
   const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(false);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
@@ -163,7 +163,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         // Clear current position selection when fetching new positions
         formik.setFieldValue('positionId', '');
         
-        const positionsData = await positionService.getDepartmentPositions(formik.values.departmentId);
+        // Use nameListService to get department positions
+        const positionsData = await nameListService.getDepartmentPositions(formik.values.departmentId);
         setPositions(positionsData);
         
         // Auto-select first position if we have positions
@@ -216,10 +217,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     name: dept.dept
   }));
 
-  // Convert positions to ListItem format (using DeptPositionList)
+  // Convert positions to ListItem format (using NameListDto)
   const positionListItems: ListItem[] = positions.map(position => ({
     id: position.id,
-    name: position.position // Using 'position' field from DeptPositionList
+    name: position.name // Using 'name' field from NameListDto
   }));
 
   // Convert job grades to ListItem format
