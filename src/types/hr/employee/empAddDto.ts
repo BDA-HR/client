@@ -10,7 +10,6 @@ export interface Step1Dto {
     lastNameAm: string;
     nationality: string;
     gender: Gender;
-
     employmentDate: string;
     jobGradeId: UUID;
     positionId: UUID;

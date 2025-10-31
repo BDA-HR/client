@@ -10,7 +10,7 @@ import {
   X,
   MapPin,
   Loader2,
-  Building
+  
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { EmployeeListDto } from '../../../types/hr/employee';
@@ -20,13 +20,7 @@ type Employee = EmployeeListDto & {
   status?: "active" | "on-leave";
   // Add optional fields that might not exist in the base type
   employmentDate?: string;
-  employmentType?: string;
-  employmentNature?: string;
   nationality?: string;
-  genderStr?: string;
-  employmentTypeStr?: string;
-  employmentNatureStr?: string;
-  employmentDateStr?: string;
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
@@ -124,60 +118,36 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
 
   const getEmploymentTypeColor = (type: string | undefined): string => {
     const typeStr = type?.toString() || '';
-    switch (typeStr) {
-      case "0":
-      case "Replacement": return "bg-green-100 text-green-800";
-      case "1":
-      case "New Opening": return "bg-blue-100 text-blue-800";
-      case "2":
-      case "Additional Required": return "bg-purple-100 text-purple-800";
-      case "3":
-      case "Old Employee": return "bg-yellow-100 text-yellow-800";
+    switch (typeStr.toLowerCase()) {
+      case "replacement": return "bg-green-100 text-green-800";
+      case "new opening": return "bg-blue-100 text-blue-800";
+      case "additional required": return "bg-purple-100 text-purple-800";
+      case "old employee": return "bg-yellow-100 text-yellow-800";
+      case "permanent": return "bg-green-100 text-green-800";
+      case "contract": return "bg-blue-100 text-blue-800";
+      case "temporary": return "bg-orange-100 text-orange-800";
+      case "probation": return "bg-yellow-100 text-yellow-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
 
   const getDepartmentColor = (dept: string | undefined): string => {
     const deptStr = dept?.toString() || '';
-    switch (deptStr) {
-      case "1":
-      case "Human Resources": return "text-red-600";
-      case "2":
-      case "Finance": return "text-green-600";
-      case "3":
-      case "IT": return "text-amber-600";
-      case "4":
-      case "Production": return "text-emerald-600";
-      case "5":
-      case "Quality Control": return "text-indigo-600";
-      case "6":
-      case "Software Development": return "text-blue-600";
-      case "7":
-      case "DevOps": return "text-purple-600";
-      case "8":
-      case "Research": return "text-pink-600";
-      case "9":
-      case "Innovation": return "text-orange-600";
-      case "10":
-      case "Customer Service": return "text-teal-600";
+    switch (deptStr.toLowerCase()) {
+      case "human resources": return "text-red-600";
+      case "finance": return "text-green-600";
+      case "it": return "text-amber-600";
+      case "production": return "text-emerald-600";
+      case "quality control": return "text-indigo-600";
+      case "software development": return "text-blue-600";
+      case "devops": return "text-purple-600";
+      case "research": return "text-pink-600";
+      case "innovation": return "text-orange-600";
+      case "customer service": return "text-teal-600";
+      case "sales": return "text-cyan-600";
+      case "marketing": return "text-rose-600";
+      case "operations": return "text-violet-600";
       default: return "text-gray-600";
-    }
-  };
-
-  const getBranchColor = (branch: string | undefined): string => {
-    const branchStr = branch?.toString() || '';
-    switch (branchStr) {
-      case "Main Branch":
-      case "Head Office": return "bg-blue-100 text-blue-800";
-      case "Branch 1":
-      case "North Branch": return "bg-green-100 text-green-800";
-      case "Branch 2":
-      case "South Branch": return "bg-purple-100 text-purple-800";
-      case "Branch 3":
-      case "East Branch": return "bg-orange-100 text-orange-800";
-      case "Branch 4":
-      case "West Branch": return "bg-pink-100 text-pink-800";
-      default: return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -185,93 +155,17 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
   };
 
-  // Helper function to get display value for department
-  const getDepartmentDisplay = (dept: string | undefined): string => {
-    const deptStr = dept?.toString() || '';
-    switch (deptStr) {
-      case "1": return "Human Resources";
-      case "2": return "Finance";
-      case "3": return "IT";
-      case "4": return "Production";
-      case "5": return "Quality Control";
-      case "6": return "Software Development";
-      case "7": return "DevOps";
-      case "8": return "Research";
-      case "9": return "Innovation";
-      case "10": return "Customer Service";
-      default: return deptStr || "Not specified";
-    }
-  };
-
-  // Helper function to get display value for branch
-  const getBranchDisplay = (branch: string | undefined): string => {
-    const branchStr = branch?.toString() || '';
-    switch (branchStr) {
-      case "1": return "Main Branch";
-      case "2": return "Branch 1";
-      case "3": return "Branch 2";
-      case "4": return "Branch 3";
-      case "5": return "Branch 4";
-      default: return branchStr || "Not specified";
-    }
-  };
-
-  // Helper function to get display value for position
-  const getPositionDisplay = (position: string | undefined): string => {
-    const positionStr = position?.toString() || '';
-    switch (positionStr) {
-      case "1": return "HR Manager";
-      case "2": return "Recruitment Specialist";
-      case "3": return "Finance Director";
-      case "4": return "Accountant";
-      case "5": return "IT Manager";
-      case "6": return "System Administrator";
-      case "7": return "Production Supervisor";
-      case "8": return "Production Worker";
-      case "9": return "Quality Analyst";
-      case "10": return "Senior Developer";
-      case "11": return "Junior Developer";
-      case "12": return "DevOps Engineer";
-      case "13": return "Research Scientist";
-      case "14": return "Innovation Lead";
-      case "15": return "Customer Support Agent";
-      default: return positionStr || "Not specified";
-    }
-  };
-
-  // Helper function to get display value for employment type
-  const getEmploymentTypeDisplay = (type: string | undefined): string => {
-    const typeStr = type?.toString() || '';
-    switch (typeStr) {
-      case "0": return "Replacement";
-      case "1": return "New Opening";
-      case "2": return "Additional Required";
-      case "3": return "Old Employee";
-      default: return typeStr || "Not specified";
-    }
-  };
-
   // Helper function to get display value for gender
   const getGenderDisplay = (gender: string | undefined): string => {
     const genderStr = gender?.toString() || '';
-    switch (genderStr) {
-      case "0": return "Male";
-      case "1": return "Female";
-      case "Male": return "Male";
-      case "Female": return "Female";
+    switch (genderStr.toLowerCase()) {
+      case "0":
+      case "male": return "Male";
+      case "1":
+      case "female": return "Female";
+      case "m": return "Male";
+      case "f": return "Female";
       default: return genderStr || "Not specified";
-    }
-  };
-
-  // Helper function to get display value for employment nature
-  const getEmploymentNatureDisplay = (nature: string | undefined): string => {
-    const natureStr = nature?.toString() || '';
-    switch (natureStr) {
-      case "0": return "Permanent";
-      case "1": return "Contract";
-      case "Permanent": return "Permanent";
-      case "Contract": return "Contract";
-      default: return natureStr || "Not specified";
     }
   };
 
@@ -332,19 +226,25 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   Employee
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  Gender
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Branch
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Department
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
                   Position
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Employment Date
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  Job Grade
                 </th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Employment Type
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                  Employment Nature
                 </th>
                 <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -354,7 +254,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <tbody className="bg-white divide-y divide-gray-200">
               {sortedEmployees.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
                     {loading ? 'Loading employees...' : 'No employees found'}
                   </td>
                 </tr>
@@ -368,13 +268,21 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     whileHover="hover"
                     className="hover:bg-gray-50"
                   >
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-2 whitespace-nowrap">
                       <div className="flex items-center">
                         <motion.div 
                           whileHover={{ rotate: 10 }}
                           className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center"
                         >
-                          <User className="text-green-600 h-5 w-5" />
+                          {employee.photo ? (
+                            <img 
+                              src={employee.photo} 
+                              alt={employee.empFullName}
+                              className="h-10 w-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <User className="text-green-600 h-5 w-5" />
+                          )}
                         </motion.div>
                         <div className="ml-3">
                           <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">
@@ -383,41 +291,43 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                           <div className="text-xs text-gray-400 truncate max-w-[120px] md:max-w-none">
                             {employee.empFullNameAm || employee.empFullName || "No Name"}
                           </div>
+                          <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono">
+                            {employee.code || "N/A"}
+                          </code>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                      <div className="flex items-center">
-                        <Building className="text-gray-400 mr-2 h-4 w-4" />
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getBranchColor(employee.branch)}`}>
-                          {getBranchDisplay(employee.branch)}
-                        </span>
-                      </div>
-                    </td>
-                    <td className={`px-4 py-4 whitespace-nowrap text-sm font-medium hidden md:table-cell ${getDepartmentColor(employee.department)}`}>
-                      {getDepartmentDisplay(employee.department)}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                      <div className="flex items-center">
-                        <Briefcase className="text-gray-400 mr-2 h-4 w-4" />
-                        <span className="truncate max-w-[120px]">{getPositionDisplay(employee.position)}</span>
-                      </div>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                      {getGenderDisplay(employee.gender)}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                       <div className="flex items-center">
-                        <Calendar className="text-gray-400 mr-2 h-4 w-4" />
-                        <span>{formatDate(employee.employmentDateStr || employee.employmentDate || employee.createdAt)}</span>
+                          {employee.branch || "Not specified"}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className={`px-4 py-2 whitespace-nowrap text-sm font-medium hidden lg:table-cell ${getDepartmentColor(employee.department)}`}>
+                      {employee.department || "Not specified"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden xl:table-cell">
+                      <div className="flex items-center">
+                        <span className="truncate max-w-[120px]">{employee.position || "Not specified"}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                      {employee.jobGrade || "Not specified"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
                       <motion.span 
                         whileHover={{ scale: 1.05 }}
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.employmentTypeStr || employee.employmentType || employee.empType)}`}
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(employee.empType)}`}
                       >
-                        {getEmploymentTypeDisplay(employee.employmentTypeStr || employee.employmentType || employee.empType)}
+                        {employee.empType || "Not specified"}
                       </motion.span>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                      {employee.empNature || "Not specified"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                       <Popover open={popoverOpen === employee.id} onOpenChange={(open) => setPopoverOpen(open ? employee.id : null)}>
                         <PopoverTrigger asChild>
                           <motion.button 
@@ -539,7 +449,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <div className="flex justify-between items-center border-b p-6 sticky top-0 bg-white/90 z-10">
               <div>
                 <h2 className="text-2xl font-bold">{selectedEmployee.empFullName || "Employee"}</h2>
-                <p className="text-gray-600">{getPositionDisplay(selectedEmployee.position)} • {getDepartmentDisplay(selectedEmployee.department)}</p>
+                <p className="text-gray-600">{selectedEmployee.position} • {selectedEmployee.department}</p>
                 <p className="text-sm text-gray-500">{selectedEmployee.empFullNameAm || selectedEmployee.empFullName || "No Name"}</p>
               </div>
               <button
@@ -565,7 +475,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Gender</p>
-                      <p className="font-medium">{getGenderDisplay(selectedEmployee.genderStr || selectedEmployee.gender)}</p>
+                      <p className="font-medium">{getGenderDisplay(selectedEmployee.gender)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Nationality</p>
@@ -573,7 +483,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employment Nature</p>
-                      <p className="font-medium">{getEmploymentNatureDisplay(selectedEmployee.employmentNatureStr || selectedEmployee.employmentNature || selectedEmployee.empNature)}</p>
+                      <p className="font-medium">{selectedEmployee.empNature || "Not specified"}</p>
                     </div>
                   </div>
                 </div>
@@ -586,15 +496,15 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Branch</p>
-                      <p className="font-medium">{getBranchDisplay(selectedEmployee.branch)}</p>
+                      <p className="font-medium">{selectedEmployee.branch || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Department</p>
-                      <p className="font-medium">{getDepartmentDisplay(selectedEmployee.department)}</p>
+                      <p className="font-medium">{selectedEmployee.department || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Position</p>
-                      <p className="font-medium">{getPositionDisplay(selectedEmployee.position)}</p>
+                      <p className="font-medium">{selectedEmployee.position || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Job Grade</p>
@@ -602,8 +512,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Employment Type</p>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType || selectedEmployee.empType)}`}>
-                        {getEmploymentTypeDisplay(selectedEmployee.employmentTypeStr || selectedEmployee.employmentType || selectedEmployee.empType)}
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(selectedEmployee.empType)}`}>
+                        {selectedEmployee.empType || "Not specified"}
                       </span>
                     </div>
                   </div>
@@ -620,7 +530,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Employment Date</p>
-                      <p className="font-medium">{formatDate(selectedEmployee.employmentDateStr || selectedEmployee.employmentDate || selectedEmployee.createdAt)}</p>
+                      <p className="font-medium">{formatDate(selectedEmployee.employmentDate || selectedEmployee.createdAt)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Status</p>
