@@ -143,7 +143,7 @@ export interface Step5Dto {
 
     // Guarantor
     guaFullName: string;
-    gGuaFullNameAm: string;
+    guaFullNameAm: string;
     guaNationality: string;
     guaGender: string;
     guaRelation: string;
