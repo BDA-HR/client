@@ -100,6 +100,60 @@ export interface Step4Dto {
     File: File | null; // Fixed: proper File type
 }
 
+export interface Step5Dto {
+    // Basic Info
+    employeeId: UUID; //Employee
+    photo: string;
+    pfullName: string;
+    fullNameAm: string;
+    code: string;
+    gender: string;
+    nationality: string;
+    employmentDate: string;
+    employmentDateAm: string;
+    jobGrade: string;
+    position: string;
+    department: string;
+    pbranch: string;
+    employmentType: string;
+    employmentNature: string;
+
+    // Biographical
+    birthDate: string;
+    birthDateAm: string;
+    birthLocation: string;
+    motherFullName: string;
+    hasBirthCert: string;
+    hasMarriageCert: string;
+    maritalStatus: string;
+    tin: string;
+    bankAccountNo: string;
+    pensionNumber: string;
+    address: string;
+    telephone: string;
+
+    // Emergency Contact
+    conFullName: string;
+    conFullNameAm: string;
+    conNationality: string;
+    conGender: string;
+    conRelation: string;
+    conAddress: string;
+    conTelephone: string;
+
+    // Guarantor
+    guaFullName: string;
+    gGuaFullNameAm: string;
+    guaNationality: string;
+    guaGender: string;
+    guaRelation: string;
+    guaAddress: string;
+    guaTelephone: string;
+    guaFileName: string;
+    guaFileSize: string;
+    guaFileType: string;
+}
+
 export interface EmpAddRes {
     id: UUID;
 }
