@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, FileText, User, MapPin, Image } from 'lucide-react';
-import { Gender, EmpType, EmpNature, YesNo, MaritalStat} from '../../../../../types/hr/enum';
+import { Gender, EmpType, EmpNature, YesNo, MaritalStat } from '../../../../../types/hr/enum';
 import type { Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
 
@@ -31,25 +31,25 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   // Function to format telephone numbers to start with +
   const formatTelephone = (phone: string): string => {
     if (!phone) return 'Not provided';
-    
+
     // Remove any existing + and non-digit characters
     const cleaned = phone.replace(/[^\d]/g, '');
-    
+
     // If it starts with 251 (Ethiopia country code), add +
     if (cleaned.startsWith('251')) {
       return `+${cleaned}`;
     }
-    
+
     // If it's already in international format without +, add it
     if (cleaned.length >= 10 && !cleaned.startsWith('0')) {
       return `+${cleaned}`;
     }
-    
+
     // For local numbers, assume Ethiopia and format as +251...
     if (cleaned.startsWith('0')) {
       return `+251${cleaned.substring(1)}`;
     }
-    
+
     // If we can't determine the format, return as is with +
     return `+${cleaned}`;
   };
@@ -59,7 +59,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     // Basic Info
     employeeId: employeeId || '00000000-0000-0000-0000-000000000000' as UUID,
     photo: step1Data.File ? 'Uploaded' : '',
-    pfullName: `${step1Data.firstName || ''} ${step1Data.middleName || ''} ${step1Data.lastName || ''}`.trim(),
+    fullName: `${step1Data.firstName || ''} ${step1Data.middleName || ''} ${step1Data.lastName || ''}`.trim(),
     fullNameAm: `${step1Data.firstNameAm || ''} ${step1Data.middleNameAm || ''} ${step1Data.lastNameAm || ''}`.trim(),
     code: employeeCode || '',
     gender: step1Data.gender || '',
@@ -134,7 +134,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   };
 
   const getEnumValue = <T extends Record<string, string | number>>(
-    enumObj: T, 
+    enumObj: T,
     value: string
   ): string => {
     return enumObj[value as keyof T] as string || value;
@@ -174,7 +174,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     return () => {
       const profileUrl = getProfilePictureUrl();
       const guarantorUrl = getGuarantorDocumentUrl();
-      
+
       if (profileUrl) {
         URL.revokeObjectURL(profileUrl);
       }
@@ -197,7 +197,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Employee Information</h2>
           <p className="text-gray-600">Please review all the information before submitting</p>
-          
+
           {/* Employee Code Display */}
           {employeeCode && (
             <div className="mt-4 inline-block bg-green-50 border border-green-200 rounded-lg px-4 py-2">
@@ -221,7 +221,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </div>
             )}
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Picture Preview */}
             <div className="lg:col-span-1 flex flex-col items-center">
@@ -251,7 +251,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-500">Full Name (English)</label>
-                <p className="text-gray-900 font-medium">{reviewData.pfullName || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.fullName || 'Not provided'}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Full Name (Amharic)</label>
@@ -293,7 +293,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <FileText className="w-5 h-5 text-blue-600 mr-2" />
             <h3 className="text-lg font-semibold text-gray-900">Biographical Information</h3>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-500">Birth Date</label>
@@ -364,7 +364,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <User className="w-5 h-5 text-orange-600 mr-2" />
             <h3 className="text-lg font-semibold text-gray-900">Emergency Contact</h3>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-500">Full Name </label>
@@ -410,7 +410,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </div>
             )}
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Guarantor Document Preview */}
             <div className="lg:col-span-1 flex flex-col items-center">

@@ -105,7 +105,7 @@ export interface Step5Dto {
     // Basic Info
     employeeId: UUID; //Employee
     photo: string;
-    pfullName: string;
+    fullName: string;
     fullNameAm: string;
     code: string;
     gender: string;
