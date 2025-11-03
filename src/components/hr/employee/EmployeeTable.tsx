@@ -244,6 +244,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                             className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                           >
                             <Trash2 size={16} />
+                            Change Status
+                          </button>
+                            <button 
+                            // onClick={() => handleDelete(employee)}
+                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+                          >
+                            <Trash2 size={16} />
                             Delete
                           </button>
                           </div>

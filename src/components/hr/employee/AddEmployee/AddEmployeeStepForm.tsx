@@ -39,11 +39,21 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const formContainerRef = useRef<HTMLDivElement>(null);
+  const stepContentRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top when step changes
   useEffect(() => {
+    // Scroll the entire window to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
+    // Also scroll the form container to top if it exists
     if (formContainerRef.current) {
       formContainerRef.current.scrollTop = 0;
+    }
+
+    // Scroll the step content to top
+    if (stepContentRef.current) {
+      stepContentRef.current.scrollTop = 0;
     }
   }, [currentStep]);
 
@@ -69,7 +79,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
       localStorage.setItem('employeeId', result.id);
 
-      // Move to next step - the useEffect will handle scrolling
+      // Move to next step
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to create employee:', error);
@@ -111,7 +121,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Move to next step - the useEffect will handle scrolling
+      // Move to next step
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to add biographical info:', error);
@@ -149,7 +159,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Move to next step - the useEffect will handle scrolling
+      // Move to next step
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to update emergency contact:', error);
@@ -187,7 +197,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Move to next step - the useEffect will handle scrolling
+      // Move to next step
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to update guarantor info:', error);
@@ -350,7 +360,10 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
           </div>
         )}
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 px-8 py-4">
+        <div 
+          ref={stepContentRef}
+          className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 px-8 py-4"
+        >
           <AnimatePresence mode="wait">
             {renderStep()}
           </AnimatePresence>
