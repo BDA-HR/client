@@ -8,8 +8,7 @@ import { GuarantorStep } from './steps/GurantorStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { AddEmployeeStepHeader } from './AddEmployeeStepHeader';
 import { empService } from '../../../../services/hr/employee/empService';
-import type { Step1Dto, Step2Dto, Step3Dto, Step4Dto, EmpAddRes } from '../../../../types/hr/employee/empAddDto';
-import type { UUID } from 'crypto';
+import type { Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto, EmpAddRes, UUID } from '../../../../types/hr/employee/empAddDto';
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: User },
@@ -207,42 +206,41 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
     }
   };
 
+  // Handle Step 5 submission with service call
+  const handleStep5Submit = async (step5Data: Step5Dto) => {
+    if (!employeeId) {
+      setError('Employee ID is missing. Please complete Step 1 first to create an employee record.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Call the Step 5 service to complete employee submission
+      const result: EmpAddRes = await empService.empAddStep5(step5Data, employeeId);
+
+      console.log('Employee submission completed successfully:', result);
+
+      // Clear local storage
+      localStorage.removeItem('employeeFormData');
+      localStorage.removeItem('employeeId');
+
+      // Call the parent callback with the result
+      onEmployeeAdded(result);
+    } catch (error) {
+      console.error('Failed to complete employee submission:', error);
+      setError('Failed to complete employee submission. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     } else {
       onBackToEmployees();
-    }
-  };
-
-  const handleSubmit = async () => {
-    try {
-      setLoading(true);
-      const finalData = {
-        ...formData.step1,
-        ...formData.step2,
-        ...formData.step3,
-        ...formData.step4,
-        employeeId: employeeId,
-      };
-
-      console.log('Submitting complete employee data:', finalData);
-
-      const mockResult = {
-        id: employeeId || `emp-${Date.now()}`,
-        code: `EMP${Date.now().toString().slice(-6)}`,
-        ...finalData
-      };
-
-      localStorage.removeItem('employeeFormData');
-      localStorage.removeItem('employeeId');
-
-      onEmployeeAdded(mockResult);
-    } catch (error) {
-      console.error('Error submitting employee:', error);
-      setError('Failed to complete employee submission. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -313,8 +311,10 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
             step2Data={formData.step2}
             step3Data={formData.step3}
             step4Data={formData.step4}
-            onSubmit={handleSubmit}
+            employeeId={employeeId}
+            onSubmit={handleStep5Submit}
             onBack={handleBack}
+            loading={loading}
           />
         );
       default:

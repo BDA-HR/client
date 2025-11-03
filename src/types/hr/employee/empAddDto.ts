@@ -1,6 +1,7 @@
 import type { UUID } from "crypto";
 import type { AddressType, EmpNature, EmpType, Gender, MaritalStat, YesNo } from "../enum";
 
+export type { UUID }
 export interface Step1Dto {
     firstName: string;
     firstNameAm: string;

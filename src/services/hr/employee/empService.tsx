@@ -1,5 +1,6 @@
-import type { EmpAddRes, Step1Dto, Step2Dto, Step3Dto, Step4Dto } from "../../../types/hr/employee/empAddDto";
+import type { EmpAddRes, Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto, UUID } from "../../../types/hr/employee/empAddDto";
 import { api } from "../../api";
+
 
 class EmpService {
     private baseUrl = `${import.meta.env.VITE_HRMM_PROFILE_URL || "/hrm/profile/v1"}/AddEmp`;
@@ -50,6 +51,17 @@ class EmpService {
             return response.data;
         } catch (error) {
             console.error("Failed to create Employee :", error);
+            throw error;
+        }
+    }
+
+       // POST: api/hrm/profile/v1/Step5/{id}
+    async empAddStep5(step5: Step5Dto, employeeId: UUID): Promise<EmpAddRes> {
+        try {
+            const response = await api.post(`${this.baseUrl}/Step5/${employeeId}`, step5);
+            return response.data;
+        } catch (error) {
+            console.error("Failed to complete employee submission:", error);
             throw error;
         }
     }
