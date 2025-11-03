@@ -80,6 +80,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     validationSchema,
     enableReinitialize: true,
     validateOnMount: true,
+    validateOnChange: true,
+    validateOnBlur: true,
     onSubmit: (values) => {
       // Clear previous errors when submitting
       setSubmitError(null);
@@ -140,6 +142,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Handle phone input change
   const handlePhoneChange = (value: string) => {
     formik.setFieldValue('telephone', value);
+    formik.setFieldTouched('telephone', true, false);
   };
 
   const handleGuarantorFileSelect = (file: File) => {
@@ -722,13 +725,15 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
           </div>
         </div>
 
-        {/* Guarantor Document Upload Section */}
-        <div className="flex flex-col items-center mb-8">
-          <GuarantorProfileUpload
-            guarantorFile={formik.values.File}
-            onGuarantorFileSelect={handleGuarantorFileSelect}
-            onGuarantorFileRemove={handleGuarantorFileRemove}
-          />
+        {/* Guarantor Document Upload Section - Centered */}
+        <div className="flex justify-center mb-8">
+          <div className="w-full max-w-2xl"> {/* Added max-width constraint */}
+            <GuarantorProfileUpload
+              guarantorFile={formik.values.File}
+              onGuarantorFileSelect={handleGuarantorFileSelect}
+              onGuarantorFileRemove={handleGuarantorFileRemove}
+            />
+          </div>
         </div>
 
         {/* Navigation Buttons */}
