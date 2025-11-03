@@ -753,11 +753,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 profilePicture={formik.values.File}
                 onProfilePictureSelect={handleProfilePictureSelect}
                 onProfilePictureRemove={handleProfilePictureRemove}
-                size="large" // You might need to update your ProfilePictureUpload component to accept a size prop
+                size="large"
               />
-            </div>
-            <div className="mt-2 text-sm text-gray-500 text-center">
-              Upload a professional profile picture.
             </div>
           </div>
         </div>

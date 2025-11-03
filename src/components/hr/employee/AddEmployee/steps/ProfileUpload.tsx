@@ -29,14 +29,14 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
     },
     medium: {
       container: "w-48 h-48",
-      icon: "w-8 h-8",
+      icon: "w-6 h-6",
       text: "text-sm",
       removeButton: "-top-2 -right-2 p-1",
       fileName: "max-w-[180px] text-sm",
     },
     large: {
       container: "w-80 h-80",
-      icon: "w-12 h-12",
+      icon: "w-6 h-6",
       text: "text-base",
       removeButton: "-top-3 -right-3 p-2",
       fileName: "max-w-[250px] text-base",
