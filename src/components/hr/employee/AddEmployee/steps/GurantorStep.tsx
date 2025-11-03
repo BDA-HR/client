@@ -39,12 +39,12 @@ const validationSchema = yup.object({
   telephone: yup.string().required('Telephone is required'),
 });
 
-export const GuarantorStep: React.FC<GuarantorStepProps> = ({ 
-  data, 
-  onNext, 
+export const GuarantorStep: React.FC<GuarantorStepProps> = ({
+  data,
+  onNext,
   onBack,
   employeeId,
-  loading = false 
+  loading = false
 }) => {
   const [relations, setRelations] = useState<ListItem[]>([]);
   const [loadingRelations, setLoadingRelations] = useState(false);
@@ -63,7 +63,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       relationId: data.relationId || '' as UUID,
       employeeId: employeeId || data.employeeId || '' as UUID,
       addressType: data.addressType || '' as AddressType,
-      addressTypeStr: data.addressTypeStr || '',
       country: data.country || '',
       region: data.region || '',
       subcity: data.subcity || '',
@@ -102,7 +101,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       try {
         const relationsData = await listService.getAllRelations();
         setRelations(relationsData);
-        
+
         // Auto-select first relation if none is selected and we have relations
         if (!formik.values.relationId && relationsData.length > 0) {
           formik.setFieldValue('relationId', relationsData[0].id);
@@ -155,7 +154,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   const isFormValid = React.useMemo(() => {
     if (loadingRelations || loading) return false;
     if (!employeeId && !formik.values.employeeId) return false;
-    
+
     return formik.isValid && formik.dirty;
   }, [formik.isValid, formik.dirty, loadingRelations, loading, employeeId, formik.values.employeeId]);
 
@@ -163,7 +162,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   const getErrorMessage = (fieldName: string): string => {
     const error = formik.errors[fieldName as keyof typeof formik.errors];
     const touched = formik.touched[fieldName as keyof typeof formik.touched];
-    
+
     if (touched && error) {
       return typeof error === 'string' ? error : 'Invalid value';
     }
@@ -176,7 +175,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Handle form submission with validation
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate all fields
     formik.validateForm().then(errors => {
       if (Object.keys(errors).length === 0) {
@@ -185,7 +184,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       } else {
         // Set a general error message
         setSubmitError('Please fill in all required fields correctly before submitting.');
-        
+
         // Mark all fields as touched to show errors
         const allFields = Object.keys(formik.values) as Array<keyof Step4Dto>;
         const touchedFields: Partial<Record<keyof Step4Dto, boolean>> = {};
@@ -246,7 +245,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {/* English Names Column */}
-            <div className="space-y-4">              
+            <div className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
                   First Name *
@@ -257,9 +256,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                   value={formik.values.firstName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="John"
                   disabled={loading}
                 />
@@ -278,9 +276,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                   value={formik.values.middleName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="Michael"
                   disabled={loading}
                 />
@@ -299,9 +296,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                   value={formik.values.lastName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="Doe"
                   disabled={loading}
                 />
@@ -312,7 +308,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
             </div>
 
             {/* Amharic Names Column */}
-            <div className="space-y-4">              
+            <div className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="firstNameAm" className="block text-sm font-medium text-gray-700 mb-1">
                   First Name (Amharic) *
@@ -323,9 +319,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                   value={formik.values.firstNameAm}
                   onChange={(e) => handleAmharicInputChange(e, 'firstNameAm')}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="አየለ"
                   disabled={loading}
                 />
@@ -344,9 +339,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                   value={formik.values.middleNameAm}
                   onChange={(e) => handleAmharicInputChange(e, 'middleNameAm')}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="በቀለ"
                   disabled={loading}
                 />
@@ -365,9 +359,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                   value={formik.values.lastNameAm}
                   onChange={(e) => handleAmharicInputChange(e, 'lastNameAm')}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="ዮሐንስ"
                   disabled={loading}
                 />
@@ -390,9 +383,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 value={formik.values.nationality}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Ethiopian"
                 disabled={loading}
               />
@@ -410,9 +402,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 onValueChange={(value: Gender) => formik.setFieldValue('gender', value)}
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
-                }`}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
+                  }`}>
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -468,9 +459,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 onValueChange={(value: AddressType) => formik.setFieldValue('addressType', value)}
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
-                }`}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
+                  }`}>
                   <SelectValue placeholder="Select address type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -497,9 +487,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 value={formik.values.country}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('country') ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('country') ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Ethiopia"
                 disabled={loading}
               />
@@ -519,9 +508,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 value={formik.values.region}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('region') ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('region') ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Addis Ababa"
                 disabled={loading}
               />
@@ -535,9 +523,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
                 Telephone *
               </label>
-              <div className={`w-full border rounded-md transition-colors duration-200 ${
-                getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
-              }`}>
+              <div className={`w-full border rounded-md transition-colors duration-200 ${getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
+                }`}>
                 <PhoneInput
                   country={'et'}
                   value={formik.values.telephone}

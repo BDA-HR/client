@@ -47,7 +47,7 @@ class EmpService {
             const response = await api.post(`${this.baseUrl}/Step4`, step4, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            return response.data.id;
+            return response.data;
         } catch (error) {
             console.error("Failed to create Employee :", error);
             throw error;

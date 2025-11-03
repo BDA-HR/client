@@ -45,7 +45,7 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const file = e.dataTransfer.files?.[0];
     if (file) {
       onGuarantorFileSelect(file);
@@ -109,6 +109,8 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
         <label className="cursor-pointer block w-full">
           <input
             type="file"
+            id="file"
+            name="file"
             className="hidden"
             accept="image/*,.pdf,.doc,.docx,.jpg,.jpeg,.png"
             onChange={handleFileChange}
@@ -116,10 +118,9 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
           <div
             className={`
               w-full h-64 rounded-2xl border-2 border-dashed transition-all duration-200
-              ${
-                isDragging
-                  ? "border-green-500 bg-green-50 scale-105"
-                  : guarantorFile
+              ${isDragging
+                ? "border-green-500 bg-green-50 scale-105"
+                : guarantorFile
                   ? "border-gray-300"
                   : "border-gray-300 hover:border-green-400 bg-gray-50"
               }
@@ -147,7 +148,7 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
             )}
           </div>
         </label>
-        
+
         {guarantorFile && (
           <button
             type="button"
@@ -158,7 +159,7 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
           </button>
         )}
       </div>
-      
+
       {guarantorFile && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

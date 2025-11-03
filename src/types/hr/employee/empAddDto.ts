@@ -85,7 +85,6 @@ export interface Step4Dto {
     relationId: UUID;
     employeeId: UUID;
     addressType: AddressType;
-    addressTypeStr: string;
     country: string;
     region: string;
     subcity: string;
