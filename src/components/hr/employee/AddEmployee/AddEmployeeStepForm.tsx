@@ -43,31 +43,31 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   const handleStep1Submit = async (step1Data: Step1Dto & { branchId: UUID }) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Call the Step 1 service to create employee
       const result: EmpAddRes = await empService.empAddStep1(step1Data);
-      
-      console.log('Employee created successfully:', result);
+
+      console.log('Employee created successfully:', result.id);
       setEmployeeId(result.id);
-      
+
       // Update form data
       const updatedFormData = {
         ...formData,
         step1: step1Data,
       };
-      
+
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
       localStorage.setItem('employeeId', result.id);
-      
+
       // Move to next step
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to create employee:', error);
       setError(
-        error instanceof Error 
-          ? error.message 
+        error instanceof Error
+          ? error.message
           : 'Failed to create employee. Please try again.'
       );
     } finally {
@@ -84,7 +84,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const step2DataWithEmployeeId: Step2Dto = {
         ...step2Data,
@@ -92,17 +92,17 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       };
 
       const result: EmpAddRes = await empService.empAddStep2(step2DataWithEmployeeId);
-      
+
       console.log('Biographical info added successfully:', result);
-      
+
       const updatedFormData = {
         ...formData,
         step2: step2Data,
       };
-      
+
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
-      
+
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to add biographical info:', error);
@@ -121,7 +121,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const step3DataWithEmployeeId: Step3Dto = {
         ...step3Data,
@@ -129,17 +129,17 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       };
 
       const result: EmpAddRes = await empService.empAddStep3(step3DataWithEmployeeId);
-      
+
       console.log('Emergency contact added successfully:', result);
-      
+
       const updatedFormData = {
         ...formData,
         step3: step3Data,
       };
-      
+
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
-      
+
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to update emergency contact:', error);
@@ -158,7 +158,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const step4DataWithEmployeeId: Step4Dto = {
         ...step4Data,
@@ -166,17 +166,17 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       };
 
       const result: EmpAddRes = await empService.empAddStep4(step4DataWithEmployeeId);
-      
+
       console.log('Guarantor added successfully:', result);
-      
+
       const updatedFormData = {
         ...formData,
         step4: step4Data,
       };
-      
+
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
-      
+
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to update guarantor info:', error);
@@ -204,18 +204,18 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
         ...formData.step4,
         employeeId: employeeId,
       };
-      
+
       console.log('Submitting complete employee data:', finalData);
-      
-      const mockResult = { 
+
+      const mockResult = {
         id: employeeId || `emp-${Date.now()}`,
         code: `EMP${Date.now().toString().slice(-6)}`,
-        ...finalData 
+        ...finalData
       };
-      
+
       localStorage.removeItem('employeeFormData');
       localStorage.removeItem('employeeId');
-      
+
       onEmployeeAdded(mockResult);
     } catch (error) {
       console.error('Error submitting employee:', error);
@@ -229,7 +229,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   useEffect(() => {
     const savedFormData = localStorage.getItem('employeeFormData');
     const savedEmployeeId = localStorage.getItem('employeeId');
-    
+
     if (savedFormData) {
       try {
         const parsedData = JSON.parse(savedFormData);
@@ -238,7 +238,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
         console.error('Error loading saved form data:', error);
       }
     }
-    
+
     if (savedEmployeeId) {
       setEmployeeId(savedEmployeeId as UUID);
     }
@@ -311,7 +311,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
           title="Add New Employee"
           backButtonText="Back to Employees"
         />
-        
+
         {/* Error Display */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
@@ -338,7 +338,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
             </div>
           </div>
         )}
-        
+
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 px-8 py-4">
           <AnimatePresence mode="wait">
             {renderStep()}
