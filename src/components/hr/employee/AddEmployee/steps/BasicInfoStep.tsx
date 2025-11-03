@@ -48,7 +48,6 @@ const validationSchema = yup.object({
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onNext,
-  onBack,
   loading = false
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
@@ -390,20 +389,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Profile Picture Section */}
-        <div className="flex flex-col items-center mb-8">
-          <ProfilePictureUpload
-            profilePicture={formik.values.File}
-            onProfilePictureSelect={handleProfilePictureSelect}
-            onProfilePictureRemove={handleProfilePictureRemove}
-          />
-          {photoData && (
-            <div className="mt-2 text-xs text-green-600">
-              ✓ Image ready to upload
-            </div>
-          )}
-        </div>
-
         {/* Personal Information Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="lg:col-span-2">
@@ -604,29 +589,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             <h3 className="text-xl font-semibold text-gray-800">Employment Details</h3>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-            {/* Employment Date */}
-            <div className="space-y-2">
-              <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Employment Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="employmentDate"
-                name="employmentDate"
-                type="date"
-                value={formik.values.employmentDate}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentDate') ? "border-red-500" : "border-gray-300"
-                  }`}
-                required
-                disabled={loading}
-              />
-              {getErrorMessage('employmentDate') && (
-                <p className="text-red-500 text-sm mt-1">{getErrorMessage('employmentDate')}</p>
-              )}
-            </div>
-
+          {/* Row 1: Branch, Department, Job Grade, Position */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
             {/* Branch - Using List Component */}
             <div className="space-y-2">
               <List
@@ -672,6 +636,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               )}
             </div>
 
+            {/* Position - Using List Component */}
             <div className="space-y-2">
               <List
                 items={positionListItems}
@@ -713,6 +678,31 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               )}
               {getErrorMessage('jobGradeId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('jobGradeId')}</div>
+              )}
+            </div>
+          </div>
+
+          {/* Row 2: Employment Date, Employment Type, Employment Nature */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Employment Date */}
+            <div className="space-y-2">
+              <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-1">
+                Employment Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="employmentDate"
+                name="employmentDate"
+                type="date"
+                value={formik.values.employmentDate}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentDate') ? "border-red-500" : "border-gray-300"
+                  }`}
+                required
+                disabled={loading}
+              />
+              {getErrorMessage('employmentDate') && (
+                <p className="text-red-500 text-sm mt-1">{getErrorMessage('employmentDate')}</p>
               )}
             </div>
 
@@ -772,16 +762,35 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between pt-6">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={loading}
-            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-          >
-            Back
-          </button>
+        {/* Profile Picture Section - Moved to bottom with increased size */}
+        <div className="mt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-2 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full"></div>
+            <h3 className="text-xl font-semibold text-gray-800">Profile Picture</h3>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <div className="w-80 h-80"> {/* Increased size */}
+              <ProfilePictureUpload
+                profilePicture={formik.values.File}
+                onProfilePictureSelect={handleProfilePictureSelect}
+                onProfilePictureRemove={handleProfilePictureRemove}
+                size="large" // You might need to update your ProfilePictureUpload component to accept a size prop
+              />
+            </div>
+            {photoData && (
+              <div className="mt-4 text-sm text-green-600">
+                ✓ Profile picture ready to upload
+              </div>
+            )}
+            <div className="mt-2 text-sm text-gray-500 text-center">
+              Upload a professional profile picture.
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Button - Only Save & Continue */}
+        <div className="flex justify-end pt-6">
           <button
             type="submit"
             disabled={!isFormValid || loading}
@@ -798,6 +807,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           </button>
         </div>
       </form>
-    </motion.div>
+    </motion.div> 
   );
 };
