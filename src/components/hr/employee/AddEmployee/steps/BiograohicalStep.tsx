@@ -192,29 +192,7 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
             <h3 className="text-xl font-semibold text-gray-800">Biographical Details</h3>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            {/* Birth Date */}
-            <div className="space-y-2">
-              <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Birth Date *
-              </label>
-              <Input
-                id="birthDate"
-                name="birthDate"
-                type="date"
-                value={formik.values.birthDate}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('birthDate') ? "border-red-500" : "border-gray-300"
-                }`}
-                disabled={loading}
-              />
-              {getErrorMessage('birthDate') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('birthDate')}</div>
-              )}
-            </div>
-
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Birth Location */}
             <div className="space-y-2">
               <label htmlFor="birthLocation" className="block text-sm font-medium text-gray-700 mb-1">
@@ -258,32 +236,27 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('motherFullName')}</div>
               )}
             </div>
-
-            {/* Marital Status */}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Birth Date */}
             <div className="space-y-2">
-              <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 mb-1">
-                Marital Status *
+              <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">
+                Birth Date *
               </label>
-              <Select
-                value={formik.values.maritalStatus}
-                onValueChange={(value: MaritalStat) => formik.setFieldValue('maritalStatus', value)}
+              <Input
+                id="birthDate"
+                name="birthDate"
+                type="date"
+                value={formik.values.birthDate}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('birthDate') ? "border-red-500" : "border-gray-300"
+                }`}
                 disabled={loading}
-              >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('maritalStatus') ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <SelectValue placeholder="Select marital status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(MaritalStat).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      {value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {getErrorMessage('maritalStatus') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('maritalStatus')}</div>
+              />
+              {getErrorMessage('birthDate') && (
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('birthDate')}</div>
               )}
             </div>
 
@@ -315,6 +288,33 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
               )}
             </div>
 
+            {/* Marital Status */}
+            <div className="space-y-2">
+              <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 mb-1">
+                Marital Status *
+              </label>
+              <Select
+                value={formik.values.maritalStatus}
+                onValueChange={(value: MaritalStat) => formik.setFieldValue('maritalStatus', value)}
+                disabled={loading}
+              >
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage('maritalStatus') ? "border-red-500" : "border-gray-300"
+                }`}>
+                  <SelectValue placeholder="Select marital status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(MaritalStat).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {getErrorMessage('maritalStatus') && (
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('maritalStatus')}</div>
+              )}
+            </div>
             {/* Has Marriage Certificate */}
             <div className="space-y-2">
               <label htmlFor="hasMarriageCert" className="block text-sm font-medium text-gray-700 mb-1">
