@@ -55,11 +55,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const handleViewDetails = (employee: Employee) => {
     sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
     sessionStorage.setItem('currentModule', 'HR');
+    window.location.href = `/hr/employees/${employee.id}`;
 
-    const newWindow = window.open(`/hr/employees/${employee.id}`, '_blank');
-    if (newWindow) {
-      newWindow.focus();
-    }
+    // const newWindow = window.open(`/hr/employees/${employee.id}`, '_blank');
+    // if (newWindow) {
+    //   newWindow.focus();
+    // }
   };
 
   if (loading && employees.length === 0) {
