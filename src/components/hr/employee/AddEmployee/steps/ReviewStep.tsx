@@ -1,15 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, FileText, User, MapPin, Image } from 'lucide-react';
 import { Gender, EmpType, EmpNature, YesNo, MaritalStat } from '../../../../../types/hr/enum';
-import type { Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto } from '../../../../../types/hr/employee/empAddDto';
+import type { Step5Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
+import { empService } from '../../../../../services/hr/employee/empService';
 
 interface ReviewStepProps {
-  step1Data: Partial<Step1Dto & { companyId: string; branchId: string }>;
-  step2Data: Partial<Step2Dto>;
-  step3Data: Partial<Step3Dto>;
-  step4Data: Partial<Step4Dto>;
   employeeId?: UUID;
   employeeCode?: string;
   onSubmit: (step5Data: Step5Dto) => void;
@@ -18,120 +15,57 @@ interface ReviewStepProps {
 }
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
-  step1Data,
-  step2Data,
-  step3Data,
-  step4Data,
   employeeId,
   employeeCode,
   onSubmit,
   onBack,
   loading = false
 }) => {
-  // Function to format telephone numbers to start with +
-  const formatTelephone = (phone: string): string => {
-    if (!phone) return 'Not provided';
+  const [reviewData, setReviewData] = useState<Step5Dto | null>(null);
+  const [fetchLoading, setFetchLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-    // Remove any existing + and non-digit characters
-    const cleaned = phone.replace(/[^\d]/g, '');
-
-    // If it starts with 251 (Ethiopia country code), add +
-    if (cleaned.startsWith('251')) {
-      return `+${cleaned}`;
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if (document.documentElement) {
+      document.documentElement.scrollTop = 0;
     }
-
-    // If it's already in international format without +, add it
-    if (cleaned.length >= 10 && !cleaned.startsWith('0')) {
-      return `+${cleaned}`;
+    
+    if (document.body) {
+      document.body.scrollTop = 0;
     }
-
-    // For local numbers, assume Ethiopia and format as +251...
-    if (cleaned.startsWith('0')) {
-      return `+251${cleaned.substring(1)}`;
-    }
-
-    // If we can't determine the format, return as is with +
-    return `+${cleaned}`;
   };
 
-  // Transform the data to match Step5Dto structure
-  const reviewData: Step5Dto = {
-    // Basic Info
-    employeeId: employeeId || '00000000-0000-0000-0000-000000000000' as UUID,
-    photo: step1Data.File ? 'Uploaded' : '',
-    fullName: `${step1Data.firstName || ''} ${step1Data.middleName || ''} ${step1Data.lastName || ''}`.trim(),
-    fullNameAm: `${step1Data.firstNameAm || ''} ${step1Data.middleNameAm || ''} ${step1Data.lastNameAm || ''}`.trim(),
-    code: employeeCode || '',
-    gender: step1Data.gender || '',
-    nationality: step1Data.nationality || '',
-    employmentDate: step1Data.employmentDate || '',
-    employmentDateAm: '',
-    jobGrade: step1Data.jobGradeId || '',
-    position: step1Data.positionId || '',
-    department: step1Data.departmentId || '',
-    pbranch: step1Data.branchId || '',
-    employmentType: step1Data.employmentType || '',
-    employmentNature: step1Data.employmentNature || '',
+  // Fetch Step5 data from API when component mounts
+  useEffect(() => {
+    const fetchStep5Data = async () => {
+      if (!employeeId) {
+        setFetchError('Employee ID is required to fetch review data');
+        setFetchLoading(false);
+        return;
+      }
 
-    // Biographical
-    birthDate: step2Data.birthDate || '',
-    birthDateAm: '',
-    birthLocation: step2Data.birthLocation || '',
-    motherFullName: step2Data.motherFullName || '',
-    hasBirthCert: step2Data.hasBirthCert || '',
-    hasMarriageCert: step2Data.hasMarriageCert || '',
-    maritalStatus: step2Data.maritalStatus || '',
-    tin: step2Data.tin || '',
-    bankAccountNo: step2Data.bankAccountNo || '',
-    pensionNumber: step2Data.pensionNumber || '',
-    address: [
-      step2Data.country,
-      step2Data.region,
-      step2Data.subcity,
-      step2Data.zone,
-      step2Data.woreda,
-      step2Data.kebele,
-      step2Data.houseNo
-    ].filter(Boolean).join(', '),
-    telephone: formatTelephone(step2Data.telephone || ''),
+      try {
+        setFetchLoading(true);
+        setFetchError(null);
+        const data = await empService.getStep5Data(employeeId);
+        setReviewData(data);
+      } catch (error) {
+        console.error('Failed to fetch review data:', error);
+        setFetchError(
+          error instanceof Error 
+            ? error.message 
+            : 'Failed to load employee data. Please try again.'
+        );
+      } finally {
+        setFetchLoading(false);
+      }
+    };
 
-    // Emergency Contact
-    conFullName: `${step3Data.firstName || ''} ${step3Data.middleName || ''} ${step3Data.lastName || ''}`.trim(),
-    conFullNameAm: `${step3Data.firstNameAm || ''} ${step3Data.middleNameAm || ''} ${step3Data.lastNameAm || ''}`.trim(),
-    conNationality: step3Data.nationality || '',
-    conGender: step3Data.gender || '',
-    conRelation: step3Data.relationId || '',
-    conAddress: [
-      step3Data.country,
-      step3Data.region,
-      step3Data.subcity,
-      step3Data.zone,
-      step3Data.woreda,
-      step3Data.kebele,
-      step3Data.houseNo
-    ].filter(Boolean).join(', '),
-    conTelephone: formatTelephone(step3Data.telephone || ''),
-
-    // Guarantor
-    guaFullName: `${step4Data.firstName || ''} ${step4Data.middleName || ''} ${step4Data.lastName || ''}`.trim(),
-    guaFullNameAm: `${step4Data.firstNameAm || ''} ${step4Data.middleNameAm || ''} ${step4Data.lastNameAm || ''}`.trim(),
-    guaNationality: step4Data.nationality || '',
-    guaGender: step4Data.gender || '',
-    guaRelation: step4Data.relationId || '',
-    guaAddress: [
-      step4Data.country,
-      step4Data.region,
-      step4Data.subcity,
-      step4Data.zone,
-      step4Data.woreda,
-      step4Data.kebele,
-      step4Data.houseNo
-    ].filter(Boolean).join(', '),
-    guaTelephone: formatTelephone(step4Data.telephone || ''),
-    guaFileName: step4Data.File?.name || '',
-    guaFileSize: step4Data.File ? `${(step4Data.File.size / 1024 / 1024).toFixed(2)} MB` : '',
-    guaFileType: step4Data.File?.type || ''
-  };
+    fetchStep5Data();
+  }, [employeeId]);
 
   const getEnumValue = <T extends Record<string, string | number>>(
     enumObj: T,
@@ -142,47 +76,100 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Not provided';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  // Create object URL for profile picture preview
-  const getProfilePictureUrl = () => {
-    if (step1Data.File && step1Data.File instanceof File) {
-      return URL.createObjectURL(step1Data.File);
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
     }
-    return null;
   };
 
-  // Create object URL for guarantor document preview
-  const getGuarantorDocumentUrl = () => {
-    if (step4Data.File && step4Data.File instanceof File) {
-      return URL.createObjectURL(step4Data.File);
-    }
-    return null;
-  };
-
+  // Handle submit with scroll to top
   const handleSubmit = () => {
-    onSubmit(reviewData);
+    if (reviewData) {
+      // Scroll to top before submitting
+      scrollToTop();
+      onSubmit(reviewData);
+    }
   };
 
-  // Clean up object URLs when component unmounts
-  React.useEffect(() => {
-    return () => {
-      const profileUrl = getProfilePictureUrl();
-      const guarantorUrl = getGuarantorDocumentUrl();
+  // Handle back button click with scroll to top
+  const handleBackClick = () => {
+    scrollToTop();
+    onBack();
+  };
 
-      if (profileUrl) {
-        URL.revokeObjectURL(profileUrl);
-      }
-      if (guarantorUrl) {
-        URL.revokeObjectURL(guarantorUrl);
-      }
-    };
+  // Scroll to top when component mounts
+  useEffect(() => {
+    scrollToTop();
   }, []);
+
+  if (fetchLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-8"
+      >
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-green-200 border-t-green-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Employee Data</h2>
+          <p className="text-gray-600">Please wait while we load the employee information...</p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-8"
+      >
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FileText className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Data</h2>
+          <p className="text-gray-600 mb-4">{fetchError}</p>
+          <button
+            onClick={handleBackClick}
+            className="px-6 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (!reviewData) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-8"
+      >
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-gray-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">No Data Available</h2>
+          <p className="text-gray-600">Unable to load employee information.</p>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -226,10 +213,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             {/* Profile Picture Preview */}
             <div className="lg:col-span-1 flex flex-col items-center">
               <label className="text-sm font-medium text-gray-500 mb-3">Profile Picture</label>
-              {step1Data.File ? (
+              {reviewData.photo ? (
                 <div className="relative group">
                   <img
-                    src={getProfilePictureUrl() || ''}
+                    src={reviewData.photo}
                     alt="Employee Profile"
                     className="w-32 h-32 rounded-full object-cover border-4 border-green-200 shadow-md"
                   />
@@ -243,7 +230,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 </div>
               )}
               <p className="text-sm text-gray-500 mt-2">
-                {step1Data.File ? 'Photo uploaded' : 'No photo uploaded'}
+                {reviewData.photo ? 'Photo uploaded' : 'No photo uploaded'}
               </p>
             </div>
 
@@ -282,6 +269,22 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 <p className="text-gray-900">
                   {reviewData.employmentNature ? getEnumValue(EmpNature, reviewData.employmentNature) : 'Not provided'}
                 </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Job Grade</label>
+                <p className="text-gray-900">{reviewData.jobGrade || 'Not provided'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Position</label>
+                <p className="text-gray-900">{reviewData.position || 'Not provided'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Department</label>
+                <p className="text-gray-900">{reviewData.department || 'Not provided'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Branch</label>
+                <p className="text-gray-900">{reviewData.pbranch || 'Not provided'}</p>
               </div>
             </div>
           </div>
@@ -352,7 +355,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Telephone</label>
-                <p className="text-gray-900">{reviewData.telephone}</p>
+                <p className="text-gray-900">{reviewData.telephone || 'Not provided'}</p>
               </div>
             </div>
           </div>
@@ -394,7 +397,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Telephone</label>
-              <p className="text-gray-900">{reviewData.conTelephone}</p>
+              <p className="text-gray-900">{reviewData.conTelephone || 'Not provided'}</p>
             </div>
           </div>
         </div>
@@ -403,7 +406,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         <div className="border border-gray-200 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Guarantor Information</h3>
-            {step4Data.File && (
+            {reviewData.guaFileName && (
               <div className="flex items-center gap-2 text-sm text-blue-600">
                 <FileText className="w-4 h-4" />
                 <span>Document uploaded</span>
@@ -415,24 +418,13 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             {/* Guarantor Document Preview */}
             <div className="lg:col-span-1 flex flex-col items-center">
               <label className="text-sm font-medium text-gray-500 mb-3">Guarantor Document</label>
-              {step4Data.File ? (
+              {reviewData.guaFileName ? (
                 <div className="relative group">
-                  {step4Data.File.type.startsWith('image/') ? (
-                    <img
-                      src={getGuarantorDocumentUrl() || ''}
-                      alt="Guarantor Document"
-                      className="w-32 h-32 rounded-lg object-cover border-2 border-blue-200 shadow-md"
-                    />
-                  ) : (
-                    <div className="w-32 h-32 rounded-lg bg-blue-50 border-2 border-blue-200 flex flex-col items-center justify-center p-4">
-                      <FileText className="w-8 h-8 text-blue-500 mb-2" />
-                      <span className="text-xs text-blue-700 text-center font-medium">
-                        {step4Data.File.name.split('.').pop()?.toUpperCase()} Document
-                      </span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200 flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div className="w-32 h-32 rounded-lg bg-blue-50 border-2 border-blue-200 flex flex-col items-center justify-center p-4">
+                    <FileText className="w-8 h-8 text-blue-500 mb-2" />
+                    <span className="text-xs text-blue-700 text-center font-medium">
+                      {reviewData.guaFileType || 'Document'}
+                    </span>
                   </div>
                 </div>
               ) : (
@@ -441,8 +433,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 </div>
               )}
               <p className="text-sm text-gray-500 mt-2 text-center">
-                {step4Data.File ? step4Data.File.name : 'No document uploaded'}
+                {reviewData.guaFileName || 'No document uploaded'}
               </p>
+              {reviewData.guaFileSize && (
+                <p className="text-xs text-gray-400 mt-1">{reviewData.guaFileSize}</p>
+              )}
             </div>
 
             {/* Guarantor Details */}
@@ -475,7 +470,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Telephone</label>
-                <p className="text-gray-900">{reviewData.guaTelephone}</p>
+                <p className="text-gray-900">{reviewData.guaTelephone || 'Not provided'}</p>
               </div>
             </div>
           </div>
@@ -485,7 +480,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         <div className="flex justify-between pt-8">
           <button
             type="button"
-            onClick={onBack}
+            onClick={handleBackClick}
             disabled={loading}
             className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
@@ -499,7 +494,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                 Submitting...
               </>
             ) : (

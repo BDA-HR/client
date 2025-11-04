@@ -50,6 +50,19 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   const [loadingRelations, setLoadingRelations] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if (document.documentElement) {
+      document.documentElement.scrollTop = 0;
+    }
+    
+    if (document.body) {
+      document.body.scrollTop = 0;
+    }
+  };
+
   const formik = useFormik<Step4Dto>({
     initialValues: {
       firstName: data.firstName || '',
@@ -85,6 +98,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     onSubmit: (values) => {
       // Clear previous errors when submitting
       setSubmitError(null);
+      
+      // Scroll to top before calling onNext
+      scrollToTop();
       onNext(values);
     },
   });
@@ -175,7 +191,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Get the selected relation name for display
   const selectedRelation = relations.find(relation => relation.id === formik.values.relationId);
 
-  // Handle form submission with validation
+  // Handle form submission with validation and scroll to top
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -183,6 +199,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     formik.validateForm().then(errors => {
       if (Object.keys(errors).length === 0) {
         // No errors, submit the form
+        // Scroll to top before form submission
+        scrollToTop();
         formik.handleSubmit();
       } else {
         // Set a general error message
@@ -197,6 +215,12 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
         formik.setTouched(touchedFields);
       }
     });
+  };
+
+  // Handle back button click with scroll to top
+  const handleBackClick = () => {
+    scrollToTop();
+    onBack();
   };
 
   return (
@@ -740,7 +764,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
         <div className="flex justify-between pt-6">
           <button
             type="button"
-            onClick={onBack}
+            onClick={handleBackClick}
             disabled={loading}
             className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >

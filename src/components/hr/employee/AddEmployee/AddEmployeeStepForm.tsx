@@ -40,21 +40,35 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   const formContainerRef = useRef<HTMLDivElement>(null);
   const stepContentRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to top when step changes
+  // Scroll to top when step changes - IMPROVED
   useEffect(() => {
-    // Scroll the entire window to top
+    scrollToTop();
+  }, [currentStep]);
+
+  const scrollToTop = () => {
+    // Multiple methods to ensure it works across different browsers
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Also scroll the form container to top if it exists
+    // Scroll the document element as well
+    if (document.documentElement) {
+      document.documentElement.scrollTop = 0;
+    }
+    
+    // Scroll the body element
+    if (document.body) {
+      document.body.scrollTop = 0;
+    }
+    
+    // Scroll the form container
     if (formContainerRef.current) {
       formContainerRef.current.scrollTop = 0;
     }
-
-    // Scroll the step content to top
+    
+    // Scroll the step content container
     if (stepContentRef.current) {
       stepContentRef.current.scrollTop = 0;
     }
-  }, [currentStep]);
+  };
 
   // Handle Step 1 submission with service call
   const handleStep1Submit = async (step1Data: Step1Dto & { branchId: UUID }) => {
@@ -62,13 +76,11 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
     setError(null);
 
     try {
-      // Call the Step 1 service to create employee
       const result: EmpAddRes = await empService.empAddStep1(step1Data);
 
       console.log('Employee created successfully:', result.id);
       setEmployeeId(result.id);
 
-      // Update form data
       const updatedFormData = {
         ...formData,
         step1: step1Data,
@@ -78,7 +90,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
       localStorage.setItem('employeeId', result.id);
 
-      // Move to next step
+      // Scroll to top before moving to next step
+      scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to create employee:', error);
@@ -120,7 +133,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Move to next step
+      // Scroll to top before moving to next step
+      scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to add biographical info:', error);
@@ -158,7 +172,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Move to next step
+      // Scroll to top before moving to next step
+      scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to update emergency contact:', error);
@@ -196,7 +211,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Move to next step
+      // Scroll to top before moving to next step
+      scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Failed to update guarantor info:', error);
@@ -206,7 +222,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
     }
   };
 
-  // Handle Step 5 submission with service call
+  // Handle Step 5 submission with service call - UPDATED
   const handleStep5Submit = async (step5Data: Step5Dto) => {
     if (!employeeId) {
       setError('Employee ID is missing. Please complete Step 1 first to create an employee record.');
@@ -218,7 +234,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
     try {
       // Call the Step 5 service to complete employee submission
-      const result: EmpAddRes = await empService.empAddStep5(step5Data, employeeId);
+      const result: EmpAddRes = await empService.submitEmployee(step5Data);
 
       console.log('Employee submission completed successfully:', result);
 
@@ -237,6 +253,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   };
 
   const handleBack = () => {
+    // Scroll to top before going back
+    scrollToTop();
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     } else {
@@ -261,6 +279,9 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
     if (savedEmployeeId) {
       setEmployeeId(savedEmployeeId as UUID);
     }
+
+    // Scroll to top on initial load
+    scrollToTop();
   }, []);
 
   const renderStep = () => {
@@ -307,10 +328,6 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       case 5:
         return (
           <ReviewStep
-            step1Data={formData.step1}
-            step2Data={formData.step2}
-            step3Data={formData.step3}
-            step4Data={formData.step4}
             employeeId={employeeId}
             onSubmit={handleStep5Submit}
             onBack={handleBack}
@@ -323,8 +340,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="mx-auto" ref={formContainerRef}>
+    <div className="min-h-screen" ref={formContainerRef}>
+      <div className="mx-auto">
         <AddEmployeeStepHeader
           steps={steps}
           currentStep={currentStep}

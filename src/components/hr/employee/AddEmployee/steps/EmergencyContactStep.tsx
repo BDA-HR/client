@@ -48,6 +48,20 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
 }) => {
   const [relations, setRelations] = useState<ListItem[]>([]);
   const [loadingRelations, setLoadingRelations] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if (document.documentElement) {
+      document.documentElement.scrollTop = 0;
+    }
+    
+    if (document.body) {
+      document.body.scrollTop = 0;
+    }
+  };
 
   const formik = useFormik<Step3Dto>({
     initialValues: {
@@ -80,6 +94,11 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
     enableReinitialize: true,
     validateOnMount: true,
     onSubmit: (values) => {
+      // Clear previous errors when submitting
+      setSubmitError(null);
+      
+      // Scroll to top before calling onNext
+      scrollToTop();
       onNext(values);
     },
   });
@@ -105,6 +124,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
         }
       } catch (error) {
         console.error('Error fetching relations:', error);
+        setSubmitError('Failed to load relations');
       } finally {
         setLoadingRelations(false);
       }
@@ -153,6 +173,38 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
     return '';
   };
 
+  // Handle form submission with validation and scroll to top
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate all fields
+    formik.validateForm().then(errors => {
+      if (Object.keys(errors).length === 0) {
+        // No errors, submit the form
+        // Scroll to top before form submission
+        scrollToTop();
+        formik.handleSubmit();
+      } else {
+        // Set a general error message
+        setSubmitError('Please fill in all required fields correctly before submitting.');
+        
+        // Mark all fields as touched to show errors
+        const allFields = Object.keys(formik.values) as Array<keyof Step3Dto>;
+        const touchedFields: Partial<Record<keyof Step3Dto, boolean>> = {};
+        allFields.forEach(field => {
+          touchedFields[field] = true;
+        });
+        formik.setTouched(touchedFields);
+      }
+    });
+  };
+
+  // Handle back button click with scroll to top
+  const handleBackClick = () => {
+    scrollToTop();
+    onBack();
+  };
+
   // Get the selected relation name for display
   const selectedRelation = relations.find(relation => relation.id === formik.values.relationId);
 
@@ -164,7 +216,38 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
-      <form onSubmit={formik.handleSubmit} className="space-y-8">
+      {/* Error Display */}
+      {submitError && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4"
+        >
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <p className="text-sm text-red-700 mt-1">{submitError}</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <button
+                onClick={() => setSubmitError(null)}
+                className="text-red-800 hover:text-red-900"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-8">
         {/* Contact Person Information Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-3">
@@ -667,7 +750,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
         <div className="flex justify-between pt-6">
           <button
             type="button"
-            onClick={onBack}
+            onClick={handleBackClick}
             disabled={loading}
             className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >

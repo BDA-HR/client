@@ -48,6 +48,7 @@ const validationSchema = yup.object({
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onNext,
+  onBack,
   loading = false
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
@@ -59,6 +60,19 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const [loadingPositions, setLoadingPositions] = useState(false);
   const [loadingJobGrades, setLoadingJobGrades] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if (document.documentElement) {
+      document.documentElement.scrollTop = 0;
+    }
+    
+    if (document.body) {
+      document.body.scrollTop = 0;
+    }
+  };
 
   // Set default employment date to today if not provided
   const getDefaultEmploymentDate = () => {
@@ -95,6 +109,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         ...values,
       };
 
+      // Scroll to top before calling onNext
+      scrollToTop();
       onNext(submitData);
     },
   });
@@ -308,12 +324,14 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     return '';
   };
 
-  // Handle form submission with validation
+  // Handle form submission with validation and scroll to top
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     formik.validateForm().then(errors => {
       if (Object.keys(errors).length === 0) {
+        // Scroll to top before form submission
+        scrollToTop();
         formik.handleSubmit();
       } else {
         setSubmitError('Please fill in all required fields correctly before submitting.');
@@ -325,6 +343,12 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         formik.setTouched(touchedFields);
       }
     });
+  };
+
+  // Handle back button click with scroll to top
+  const handleBackClick = () => {
+    scrollToTop();
+    onBack();
   };
 
   return (
@@ -759,8 +783,16 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           </div>
         </div>
 
-        {/* Navigation Button - Only Save & Continue */}
-        <div className="flex justify-end pt-6">
+        {/* Navigation Buttons */}
+        <div className="flex justify-between pt-6">
+          <button
+            type="button"
+            onClick={handleBackClick}
+            disabled={loading}
+            className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            Back
+          </button>
           <button
             type="submit"
             disabled={!isFormValid || loading}
