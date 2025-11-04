@@ -403,20 +403,20 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="field">
                 <label className="text-sm font-medium text-gray-500"> Full Name </label>
-                <p className="text-gray-900 font-medium">{reviewData.fullName || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.fullName || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500"> ሙሉ ስም </label>
-                <p className="text-gray-900 font-medium">{reviewData.fullNameAm || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.fullNameAm || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Nationality</label>
-                <p className="text-gray-900 font-medium">{reviewData.nationality || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.nationality || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Gender</label>
                 <p className="text-gray-900 font-medium">
-                  {reviewData.gender ? getEnumValue(Gender, reviewData.gender) : 'Not provided'}
+                  {reviewData.gender ? getEnumValue(Gender, reviewData.gender) : ''}
                 </p>
               </div>
               <div className="field">
@@ -426,7 +426,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Employment Type</label>
                 <p className="text-gray-900 font-medium">
-                  {reviewData.employmentType ? getEnumValue(EmpType, reviewData.employmentType) : 'Not provided'}
+                  {reviewData.employmentType ? getEnumValue(EmpType, reviewData.employmentType) : ''}
                 </p>
               </div>
               <div className="field">
@@ -437,19 +437,19 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Job Grade</label>
-                <p className="text-gray-900 font-medium">{reviewData.jobGrade || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.jobGrade || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Position</label>
-                <p className="text-gray-900 font-medium">{reviewData.position || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.position || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Department</label>
-                <p className="text-gray-900 font-medium">{reviewData.department || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.department || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Branch</label>
-                <p className="text-gray-900 font-medium">{reviewData.pbranch || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.pbranch || ''}</p>
               </div>
             </div>
           </div>
@@ -469,41 +469,41 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Birth Location</label>
-              <p className="text-gray-900 font-medium">{reviewData.birthLocation || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.birthLocation || ''}</p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Mother's Full Name</label>
-              <p className="text-gray-900 font-medium">{reviewData.motherFullName || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.motherFullName || ''}</p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Marital Status</label>
               <p className="text-gray-900 font-medium">
-                {reviewData.maritalStatus ? getEnumValue(MaritalStat, reviewData.maritalStatus) : 'Not provided'}
+                {reviewData.maritalStatus ? getEnumValue(MaritalStat, reviewData.maritalStatus) : ''}
               </p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Has Birth Certificate</label>
               <p className="text-gray-900 font-medium">
-                {reviewData.hasBirthCert ? getEnumValue(YesNo, reviewData.hasBirthCert) : 'Not provided'}
+                {reviewData.hasBirthCert ? getEnumValue(YesNo, reviewData.hasBirthCert) : ''}
               </p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Has Marriage Certificate</label>
               <p className="text-gray-900 font-medium">
-                {reviewData.hasMarriageCert ? getEnumValue(YesNo, reviewData.hasMarriageCert) : 'Not provided'}
+                {reviewData.hasMarriageCert ? getEnumValue(YesNo, reviewData.hasMarriageCert) : ''}
               </p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">TIN</label>
-              <p className="text-gray-900 font-medium">{reviewData.tin || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.tin || ''}</p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Bank Account</label>
-              <p className="text-gray-900 font-medium">{reviewData.bankAccountNo || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.bankAccountNo || ''}</p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Pension Number</label>
-              <p className="text-gray-900 font-medium">{reviewData.pensionNumber || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.pensionNumber || ''}</p>
             </div>
           </div>
 
@@ -516,11 +516,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="grid grid-cols-1 gap-4">
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Full Address</label>
-                <p className="text-gray-900 font-medium">{reviewData.address || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.address || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Telephone</label>
-                <p className="text-gray-900 font-medium">{reviewData.telephone || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.telephone || ''}</p>
               </div>
             </div>
           </div>
@@ -536,25 +536,25 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Full Name </label>
-              <p className="text-gray-900 font-medium">{reviewData.conFullName || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.conFullName || ''}</p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">ሙሉ ስም </label>
-              <p className="text-gray-900 font-medium">{reviewData.conFullNameAm || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.conFullNameAm || ''}</p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Nationality</label>
-              <p className="text-gray-900 font-medium">{reviewData.conNationality || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.conNationality || ''}</p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Gender</label>
               <p className="text-gray-900 font-medium">
-                {reviewData.conGender ? getEnumValue(Gender, reviewData.conGender) : 'Not provided'}
+                {reviewData.conGender ? getEnumValue(Gender, reviewData.conGender) : ''}
               </p>
             </div>
             <div className="field">
               <label className="text-sm font-medium text-gray-500">Relation</label>
-              <p className="text-gray-900 font-medium">{reviewData.conRelation || 'Not provided'}</p>
+              <p className="text-gray-900 font-medium">{reviewData.conRelation || ''}</p>
             </div>
           </div>
 
@@ -567,11 +567,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="grid grid-cols-1 gap-4">
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Full Address</label>
-                <p className="text-gray-900 font-medium">{reviewData.conAddress || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.conAddress || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Telephone</label>
-                <p className="text-gray-900 font-medium">{reviewData.conTelephone || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.conTelephone || ''}</p>
               </div>
             </div>
           </div>
@@ -619,25 +619,25 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Full Name </label>
-                <p className="text-gray-900 font-medium">{reviewData.guaFullName || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.guaFullName || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">ሙሉ ስም </label>
-                <p className="text-gray-900 font-medium">{reviewData.guaFullNameAm || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.guaFullNameAm || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Nationality</label>
-                <p className="text-gray-900 font-medium">{reviewData.guaNationality || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.guaNationality || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Gender</label>
                 <p className="text-gray-900 font-medium">
-                  {reviewData.guaGender ? getEnumValue(Gender, reviewData.guaGender) : 'Not provided'}
+                  {reviewData.guaGender ? getEnumValue(Gender, reviewData.guaGender) : ''}
                 </p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Relation</label>
-                <p className="text-gray-900 font-medium">{reviewData.guaRelation || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.guaRelation || ''}</p>
               </div>
             </div>
           </div>
@@ -651,11 +651,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="grid grid-cols-1 gap-4">
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Full Address</label>
-                <p className="text-gray-900 font-medium">{reviewData.guaAddress || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.guaAddress || ''}</p>
               </div>
               <div className="field">
                 <label className="text-sm font-medium text-gray-500">Telephone</label>
-                <p className="text-gray-900 font-medium">{reviewData.guaTelephone || 'Not provided'}</p>
+                <p className="text-gray-900 font-medium">{reviewData.guaTelephone || ''}</p>
               </div>
             </div>
           </div>
