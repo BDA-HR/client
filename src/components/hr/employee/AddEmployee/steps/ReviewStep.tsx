@@ -322,14 +322,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Employee Information</h2>
           <p className="text-gray-600">Please review all the information before submitting</p>
-
-          {/* Employee Code Display */}
-          {reviewData.code && (
-            <div className="mt-4 inline-block bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-              <span className="text-sm font-medium text-green-600">Employee Code: </span>
-              <span className="text-sm font-bold text-green-800">{reviewData.code}</span>
-            </div>
-          )}
         </div>
 
         {/* Step 1: Basic Information */}
@@ -343,20 +335,30 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Picture Preview */}
-            <div className="lg:col-span-1 flex flex-col items-center">
-              <div className="photo-section">
-                {reviewData.photo ? (
-                  <img
-                    src={`data:image/png;base64,${reviewData.photo}`}
-                    alt="Employee Profile"
-                    className="employee-photo"
-                  />
-                ) : (
-                  <div className="placeholder-photo">
-                    <User className="w-12 h-12 text-gray-400" />
-                  </div>
-                )}
+            <div className="lg:col-span-1">
+              <div className="border-dashed border-2 rounded-lg px-4 py-32 flex flex-col items-center justify-center mb-4">
+                <div className="photo-section">
+                  {reviewData.photo ? (
+                    <img
+                      src={`data:image/png;base64,${reviewData.photo}`}
+                      alt="Employee Profile"
+                      className="employee-photo"
+                    />
+                  ) : (
+                    <div className="placeholder-photo">
+                      <User className="w-12 h-12 text-gray-400" />
+                    </div>
+                  )}
+                </div>
               </div>
+                            {reviewData.code && (
+                <div className="text-center">
+                  <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 inline-block">
+                    <span className="text-xs font-medium text-green-600">Employee Code: </span>
+                    <span className="text-sm font-bold text-green-800">{reviewData.code}</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Personal Information */}

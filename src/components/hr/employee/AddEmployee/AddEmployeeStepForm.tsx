@@ -8,7 +8,7 @@ import { GuarantorStep } from './steps/GurantorStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { AddEmployeeStepHeader } from './AddEmployeeStepHeader';
 import { empService } from '../../../../services/hr/employee/empService';
-import type { Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto, EmpAddRes, UUID } from '../../../../types/hr/employee/empAddDto';
+import type {Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto, EmpAddRes, UUID } from '../../../../types/hr/employee/empAddDto';
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: User },
