@@ -48,7 +48,6 @@ const validationSchema = yup.object({
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onNext,
-  onBack,
   loading = false
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
@@ -345,11 +344,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     });
   };
 
-  // Handle back button click with scroll to top
-  const handleBackClick = () => {
-    scrollToTop();
-    onBack();
-  };
 
   return (
     <motion.div
@@ -785,14 +779,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
         {/* Navigation Buttons */}
         <div className="flex justify-between pt-6">
-          <button
-            type="button"
-            onClick={handleBackClick}
-            disabled={loading}
-            className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-          >
-            Back
-          </button>
+
           <button
             type="submit"
             disabled={!isFormValid || loading}
