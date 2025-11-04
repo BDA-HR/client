@@ -7,7 +7,7 @@ import 'react-phone-input-2/lib/style.css';
 import { Input } from '../../../../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/select';
 import { Gender, AddressType } from '../../../../../types/hr/enum';
-import type { Step3Dto} from '../../../../../types/hr/employee/empAddDto';
+import type { Step3Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
 import { amharicRegex } from '../../../../../utils/amharic-regex';
 import List from '../../../../List/list';
@@ -39,12 +39,12 @@ const validationSchema = yup.object({
   telephone: yup.string().required('Telephone is required'),
 });
 
-export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({ 
-  data, 
-  onNext, 
+export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
+  data,
+  onNext,
   onBack,
   employeeId,
-  loading = false 
+  loading = false
 }) => {
   const [relations, setRelations] = useState<ListItem[]>([]);
   const [loadingRelations, setLoadingRelations] = useState(false);
@@ -53,11 +53,11 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
   // Scroll to top function
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
-    
+
     if (document.body) {
       document.body.scrollTop = 0;
     }
@@ -76,7 +76,6 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
       relationId: data.relationId || '' as UUID,
       employeeId: employeeId || data.employeeId || '' as UUID,
       addressType: data.addressType || '' as AddressType,
-      addressTypeStr: data.addressTypeStr || '',
       country: data.country || '',
       region: data.region || '',
       subcity: data.subcity || '',
@@ -96,7 +95,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
     onSubmit: (values) => {
       // Clear previous errors when submitting
       setSubmitError(null);
-      
+
       // Scroll to top before calling onNext
       scrollToTop();
       onNext(values);
@@ -117,7 +116,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
       try {
         const relationsData = await listService.getAllRelations();
         setRelations(relationsData);
-        
+
         // Auto-select first relation if none is selected and we have relations
         if (!formik.values.relationId && relationsData.length > 0) {
           formik.setFieldValue('relationId', relationsData[0].id);
@@ -158,7 +157,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
   const isFormValid = React.useMemo(() => {
     if (loadingRelations || loading) return false;
     if (!employeeId && !formik.values.employeeId) return false;
-    
+
     return formik.isValid && formik.dirty;
   }, [formik.isValid, formik.dirty, loadingRelations, loading, employeeId, formik.values.employeeId]);
 
@@ -166,7 +165,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
   const getErrorMessage = (fieldName: string): string => {
     const error = formik.errors[fieldName as keyof typeof formik.errors];
     const touched = formik.touched[fieldName as keyof typeof formik.touched];
-    
+
     if (touched && error) {
       return typeof error === 'string' ? error : 'Invalid value';
     }
@@ -176,7 +175,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
   // Handle form submission with validation and scroll to top
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate all fields
     formik.validateForm().then(errors => {
       if (Object.keys(errors).length === 0) {
@@ -187,7 +186,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
       } else {
         // Set a general error message
         setSubmitError('Please fill in all required fields correctly before submitting.');
-        
+
         // Mark all fields as touched to show errors
         const allFields = Object.keys(formik.values) as Array<keyof Step3Dto>;
         const touchedFields: Partial<Record<keyof Step3Dto, boolean>> = {};
@@ -257,7 +256,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {/* English Names Column */}
-            <div className="space-y-4">              
+            <div className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
                   First Name *
@@ -268,9 +267,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   value={formik.values.firstName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="John"
                   disabled={loading}
                 />
@@ -289,9 +287,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   value={formik.values.middleName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="Michael"
                   disabled={loading}
                 />
@@ -310,9 +307,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   value={formik.values.lastName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="Doe"
                   disabled={loading}
                 />
@@ -334,9 +330,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   value={formik.values.firstNameAm}
                   onChange={(e) => handleAmharicInputChange(e, 'firstNameAm')}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="አየለ"
                   disabled={loading}
                 />
@@ -355,9 +350,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   value={formik.values.middleNameAm}
                   onChange={(e) => handleAmharicInputChange(e, 'middleNameAm')}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="በቀለ"
                   disabled={loading}
                 />
@@ -376,9 +370,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   value={formik.values.lastNameAm}
                   onChange={(e) => handleAmharicInputChange(e, 'lastNameAm')}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                    getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
+                    }`}
                   placeholder="ዮሐንስ"
                   disabled={loading}
                 />
@@ -401,9 +394,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                 value={formik.values.nationality}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Ethiopian"
                 disabled={loading}
               />
@@ -421,9 +413,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                 onValueChange={(value: Gender) => formik.setFieldValue('gender', value)}
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
-                }`}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
+                  }`}>
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -479,9 +470,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                 onValueChange={(value: AddressType) => formik.setFieldValue('addressType', value)}
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
-                }`}>
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
+                  }`}>
                   <SelectValue placeholder="Select address type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -508,9 +498,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                 value={formik.values.country}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('country') ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('country') ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Ethiopia"
                 disabled={loading}
               />
@@ -530,9 +519,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                 value={formik.values.region}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('region') ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('region') ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Addis Ababa"
                 disabled={loading}
               />
@@ -546,9 +534,8 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
               <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
                 Telephone *
               </label>
-              <div className={`w-full border rounded-md transition-colors duration-200 ${
-                getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
-              }`}>
+              <div className={`w-full border rounded-md transition-colors duration-200 ${getErrorMessage('telephone') ? "border-red-500" : "border-gray-300"
+                }`}>
                 <PhoneInput
                   country={'et'}
                   value={formik.values.telephone}

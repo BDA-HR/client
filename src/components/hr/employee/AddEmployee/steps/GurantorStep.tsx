@@ -53,11 +53,11 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Scroll to top function
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
-    
+
     if (document.body) {
       document.body.scrollTop = 0;
     }
@@ -85,7 +85,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       houseNo: data.houseNo || '',
       telephone: data.telephone || '',
       poBox: data.poBox || '',
-      fax: data.fax || '',
+      fax: data.fax || ' ',
       email: data.email || '',
       website: data.website || '',
       File: data.File || null,
@@ -98,7 +98,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     onSubmit: (values) => {
       // Clear previous errors when submitting
       setSubmitError(null);
-      
+
       // Scroll to top before calling onNext
       scrollToTop();
       onNext(values);

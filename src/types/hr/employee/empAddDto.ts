@@ -32,7 +32,7 @@ export interface Step2Dto {
     bankAccountNo: string;
     pensionNumber: string;
     addressType: AddressType;
-    addressTypeStr: string;
+    // addressTypeStr: string;
     country: string;
     region: string;
     subcity: string;
@@ -59,7 +59,6 @@ export interface Step3Dto {
     relationId: UUID;
     employeeId: UUID;
     addressType: AddressType;
-    addressTypeStr: string;
     country: string;
     region: string;
     subcity: string;
