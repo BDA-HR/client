@@ -660,14 +660,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           >
             Back
           </button>
-          <button
-            type="button"
-            onClick={handleCancelAndClear}
-            disabled={loading}
-            className="px-6 py-3 border border-red-600 text-red-600 rounded-xl font-medium hover:bg-red-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-          >
-            Cancel & Clear Data
-          </button>
         </div>
 
         <div className="flex gap-4">
