@@ -67,7 +67,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-8 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
           <p className="text-gray-600">Loading employees...</p>
         </div>
       </div>
