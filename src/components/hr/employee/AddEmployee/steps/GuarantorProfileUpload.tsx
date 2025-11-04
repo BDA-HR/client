@@ -68,15 +68,7 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
   };
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith("image/")) {
-      return (
-        <img
-          src={previewUrl || ""}
-          alt="File preview"
-          className="w-full h-full object-cover"
-        />
-      );
-    } else if (file.type.includes("pdf")) {
+ if (file.type.includes("pdf")) {
       return (
         <div className="w-full h-full flex flex-col items-center justify-center">
           {previewUrl ? (
