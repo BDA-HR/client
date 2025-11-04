@@ -186,10 +186,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <p className="text-gray-600">Please review all the information before submitting</p>
 
           {/* Employee Code Display */}
-          {employeeCode && (
+          {reviewData.code && (
             <div className="mt-4 inline-block bg-green-50 border border-green-200 rounded-lg px-4 py-2">
               <span className="text-sm font-medium text-green-600">Employee Code: </span>
-              <span className="text-sm font-bold text-green-800">{employeeCode}</span>
+              <span className="text-sm font-bold text-green-800">{reviewData.code}</span>
             </div>
           )}
         </div>
@@ -201,18 +201,12 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <User className="w-5 h-5 text-green-600 mr-2" />
               <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
             </div>
-            {employeeCode && (
-              <div className="text-right">
-                <span className="text-sm font-medium text-gray-500">Employee Code:</span>
-                <span className="text-sm font-bold text-gray-900 ml-2">{employeeCode}</span>
-              </div>
-            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Picture Preview */}
             <div className="lg:col-span-1 flex flex-col items-center">
-              <label className="text-sm font-medium text-gray-500 mb-3">Profile Picture</label>
+              {/* <label className="text-sm font-medium text-gray-500 mb-3">Profile Picture</label> */}
               {reviewData.photo ? (
                 <div className="relative group">
                   <img
@@ -220,18 +214,12 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                     alt="Employee Profile"
                     className="w-32 h-32 rounded-full object-cover border-4 border-green-200 shadow-md"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-full transition-all duration-200 flex items-center justify-center">
-                    <Image className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  </div>
                 </div>
               ) : (
                 <div className="w-32 h-32 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
                   <User className="w-12 h-12 text-gray-400" />
                 </div>
               )}
-              <p className="text-sm text-gray-500 mt-2">
-                {reviewData.photo ? 'Photo uploaded' : 'No photo uploaded'}
-              </p>
             </div>
 
             {/* Personal Information */}
