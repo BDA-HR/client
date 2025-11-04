@@ -28,11 +28,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   // Scroll to top function
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
-    
+
     if (document.body) {
       document.body.scrollTop = 0;
     }
@@ -55,8 +55,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       } catch (error) {
         console.error('Failed to fetch review data:', error);
         setFetchError(
-          error instanceof Error 
-            ? error.message 
+          error instanceof Error
+            ? error.message
             : 'Failed to load employee data. Please try again.'
         );
       } finally {
@@ -216,7 +216,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               {reviewData.photo ? (
                 <div className="relative group">
                   <img
-                    src={reviewData.photo}
+                    src={`data:image/png;base64,${reviewData.photo}`}
                     alt="Employee Profile"
                     className="w-32 h-32 rounded-full object-cover border-4 border-green-200 shadow-md"
                   />
