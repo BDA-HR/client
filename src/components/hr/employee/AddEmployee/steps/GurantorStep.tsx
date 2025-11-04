@@ -37,6 +37,11 @@ const validationSchema = yup.object({
   country: yup.string().required('Country is required'),
   region: yup.string().required('Region is required'),
   telephone: yup.string().required('Telephone is required'),
+  wereda: yup.string().required('Wereda is required'),
+  kebele: yup.string().required('Kebele is required'),
+  zone: yup.string().required('Zone is required'),
+  subcity: yup.string().required('Subcity is required'),
+  housenumber: yup.string().required('House number is required'),
 });
 
 export const GuarantorStep: React.FC<GuarantorStepProps> = ({
@@ -593,24 +598,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               )}
             </div>
 
-            {/* Email - Optional */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
-                placeholder="example@email.com"
-                disabled={loading}
-              />
-            </div>
-
             {/* Subcity - Optional */}
             <div className="space-y-2">
               <label htmlFor="subcity" className="block text-sm font-medium text-gray-700 mb-1">
@@ -692,6 +679,24 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                 onBlur={formik.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
                 placeholder="H-123"
+                disabled={loading}
+              />
+            </div>
+
+                        {/* Email - Optional */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200"
+                placeholder="example@email.com"
                 disabled={loading}
               />
             </div>
