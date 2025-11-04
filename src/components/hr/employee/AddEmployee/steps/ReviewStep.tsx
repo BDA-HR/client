@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, FileText, User, MapPin, Image } from 'lucide-react';
+import { CheckCircle, FileText, User, MapPin, Printer } from 'lucide-react';
 import { Gender, EmpType, EmpNature, YesNo, MaritalStat } from '../../../../../types/hr/enum';
 import type { Step5Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
 import { empService } from '../../../../../services/hr/employee/empService';
+import { useNavigate } from 'react-router-dom';
 
 interface ReviewStepProps {
   employeeId?: UUID;
@@ -16,11 +17,11 @@ interface ReviewStepProps {
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
   employeeId,
-  employeeCode,
   onSubmit,
   onBack,
   loading = false
 }) => {
+  const navigate = useNavigate();
   const [reviewData, setReviewData] = useState<Step5Dto | null>(null);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -87,12 +88,20 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     }
   };
 
-  // Handle submit with scroll to top
-  const handleSubmit = () => {
+  // Handle submit with scroll to top and navigation
+  const handleSubmit = async () => {
     if (reviewData) {
       // Scroll to top before submitting
       scrollToTop();
-      onSubmit(reviewData);
+      
+      try {
+        await onSubmit(reviewData);
+        // Navigate to employee list after successful submission
+        navigate('/hr/employees/record');
+      } catch (error) {
+        console.error('Submission failed:', error);
+        // Handle submission error (you might want to show an error message)
+      }
     }
   };
 
@@ -100,6 +109,135 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   const handleBackClick = () => {
     scrollToTop();
     onBack();
+  };
+
+  // Print functionality
+  const handlePrint = () => {
+    scrollToTop();
+    
+    // Wait a brief moment for scroll to complete before printing
+    setTimeout(() => {
+      const printContent = document.getElementById('employee-review-content');
+      
+      if (printContent) {
+        // Create a print-friendly version
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>Employee Record - ${reviewData?.fullName || 'Employee'}</title>
+                <style>
+                  body { 
+                    font-family: Arial, sans-serif; 
+                    line-height: 1.4; 
+                    color: #333; 
+                    margin: 20px;
+                    max-width: 1000px;
+                  }
+                  .print-header { 
+                    text-align: center; 
+                    margin-bottom: 30px; 
+                    border-bottom: 2px solid #333; 
+                    padding-bottom: 20px;
+                  }
+                  .print-section { 
+                    margin-bottom: 25px; 
+                    page-break-inside: avoid;
+                  }
+                  .print-section h3 { 
+                    background-color: #f3f4f6; 
+                    padding: 10px; 
+                    margin: 0 0 15px 0; 
+                    border-left: 4px solid #10b981;
+                  }
+                  .grid { 
+                    display: grid; 
+                    grid-template-columns: 1fr 1fr; 
+                    gap: 15px; 
+                  }
+                  .field { 
+                    margin-bottom: 12px; 
+                  }
+                  .field label { 
+                    font-weight: bold; 
+                    display: block; 
+                    margin-bottom: 4px;
+                    font-size: 14px;
+                    color: #666;
+                  }
+                  .field p { 
+                    margin: 0; 
+                    padding: 8px 0;
+                    border-bottom: 1px solid #e5e7eb;
+                  }
+                  .photo-section { 
+                    text-align: center; 
+                    margin-bottom: 20px;
+                  }
+                  .employee-photo {
+                    width: 120px;
+                    height: 120px;
+                    border: 2px solid #333;
+                    border-radius: 4px;
+                    object-fit: cover;
+                  }
+                  .placeholder-photo {
+                    width: 120px;
+                    height: 120px;
+                    border: 2px dashed #ccc;
+                    border-radius: 4px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #f9fafb;
+                  }
+                  .document-section {
+                    text-align: center;
+                    margin: 15px 0;
+                  }
+                  .document-placeholder {
+                    width: 100px;
+                    height: 100px;
+                    border: 2px dashed #ccc;
+                    border-radius: 4px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #f9fafb;
+                  }
+                  @media print {
+                    body { margin: 0.5in; }
+                    .print-section { break-inside: avoid; }
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="print-header">
+                  <h1>Employee Record</h1>
+                  ${reviewData?.code ? `<p><strong>Employee Code:</strong> ${reviewData.code}</p>` : ''}
+                  <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                </div>
+                ${printContent.innerHTML}
+              </body>
+            </html>
+          `);
+          
+          printWindow.document.close();
+          printWindow.focus();
+          
+          // Wait for content to load before printing
+          setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+          }, 250);
+        }
+      } else {
+        // Fallback: print the entire page
+        window.print();
+      }
+    }, 100);
   };
 
   // Scroll to top when component mounts
@@ -179,7 +317,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
-      <div>
+      <div id="employee-review-content">
         <div className="text-center mb-8">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Employee Information</h2>
@@ -195,7 +333,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         </div>
 
         {/* Step 1: Basic Information */}
-        <div className="border border-gray-200 rounded-xl p-6 mb-6">
+        <div className="border border-gray-200 rounded-xl p-6 mb-6 print-section">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <User className="w-5 h-5 text-green-600 mr-2" />
@@ -206,71 +344,70 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Picture Preview */}
             <div className="lg:col-span-1 flex flex-col items-center">
-              {/* <label className="text-sm font-medium text-gray-500 mb-3">Profile Picture</label> */}
-              {reviewData.photo ? (
-                <div className="relative group">
+              <div className="photo-section">
+                {reviewData.photo ? (
                   <img
                     src={`data:image/png;base64,${reviewData.photo}`}
                     alt="Employee Profile"
-                    className="w-32 h-32 rounded-full object-cover border-4 border-green-200 shadow-md"
+                    className="employee-photo"
                   />
-                </div>
-              ) : (
-                <div className="w-32 h-32 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                  <User className="w-12 h-12 text-gray-400" />
-                </div>
-              )}
+                ) : (
+                  <div className="placeholder-photo">
+                    <User className="w-12 h-12 text-gray-400" />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Personal Information */}
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-500">Full Name (English)</label>
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500"> Full Name </label>
                 <p className="text-gray-900 font-medium">{reviewData.fullName || 'Not provided'}</p>
               </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Full Name (Amharic)</label>
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500"> ሙሉ ስም </label>
                 <p className="text-gray-900 font-medium">{reviewData.fullNameAm || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Nationality</label>
                 <p className="text-gray-900">{reviewData.nationality || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Gender</label>
                 <p className="text-gray-900">
                   {reviewData.gender ? getEnumValue(Gender, reviewData.gender) : 'Not provided'}
                 </p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Employment Date</label>
                 <p className="text-gray-900">{formatDate(reviewData.employmentDate)}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Employment Type</label>
                 <p className="text-gray-900">
                   {reviewData.employmentType ? getEnumValue(EmpType, reviewData.employmentType) : 'Not provided'}
                 </p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Employment Nature</label>
                 <p className="text-gray-900">
                   {reviewData.employmentNature ? getEnumValue(EmpNature, reviewData.employmentNature) : 'Not provided'}
                 </p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Job Grade</label>
                 <p className="text-gray-900">{reviewData.jobGrade || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Position</label>
                 <p className="text-gray-900">{reviewData.position || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Department</label>
                 <p className="text-gray-900">{reviewData.department || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Branch</label>
                 <p className="text-gray-900">{reviewData.pbranch || 'Not provided'}</p>
               </div>
@@ -279,52 +416,52 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         </div>
 
         {/* Step 2: Biographical Information */}
-        <div className="border border-gray-200 rounded-xl p-6 mb-6">
+        <div className="border border-gray-200 rounded-xl p-6 mb-6 print-section">
           <div className="flex items-center mb-4">
             <FileText className="w-5 h-5 text-blue-600 mr-2" />
             <h3 className="text-lg font-semibold text-gray-900">Biographical Information</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Birth Date</label>
               <p className="text-gray-900">{formatDate(reviewData.birthDate)}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Birth Location</label>
               <p className="text-gray-900">{reviewData.birthLocation || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Mother's Full Name</label>
               <p className="text-gray-900">{reviewData.motherFullName || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Marital Status</label>
               <p className="text-gray-900">
                 {reviewData.maritalStatus ? getEnumValue(MaritalStat, reviewData.maritalStatus) : 'Not provided'}
               </p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Has Birth Certificate</label>
               <p className="text-gray-900">
                 {reviewData.hasBirthCert ? getEnumValue(YesNo, reviewData.hasBirthCert) : 'Not provided'}
               </p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Has Marriage Certificate</label>
               <p className="text-gray-900">
                 {reviewData.hasMarriageCert ? getEnumValue(YesNo, reviewData.hasMarriageCert) : 'Not provided'}
               </p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">TIN</label>
               <p className="text-gray-900">{reviewData.tin || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Bank Account</label>
               <p className="text-gray-900">{reviewData.bankAccountNo || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Pension Number</label>
               <p className="text-gray-900">{reviewData.pensionNumber || 'Not provided'}</p>
             </div>
@@ -337,11 +474,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <h4 className="font-semibold text-gray-900">Address</h4>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Full Address</label>
                 <p className="text-gray-900">{reviewData.address || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Telephone</label>
                 <p className="text-gray-900">{reviewData.telephone || 'Not provided'}</p>
               </div>
@@ -350,40 +487,40 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         </div>
 
         {/* Step 3: Emergency Contact */}
-        <div className="border border-gray-200 rounded-xl p-6 mb-6">
+        <div className="border border-gray-200 rounded-xl p-6 mb-6 print-section">
           <div className="flex items-center mb-4">
             <User className="w-5 h-5 text-orange-600 mr-2" />
             <h3 className="text-lg font-semibold text-gray-900">Emergency Contact</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Full Name </label>
               <p className="text-gray-900">{reviewData.conFullName || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">ሙሉ ስም </label>
               <p className="text-gray-900">{reviewData.conFullNameAm || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Nationality</label>
               <p className="text-gray-900">{reviewData.conNationality || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Gender</label>
               <p className="text-gray-900">
                 {reviewData.conGender ? getEnumValue(Gender, reviewData.conGender) : 'Not provided'}
               </p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Relation</label>
               <p className="text-gray-900">{reviewData.conRelation || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Address</label>
               <p className="text-gray-900">{reviewData.conAddress || 'Not provided'}</p>
             </div>
-            <div>
+            <div className="field">
               <label className="text-sm font-medium text-gray-500">Telephone</label>
               <p className="text-gray-900">{reviewData.conTelephone || 'Not provided'}</p>
             </div>
@@ -391,7 +528,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         </div>
 
         {/* Step 4: Guarantor Information */}
-        <div className="border border-gray-200 rounded-xl p-6">
+        <div className="border border-gray-200 rounded-xl p-6 print-section">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Guarantor Information</h3>
             {reviewData.guaFileName && (
@@ -407,73 +544,86 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="lg:col-span-1 flex flex-col items-center">
               <label className="text-sm font-medium text-gray-500 mb-3">Guarantor Document</label>
               {reviewData.guaFileName ? (
-                <div className="relative group">
-                  <div className="w-32 h-32 rounded-lg bg-blue-50 border-2 border-blue-200 flex flex-col items-center justify-center p-4">
-                    <FileText className="w-8 h-8 text-blue-500 mb-2" />
-                    <span className="text-xs text-blue-700 text-center font-medium">
-                      {reviewData.guaFileType || 'Document'}
-                    </span>
+                <div className="document-section">
+                  <div className="document-placeholder">
+                    <FileText className="w-8 h-8 text-blue-500" />
                   </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {reviewData.guaFileName}
+                  </p>
+                  {reviewData.guaFileSize && (
+                    <p className="text-xs text-gray-400 mt-1">{reviewData.guaFileSize}</p>
+                  )}
                 </div>
               ) : (
-                <div className="w-32 h-32 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                  <FileText className="w-8 h-8 text-gray-400" />
+                <div className="document-section">
+                  <div className="document-placeholder">
+                    <FileText className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">No document uploaded</p>
                 </div>
-              )}
-              <p className="text-sm text-gray-500 mt-2 text-center">
-                {reviewData.guaFileName || 'No document uploaded'}
-              </p>
-              {reviewData.guaFileSize && (
-                <p className="text-xs text-gray-400 mt-1">{reviewData.guaFileSize}</p>
               )}
             </div>
 
             {/* Guarantor Details */}
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Full Name </label>
                 <p className="text-gray-900">{reviewData.guaFullName || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">ሙሉ ስም </label>
                 <p className="text-gray-900">{reviewData.guaFullNameAm || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Nationality</label>
                 <p className="text-gray-900">{reviewData.guaNationality || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Gender</label>
                 <p className="text-gray-900">
                   {reviewData.guaGender ? getEnumValue(Gender, reviewData.guaGender) : 'Not provided'}
                 </p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Relation</label>
                 <p className="text-gray-900">{reviewData.guaRelation || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Address</label>
                 <p className="text-gray-900">{reviewData.guaAddress || 'Not provided'}</p>
               </div>
-              <div>
+              <div className="field">
                 <label className="text-sm font-medium text-gray-500">Telephone</label>
                 <p className="text-gray-900">{reviewData.guaTelephone || 'Not provided'}</p>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between pt-8">
+      {/* Navigation Buttons */}
+      <div className="flex justify-between pt-8">
+        <button
+          type="button"
+          onClick={handleBackClick}
+          disabled={loading}
+          className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+        >
+          Back
+        </button>
+        
+        <div className="flex gap-4">
           <button
             type="button"
-            onClick={handleBackClick}
+            onClick={handlePrint}
             disabled={loading}
-            className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+            className="px-8 py-3 border border-blue-600 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center"
           >
-            Back
+            <Printer className="w-5 h-5 mr-2" />
+            Print
           </button>
+          
           <button
             type="button"
             onClick={handleSubmit}
@@ -488,7 +638,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             ) : (
               <>
                 <CheckCircle className="w-5 h-5 mr-2" />
-                Submit Employee
+                Finish
               </>
             )}
           </button>
