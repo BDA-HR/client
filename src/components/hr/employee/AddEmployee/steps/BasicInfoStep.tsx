@@ -778,7 +778,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between pt-6">
+        <div className="flex justify-end pt-6">
 
           <button
             type="submit"
