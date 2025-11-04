@@ -8,14 +8,14 @@ import { GuarantorStep } from './steps/GurantorStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { AddEmployeeStepHeader } from './AddEmployeeStepHeader';
 import { empService } from '../../../../services/hr/employee/empService';
-import type {Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto, EmpAddRes, UUID } from '../../../../types/hr/employee/empAddDto';
+import type { Step1Dto, Step2Dto, Step3Dto, Step4Dto, Step5Dto, EmpAddRes, UUID } from '../../../../types/hr/employee/empAddDto';
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: User },
   { id: 2, title: 'Biographical', icon: FileText },
   { id: 3, title: 'Emergency Contact', icon: Users },
   { id: 4, title: 'Guarantor', icon: Shield },
-  { id: 5, title: 'Review', icon: CheckCircle },
+  { id: 5, title: 'Print', icon: CheckCircle },
 ];
 
 interface AddEmployeeStepFormProps {
@@ -40,34 +40,43 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   const formContainerRef = useRef<HTMLDivElement>(null);
   const stepContentRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to top when step changes - IMPROVED
+  // Scroll to top when step changes
   useEffect(() => {
     scrollToTop();
   }, [currentStep]);
 
   const scrollToTop = () => {
-    // Multiple methods to ensure it works across different browsers
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Scroll the document element as well
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
     
-    // Scroll the body element
     if (document.body) {
       document.body.scrollTop = 0;
     }
     
-    // Scroll the form container
     if (formContainerRef.current) {
       formContainerRef.current.scrollTop = 0;
     }
     
-    // Scroll the step content container
     if (stepContentRef.current) {
       stepContentRef.current.scrollTop = 0;
     }
+  };
+
+  // Clear all temporary data
+  const clearTemporaryData = () => {
+    localStorage.removeItem('employeeFormData');
+    localStorage.removeItem('employeeId');
+    setFormData({
+      step1: {},
+      step2: {},
+      step3: {},
+      step4: {},
+    });
+    setEmployeeId(undefined);
+    setCurrentStep(1);
   };
 
   // Handle Step 1 submission with service call
@@ -90,7 +99,6 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
       localStorage.setItem('employeeId', result.id);
 
-      // Scroll to top before moving to next step
       scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
@@ -133,7 +141,6 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Scroll to top before moving to next step
       scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
@@ -172,7 +179,6 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Scroll to top before moving to next step
       scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
@@ -211,7 +217,6 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('employeeFormData', JSON.stringify(updatedFormData));
 
-      // Scroll to top before moving to next step
       scrollToTop();
       setCurrentStep(prev => prev + 1);
     } catch (error) {
@@ -222,7 +227,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
     }
   };
 
-  // Handle Step 5 submission with service call - UPDATED
+  // Handle Step 5 submission with service call - UPDATED to clear temporary data
   const handleStep5Submit = async (step5Data: Step5Dto) => {
     if (!employeeId) {
       setError('Employee ID is missing. Please complete Step 1 first to create an employee record.');
@@ -238,9 +243,8 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
       console.log('Employee submission completed successfully:', result);
 
-      // Clear local storage
-      localStorage.removeItem('employeeFormData');
-      localStorage.removeItem('employeeId');
+      // Clear all temporary data after successful submission
+      clearTemporaryData();
 
       // Call the parent callback with the result
       onEmployeeAdded(result);
@@ -253,13 +257,20 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   };
 
   const handleBack = () => {
-    // Scroll to top before going back
     scrollToTop();
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     } else {
+      // When going back from step 1, clear temporary data if user wants to start fresh
+      clearTemporaryData();
       onBackToEmployees();
     }
+  };
+
+  // Handle back to employees without clearing data (for temporary saving)
+  const handleBackToEmployees = () => {
+    // Don't clear data when going back temporarily - allow user to continue later
+    onBackToEmployees();
   };
 
   // Load saved form data and employee ID on component mount
@@ -280,7 +291,6 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
       setEmployeeId(savedEmployeeId as UUID);
     }
 
-    // Scroll to top on initial load
     scrollToTop();
   }, []);
 
@@ -345,7 +355,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
         <AddEmployeeStepHeader
           steps={steps}
           currentStep={currentStep}
-          onBack={onBackToEmployees}
+          onBack={handleBackToEmployees}
           title="Add New Employee"
           backButtonText="Back to Employees"
         />

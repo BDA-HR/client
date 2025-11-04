@@ -13,13 +13,15 @@ interface ReviewStepProps {
   onSubmit: (step5Data: Step5Dto) => void;
   onBack: () => void;
   loading?: boolean;
+  onClearTempData?: () => void; 
 }
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
   employeeId,
   onSubmit,
   onBack,
-  loading = false
+  loading = false,
+  onClearTempData
 }) => {
   const navigate = useNavigate();
   const [reviewData, setReviewData] = useState<Step5Dto | null>(null);
@@ -39,7 +41,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     }
   };
 
-  // Fetch Step5 data from API when component mounts
+  
   useEffect(() => {
     const fetchStep5Data = async () => {
       if (!employeeId) {
@@ -88,19 +90,35 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     }
   };
 
-  // Handle submit with scroll to top and navigation
+  // Clear temporary data function
+  const clearTemporaryData = () => {
+    // Clear local storage
+    localStorage.removeItem('employeeFormData');
+    localStorage.removeItem('employeeId');
+    
+    // Call parent callback if provided
+    if (onClearTempData) {
+      onClearTempData();
+    }
+    
+    console.log('Temporary employee data cleared');
+  };
+
+  
   const handleSubmit = async () => {
     if (reviewData) {
-      // Scroll to top before submitting
+      
       scrollToTop();
       
       try {
         await onSubmit(reviewData);
-        // Navigate to employee list after successful submission
+        
+        clearTemporaryData();
+        
         navigate('/hr/employees/record');
       } catch (error) {
         console.error('Submission failed:', error);
-        // Handle submission error (you might want to show an error message)
+        
       }
     }
   };
@@ -111,16 +129,23 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     onBack();
   };
 
+
+  const handleCancelAndClear = () => {
+    if (window.confirm('Are you sure you want to cancel and clear all temporary data? This action cannot be undone.')) {
+      clearTemporaryData();
+      navigate('/hr/employees/record');
+    }
+  };
+
   // Print functionality
   const handlePrint = () => {
     scrollToTop();
     
-    // Wait a brief moment for scroll to complete before printing
     setTimeout(() => {
       const printContent = document.getElementById('employee-review-content');
       
       if (printContent) {
-        // Create a print-friendly version
+        
         const printWindow = window.open('', '_blank');
         if (printWindow) {
           printWindow.document.write(`
@@ -227,20 +252,18 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           printWindow.document.close();
           printWindow.focus();
           
-          // Wait for content to load before printing
           setTimeout(() => {
             printWindow.print();
             printWindow.close();
           }, 250);
         }
       } else {
-        // Fallback: print the entire page
+        
         window.print();
       }
     }, 100);
   };
 
-  // Scroll to top when component mounts
   useEffect(() => {
     scrollToTop();
   }, []);
@@ -278,12 +301,20 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Data</h2>
           <p className="text-gray-600 mb-4">{fetchError}</p>
-          <button
-            onClick={handleBackClick}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
-          >
-            Go Back
-          </button>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={handleBackClick}
+              className="px-6 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={handleCancelAndClear}
+              className="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+            >
+              Cancel & Clear Data
+            </button>
+          </div>
         </div>
       </motion.div>
     );
@@ -303,7 +334,21 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <User className="w-8 h-8 text-gray-400" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">No Data Available</h2>
-          <p className="text-gray-600">Unable to load employee information.</p>
+          <p className="text-gray-600 mb-4">Unable to load employee information.</p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={handleBackClick}
+              className="px-6 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={handleCancelAndClear}
+              className="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+            >
+              Cancel & Clear Data
+            </button>
+          </div>
         </div>
       </motion.div>
     );
@@ -320,7 +365,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       <div id="employee-review-content">
         <div className="text-center mb-8">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Employee Information</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Print Employee Information</h2>
           <p className="text-gray-600">Please review all the information before submitting</p>
         </div>
 
@@ -351,7 +396,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                   )}
                 </div>
               </div>
-                            {reviewData.code && (
+              {reviewData.code && (
                 <div className="text-center">
                   <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 inline-block">
                     <span className="text-xs font-medium text-green-600">Employee Code: </span>
@@ -606,21 +651,31 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-8">
-        <button
-          type="button"
-          onClick={handleBackClick}
-          disabled={loading}
-          className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-        >
-          Back
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={handleBackClick}
+            disabled={loading}
+            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            onClick={handleCancelAndClear}
+            disabled={loading}
+            className="px-6 py-3 border border-red-600 text-red-600 rounded-xl font-medium hover:bg-red-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            Cancel & Clear Data
+          </button>
+        </div>
         
         <div className="flex gap-4">
           <button
             type="button"
             onClick={handlePrint}
             disabled={loading}
-            className="px-8 py-3 border border-blue-600 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center"
+            className="px-6 py-3 border border-blue-600 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center"
           >
             <Printer className="w-5 h-5 mr-2" />
             Print
