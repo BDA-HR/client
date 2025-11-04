@@ -41,7 +41,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     }
   };
 
-
   useEffect(() => {
     const fetchStep5Data = async () => {
       if (!employeeId) {
@@ -104,10 +103,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     console.log('Temporary employee data cleared');
   };
 
-
   const handleSubmit = async () => {
     if (reviewData) {
-
       scrollToTop();
 
       try {
@@ -118,7 +115,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         navigate('/hr/employees/record');
       } catch (error) {
         console.error('Submission failed:', error);
-
       }
     }
   };
@@ -128,7 +124,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     scrollToTop();
     onBack();
   };
-
 
   const handleCancelAndClear = () => {
     if (window.confirm('Are you sure you want to cancel and clear all temporary data? This action cannot be undone.')) {
@@ -145,7 +140,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       const printContent = document.getElementById('employee-review-content');
 
       if (printContent) {
-
         const printWindow = window.open('', '_blank');
         if (printWindow) {
           printWindow.document.write(`
@@ -258,7 +252,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           }, 250);
         }
       } else {
-
         window.print();
       }
     }, 100);
@@ -563,13 +556,23 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <label className="text-sm font-medium text-gray-500">Relation</label>
               <p className="text-gray-900 font-medium">{reviewData.conRelation || 'Not provided'}</p>
             </div>
-            <div className="field">
-              <label className="text-sm font-medium text-gray-500">Address</label>
-              <p className="text-gray-900 font-medium">{reviewData.conAddress || 'Not provided'}</p>
+          </div>
+
+          {/* Emergency Contact Address Information */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="flex items-center mb-4">
+              <MapPin className="w-5 h-5 text-purple-600 mr-2" />
+              <h4 className="font-semibold text-gray-900"> Address</h4>
             </div>
-            <div className="field">
-              <label className="text-sm font-medium text-gray-500">Telephone</label>
-              <p className="text-gray-900 font-medium">{reviewData.conTelephone || 'Not provided'}</p>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Full Address</label>
+                <p className="text-gray-900 font-medium">{reviewData.conAddress || 'Not provided'}</p>
+              </div>
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Telephone</label>
+                <p className="text-gray-900 font-medium">{reviewData.conTelephone || 'Not provided'}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -636,8 +639,18 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 <label className="text-sm font-medium text-gray-500">Relation</label>
                 <p className="text-gray-900 font-medium">{reviewData.guaRelation || 'Not provided'}</p>
               </div>
+            </div>
+          </div>
+
+          {/* Guarantor Address Information */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="flex items-center mb-4">
+              <MapPin className="w-5 h-5 text-purple-600 mr-2" />
+              <h4 className="font-semibold text-gray-900"> Address</h4>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
               <div className="field">
-                <label className="text-sm font-medium text-gray-500">Address</label>
+                <label className="text-sm font-medium text-gray-500">Full Address</label>
                 <p className="text-gray-900 font-medium">{reviewData.guaAddress || 'Not provided'}</p>
               </div>
               <div className="field">
