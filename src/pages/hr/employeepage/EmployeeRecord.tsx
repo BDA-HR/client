@@ -164,6 +164,31 @@ const EmployeeManagementPage = () => {
     setEmployees(updatedEmployees);
   };
 
+  // NEW: Handle employee deletion
+  const handleEmployeeDelete = async (employeeId: string) => {
+    try {
+      setError(null);
+      // Call the API to delete the employee
+      await employeeService.deleteEmployee(employeeId as UUID);
+      
+      // Update previous stats before making changes
+      setPreviousStats({
+        total: employees.length,
+        active: employees.filter(e => e.status === "active").length,
+        onLeave: employees.filter(e => e.status === "on-leave").length
+      });
+
+      // Remove employee from local state
+      const updatedEmployees = employees.filter(emp => emp.id !== employeeId);
+      setEmployees(updatedEmployees);
+      
+      console.log('Employee deleted successfully');
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      setError('Failed to delete employee. Please try again.');
+    }
+  };
+
   const handleEmployeeTerminate = async (employeeId: string) => {
     try {
       setError(null);
@@ -291,7 +316,7 @@ const EmployeeManagementPage = () => {
               className="flex justify-center items-center py-8"
             >
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading employees...</p>
               </div>
             </motion.div>
@@ -328,6 +353,7 @@ const EmployeeManagementPage = () => {
                 onEmployeeUpdate={handleEmployeeUpdate}
                 onEmployeeStatusChange={handleEmployeeStatusChange}
                 onEmployeeTerminate={handleEmployeeTerminate}
+                onEmployeeDelete={handleEmployeeDelete}
                 loading={loading}
               />
             </>

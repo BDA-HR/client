@@ -1,4 +1,4 @@
-import { Briefcase, Calendar, User, Mail, Phone, MapPin, Clock, Award, BarChart2, DollarSign, Users, Star, TrendingUp } from 'lucide-react';
+import { Briefcase, User, Mail, Clock, Award, BarChart2, DollarSign, Users, Star, TrendingUp } from 'lucide-react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useModule } from '../../../ModuleContext';
 import { useEffect, useState } from 'react';
@@ -137,22 +137,40 @@ const EmployeeDetailsPage = () => {
               employmentTypeId: '' as UUID,
               employmentNatureId: '' as UUID,
               gender: '0',
-              nationality: 'Unknown',
-              code: 'N/A',
+              nationality: 'Ethiopian',
+              code: 'EMP001',
               employmentDate: new Date().toISOString(),
-              jobGrade: 'N/A',
-              position: 'Unknown Position',
-              department: 'Unknown Department',
-              employmentType: 'Unknown',
-              employmentNature: 'Unknown',
-              genderStr: 'Unknown',
-              empFullName: 'Unknown Employee',
-              empFullNameAm: 'Unknown',
-              employmentDateStr: 'Unknown',
-              employmentDateStrAm: 'Unknown',
+              jobGrade: 'G7',
+              position: 'HR Manager',
+              department: 'Human Resources',
+              employmentType: 'Permanent',
+              employmentNature: 'Full-time',
+              genderStr: 'Male',
+              empFullName: 'John Smith',
+              empFullNameAm: 'ጆን ስሚዝ',
+              employmentDateStr: '2023-01-15',
+              employmentDateStrAm: '2015-ጥር-15',
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
-              updatedBy: 'System'
+              updatedBy: 'Admin',
+              // Additional sample data for demonstration
+              email: 'john.smith@company.com',
+              phone: '+251-911-234567',
+              address: 'Bole Road, Addis Ababa',
+              dateOfBirth: '1990-05-15',
+              maritalStatus: 'Married',
+              emergencyContact: {
+                name: 'Sarah Smith',
+                relationship: 'Spouse',
+                phone: '+251-911-345678'
+              },
+              salary: 50000,
+              currency: 'ETB',
+              performanceRating: 4.5,
+              lastAppraisalDate: '2024-01-15',
+              nextAppraisalDate: '2025-01-15',
+              attendancePercentage: 95.5,
+              leaveBalance: 18
             });
           }
         }, 1000);
@@ -201,10 +219,9 @@ const EmployeeDetailsPage = () => {
 
   const getEmploymentTypeColor = (type: string): string => {
     switch (type) {
-      case "Full-time": return "bg-green-100 text-green-800";
-      case "Part-time": return "bg-blue-100 text-blue-800";
-      case "Freelance": return "bg-purple-100 text-purple-800";
-      case "Internship": return "bg-yellow-100 text-yellow-800";
+      case "Permanent": return "bg-green-100 text-green-800";
+      case "Contract": return "bg-blue-100 text-blue-800";
+      case "Temporary": return "bg-yellow-100 text-yellow-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -218,369 +235,396 @@ const EmployeeDetailsPage = () => {
     return field !== undefined && field !== null && field !== '';
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Not provided';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen"
+      className="min-h-screen bg-gray-50 py-8"
     >
-      <div className="mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center mb-4 md:mb-0">
-              <div className="bg-green-100 rounded-full h-16 w-16 flex items-center justify-center mr-4">
-                <User className="text-green-600 h-8 w-8" />
+        <div className="text-center mb-8">
+          <User className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Employee Information</h1>
+          <p className="text-gray-600">Complete employee profile and details</p>
+        </div>
+
+        <div id="employee-details-content">
+          {/* Basic Information Section */}
+          <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <User className="w-5 h-5 text-green-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{employee.empFullName}</h1>
-                <p className="text-sm text-gray-500 mt-1">{employee.empFullNameAm}</p>
-                <div className="flex items-center mt-2">
-                  <span className="text-lg text-gray-600 mr-2">{employee.position}</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${getEmploymentTypeColor(employee.employmentType)}`}>
-                    {employee.employmentType}
+              {employee.code && (
+                <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-1">
+                  <span className="text-xs font-medium text-green-600">Employee Code: </span>
+                  <span className="text-sm font-bold text-green-800">{employee.code}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Profile Picture */}
+              <div className="lg:col-span-1 flex flex-col items-center">
+                <div className="bg-green-100 rounded-full h-32 w-32 flex items-center justify-center mb-4 border-4 border-white shadow-lg">
+                  <User className="text-green-600 h-16 w-16" />
+                </div>
+                <div className="text-center">
+                  <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(employee.status)}`}>
+                    {employee.status === "on-leave" ? "On Leave" : "Active"}
                   </span>
                 </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500">Employee Code</p>
-                <p className="font-medium">{employee.code}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Department</p>
-                <p className="font-medium">{employee.department}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Status</p>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(employee.status)}`}>
-                  {employee.status === "on-leave" ? "On Leave" : "Active"}
-                </span>
-              </div>
-              <div>
-                <p className="text-gray-500">Employment Date</p>
-                <p className="font-medium">{employee.employmentDateStr || employee.employmentDate}</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Basic Information */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center">
-                <User className="mr-2 text-blue-500" size={20} />
-                Basic Information
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-gray-500">Employee Code</p>
-                  <p className="font-medium">{employee.code}</p>
+              {/* Personal Information */}
+              <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Full Name (English)</label>
+                  <p className="text-gray-900 font-medium text-lg">{employee.empFullName || ' '}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Gender</p>
-                  <p className="font-medium">{employee.genderStr}</p>
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">ሙሉ ስም (Amharic)</label>
+                  <p className="text-gray-900 font-medium text-lg">{employee.empFullNameAm || ' '}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Nationality</p>
-                  <p className="font-medium">{employee.nationality}</p>
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Gender</label>
+                  <p className="text-gray-900">{employee.gender || ' '}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Employment Nature</p>
-                  <p className="font-medium">{employee.employmentNature}</p>
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Nationality</label>
+                  <p className="text-gray-900">{employee.nationality || ' '}</p>
                 </div>
                 {hasData(employee.dateOfBirth) && (
-                  <div className="flex items-start">
-                    <Calendar className="text-gray-500 mr-3 mt-1" size={16} />
-                    <div>
-                      <p className="text-sm text-gray-500">Date of Birth</p>
-                      <p>{employee.dateOfBirth}</p>
-                    </div>
+                  <div className="field">
+                    <label className="text-sm font-medium text-gray-500">Date of Birth</label>
+                    <p className="text-gray-900">{formatDate(employee.dateOfBirth)}</p>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Contact Information - Only show if data exists */}
-            {(hasData(employee.email) || hasData(employee.phone) || hasData(employee.address)) && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-semibold mb-4 flex items-center">
-                  <Mail className="mr-2 text-green-500" size={20} />
-                  Contact Information
-                </h2>
-                <div className="space-y-4">
-                  {hasData(employee.email) && (
-                    <div className="flex items-start">
-                      <Mail className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Email</p>
-                        <p>{employee.email}</p>
-                      </div>
-                    </div>
-                  )}
-                  {hasData(employee.phone) && (
-                    <div className="flex items-start">
-                      <Phone className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Phone</p>
-                        <p>{employee.phone}</p>
-                      </div>
-                    </div>
-                  )}
-                  {hasData(employee.address) && (
-                    <div className="flex items-start">
-                      <MapPin className="text-gray-500 mr-3 mt-1" size={16} />
-                      <div>
-                        <p className="text-sm text-gray-500">Address</p>
-                        <p>{employee.address}{employee.city && `, ${employee.city}`}{employee.country && `, ${employee.country}`}</p>
-                      </div>
-                    </div>
-                  )}
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Employment Date</label>
+                  <p className="text-gray-900">{formatDate(employee.employmentDate)}</p>
                 </div>
-              </div>
-            )}
-
-            {/* Emergency Contact - Only show if data exists */}
-            {employee.emergencyContact && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-semibold mb-4 flex items-center">
-                  <Users className="mr-2 text-red-500" size={20} />
-                  Emergency Contact
-                </h2>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Name</p>
-                    <p>{employee.emergencyContact.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Relationship</p>
-                    <p>{employee.emergencyContact.relationship}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <p>{employee.emergencyContact.phone}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Middle Column - Employment Details */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center">
-                <Briefcase className="mr-2 text-green-500" size={20} />
-                Employment Details
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Department</p>
-                  <p className="font-medium">{employee.department}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Position</p>
-                  <p className="font-medium">{employee.position}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Job Grade</p>
-                  <p className="font-medium">{employee.jobGrade}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Employment Type</p>
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Employment Type</label>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getEmploymentTypeColor(employee.employmentType)}`}>
                     {employee.employmentType}
                   </span>
                 </div>
-                {hasData(employee.employeeCategory) && (
-                  <div>
-                    <p className="text-sm text-gray-500">Category</p>
-                    <p className="font-medium">{employee.employeeCategory}</p>
-                  </div>
-                )}
-                {hasData(employee.reportingTo) && (
-                  <div>
-                    <p className="text-sm text-gray-500">Reporting To</p>
-                    <p className="font-medium">{employee.reportingTo}</p>
-                  </div>
-                )}
-                {hasData(employee.manager) && (
-                  <div>
-                    <p className="text-sm text-gray-500">Manager</p>
-                    <p className="font-medium">{employee.manager}</p>
-                  </div>
-                )}
-                {hasData(employee.team) && (
-                  <div>
-                    <p className="text-sm text-gray-500">Team</p>
-                    <p className="font-medium">{employee.team}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* System Information */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center">
-                <Clock className="mr-2 text-purple-500" size={20} />
-                System Information
-              </h2>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-gray-500">Created</p>
-                  <p className="font-medium">{employee.createdAt}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Last Updated</p>
-                  <p className="font-medium">{employee.updatedAt}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Updated By</p>
-                  <p className="font-medium">{employee.updatedBy}</p>
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Employment Nature</label>
+                  <p className="text-gray-900">{employee.employmentNature || 'Not provided'}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Additional Information */}
-          <div className="space-y-6">
-            {/* Performance - Only show if data exists */}
+          {/* Employment Details Section */}
+          <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white">
+            <div className="flex items-center mb-6">
+              <Briefcase className="w-5 h-5 text-blue-600 mr-2" />
+              <h3 className="text-lg font-semibold text-gray-900">Employment Details</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Department</label>
+                <p className="text-gray-900 font-medium">{employee.department || ' '}</p>
+              </div>
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Position</label>
+                <p className="text-gray-900 font-medium">{employee.position || ' '}</p>
+              </div>
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Job Grade</label>
+                <p className="text-gray-900">{employee.jobGrade || ' '}</p>
+              </div>
+              {hasData(employee.employeeCategory) && (
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Employee Category</label>
+                  <p className="text-gray-900">{employee.employeeCategory}</p>
+                </div>
+              )}
+              {hasData(employee.reportingTo) && (
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Reporting To</label>
+                  <p className="text-gray-900">{employee.reportingTo}</p>
+                </div>
+              )}
+              {hasData(employee.manager) && (
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Manager</label>
+                  <p className="text-gray-900">{employee.manager}</p>
+                </div>
+              )}
+              {hasData(employee.team) && (
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Team</label>
+                  <p className="text-gray-900">{employee.team}</p>
+                </div>
+              )}
+              {hasData(employee.workLocation) && (
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Work Location</label>
+                  <p className="text-gray-900">{employee.workLocation}</p>
+                </div>
+              )}
+              {hasData(employee.workSchedule) && (
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Work Schedule</label>
+                  <p className="text-gray-900">{employee.workSchedule}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Contact Information Section */}
+          {(hasData(employee.email) || hasData(employee.phone) || hasData(employee.address)) && (
+            <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white">
+              <div className="flex items-center mb-6">
+                <Mail className="w-5 h-5 text-green-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {hasData(employee.email) && (
+                  <div className="field">
+                    <label className="text-sm font-medium text-gray-500">Email Address</label>
+                    <p className="text-gray-900">{employee.email}</p>
+                  </div>
+                )}
+                {hasData(employee.phone) && (
+                  <div className="field">
+                    <label className="text-sm font-medium text-gray-500">Phone Number</label>
+                    <p className="text-gray-900">{employee.phone}</p>
+                  </div>
+                )}
+                {hasData(employee.address) && (
+                  <div className="field md:col-span-2">
+                    <label className="text-sm font-medium text-gray-500">Address</label>
+                    <p className="text-gray-900">{employee.address}{employee.city && `, ${employee.city}`}{employee.country && `, ${employee.country}`}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Emergency Contact Section */}
+          {employee.emergencyContact && (
+            <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white">
+              <div className="flex items-center mb-6">
+                <Users className="w-5 h-5 text-red-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Emergency Contact</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Full Name</label>
+                  <p className="text-gray-900 font-medium">{employee.emergencyContact.name}</p>
+                </div>
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Relationship</label>
+                  <p className="text-gray-900">{employee.emergencyContact.relationship}</p>
+                </div>
+                <div className="field">
+                  <label className="text-sm font-medium text-gray-500">Phone Number</label>
+                  <p className="text-gray-900">{employee.emergencyContact.phone}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Performance & Compensation Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Performance Section */}
             {hasData(employee.performanceRating) && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-semibold mb-4 flex items-center">
-                  <BarChart2 className="mr-2 text-amber-500" size={20} />
-                  Performance
-                </h2>
+              <div className="border border-gray-200 rounded-xl p-6 bg-white">
+                <div className="flex items-center mb-6">
+                  <BarChart2 className="w-5 h-5 text-amber-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900">Performance</h3>
+                </div>
+
                 <div className="space-y-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Current Rating</p>
+                  <div className="field">
+                    <label className="text-sm font-medium text-gray-500">Current Rating</label>
                     <div className="flex items-center">
-                      <span className="px-2 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 mr-3">
                         {employee.performanceRating}/5
                       </span>
-                      <div className="ml-2 flex">
+                      <div className="flex">
                         {[...Array(5)].map((_, i) => (
                           <Star 
                             key={i} 
                             size={16} 
-                            className={`${i < Math.floor(employee.performanceRating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
+                            className={`${i < Math.floor(employee.performanceRating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'} mr-1`} 
                           />
                         ))}
                       </div>
                     </div>
                   </div>
                   {hasData(employee.lastAppraisalDate) && (
-                    <div>
-                      <p className="text-sm text-gray-500">Last Appraisal</p>
-                      <p>{employee.lastAppraisalDate}</p>
+                    <div className="field">
+                      <label className="text-sm font-medium text-gray-500">Last Appraisal</label>
+                      <p className="text-gray-900">{formatDate(employee.lastAppraisalDate)}</p>
                     </div>
                   )}
                   {hasData(employee.nextAppraisalDate) && (
-                    <div>
-                      <p className="text-sm text-gray-500">Next Appraisal</p>
-                      <p>{employee.nextAppraisalDate}</p>
+                    <div className="field">
+                      <label className="text-sm font-medium text-gray-500">Next Appraisal</label>
+                      <p className="text-gray-900">{formatDate(employee.nextAppraisalDate)}</p>
+                    </div>
+                  )}
+                  {hasData(employee.attendancePercentage) && (
+                    <div className="field">
+                      <label className="text-sm font-medium text-gray-500">Attendance Rate</label>
+                      <p className="text-gray-900">{employee.attendancePercentage}%</p>
+                    </div>
+                  )}
+                  {hasData(employee.leaveBalance) && (
+                    <div className="field">
+                      <label className="text-sm font-medium text-gray-500">Leave Balance</label>
+                      <p className="text-gray-900">{employee.leaveBalance} days</p>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Compensation - Only show if data exists */}
+            {/* Compensation Section */}
             {hasData(employee.salary) && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-semibold mb-4 flex items-center">
-                  <DollarSign className="mr-2 text-emerald-500" size={20} />
-                  Compensation
-                </h2>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Salary</p>
-                    <p className="text-lg font-medium">
+              <div className="border border-gray-200 rounded-xl p-6 bg-white">
+                <div className="flex items-center mb-6">
+                  <DollarSign className="w-5 h-5 text-emerald-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900">Compensation</h3>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="field">
+                    <label className="text-sm font-medium text-gray-500">Salary</label>
+                    <p className="text-xl font-bold text-gray-900">
                       {employee.currency} {employee.salary?.toLocaleString()}
                     </p>
                   </div>
                   {hasData(employee.paymentMethod) && (
-                    <div>
-                      <p className="text-sm text-gray-500">Payment Method</p>
-                      <p>{employee.paymentMethod}</p>
+                    <div className="field">
+                      <label className="text-sm font-medium text-gray-500">Payment Method</label>
+                      <p className="text-gray-900">{employee.paymentMethod}</p>
                     </div>
                   )}
                   {employee.bankDetails && (
-                    <div>
-                      <p className="text-sm text-gray-500">Bank Details</p>
-                      <p className="text-sm">
-                        {employee.bankDetails.bankName} ••••{employee.bankDetails.accountNumber?.slice(-4)}
-                      </p>
-                    </div>
+                    <>
+                      <div className="field">
+                        <label className="text-sm font-medium text-gray-500">Bank Name</label>
+                        <p className="text-gray-900">{employee.bankDetails.bankName}</p>
+                      </div>
+                      <div className="field">
+                        <label className="text-sm font-medium text-gray-500">Account Number</label>
+                        <p className="text-gray-900">••••{employee.bankDetails.accountNumber?.slice(-4)}</p>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
             )}
-
-            {/* Training & Development - Only show if data exists */}
-            {employee.trainings && employee.trainings.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-semibold mb-4 flex items-center">
-                  <Award className="mr-2 text-indigo-500" size={20} />
-                  Training & Development
-                </h2>
-                <div className="space-y-3">
-                  {employee.trainings.slice(0, 3).map((training, index) => (
-                    <div key={index} className="text-sm">
-                      <p className="font-medium">{training.name}</p>
-                      <div className="flex justify-between text-gray-500">
-                        <span>{training.date}</span>
-                        <span className={
-                          training.status === "Completed" ? "text-green-500" :
-                          training.status === "In Progress" ? "text-blue-500" : "text-gray-500"
-                        }>
-                          {training.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
-        </div>
 
-        {/* Career History Section - Only show if data exists */}
-        {employee.previousRoles && employee.previousRoles.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <TrendingUp className="mr-2 text-purple-500" size={20} />
-              Career History
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Period</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Responsibilities</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {employee.previousRoles.map((role, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-2 text-sm">{role.jobTitle}</td>
-                      <td className="px-4 py-2 text-sm">{role.department}</td>
-                      <td className="px-4 py-2 text-sm">
-                        {role.startDate} - {role.endDate || 'Present'}
-                      </td>
-                      <td className="px-4 py-2 text-sm text-gray-500">{role.responsibilities}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* System Information Section */}
+          <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white">
+            <div className="flex items-center mb-6">
+              <Clock className="w-5 h-5 text-purple-600 mr-2" />
+              <h3 className="text-lg font-semibold text-gray-900">System Information</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Created Date</label>
+                <p className="text-gray-900">{formatDate(employee.createdAt)}</p>
+              </div>
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Last Updated</label>
+                <p className="text-gray-900">{formatDate(employee.updatedAt)}</p>
+              </div>
+              <div className="field">
+                <label className="text-sm font-medium text-gray-500">Updated By</label>
+                <p className="text-gray-900">{employee.updatedBy || 'System'}</p>
+              </div>
             </div>
           </div>
-        )}
+
+          {/* Training & Development Section */}
+          {employee.trainings && employee.trainings.length > 0 && (
+            <div className="border border-gray-200 rounded-xl p-6 mb-6 bg-white">
+              <div className="flex items-center mb-6">
+                <Award className="w-5 h-5 text-indigo-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Training & Development</h3>
+              </div>
+
+              <div className="space-y-4">
+                {employee.trainings.map((training, index) => (
+                  <div key={index} className="border-l-4 border-indigo-500 pl-4 py-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium text-gray-900">{training.name}</p>
+                        <p className="text-sm text-gray-500">{training.date} • {training.duration}</p>
+                        {training.certification && (
+                          <p className="text-sm text-blue-600">{training.certification}</p>
+                        )}
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        training.status === "Completed" ? "bg-green-100 text-green-800" :
+                        training.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+                      }`}>
+                        {training.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Career History Section */}
+          {employee.previousRoles && employee.previousRoles.length > 0 && (
+            <div className="border border-gray-200 rounded-xl p-6 bg-white">
+              <div className="flex items-center mb-6">
+                <TrendingUp className="w-5 h-5 text-purple-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Career History</h3>
+              </div>
+
+              <div className="space-y-4">
+                {employee.previousRoles.map((role, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-medium text-gray-900">{role.jobTitle}</p>
+                        <p className="text-sm text-gray-500">{role.department}</p>
+                      </div>
+                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {role.startDate} - {role.endDate || 'Present'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600">{role.responsibilities}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
   );

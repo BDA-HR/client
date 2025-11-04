@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import type { EmployeeListDto } from '../../../types/hr/employee';
+import DeleteEmployeeModal from './DeleteEmployeeModal';
 
 // Extended Employee type based on EmployeeListDto with optional fields
 type Employee = EmployeeListDto & {
@@ -33,6 +34,7 @@ interface EmployeeTableProps {
   onEmployeeUpdate: (updatedEmployee: Employee) => void;
   onEmployeeStatusChange: (employeeId: string, newStatus: "active" | "on-leave") => void;
   onEmployeeTerminate: (employeeId: string) => void;
+  onEmployeeDelete: (employeeId: string) => void;
   loading?: boolean;
 }
 
@@ -42,9 +44,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   totalPages,
   totalItems,
   onPageChange,
+  onEmployeeDelete,
   loading = false
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const sortedEmployees = [...employees].sort((a, b) => {
     // Use createdAt as fallback for sorting if employmentDate doesn't exist
     const dateA = a.employmentDate || a.createdAt || '';
@@ -56,11 +62,23 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
     sessionStorage.setItem('currentModule', 'HR');
     window.location.href = `/hr/employees/${employee.id}`;
+  };
 
-    // const newWindow = window.open(`/hr/employees/${employee.id}`, '_blank');
-    // if (newWindow) {
-    //   newWindow.focus();
-    // }
+  const handleDelete = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setIsDeleteModalOpen(true);
+    setPopoverOpen(null);
+  };
+
+  const confirmDeletion = (employeeId: string) => {
+    onEmployeeDelete(employeeId);
+    setIsDeleteModalOpen(false);
+    setSelectedEmployee(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedEmployee(null);
   };
 
   if (loading && employees.length === 0) {
@@ -228,32 +246,31 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                             <button
                               onClick={() => handleViewDetails(employee)}
                               className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                          >
-                            <Eye size={16} />
+                            >
+                              <Eye size={16} />
                               View Details
                             </button>
                             <button 
-                            // onClick={() => handleEdit(employee)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                          >
-                            <PenBox size={16} />
-                            Edit
-                          </button>
-
-                          <button 
-                            // onClick={() => handleDelete(employee)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                          >
-                            <Trash2 size={16} />
-                            Change Status
-                          </button>
+                              // onClick={() => handleEdit(employee)}
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                            >
+                              <PenBox size={16} />
+                              Edit
+                            </button>
                             <button 
-                            // onClick={() => handleDelete(employee)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                          >
-                            <Trash2 size={16} />
-                            Delete
-                          </button>
+                              // onClick={() => handleStatusChange(employee)}
+                              className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded flex items-center gap-2"
+                            >
+                              <Trash2 size={16} />
+                              Change Status
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(employee)}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+                            >
+                              <Trash2 size={16} />
+                              Delete
+                            </button>
                           </div>
                         </PopoverContent>
                       </Popover>
@@ -326,6 +343,14 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
           </div>
         </div>
       </motion.div>
+
+      {/* Delete Employee Modal */}
+      <DeleteEmployeeModal
+        employee={selectedEmployee}
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={confirmDeletion}
+      />
     </>
   );
 };
