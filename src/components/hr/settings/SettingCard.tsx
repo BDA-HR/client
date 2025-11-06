@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 interface SettingCardProps {
   id: number;
   title: string;
-  description: string;
+  // description: string;
   icon: LucideIcon;
   href: string;
   color: string;
@@ -16,7 +16,7 @@ interface SettingCardProps {
 
 const SettingCard: React.FC<SettingCardProps> = ({
   title,
-  description,
+  // description,
   icon: Icon,
   href,
   color,
@@ -34,7 +34,7 @@ const SettingCard: React.FC<SettingCardProps> = ({
     <motion.div
       variants={itemVariants}
       custom={index}
-      whileHover={{ 
+      whileHover={{
         scale: 1.02,
         transition: { duration: 0.2 }
       }}
@@ -50,19 +50,19 @@ const SettingCard: React.FC<SettingCardProps> = ({
             <Icon className={`w-6 h-6 ${iconColor}`} />
           </div>
         </div>
-        
+
         <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-gray-700">
           {title}
         </h3>
-        
-        <p className="text-gray-600 text-sm leading-relaxed mb-4">
+
+        {/* <p className="text-gray-600 text-sm leading-relaxed mb-4">
           {description}
-        </p>
-        
+        </p> */}
+
         <div className={`w-12 h-1 rounded-full bg-gradient-to-r ${color} 
                       group-hover:w-16 transition-all duration-300`} />
       </div>
-      
+
       {/* Hover effect overlay */}
       <div className={`absolute inset-0 bg-gradient-to-r ${color} 
                     opacity-0 group-hover:opacity-5 transition-opacity duration-200 
