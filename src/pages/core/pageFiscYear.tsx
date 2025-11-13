@@ -11,6 +11,7 @@ import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../
 import PeriodSection from '../../components/core/period/PeriodSection';
 import ActiveFisc from '../../components/core/fiscalyear/ActFiscYear';
 import { motion } from 'framer-motion';
+import PagePublicHoliday from './pagePublicHoliday';
 
 const getDefaultFiscalYear = (): AddFiscYearDto => ({
   name: '',
@@ -222,7 +223,9 @@ export default function FiscalYearOverview() {
           onConfirm={handleYearDelete}
         />
       </div>
+      <PagePublicHoliday/>
       <PeriodSection />
+      
     </>
   );
 }
