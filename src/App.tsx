@@ -45,6 +45,7 @@ import PageEducationalQual from './pages/hr/settings/pageEducationalQual';
 import PagePosition from './pages/hr/settings/position/pagePosition';
 import PositionDetails from './pages/hr/settings/position/PositionDetails';
 import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
+import PageAnnualLeave from './pages/hr/settings/pageAnnualLeave';
 import { PagePubHolidayHist } from './pages/core/pagePubHolidayHist';
 
 function App() {
@@ -104,6 +105,7 @@ function App() {
             <Route path="/hr/settings/educationqual" element={<PageEducationalQual />} />
             <Route path="/hr/settings/position" element={<PagePosition />} />
             <Route path="/hr/settings/position/:id" element={<PositionDetails />} />
+            <Route path='/hr/settings/annualleave' element={<PageAnnualLeave />} />
             <Route path='/hr/training' element={<Training />} />
             {/* END HR ROUTES */}
 

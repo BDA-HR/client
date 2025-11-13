@@ -3,7 +3,8 @@ import {
   GraduationCap, 
   Users, 
   Award,
-  Building
+  Building,
+  Calendar
 } from 'lucide-react'
 import SettingsHeader from '../../../components/hr/settings/SettingsHeader'
 import SettingCard from '../../../components/hr/settings/SettingCard'
@@ -61,6 +62,16 @@ const settingsCards = [
     color: "from-orange-500 to-orange-600",
     bgColor: "bg-orange-50",
     iconColor: "text-orange-600"
+  },
+    {
+    id: 5,
+    title: "Annual leave",
+    description: "Set up annual leave policies, accruals, and entitlements",
+    icon: Calendar,
+    href: "/hr/settings/annualleave",
+    color: "from-yellow-500 to-yellow-600",
+    bgColor: "bg-yellow-50",
+    iconColor: "text-yellow-600"
   }
 ]
 
