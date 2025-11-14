@@ -27,7 +27,7 @@ export const HolidayHeader = ({
           className="flex flex-col space-y-2"
         >
           <h1 className="text-2xl font-bold">
-            <span className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent mr-2">
+            <span className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent mr-2">
               Public
             </span>
             Holidays
@@ -43,7 +43,7 @@ export const HolidayHeader = ({
           {/* Add Public Holiday Button */}
           <DialogTrigger asChild>
             <Button
-              className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-md text-white flex items-center gap-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:bg-emerald-700 rounded-md text-white flex items-center gap-2 cursor-pointer"
               onClick={() => setDialogOpen(true)}
             >
               <BadgePlus size={18} />
@@ -55,7 +55,7 @@ export const HolidayHeader = ({
           <Button
             onClick={handleViewHistory}
             variant="outline"
-            className="flex items-center gap-2 cursor-pointer border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800 hover:border-green-300 transition-all duration-200"
+            className="flex items-center gap-2 cursor-pointer border-emerald-200"
           >
             <History size={18} />
             <span>View History</span>

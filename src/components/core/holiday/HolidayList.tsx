@@ -134,7 +134,7 @@ export const HolidayList = ({
             <AccordionItem value={month} className="bg-white rounded-xl shadow-sm border overflow-hidden">
               <AccordionTrigger className="hover:no-underline hover:bg-gray-50 px-6 py-4 border-b data-[state=open]:bg-gray-50">
                 <div className="flex items-center gap-3 text-left">
-                  <Calendar className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <Calendar className="h-5 w-5 text-emerald-500 flex-shrink-0" />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">
                       {month}
@@ -178,13 +178,13 @@ export const HolidayList = ({
         className="grid grid-cols-1 md:grid-cols-4 gap-4"
       >
         <div className="bg-white rounded-lg p-4 shadow-sm border text-center">
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl font-bold text-emerald-600">
             {holidays.filter(h => isUpcomingHoliday(h.date)).length}
           </div>
           <div className="text-sm text-gray-600">Upcoming Holidays</div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm border text-center">
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl font-bold text-emerald-600">
             {holidays.filter(h => new Date(h.date).getMonth() === new Date().getMonth()).length}
           </div>
           <div className="text-sm text-gray-600">This Month</div>
@@ -233,16 +233,16 @@ const HolidayListItem = ({
         <div className="flex items-start space-x-4 flex-1">
           {/* Date Badge */}
           <div className="text-center min-w-16">
-            <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-              <div className="text-green-600 font-bold text-lg">
+            <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
+              <div className="text-emerald-600 font-bold text-lg">
                 {dateInfo.day}
               </div>
-              <div className="text-green-500 text-xs font-medium uppercase">
+              <div className="text-emerald-500 text-xs font-medium uppercase">
                 {dateInfo.month}
               </div>
             </div>
             {upcoming && (
-              <Badge className="mt-2 bg-green-100 text-green-800 border-green-200 text-xs">
+              <Badge className="mt-2 bg-emerald-100 text-emerald-800 border-emerald-200 text-xs">
                 Upcoming
               </Badge>
             )}

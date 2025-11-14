@@ -1,4 +1,5 @@
 import type { UUID } from 'crypto';
+import type { BaseDto } from './BaseDto';
 
 export type { UUID };
 
@@ -9,19 +10,17 @@ export interface AddHolidayDto {
   fiscalYearId: UUID; // Added this required field
 }
 
-export interface HolidayDto {
+export interface HolidayDto extends BaseDto {
   id: UUID;
   name: string;
   date: string;
   description?: string;
-  createdAt?: string;
-  updatedAt?: string;
   isActive?: boolean;
   fiscalYearId?: UUID;
   isPublic: boolean;
 }
 
-export interface HolidayListDto {
+export interface HolidayListDto extends BaseDto {
   id: UUID;
   name: string;
   date: string;
@@ -41,7 +40,7 @@ export interface HolidayListDto {
 export interface EditHolidayDto {
   id: UUID;
   name: string;
-  date: string; // ISO date string
+  date: string;
   isPublic: boolean;
   rowVersion: string;
   

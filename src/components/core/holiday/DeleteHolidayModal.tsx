@@ -1,11 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { HolidayDto, UUID } from "../../../types/core/holiday";
+import type { HolidayListDto, UUID } from "../../../types/core/holiday";
 import { Button } from "../../ui/button";
 
 interface DeleteHolidayModalProps {
-  holiday: HolidayDto | null;
+  holiday: HolidayListDto | null;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (holidayId: UUID) => void;
@@ -39,7 +39,7 @@ export const DeleteHolidayModal: React.FC<DeleteHolidayModalProps> = ({
             </div>
 
             <p className="text-lg font-medium text-red-600 mt-4">
-              Are you sure you want to delete this public holiday?
+              Are you sure you want to delete this holiday?
             </p>
             <p className="text-sm text-red-600 mt-1">
               This action cannot be undone.

@@ -5,13 +5,14 @@ import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Switch } from '../../ui/switch';
-import type { EditHolidayDto, HolidayDto, UUID } from '../../../types/core/holiday';
+import type { EditHolidayDto, HolidayListDto, UUID } from '../../../types/core/holiday';
 
 interface EditHolidayModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (holidayData: EditHolidayDto) => void;
-  holiday: HolidayDto | null;
+  holiday: HolidayListDto | null;
+  fiscalYears?: Array<{ id: UUID; name: string }>;
 }
 
 interface FormErrors {
@@ -48,7 +49,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
         name: holiday.name || '',
         date: formatDateForInput(holiday.date),
         isPublic: holiday.isPublic ?? true,
-        rowVersion: holiday.rowVersion || '',
+        rowVersion: holiday.rowVersion || '1', // Default to '1' if not provided
       });
     }
   }, [holiday]);
@@ -91,12 +92,11 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
     if (validateForm()) {
       const submitData: EditHolidayDto = {
         ...formData,
-        date: formData.date,
-        name: formData.name,
+        date: new Date(formData.date).toISOString(), // Ensure ISO format
+        name: formData.name.trim(),
         isPublic: formData.isPublic,
       };
       onSave(submitData);
-      handleClose();
     }
   };
 
@@ -119,7 +119,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-4">
           <div className="flex items-center gap-2">
             <PenBox size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Edit </h2>
+            <h2 className="text-lg font-bold text-gray-800">Edit Holiday</h2>
           </div>
           <button
             onClick={handleClose}
@@ -144,7 +144,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
                   placeholder="e.g., New Year's Day"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                  className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
@@ -159,10 +159,29 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
                   type="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                  className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 />
                 {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
               </div>
+
+              {/* Fiscal Year (Read-only) */}
+              {holiday?.fiscalYearName && (
+                <div className="space-y-2">
+                  <Label htmlFor="fiscalYear" className="text-sm text-gray-500">
+                    Fiscal Year
+                  </Label>
+                  <Input
+                    id="fiscalYear"
+                    type="text"
+                    value={holiday.fiscalYearName}
+                    disabled
+                    className="w-full bg-gray-50 text-gray-600"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Fiscal year cannot be changed after creation
+                  </p>
+                </div>
+              )}
 
               {/* Is Public Switch */}
               <div className="flex items-center justify-between space-y-2 py-2">
@@ -188,7 +207,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
               <div className="mx-auto flex justify-center items-center gap-1.5">
                 <Button
                   type="submit"
-                  className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
                   disabled={!formData.name.trim() || !formData.date}
                 >
                   Save Changes

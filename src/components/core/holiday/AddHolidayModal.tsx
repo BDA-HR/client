@@ -5,7 +5,7 @@ import { Label } from '../../ui/label';
 import { Input } from '../../ui/input';
 import { Switch } from '../../ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import type { AddHolidayDto } from '../../../types/core/holiday';
+import type { AddHolidayDto, UUID } from '../../../types/core/holiday';
 import React from 'react';
 import toast from 'react-hot-toast';
 
@@ -15,7 +15,7 @@ interface AddHolidayModalProps {
   newHoliday: AddHolidayDto;
   setNewHoliday: (holiday: AddHolidayDto) => void;
   onAddHoliday: () => Promise<void>;
-  fiscalYears: Array<{ id: string; name: string }>; // Add fiscal years prop
+  fiscalYears: Array<{ id: string; name: string }>;
 }
 
 export const AddHolidayModal = ({
@@ -45,7 +45,7 @@ export const AddHolidayModal = ({
   const handleFiscalYearChange = (value: string) => {
     const updatedHoliday: AddHolidayDto = {
       ...newHoliday,
-      fiscalYearId: value
+      fiscalYearId: value as UUID
     };
     setNewHoliday(updatedHoliday);
   };
@@ -79,7 +79,7 @@ export const AddHolidayModal = ({
         name: '',
         date: '',
         isPublic: true,
-        fiscalYearId: '' // Reset fiscal year ID
+        fiscalYearId: '' as UUID
       });
       
       onOpenChange(false);
@@ -97,7 +97,7 @@ export const AddHolidayModal = ({
       name: '',
       date: '',
       isPublic: true,
-      fiscalYearId: ''
+      fiscalYearId: '' as UUID
     });
     onOpenChange(false);
   };
@@ -143,7 +143,7 @@ export const AddHolidayModal = ({
                     <Input
                       type="text"
                       id="holidayName"
-                      className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                       placeholder="e.g., New Year's Day"
                       value={newHoliday.name}
                       onChange={handleNameChange}
@@ -159,7 +159,7 @@ export const AddHolidayModal = ({
                     <Input
                       type="date"
                       id="holidayDate"
-                      className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                       value={newHoliday.date ? newHoliday.date.split('T')[0] : newHoliday.date}
                       onChange={handleDateChange}
                       required
@@ -175,7 +175,7 @@ export const AddHolidayModal = ({
                       value={newHoliday.fiscalYearId}
                       onValueChange={handleFiscalYearChange}
                     >
-                      <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent">
+                      <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                         <SelectValue placeholder="Select fiscal year" />
                       </SelectTrigger>
                       <SelectContent>
@@ -212,7 +212,7 @@ export const AddHolidayModal = ({
                   <div className="mx-auto flex justify-center items-center gap-1.5">
                     <Button
                       type="submit"
-                      className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
                       disabled={!newHoliday.name || !newHoliday.date || !newHoliday.fiscalYearId}
                     >
                       Save
