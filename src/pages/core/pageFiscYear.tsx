@@ -11,7 +11,7 @@ import type { FiscYearListDto, AddFiscYearDto, EditFiscYearDto, UUID } from '../
 import PeriodSection from '../../components/core/period/PeriodSection';
 import ActiveFisc from '../../components/core/fiscalyear/ActFiscYear';
 import { motion } from 'framer-motion';
-import PagePublicHoliday from './pagePublicHoliday';
+import PagePublicHoliday from './pageHoliday';
 
 const getDefaultFiscalYear = (): AddFiscYearDto => ({
   name: '',

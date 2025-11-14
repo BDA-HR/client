@@ -3,37 +3,31 @@ import { X, BadgePlus } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { Input } from '../../ui/input';
-import type { AddPubHolidayDto } from '../../../types/core/pubHoliday';
+import { Switch } from '../../ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import type { AddHolidayDto } from '../../../types/core/holiday';
 import React from 'react';
 import toast from 'react-hot-toast';
-import { amharicRegex } from '../../../utils/amharic-regex';
 
-export const AddPubHolidayModal = ({
+interface AddHolidayModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  newHoliday: AddHolidayDto;
+  setNewHoliday: (holiday: AddHolidayDto) => void;
+  onAddHoliday: () => Promise<void>;
+  fiscalYears: Array<{ id: string; name: string }>; // Add fiscal years prop
+}
+
+export const AddHolidayModal = ({
   open,
   onOpenChange,
   newHoliday,
   setNewHoliday,
-  onAddPubHoliday
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  newHoliday: AddPubHolidayDto;
-  setNewHoliday: (holiday: AddPubHolidayDto) => void;
-  onAddPubHoliday: () => Promise<void>;
-}) => {
-  const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '' || amharicRegex.test(value)) {
-      const updatedHoliday: AddPubHolidayDto = {
-        ...newHoliday,
-        nameAm: value
-      };
-      setNewHoliday(updatedHoliday);
-    }
-  };
-
-  const handleEnglishNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedHoliday: AddPubHolidayDto = {
+  onAddHoliday,
+  fiscalYears = [] // Default to empty array
+}: AddHolidayModalProps) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedHoliday: AddHolidayDto = {
       ...newHoliday,
       name: e.target.value
     };
@@ -41,9 +35,25 @@ export const AddPubHolidayModal = ({
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedHoliday: AddPubHolidayDto = {
+    const updatedHoliday: AddHolidayDto = {
       ...newHoliday,
       date: e.target.value
+    };
+    setNewHoliday(updatedHoliday);
+  };
+
+  const handleFiscalYearChange = (value: string) => {
+    const updatedHoliday: AddHolidayDto = {
+      ...newHoliday,
+      fiscalYearId: value
+    };
+    setNewHoliday(updatedHoliday);
+  };
+
+  const handleIsPublicChange = (isPublic: boolean) => {
+    const updatedHoliday: AddHolidayDto = {
+      ...newHoliday,
+      isPublic
     };
     setNewHoliday(updatedHoliday);
   };
@@ -52,31 +62,32 @@ export const AddPubHolidayModal = ({
     e.preventDefault();
     
     // Validation
-    if (!newHoliday.name || !newHoliday.nameAm || !newHoliday.date) {
+    if (!newHoliday.name || !newHoliday.date || !newHoliday.fiscalYearId) {
       toast.error('Please fill all required fields');
       return;
     }
 
     try {      
       // Call the add function
-      await onAddPubHoliday();
+      await onAddHoliday();
       
       // Success notification
-      toast.success('Public holiday added successfully!');
+      toast.success('Holiday added successfully!');
       
       // Reset form and close modal
       setNewHoliday({
         name: '',
-        nameAm: '',
-        date: ''
+        date: '',
+        isPublic: true,
+        fiscalYearId: '' // Reset fiscal year ID
       });
       
       onOpenChange(false);
       
     } catch (error) {
-      // Error notification - this will be called if onAddPubHoliday throws an error
-      toast.error('Failed to add public holiday');
-      console.error('Error adding public holiday:', error);
+      // Error notification - this will be called if onAddHoliday throws an error
+      toast.error('Failed to add holiday');
+      console.error('Error adding holiday:', error);
     }
   };
 
@@ -84,8 +95,9 @@ export const AddPubHolidayModal = ({
     // Reset form when canceling
     setNewHoliday({
       name: '',
-      nameAm: '',
-      date: ''
+      date: '',
+      isPublic: true,
+      fiscalYearId: ''
     });
     onOpenChange(false);
   };
@@ -109,7 +121,7 @@ export const AddPubHolidayModal = ({
             <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
               <div className="flex items-center gap-2">
                 <BadgePlus size={20} />
-                <h2 className="text-lg font-bold text-gray-800">Add New</h2>
+                <h2 className="text-lg font-bold text-gray-800">Add New </h2>
               </div>
               <button
                 onClick={handleClose}
@@ -123,26 +135,10 @@ export const AddPubHolidayModal = ({
             <div className="px-6">
               <form onSubmit={handleSubmit}>
                 <div className="py-4 space-y-3">
-                  {/* Holiday Name (Amharic) */}
-                  <div className="space-y-2">
-                    <Label htmlFor="holidayNameAm" className="block text-sm font-medium text-gray-700">
-                      የበዓል ስም (አማርኛ) <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      type="text"
-                      id="holidayNameAm"
-                      className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
-                      placeholder="ምሳሌ፡ አዲስ አመት"
-                      value={newHoliday.nameAm}
-                      onChange={handleAmharicChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Holiday Name (English) */}
+                  {/* Holiday Name */}
                   <div className="space-y-2">
                     <Label htmlFor="holidayName" className="block text-sm font-medium text-gray-700">
-                      Holiday Name (English) <span className="text-red-500">*</span>
+                      Holiday Name <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       type="text"
@@ -150,7 +146,7 @@ export const AddPubHolidayModal = ({
                       className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                       placeholder="e.g., New Year's Day"
                       value={newHoliday.name}
-                      onChange={handleEnglishNameChange}
+                      onChange={handleNameChange}
                       required
                     />
                   </div>
@@ -169,6 +165,46 @@ export const AddPubHolidayModal = ({
                       required
                     />
                   </div>
+
+                  {/* Fiscal Year */}
+                  <div className="space-y-2">
+                    <Label htmlFor="fiscalYear" className="block text-sm font-medium text-gray-700">
+                      Fiscal Year <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      value={newHoliday.fiscalYearId}
+                      onValueChange={handleFiscalYearChange}
+                    >
+                      <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent">
+                        <SelectValue placeholder="Select fiscal year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fiscalYears.map((fiscalYear) => (
+                          <SelectItem key={fiscalYear.id} value={fiscalYear.id}>
+                            {fiscalYear.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Is Public Switch */}
+                  <div className="flex items-center justify-between space-y-2 py-2">
+                    <Label htmlFor="isPublic" className="block text-sm font-medium text-gray-700">
+                      Public Holiday
+                    </Label>
+                    <Switch
+                      id="isPublic"
+                      checked={newHoliday.isPublic}
+                      onCheckedChange={handleIsPublicChange}
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 -mt-2">
+                    {newHoliday.isPublic 
+                      ? 'This holiday will be visible to all employees' 
+                      : 'This holiday will be for specific groups only'
+                    }
+                  </p>
                 </div>
 
                 {/* footer */}
@@ -177,6 +213,7 @@ export const AddPubHolidayModal = ({
                     <Button
                       type="submit"
                       className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
+                      disabled={!newHoliday.name || !newHoliday.date || !newHoliday.fiscalYearId}
                     >
                       Save
                     </Button>

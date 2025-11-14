@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 
-interface PubHolidaySearchProps {
+interface HolidaySearchProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
 }
 
-export const PubHolidaySearch: React.FC<PubHolidaySearchProps> = ({ 
+export const HolidaySearch: React.FC<HolidaySearchProps> = ({ 
   searchTerm, 
   onSearchChange 
 }) => {
@@ -25,18 +25,18 @@ export const PubHolidaySearch: React.FC<PubHolidaySearchProps> = ({
     >
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1">
-          <label htmlFor="pub-holiday-search" className="sr-only">
-            Search public holidays
+          <label htmlFor="holiday-search" className="sr-only">
+            Search holidays
           </label>
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
             <input
-              id="pub-holiday-search"
-              name="pub-holiday-search"
+              id="holiday-search"
+              name="holiday-search"
               type="text"
-              placeholder="Search public holidays by name, date, or description..."
+              placeholder="Search  holidays by name, date, or description..."
               className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}

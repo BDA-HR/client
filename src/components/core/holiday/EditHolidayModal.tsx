@@ -1,37 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, PenBox } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
-import type { EditPubHolidayDto, PubHolidayDto, UUID } from '../../../types/core/pubHoliday';
-import { amharicRegex } from '../../../utils/amharic-regex';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
+import { Label } from '../../ui/label';
+import { Switch } from '../../ui/switch';
+import type { EditHolidayDto, HolidayDto, UUID } from '../../../types/core/holiday';
 
-interface EditPubHolidayModalProps {
+interface EditHolidayModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (holidayData: EditPubHolidayDto) => void;
-  holiday: PubHolidayDto | null;
+  onSave: (holidayData: EditHolidayDto) => void;
+  holiday: HolidayDto | null;
 }
 
 interface FormErrors {
   name?: string;
-  nameAm?: string;
   date?: string;
 }
 
-export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
+export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
   isOpen,
   onClose,
   onSave,
   holiday,
 }) => {
-  const [formData, setFormData] = useState<EditPubHolidayDto>({
+  const [formData, setFormData] = useState<EditHolidayDto>({
     id: '' as UUID,
     name: '',
-    nameAm: '',
     date: '',
-    description: '',
+    isPublic: true,
     rowVersion: '',
   });
 
@@ -48,25 +46,14 @@ export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
       setFormData({
         id: holiday.id,
         name: holiday.name || '',
-        nameAm: holiday.nameAm || '',
         date: formatDateForInput(holiday.date),
-        description: holiday.description || '',
+        isPublic: holiday.isPublic ?? true,
         rowVersion: holiday.rowVersion || '',
       });
     }
   }, [holiday]);
 
-  const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '' || amharicRegex.test(value)) {
-      setFormData((prev) => ({ ...prev, nameAm: value }));
-      if (errors.nameAm) {
-        setErrors((prev) => ({ ...prev, nameAm: undefined }));
-      }
-    }
-  };
-
-  const handleInputChange = (field: keyof EditPubHolidayDto, value: string) => {
+  const handleInputChange = (field: keyof EditHolidayDto, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -77,11 +64,7 @@ export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
     const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Holiday name (English) is required';
-    }
-
-    if (!formData.nameAm.trim()) {
-      newErrors.nameAm = 'Holiday name (Amharic) is required';
+      newErrors.name = 'Holiday name is required';
     }
     
     if (!formData.date) {
@@ -106,9 +89,11 @@ export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
     e.preventDefault();
 
     if (validateForm()) {
-      const submitData: EditPubHolidayDto = {
+      const submitData: EditHolidayDto = {
         ...formData,
         date: formData.date,
+        name: formData.name,
+        isPublic: formData.isPublic,
       };
       onSave(submitData);
       handleClose();
@@ -134,7 +119,7 @@ export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-4">
           <div className="flex items-center gap-2">
             <PenBox size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Edit</h2>
+            <h2 className="text-lg font-bold text-gray-800">Edit </h2>
           </div>
           <button
             onClick={handleClose}
@@ -148,23 +133,7 @@ export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
         <div className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-4">
-              {/* Holiday Name (Amharic) */}
-              <div className="space-y-2">
-                <Label htmlFor="holidayNameAm" className="text-sm text-gray-500">
-                  የበዓል ስም <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="holidayNameAm"
-                  type="text"
-                  placeholder="ምሳሌ፡ አዲስ አመት"
-                  value={formData.nameAm}
-                  onChange={handleAmharicChange}
-                  className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
-                />
-                {errors.nameAm && <p className="text-red-500 text-sm">{errors.nameAm}</p>}
-              </div>
-
-              {/* Holiday Name (English) */}
+              {/* Holiday Name */}
               <div className="space-y-2">
                 <Label htmlFor="holidayName" className="text-sm text-gray-500">
                   Holiday Name <span className="text-red-500">*</span>
@@ -195,6 +164,23 @@ export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
                 {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
               </div>
 
+              {/* Is Public Switch */}
+              <div className="flex items-center justify-between space-y-2 py-2">
+                <Label htmlFor="isPublic" className="text-sm font-medium text-gray-700">
+                  Public Holiday
+                </Label>
+                <Switch
+                  id="isPublic"
+                  checked={formData.isPublic}
+                  onCheckedChange={(checked) => handleInputChange('isPublic', checked)}
+                />
+              </div>
+              <p className="text-sm text-gray-500 -mt-2">
+                {formData.isPublic 
+                  ? 'This holiday will be visible to all employees' 
+                  : 'This holiday will be for specific groups only'
+                }
+              </p>
             </div>
 
             {/* Footer */}
@@ -203,7 +189,7 @@ export const EditPubHolidayModal: React.FC<EditPubHolidayModalProps> = ({
                 <Button
                   type="submit"
                   className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
-                  disabled={!formData.name.trim() || !formData.nameAm.trim() || !formData.date}
+                  disabled={!formData.name.trim() || !formData.date}
                 >
                   Save Changes
                 </Button>

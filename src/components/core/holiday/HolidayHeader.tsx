@@ -4,7 +4,7 @@ import { DialogTrigger } from '../../ui/dialog';
 import { Button } from '../../ui/button';
 import { useNavigate } from 'react-router-dom';
 
-export const PubHolidayHeader = ({ 
+export const HolidayHeader = ({ 
   setDialogOpen, 
   totalItems,
 }: { 
@@ -14,7 +14,7 @@ export const PubHolidayHeader = ({
   const navigate = useNavigate();
 
   const handleViewHistory = () => {
-    navigate('/core/fiscal-year/public-holiday-history');
+    navigate('/core/fiscal-year/holiday-history');
   };
 
   return (

@@ -46,7 +46,7 @@ import PagePosition from './pages/hr/settings/position/pagePosition';
 import PositionDetails from './pages/hr/settings/position/PositionDetails';
 import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
 import PageAnnualLeave from './pages/hr/settings/pageAnnualLeave';
-import { PagePubHolidayHist } from './pages/core/pagePubHolidayHist';
+import { PageHolidayHist } from './pages/core/pageHolidayHist';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -127,7 +127,7 @@ function App() {
             <Route path='/core/users' element={<UserOverview />} />
             <Route path="/core/department" element={<DepartmentOverview />} />
             <Route path="/core/company/:id" element={<CompanyDetailsPage />} />
-            <Route path="/core/fiscal-year/public-holiday-history" element={<PagePubHolidayHist />} />
+            <Route path="/core/fiscal-year/holiday-history" element={<PageHolidayHist />} />
 
           </Route>
           {/* END CORE ROUTES */}

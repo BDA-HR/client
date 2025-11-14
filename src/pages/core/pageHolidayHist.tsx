@@ -1,84 +1,164 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Calendar, ChevronDown, Filter } from 'lucide-react';
-import { PubHolidayList } from '../../components/core/publicHoliday/PubHolidayList';
-import { PubHolidaySearch } from '../../components/core/publicHoliday/PubHolidaySearch';
+import { HolidayList } from '../../components/core/holiday/HolidayList';
+import { HolidaySearch } from '../../components/core/holiday/HolidaySearch'; // Updated import name
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import type { PubHolidayDto } from '../../types/core/pubHoliday';
+import type { HolidayListDto } from '../../types/core/holiday'; // Updated import
 
 // Mock data for demonstration - replace with your actual data
-const mockHolidaysData: Record<string, PubHolidayDto[]> = {
+const mockHolidaysData: Record<string, HolidayListDto[]> = {
   '2024': [
     {
       id: '1',
       name: 'New Year',
-      nameAm: 'አዲስ አመት',
-      date: '2024-01-01',
-      fiscalYear: '2024'
+      date: '2024-01-01T00:00:00.000Z',
+      dateStr: 'January 01, 2024',
+      dateStrAm: 'ጥር 22, 2016',
+      description: 'New Year celebration',
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2024',
+      fiscalYearName: '2023/2024',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2023/2024',
+      rowVersion: '1'
     },
     {
       id: '2',
       name: 'Christmas',
-      nameAm: 'ገና',
-      date: '2024-01-07',
-      fiscalYear: '2024'
+      date: '2024-01-07T00:00:00.000Z',
+      dateStr: 'January 07, 2024',
+      dateStrAm: 'ጥር 28, 2016',
+      description: 'Christmas celebration',
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2024',
+      fiscalYearName: '2023/2024',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2023/2024',
+      rowVersion: '1'
     },
     {
       id: '3',
       name: 'Epiphany',
-      nameAm: 'ጥምቀት',
-      date: '2024-01-19',
-      fiscalYear: '2024'
+      date: '2024-01-19T00:00:00.000Z',
+      dateStr: 'January 19, 2024',
+      dateStrAm: 'የካቲት 10, 2016',
+      description: 'Epiphany celebration',
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2024',
+      fiscalYearName: '2023/2024',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2023/2024',
+      rowVersion: '1'
     }
   ],
   '2023': [
     {
       id: '4',
       name: 'New Year',
-      nameAm: 'አዲስ አመት',
-      date: '2023-01-01',
-      fiscalYear: '2023'
+      date: '2023-01-01T00:00:00.000Z',
+      dateStr: 'January 01, 2023',
+      dateStrAm: 'ጥር 22, 2015',
+      description: 'New Year celebration',
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2023',
+      fiscalYearName: '2022/2023',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2022/2023',
+      rowVersion: '1'
     },
     {
       id: '5',
       name: 'Christmas',
-      nameAm: 'ገና',
-      date: '2023-01-07',
-      fiscalYear: '2023'
+      date: '2023-01-07T00:00:00.000Z',
+      dateStr: 'January 07, 2023',
+      dateStrAm: 'ጥር 28, 2015',
+      description: 'Christmas celebration',
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2023',
+      fiscalYearName: '2022/2023',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2022/2023',
+      rowVersion: '1'
     },
     {
       id: '7',
       name: 'Easter',
-      nameAm: 'ፋሲካ',
-      date: '2023-04-16',
-      fiscalYear: '2023'
+      date: '2023-04-16T00:00:00.000Z',
+      dateStr: 'April 16, 2023',
+      dateStrAm: 'ሚያዚያ 8, 2015',
+      description: 'Easter celebration',
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2023',
+      fiscalYearName: '2022/2023',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2022/2023',
+      rowVersion: '1'
     }
   ],
   '2022': [
     {
       id: '6',
       name: 'New Year',
-      nameAm: 'አዲስ አመት',
-      date: '2022-01-01',
-      fiscalYear: '2022'
+      date: '2022-01-01T00:00:00.000Z',
+      dateStr: 'January 01, 2022',
+      dateStrAm: 'ጥር 22, 2014',
+      description: 'New Year celebration',
+      createdAt: '2022-01-01T00:00:00.000Z',
+      updatedAt: '2022-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2022',
+      fiscalYearName: '2021/2022',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2021/2022',
+      rowVersion: '1'
     },
     {
       id: '8',
       name: 'Meskel',
-      nameAm: 'መስቀል',
-      date: '2022-09-27',
-      fiscalYear: '2022'
+      date: '2022-09-27T00:00:00.000Z',
+      dateStr: 'September 27, 2022',
+      dateStrAm: 'መስከረም 17, 2014',
+      description: 'Meskel celebration',
+      createdAt: '2022-01-01T00:00:00.000Z',
+      updatedAt: '2022-01-01T00:00:00.000Z',
+      isActive: true,
+      fiscalYearId: 'fy-2022',
+      fiscalYearName: '2021/2022',
+      isPublic: true,
+      isPublicStr: 'Public',
+      fiscYear: '2021/2022',
+      rowVersion: '1'
     }
   ]
 };
 
-export const PagePubHolidayHist = () => {
+export const PageHolidayHist = () => {
   const [selectedYear, setSelectedYear] = useState<string>('2024');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filteredHolidays, setFilteredHolidays] = useState<PubHolidayDto[]>([]);
-  const [allHolidays, setAllHolidays] = useState<PubHolidayDto[]>([]);
-  const [currentYearHolidays, setCurrentYearHolidays] = useState<PubHolidayDto[]>([]);
+  const [filteredHolidays, setFilteredHolidays] = useState<HolidayListDto[]>([]);
+  const [allHolidays, setAllHolidays] = useState<HolidayListDto[]>([]);
+  const [currentYearHolidays, setCurrentYearHolidays] = useState<HolidayListDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [years, setYears] = useState<string[]>([]);
   const [searchMode, setSearchMode] = useState<boolean>(false);
@@ -90,7 +170,7 @@ export const PagePubHolidayHist = () => {
       setYears(availableYears);
       
       // Combine all holidays from all years
-      const allHolidaysList: PubHolidayDto[] = [];
+      const allHolidaysList: HolidayListDto[] = [];
       availableYears.forEach(year => {
         allHolidaysList.push(...(mockHolidaysData[year] || []));
       });
@@ -116,9 +196,10 @@ export const PagePubHolidayHist = () => {
     } else {
       const filtered = allHolidays.filter(holiday =>
         holiday.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        holiday.nameAm.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        holiday.dateStrAm?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         holiday.date.includes(searchTerm) ||
-        holiday.fiscalYear.includes(searchTerm)
+        holiday.fiscYear.includes(searchTerm) ||
+        (holiday.description && holiday.description.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setFilteredHolidays(filtered);
       setSearchMode(true);
@@ -159,12 +240,12 @@ export const PagePubHolidayHist = () => {
     setSearchTerm(term);
   };
 
-  const handleEditHoliday = (holiday: PubHolidayDto) => {
+  const handleEditHoliday = (holiday: HolidayListDto) => {
     console.log('Edit holiday:', holiday);
     // Implement edit functionality
   };
 
-  const handleDeleteHoliday = (holiday: PubHolidayDto) => {
+  const handleDeleteHoliday = (holiday: HolidayListDto) => {
     console.log('Delete holiday:', holiday);
     // Implement delete functionality
   };
@@ -176,14 +257,14 @@ export const PagePubHolidayHist = () => {
   const getSearchResultsCountByYear = () => {
     const countByYear: Record<string, number> = {};
     filteredHolidays.forEach(holiday => {
-      countByYear[holiday.fiscalYear] = (countByYear[holiday.fiscalYear] || 0) + 1;
+      countByYear[holiday.fiscYear] = (countByYear[holiday.fiscYear] || 0) + 1;
     });
     return countByYear;
   };
 
   return (
     <div className="min-h-screen bg-gray-50/30">
-      <div className="container mx-auto p-6">
+      <div className="container ">
         {/* Header */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
@@ -193,61 +274,11 @@ export const PagePubHolidayHist = () => {
         >
           <h1 className="text-2xl font-bold">
             <span className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent mr-2">
-              Public
+              Holiday
             </span>
-            Holidays
+            History
           </h1>
         </motion.div>
-
-        {/* Year Selection */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-6"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Filter className="h-5 w-5 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filter by Year:</span>
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              {years.map((year, index) => (
-                <motion.div
-                  key={year}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1 * index }}
-                >
-                  <Button
-                    variant={selectedYear === year && !searchMode ? "default" : "outline"}
-                    onClick={() => handleYearChange(year)}
-                    className={`flex items-center gap-2 ${
-                      selectedYear === year && !searchMode
-                        ? 'bg-green-600 hover:bg-green-700 text-white' 
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    {year}
-                    <Badge 
-                      variant="secondary" 
-                      className={`ml-1 ${
-                        selectedYear === year && !searchMode
-                          ? 'bg-green-500 text-white' 
-                          : 'bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {getTotalHolidays(year)}
-                    </Badge>
-                  </Button>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
         {/* Search Component */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -255,7 +286,7 @@ export const PagePubHolidayHist = () => {
           transition={{ delay: 0.3 }}
           className="mb-6"
         >
-          <PubHolidaySearch 
+          <HolidaySearch // Updated component name
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
           />
@@ -271,9 +302,9 @@ export const PagePubHolidayHist = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
               <h2 className="text-xl font-semibold text-gray-900">
-                {searchMode ? 'Search Results' : `${selectedYear} Public Holidays`}
+                {searchMode ? 'Search Results' : `${selectedYear} Holidays`}
               </h2>
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                 {filteredHolidays.length} {filteredHolidays.length === 1 ? 'Holiday' : 'Holidays'}
                 {searchMode && ` found across all years`}
               </Badge>
@@ -303,7 +334,7 @@ export const PagePubHolidayHist = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <PubHolidayList
+          <HolidayList
             holidays={filteredHolidays}
             loading={loading}
             onEdit={handleEditHoliday}
@@ -321,8 +352,8 @@ export const PagePubHolidayHist = () => {
             className="mt-12"
           >
             <div className="border-t pt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-gray-500" />
+              <h3 className="text-lg font-semibold text--900 mb-6 flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-green-500" />
                 Previous Years
               </h3>
               
@@ -339,15 +370,15 @@ export const PagePubHolidayHist = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="bg-gray-50 rounded-lg p-3 border">
-                            <Calendar className="h-6 w-6 text-gray-600" />
+                          <div className="bg-green-50 rounded-lg p-3 border">
+                            <Calendar className="h-6 w-6 text-green-600" />
                           </div>
                           <div>
                             <h4 className="font-semibold text-gray-900 text-lg">
-                              {year} Public Holidays
+                              {year} Holidays
                             </h4>
                             <p className="text-gray-600 text-sm mt-1">
-                              {getTotalHolidays(year)} official holiday{getTotalHolidays(year) !== 1 ? 's' : ''}
+                              {getTotalHolidays(year)} holiday{getTotalHolidays(year) !== 1 ? 's' : ''}
                             </p>
                           </div>
                         </div>

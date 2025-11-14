@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Clock, Edit3, Trash2 } from 'lucide-react';
+import { Calendar, MapPin, Clock, Edit3, Trash2, Users, UserCheck } from 'lucide-react';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import {
@@ -8,23 +8,23 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '../../ui/accordion';
-import type { PubHolidayDto } from '../../../types/core/pubHoliday';
+import type { HolidayListDto } from '../../../types/core/holiday';
 
-interface PubHolidayListProps {
-  holidays: PubHolidayDto[];
+interface HolidayListProps {
+  holidays: HolidayListDto[];
   loading?: boolean;
-  onEdit: (holiday: PubHolidayDto) => void;
-  onDelete: (holiday: PubHolidayDto) => void;
+  onEdit: (holiday: HolidayListDto) => void;
+  onDelete: (holiday: HolidayListDto) => void;
   currentFiscalYear?: string;
 }
 
-export const PubHolidayList = ({
+export const HolidayList = ({
   holidays,
   loading = false,
   onEdit,
   onDelete,
   currentFiscalYear = '2024'
-}: PubHolidayListProps) => {
+}: HolidayListProps) => {
   // Group holidays by month
   const holidaysByMonth = holidays.reduce((acc, holiday) => {
     const date = new Date(holiday.date);
@@ -35,7 +35,7 @@ export const PubHolidayList = ({
     }
     acc[month].push(holiday);
     return acc;
-  }, {} as Record<string, PubHolidayDto[]>);
+  }, {} as Record<string, HolidayListDto[]>);
 
   // Sort months chronologically
   const sortedMonths = Object.keys(holidaysByMonth).sort((a, b) => {
@@ -112,9 +112,9 @@ export const PubHolidayList = ({
         className="text-center py-12"
       >
         <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Public Holidays</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Holidays</h3>
         <p className="text-gray-500 max-w-sm mx-auto">
-          No public holidays have been added for the current fiscal year ({currentFiscalYear}).
+          No holidays have been added for the current fiscal year ({currentFiscalYear}).
         </p>
       </motion.div>
     );
@@ -175,7 +175,7 @@ export const PubHolidayList = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        className="grid grid-cols-1 md:grid-cols-4 gap-4"
       >
         <div className="bg-white rounded-lg p-4 shadow-sm border text-center">
           <div className="text-2xl font-bold text-green-600">
@@ -188,6 +188,12 @@ export const PubHolidayList = ({
             {holidays.filter(h => new Date(h.date).getMonth() === new Date().getMonth()).length}
           </div>
           <div className="text-sm text-gray-600">This Month</div>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow-sm border text-center">
+          <div className="text-2xl font-bold text-blue-600">
+            {holidays.filter(h => h.isPublic).length}
+          </div>
+          <div className="text-sm text-gray-600">Public Holidays</div>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm border text-center">
           <div className="text-2xl font-bold text-purple-600">
@@ -209,11 +215,11 @@ const HolidayListItem = ({
   onDelete, 
   index
 }: {
-  holiday: PubHolidayDto;
+  holiday: HolidayListDto;
   dateInfo: any;
   upcoming: boolean;
-  onEdit: (holiday: PubHolidayDto) => void;
-  onDelete: (holiday: PubHolidayDto) => void;
+  onEdit: (holiday: HolidayListDto) => void;
+  onDelete: (holiday: HolidayListDto) => void;
   index: number;
 }) => {
   return (
@@ -244,11 +250,22 @@ const HolidayListItem = ({
 
           {/* Holiday Details */}
           <div className="flex-1 min-w-0">
-            {/* English Name */}
+            {/* Holiday Name */}
             <div className="flex items-center gap-2 mb-2">
               <h4 className="text-lg font-semibold text-gray-900">
                 {holiday.name}
               </h4>
+              {holiday.isPublic ? (
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  Public
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 flex items-center gap-1">
+                  <UserCheck className="h-3 w-3" />
+                  Private
+                </Badge>
+              )}
               {upcoming && new Date(holiday.date).getMonth() === new Date().getMonth() && (
                 <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
                   This Month
@@ -256,12 +273,14 @@ const HolidayListItem = ({
               )}
             </div>
 
-            {/* Amharic Name */}
-            <div className="mb-2">
-              <p className="text-sm text-gray-600 font-medium">
-                {holiday.nameAm}
-              </p>
-            </div>
+            {/* Ethiopian Date */}
+            {holiday.dateStrAm && (
+              <div className="mb-2">
+                <p className="text-sm text-gray-600 font-medium">
+                  {holiday.dateStrAm}
+                </p>
+              </div>
+            )}
             
             <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
               <div className="flex items-center gap-1">
@@ -272,6 +291,18 @@ const HolidayListItem = ({
                 <MapPin className="h-4 w-4" />
                 {dateInfo.fullDate}
               </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              {holiday.fiscYear && (
+                <span>Fiscal Year: {holiday.fiscYear}</span>
+              )}
+              {holiday.description && (
+                <span className="max-w-xs truncate" title={holiday.description}>
+                  {holiday.description}
+                </span>
+              )}
             </div>
           </div>
         </div>

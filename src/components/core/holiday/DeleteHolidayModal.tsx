@@ -1,17 +1,17 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { PubHolidayDto, UUID } from "../../../types/core/pubHoliday";
-import { Button } from "../../../components/ui/button";
+import type { HolidayDto, UUID } from "../../../types/core/holiday";
+import { Button } from "../../ui/button";
 
-interface DeletePubHolidayModalProps {
-  holiday: PubHolidayDto | null;
+interface DeleteHolidayModalProps {
+  holiday: HolidayDto | null;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (holidayId: UUID) => void;
 }
 
-export const DeletePubHolidayModal: React.FC<DeletePubHolidayModalProps> = ({ 
+export const DeleteHolidayModal: React.FC<DeleteHolidayModalProps> = ({ 
   holiday, 
   isOpen, 
   onClose, 
