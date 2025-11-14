@@ -1,6 +1,6 @@
 
 import { api } from '../api';
-import type { CompListDto, AddCompDto, EditCompDto} from '../../types/core/comp';
+import type { CompListDto, AddCompDto, EditCompDto } from '../../types/core/comp';
 import type { UUID } from 'crypto';
 
 class CompanyService {
@@ -9,7 +9,7 @@ class CompanyService {
   async getAllCompanies(): Promise<CompListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllCompany`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching companies:', error);
       throw error;
@@ -19,7 +19,7 @@ class CompanyService {
   async getCompanyById(id: UUID): Promise<CompListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetCompany/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching company:', error);
       throw error;
@@ -39,7 +39,7 @@ class CompanyService {
 
   async updateCompany(updateData: EditCompDto): Promise<CompListDto> {
     try {
-      const response = await api.put(`${this.baseUrl}/ModCompany/${updateData.id}`,updateData);
+      const response = await api.put(`${this.baseUrl}/ModCompany/${updateData.id}`, updateData);
       return response.data;
     } catch (error) {
       console.error('Error updating company:', error);
@@ -49,7 +49,8 @@ class CompanyService {
 
   async deleteCompany(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/DelCompany/${id}`);
+      const response = await api.delete(`${this.baseUrl}/DelCompany/${id}`);
+      console.error(response.data.message);
     } catch (error) {
       console.error('Error deleting company:', error);
       throw error;

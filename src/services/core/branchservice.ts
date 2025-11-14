@@ -9,7 +9,7 @@ class BranchService {
   async getAllBranches(): Promise<BranchListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllBranch`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching branches:', error);
       throw error;
