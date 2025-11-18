@@ -1,0 +1,118 @@
+import type { UUID } from 'crypto';
+import type { BaseDto } from './BaseDto';
+
+export type { UUID };
+
+// Leave Policy Types
+export interface LeavePolicyListDto extends BaseDto {
+  leaveTypeId: UUID;
+  name: string;
+  requiresAttachment: boolean;
+  minDurPerReq: number;
+  maxDurPerReq: number;
+  holidaysAsLeave: boolean;
+  leaveType: string;
+  requiresAttachmentStr: string;
+  minDurPerReqStr: string;
+  maxDurPerReqStr: string;
+  holidaysAsLeaveStr: string;
+}
+
+export interface LeavePolicyAddDto {
+  name: string;
+  requiresAttachment: boolean;
+  minDurPerReq: number;
+  maxDurPerReq: number;
+  holidaysAsLeave: boolean;
+  leaveTypeId: UUID;
+}
+
+export interface LeavePolicyModDto {
+  id: UUID;
+  name: string;
+  requiresAttachment: boolean;
+  minDurPerReq: number;
+  maxDurPerReq: number;
+  holidaysAsLeave: boolean;
+  leaveTypeId: UUID;
+  rowVersion: string;
+}
+
+// Service response types (if needed for dropdowns/selects)
+export interface LeaveTypeOptionDto {
+  id: UUID;
+  name: string;
+  nameAm?: string;
+}
+
+export interface BooleanOptionDto {
+  id: boolean;
+  name: string;
+  nameAm?: string;
+}
+
+// Combined types for UI
+export type LeavePolicyFilterType = 
+  | 'all' 
+  | 'withAttachment' 
+  | 'withoutAttachment' 
+  | 'holidaysAsLeave' 
+  | 'byLeaveType';
+
+export interface LeavePolicyFilters {
+  searchTerm: string;
+  requiresAttachment?: boolean;
+  holidaysAsLeave?: boolean;
+  leaveTypeId?: UUID;
+  minDuration?: number;
+  maxDuration?: number;
+}
+
+export interface LeavePolicyTableData {
+  data: LeavePolicyListDto[];
+  totalCount: number;
+  pageSize: number;
+  currentPage: number;
+}
+
+// Form data types
+export interface LeavePolicyFormData {
+  name: string;
+  requiresAttachment: boolean;
+  minDurPerReq: number;
+  maxDurPerReq: number;
+  holidaysAsLeave: boolean;
+  leaveTypeId: UUID;
+}
+
+// Validation types
+export interface LeavePolicyValidationResult {
+  isValid: boolean;
+  errors: {
+    name?: string;
+    requiresAttachment?: string;
+    minDurPerReq?: string;
+    maxDurPerReq?: string;
+    holidaysAsLeave?: string;
+    leaveTypeId?: string;
+  };
+}
+
+// Duration validation types
+export interface DurationValidation {
+  minDuration: number;
+  maxDuration: number;
+  isValid: boolean;
+  error?: string;
+}
+
+// Policy configuration types
+export interface LeavePolicyConfig {
+  id: UUID;
+  name: string;
+  requiresAttachment: boolean;
+  minDuration: number;
+  maxDuration: number;
+  holidaysAsLeave: boolean;
+  leaveTypeName: string;
+}
