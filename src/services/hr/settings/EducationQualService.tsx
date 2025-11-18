@@ -9,14 +9,32 @@ import type {
 class EducationQualService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/EducationQual`;
 
+  // Helper method to extract error messages
+  private extractErrorMessage(error: any): string {
+    if (error.response?.data?.message) {
+      return error.response.data.message;
+    }
+    if (error.response?.data?.errors) {
+      // Handle validation errors (object with field names as keys)
+      const errors = error.response.data.errors;
+      const errorMessages = Object.values(errors).flat();
+      return errorMessages.join(', ');
+    }
+    if (error.message) {
+      return error.message;
+    }
+    return 'An unexpected error occurred';
+  }
+
   // GET: /api/core/hrmm/v1/EducationQual/AllEducationQual
   async getAllEducationQuals(): Promise<EducationQualListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllEducationQual`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error('Error fetching educational qualifications:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error fetching educational qualifications:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -24,10 +42,11 @@ class EducationQualService {
   async getEducationQualById(id: UUID): Promise<EducationQualListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetEducationQual/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error('Error fetching educational qualification:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error fetching educational qualification:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -35,10 +54,12 @@ class EducationQualService {
   async createEducationQual(educationQual: EducationQualAddDto): Promise<EducationQualListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddEducationQual`, educationQual);
+      console.info('Educational qualification created successfully:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error('Error creating educational qualification:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error creating educational qualification:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -48,18 +69,21 @@ class EducationQualService {
       const response = await api.put(`${this.baseUrl}/ModEducationQual/${updateData.id}`, updateData);
       return response.data;
     } catch (error) {
-      console.error('Error updating educational qualification:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error updating educational qualification:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
   // DELETE: /api/core/hrmm/v1/EducationQual/DelEducationQual/{id}
   async deleteEducationQual(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/DelEducationQual/${id}`);
+      const response = await api.delete(`${this.baseUrl}/DelEducationQual/${id}`);
+      console.info('Educational qualification deleted successfully:', response.data.message);
     } catch (error) {
-      console.error('Error deleting educational qualification:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error deleting educational qualification:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 }

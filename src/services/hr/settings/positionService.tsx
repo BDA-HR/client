@@ -34,16 +34,35 @@ class PositionService {
   private reqUrl = `${
     import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
   }/PositionReq`;
+
+  // Helper method to extract error messages
+  private extractErrorMessage(error: any): string {
+    if (error.response?.data?.message) {
+      return error.response.data.message;
+    }
+    if (error.response?.data?.errors) {
+      // Handle validation errors (object with field names as keys)
+      const errors = error.response.data.errors;
+      const errorMessages = Object.values(errors).flat();
+      return errorMessages.join(', ');
+    }
+    if (error.message) {
+      return error.message;
+    }
+    return 'An unexpected error occurred';
+  }
+
   // ============ POSITION CRUD OPERATIONS ============
 
   // GET: /api/core/hrmm/v1/Position/AllPosition
   async getAllPositions(): Promise<PositionListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllPosition`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error("Error fetching positions:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error fetching positions:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -51,10 +70,11 @@ class PositionService {
   async getPositionById(id: UUID): Promise<PositionListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetPosition/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error("Error fetching position:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error fetching position:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -62,10 +82,12 @@ class PositionService {
   async createPosition(position: PositionAddDto): Promise<PositionListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddPosition`, position);
+      console.info('Position created successfully:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error("Error creating position:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error creating position:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -78,18 +100,21 @@ class PositionService {
       );
       return response.data;
     } catch (error) {
-      console.error("Error updating position:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error updating position:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
   // DELETE: /api/core/hrmm/v1/Position/DelPosition/{id}
   async deletePosition(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/DelPosition/${id}`);
+      const response = await api.delete(`${this.baseUrl}/DelPosition/${id}`);
+      console.info('Position deleted successfully:', response.data.message);
     } catch (error) {
-      console.error("Error deleting position:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error deleting position:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -101,10 +126,11 @@ class PositionService {
       const response = await api.get(
         `${this.benefitUrl}/AllPositionBenefit/${id}`
       );
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error("Error fetching position benefits:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error fetching position benefits:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -117,10 +143,12 @@ class PositionService {
         `${this.benefitUrl}/AddPositionBenefit`,
         benefit
       );
+      console.info('Position benefit created successfully:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error("Error creating position benefit:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error creating position benefit:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -135,18 +163,21 @@ class PositionService {
       );
       return response.data;
     } catch (error) {
-      console.error("Error updating position benefit:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error updating position benefit:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
   // DELETE: /api/core/hrmm/v1/PositionBenefit/DelPositionBenefit/{id}
   async deletePositionBenefit(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.benefitUrl}/DelPositionBenefit/${id}`);
+      const response = await api.delete(`${this.benefitUrl}/DelPositionBenefit/${id}`);
+      console.info('Position benefit deleted successfully:', response.data.message);
     } catch (error) {
-      console.error("Error deleting position benefit:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error deleting position benefit:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -156,10 +187,11 @@ class PositionService {
   async getAllPositionEducations(id: UUID): Promise<PositionEduListDto[]> {
     try {
       const response = await api.get(`${this.eduUrl}/AllPositionEdu/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error("Error fetching position educations:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error fetching position educations:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -172,10 +204,12 @@ class PositionService {
         `${this.eduUrl}/AddPositionEdu`,
         education
       );
+      console.info('Position education created successfully:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error("Error creating position education:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error creating position education:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -190,18 +224,21 @@ class PositionService {
       );
       return response.data;
     } catch (error) {
-      console.error("Error updating position education:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error updating position education:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
   // DELETE: /api/core/hrmm/v1/PositionEdu/DelPositionEdu/{id}
   async deletePositionEducation(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.eduUrl}/DelPositionEdu/${id}`);
+      const response = await api.delete(`${this.eduUrl}/DelPositionEdu/${id}`);
+      console.info('Position education deleted successfully:', response.data.message);
     } catch (error) {
-      console.error("Error deleting position education:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error deleting position education:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -211,10 +248,11 @@ class PositionService {
   async getAllPositionExperiences(id: UUID): Promise<PositionExpListDto[]> {
     try {
       const response = await api.get(`${this.expUrl}/AllPositionExp/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error("Error fetching position experiences:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error fetching position experiences:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -227,10 +265,12 @@ class PositionService {
         `${this.expUrl}/AddPositionExp`,
         experience
       );
+      console.info('Position experience created successfully:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error("Error creating position experience:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error creating position experience:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -245,18 +285,21 @@ class PositionService {
       );
       return response.data;
     } catch (error) {
-      console.error("Error updating position experience:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error updating position experience:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
   // DELETE: /api/core/hrmm/v1/PositionExp/DelPositionExp/{id}
   async deletePositionExperience(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.expUrl}/DelPositionExp/${id}`);
+      const response = await api.delete(`${this.expUrl}/DelPositionExp/${id}`);
+      console.info('Position experience deleted successfully:', response.data.message);
     } catch (error) {
-      console.error("Error deleting position experience:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error deleting position experience:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -266,10 +309,11 @@ class PositionService {
   async getAllPositionRequirements(id: UUID): Promise<PositionReqListDto[]> {
     try {
       const response = await api.get(`${this.reqUrl}/AllPositionReq/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error("Error fetching position requirements:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error fetching position requirements:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -282,10 +326,12 @@ class PositionService {
         `${this.reqUrl}/AddPositionReq`,
         requirement
       );
+      console.info('Position requirement created successfully:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error("Error creating position requirement:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error creating position requirement:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -300,18 +346,21 @@ class PositionService {
       );
       return response.data;
     } catch (error) {
-      console.error("Error updating position requirement:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error updating position requirement:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
   // DELETE: /api/core/hrmm/v1/PositionReq/DelPositionReq/{id}
   async deletePositionRequirement(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.reqUrl}/DelPositionReq/${id}`);
+      const response = await api.delete(`${this.reqUrl}/DelPositionReq/${id}`);
+      console.info('Position requirement deleted successfully:', response.data.message);
     } catch (error) {
-      console.error("Error deleting position requirement:", error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Error deleting position requirement:", errorMessage);
+      throw new Error(errorMessage);
     }
   }
 }

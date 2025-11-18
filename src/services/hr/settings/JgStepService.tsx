@@ -10,14 +10,32 @@ import type {
 class JgStepService {
   private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/JgStep`;
 
+  // Helper method to extract error messages
+  private extractErrorMessage(error: any): string {
+    if (error.response?.data?.message) {
+      return error.response.data.message;
+    }
+    if (error.response?.data?.errors) {
+      // Handle validation errors (object with field names as keys)
+      const errors = error.response.data.errors;
+      const errorMessages = Object.values(errors).flat();
+      return errorMessages.join(', ');
+    }
+    if (error.message) {
+      return error.message;
+    }
+    return 'An unexpected error occurred';
+  }
+
   // GET: /api/core/hrmm/v1/JgStep/AllJgSteps/{id} - Get list of Job Grade Steps by JobGradeId
   async getJgStepsByJobGrade(jobGradeId: UUID): Promise<JgStepListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllJgSteps/${jobGradeId}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error('Error fetching job grade steps by job grade:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error fetching job grade steps by job grade:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -25,10 +43,11 @@ class JgStepService {
   async getJgStepById(id: UUID): Promise<JgStepListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetJgStep/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
-      console.error('Error fetching job grade step:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error fetching job grade step:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -36,10 +55,12 @@ class JgStepService {
   async createJgStep(jgStep: JgStepAddDto): Promise<JgStepListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddJgStep`, jgStep);
+      console.info('Job grade step created successfully:', response.data.id);
       return response.data;
     } catch (error) {
-      console.error('Error creating job grade step:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error creating job grade step:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -49,18 +70,21 @@ class JgStepService {
       const response = await api.put(`${this.baseUrl}/ModJgStep/${updateData.id}`, updateData);
       return response.data;
     } catch (error) {
-      console.error('Error updating job grade step:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error updating job grade step:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
   // DELETE: /api/core/hrmm/v1/JgStep/DelJgStep/{id}
   async deleteJgStep(id: UUID): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/DelJgStep/${id}`);
+      const response = await api.delete(`${this.baseUrl}/DelJgStep/${id}`);
+      console.info('Job grade step deleted successfully:', response.data.message);
     } catch (error) {
-      console.error('Error deleting job grade step:', error);
-      throw error;
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error deleting job grade step:', errorMessage);
+      throw new Error(errorMessage);
     }
   }
 }
