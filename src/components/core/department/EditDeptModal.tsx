@@ -11,10 +11,11 @@ import { amharicRegex } from '../../../utils/amharic-regex';
 import { DeptStat } from '../../../types/core/enum';
 import type { BranchCompListDto } from '../../../types/core/branch';
 import { branchService } from '../../../services/core/branchservice';
+import toast from 'react-hot-toast';
 
 interface EditDeptModalProps {
   department: DeptListDto;
-  onEditDepartment: (department: EditDeptDto) => void;
+  onEditDepartment: (department: EditDeptDto) => Promise<any>;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -36,6 +37,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     branchId: department.branchId,
     rowVersion: department.rowVersion
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const deptStatusOptions = Object.entries(DeptStat);
 
@@ -101,10 +103,39 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     setEditedDepartment((prev) => ({ ...prev, name: value }));
   };
 
-  const handleSubmit = () => {
-    if (!editedDepartment.name || !editedDepartment.nameAm || !editedDepartment.branchId) return;
+  const handleSubmit = async () => {
+    if (!editedDepartment.name || !editedDepartment.nameAm || !editedDepartment.branchId) {
+      toast.error('Please fill all required fields');
+      return;
+    }
 
-    onEditDepartment(editedDepartment);
+    setIsSubmitting(true);
+
+    try {
+      const response = await onEditDepartment(editedDepartment);
+
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error updating department:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isSubmitting) {
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -124,8 +155,9 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
             <h2 className="text-lg font-bold text-gray-800">Edit</h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            disabled={isSubmitting}
           >
             <X size={24} />
           </button>
@@ -143,7 +175,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
                 label= "Branch"
                 placeholder={branchPlaceholder}
                 required
-                disabled={loading}
+                disabled={loading || isSubmitting}
               />
               {loading && <p className="text-sm text-gray-500">Loading branches...</p>}
             </div>
@@ -159,6 +191,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
                 onChange={handleAmharicChange}
                 placeholder="ፋይናንስ"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -172,6 +205,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
                 onChange={handleNameChange}
                 placeholder="Finance"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -183,6 +217,7 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
               <Select
                 value={editedDepartment.deptStat}
                 onValueChange={handleStatusChange}
+                disabled={isSubmitting}
               >
                 <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                   <SelectValue placeholder="Select status" />
@@ -205,14 +240,15 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!editedDepartment.name || !editedDepartment.nameAm || !editedDepartment.branchId}
+              disabled={!editedDepartment.name || !editedDepartment.nameAm || !editedDepartment.branchId || isSubmitting}
             >
-              Save Changes
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
             <Button
               variant="outline"
               className="cursor-pointer px-6"
-              onClick={onClose}
+              onClick={handleClose}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>

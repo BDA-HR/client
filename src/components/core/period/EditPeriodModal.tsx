@@ -23,7 +23,7 @@ import {
 
 interface EditPeriodModalProps {
   period: PeriodListDto;
-  onEditPeriod: (period: EditPeriodDto) => void;
+  onEditPeriod: (period: EditPeriodDto) => Promise<any>;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -224,8 +224,16 @@ const EditPeriodModal: React.FC<EditPeriodModalProps> = ({
         dateEnd: new Date(editedPeriod.dateEnd).toISOString(),
       };
 
-      await onEditPeriod(payload);
-    } catch (error) {
+      const response = await onEditPeriod(payload);
+ const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
       console.error("Error updating period:", error);
     } finally {
       setLoading(false);

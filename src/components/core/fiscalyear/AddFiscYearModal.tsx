@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { X, BadgePlus } from 'lucide-react';
 import { Button } from '../../ui/button';
 import type { AddFiscYearDto } from '../../../types/core/fisc';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export const AddFiscalYearModal = ({
@@ -16,8 +16,10 @@ export const AddFiscalYearModal = ({
   onOpenChange: (open: boolean) => void;
   newYear: AddFiscYearDto;
   setNewYear: (year: AddFiscYearDto) => void;
-  onAddFiscalYear: () => Promise<void>;
+  onAddFiscalYear: () => Promise<any>;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -36,12 +38,17 @@ export const AddFiscalYearModal = ({
       return;
     }
 
+    setIsLoading(true);
+
     try {      
-      // Call the add function
-      await onAddFiscalYear();
+      const response = await onAddFiscalYear();
       
-      // Success notification
-      toast.success('Fiscal year added successfully!');
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
       
       // Reset form and close modal
       setNewYear({
@@ -52,25 +59,31 @@ export const AddFiscalYearModal = ({
       
       onOpenChange(false);
       
-    } catch (error) {
-      // Error notification - this will be called if onAddFiscalYear throws an error
-      toast.error('Failed to add fiscal year');
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
       console.error('Error adding fiscal year:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // Reset form when canceling
-    setNewYear({
-      name: '',
-      dateStart: '',
-      dateEnd: ''
-    });
-    onOpenChange(false);
+    if (!isLoading) {
+      // Reset form when canceling
+      setNewYear({
+        name: '',
+        dateStart: '',
+        dateEnd: ''
+      });
+      onOpenChange(false);
+    }
   };
 
   const handleClose = () => {
-    onOpenChange(false);
+    if (!isLoading) {
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -93,6 +106,7 @@ export const AddFiscalYearModal = ({
               <button
                 onClick={handleClose}
                 className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                disabled={isLoading}
               >
                 <X size={24} />
               </button>
@@ -115,6 +129,7 @@ export const AddFiscalYearModal = ({
                       value={newYear.name}
                       onChange={(e) => setNewYear({ ...newYear, name: e.target.value })}
                       required
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -134,6 +149,7 @@ export const AddFiscalYearModal = ({
                           dateStart: e.target.value
                         })}
                         required
+                        disabled={isLoading}
                       />
                     </div>
 
@@ -151,6 +167,7 @@ export const AddFiscalYearModal = ({
                           dateEnd: e.target.value
                         })}
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -162,14 +179,16 @@ export const AddFiscalYearModal = ({
                     <Button
                       type="submit"
                       className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
+                      disabled={isLoading}
                     >
-                      Save
+                      {isLoading ? 'Saving...' : 'Save'}
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
                       className="cursor-pointer px-6"
                       onClick={handleCancel}
+                      disabled={isLoading}
                     >
                       Cancel
                     </Button>

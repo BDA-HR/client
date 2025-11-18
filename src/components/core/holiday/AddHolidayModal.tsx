@@ -6,7 +6,7 @@ import { Input } from '../../ui/input';
 import { Switch } from '../../ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import type { AddHolidayDto, UUID } from '../../../types/core/holiday';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface AddHolidayModalProps {
@@ -14,7 +14,7 @@ interface AddHolidayModalProps {
   onOpenChange: (open: boolean) => void;
   newHoliday: AddHolidayDto;
   setNewHoliday: (holiday: AddHolidayDto) => void;
-  onAddHoliday: () => Promise<void>;
+  onAddHoliday: () => Promise<any>;
   fiscalYears: Array<{ id: string; name: string }>;
 }
 
@@ -26,6 +26,8 @@ export const AddHolidayModal = ({
   onAddHoliday,
   fiscalYears = [] // Default to empty array
 }: AddHolidayModalProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedHoliday: AddHolidayDto = {
       ...newHoliday,
@@ -67,12 +69,18 @@ export const AddHolidayModal = ({
       return;
     }
 
+    setIsLoading(true);
+
     try {      
-      // Call the add function
-      await onAddHoliday();
+      // Call the add function and capture response
+      const response = await onAddHoliday();
       
-      // Success notification
-      toast.success('Holiday added successfully!');
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
       
       // Reset form and close modal
       setNewHoliday({
@@ -84,26 +92,32 @@ export const AddHolidayModal = ({
       
       onOpenChange(false);
       
-    } catch (error) {
-      // Error notification - this will be called if onAddHoliday throws an error
-      toast.error('Failed to add holiday');
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
       console.error('Error adding holiday:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // Reset form when canceling
-    setNewHoliday({
-      name: '',
-      date: '',
-      isPublic: true,
-      fiscalYearId: '' as UUID
-    });
-    onOpenChange(false);
+    if (!isLoading) {
+      // Reset form when canceling
+      setNewHoliday({
+        name: '',
+        date: '',
+        isPublic: true,
+        fiscalYearId: '' as UUID
+      });
+      onOpenChange(false);
+    }
   };
 
   const handleClose = () => {
-    onOpenChange(false);
+    if (!isLoading) {
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -126,6 +140,7 @@ export const AddHolidayModal = ({
               <button
                 onClick={handleClose}
                 className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                disabled={isLoading}
               >
                 <X size={24} />
               </button>
@@ -148,6 +163,7 @@ export const AddHolidayModal = ({
                       value={newHoliday.name}
                       onChange={handleNameChange}
                       required
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -163,6 +179,7 @@ export const AddHolidayModal = ({
                       value={newHoliday.date ? newHoliday.date.split('T')[0] : newHoliday.date}
                       onChange={handleDateChange}
                       required
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -174,6 +191,7 @@ export const AddHolidayModal = ({
                     <Select
                       value={newHoliday.fiscalYearId}
                       onValueChange={handleFiscalYearChange}
+                      disabled={isLoading}
                     >
                       <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                         <SelectValue placeholder="Select fiscal year" />
@@ -197,6 +215,7 @@ export const AddHolidayModal = ({
                       id="isPublic"
                       checked={newHoliday.isPublic}
                       onCheckedChange={handleIsPublicChange}
+                      disabled={isLoading}
                     />
                   </div>
                   <p className="text-sm text-gray-500 -mt-2">
@@ -213,15 +232,16 @@ export const AddHolidayModal = ({
                     <Button
                       type="submit"
                       className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
-                      disabled={!newHoliday.name || !newHoliday.date || !newHoliday.fiscalYearId}
+                      disabled={!newHoliday.name || !newHoliday.date || !newHoliday.fiscalYearId || isLoading}
                     >
-                      Save
+                      {isLoading ? 'Saving...' : 'Save'}
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
                       className="cursor-pointer px-6"
                       onClick={handleCancel}
+                      disabled={isLoading}
                     >
                       Cancel
                     </Button>

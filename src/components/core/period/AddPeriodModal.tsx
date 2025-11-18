@@ -22,7 +22,7 @@ interface AddPeriodModalProps {
   onOpenChange: (open: boolean) => void;
   newPeriod: AddPeriodDto;
   setNewPeriod: (period: AddPeriodDto) => void;
-  onAddPeriod: () => Promise<void>;
+  onAddPeriod: () => Promise<any>;
 }
 
 export const AddPeriodModal = ({
@@ -112,14 +112,24 @@ export const AddPeriodModal = ({
       return;
     }
 
+    setLoading(true);
+
     try {
-      setLoading(true);
-      await onAddPeriod();
+      const response = await onAddPeriod();
+      
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
       // Only close modal if successful
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
       console.error("Error adding period:", error);
-      // Error is handled in the parent component
     } finally {
       setLoading(false);
     }
@@ -154,18 +164,20 @@ export const AddPeriodModal = ({
   };
 
   const handleCancel = () => {
-    // Reset form
-    setNewPeriod({
-      name: "",
-      dateStart: new Date().toISOString().split("T")[0],
-      dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0],
-      quarter: "" as Quarter,
-      fiscalYearId: "" as UUID,
-    });
-    setFormErrors({});
-    onOpenChange(false);
+    if (!loading) {
+      // Reset form
+      setNewPeriod({
+        name: "",
+        dateStart: new Date().toISOString().split("T")[0],
+        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0],
+        quarter: "" as Quarter,
+        fiscalYearId: "" as UUID,
+      });
+      setFormErrors({});
+      onOpenChange(false);
+    }
   };
 
   const handleClose = () => {
@@ -191,6 +203,7 @@ export const AddPeriodModal = ({
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            disabled={loading}
           >
             <X size={24} />
           </button>
@@ -218,6 +231,7 @@ export const AddPeriodModal = ({
                   value={newPeriod.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   required
+                  disabled={loading}
                 />
                 {formErrors.name && (
                   <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
@@ -237,6 +251,7 @@ export const AddPeriodModal = ({
                   <Select
                     value={newPeriod.quarter}
                     onValueChange={handleQuarterChange}
+                    disabled={loading}
                   >
                     <SelectTrigger
                       id="quarter"
@@ -270,7 +285,7 @@ export const AddPeriodModal = ({
                     label="Fiscal Year"
                     placeholder="Select a fiscal year"
                     required
-                    disabled={loadingFiscalYears}
+                    disabled={loadingFiscalYears || loading}
                   />
                   {loadingFiscalYears && (
                     <p className="text-sm text-gray-500 mt-1">
@@ -307,6 +322,7 @@ export const AddPeriodModal = ({
                       handleInputChange("dateStart", e.target.value)
                     }
                     required
+                    disabled={loading}
                   />
                   {formErrors.dateStart && (
                     <p className="text-red-500 text-sm mt-1">
@@ -333,6 +349,7 @@ export const AddPeriodModal = ({
                       handleInputChange("dateEnd", e.target.value)
                     }
                     required
+                    disabled={loading}
                   />
                   {formErrors.dateEnd && (
                     <p className="text-red-500 text-sm mt-1">

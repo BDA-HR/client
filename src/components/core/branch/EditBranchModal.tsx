@@ -8,11 +8,12 @@ import { amharicRegex } from '../../../utils/amharic-regex';
 import type { EditBranchDto, BranchListDto, UUID } from '../../../types/core/branch';
 import { BranchType, BranchStat } from '../../../types/core/enum';
 import { Button } from '../../ui/button';
+import toast from 'react-hot-toast';
 
 interface EditBranchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (branchData: EditBranchDto) => void;
+  onSave: (branchData: EditBranchDto) => Promise<any>;
   branch: BranchListDto | null;
   defaultCompanyId?: string;
   companyName?: string;
@@ -50,6 +51,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // Format date for input field (YYYY-MM-DD)
   const formatDateForInput = (dateString: string): string => {
@@ -126,21 +128,48 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (!validateForm()) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
       const submitData: EditBranchDto = {
         ...formData,
         dateOpened: new Date(formData.dateOpened).toISOString(),
       };
-      onSave(submitData);
+      
+      const response = await onSave(submitData);
+
+      // Extract success message from backend response
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error updating branch:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleClose = () => {
-    setErrors({});
-    onClose();
+    if (!isLoading) {
+      setErrors({});
+      onClose();
+    }
   };
 
   // Get branch type options - simplified like AddBranchModal
@@ -174,6 +203,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            disabled={isLoading}
           >
             <X size={24} />
           </button>
@@ -188,7 +218,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
         )}
 
         {/* Body */}
-        <div className="p-6 pb-2"> {/* Reduced bottom padding from p-6 to pb-2 */}
+        <div className="p-6 pb-2">
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               {/* Branch Names - Amharic first like AddBranchModal */}
@@ -202,6 +232,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   onChange={handleAmharicChange}
                   placeholder="ምሳሌ፡ ቅርንጫፍ 1"
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 {errors.nameAm && <p className="text-red-500 text-sm">{errors.nameAm}</p>}
               </div>
@@ -216,6 +247,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Eg. Branch 1"
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
@@ -232,6 +264,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                     value={formData.dateOpened}
                     onChange={(e) => handleInputChange('dateOpened', e.target.value)}
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isLoading}
                   />
                   {errors.dateOpened && <p className="text-red-500 text-sm">{errors.dateOpened}</p>}
                 </div>
@@ -245,6 +278,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   onChange={(e) => handleInputChange('location', e.target.value)}
                   placeholder="Eg. Addis Ababa"
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
               </div>
@@ -258,6 +292,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   <Select
                     value={formData.branchType}
                     onValueChange={(value: BranchType) => handleTypeChange(value)}
+                    disabled={isLoading}
                   >
                     <SelectTrigger 
                       id="edit-branchType"
@@ -283,6 +318,7 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
                   <Select
                     value={formData.branchStat}
                     onValueChange={(value: BranchStat) => handleStatusChange(value)}
+                    disabled={isLoading}
                   >
                     <SelectTrigger 
                       id="edit-branchStat"
@@ -304,20 +340,21 @@ export const EditBranchModal: React.FC<EditBranchModalProps> = ({
             </div>
 
             {/* Footer - Reduced padding */}
-            <div className="border-t px-6 py-1"> {/* Changed from py-2 to py-1 (4px) */}
+            <div className="border-t px-6 py-1">
               <div className="flex justify-center items-center gap-3">
                 <Button
                   type="submit"
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
-                  disabled={!formData.name.trim() || !formData.nameAm.trim() || !formData.code.trim() || !formData.location.trim()}
+                  disabled={!formData.name.trim() || !formData.nameAm.trim() || !formData.code.trim() || !formData.location.trim() || isLoading}
                 >
-                  Save Changes
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   className="cursor-pointer px-6"
                   onClick={handleClose}
+                  disabled={isLoading}
                 >
                   Cancel
                 </Button>

@@ -6,11 +6,12 @@ import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Switch } from '../../ui/switch';
 import type { EditHolidayDto, HolidayListDto, UUID } from '../../../types/core/holiday';
+import toast from 'react-hot-toast';
 
 interface EditHolidayModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (holidayData: EditHolidayDto) => void;
+  onSave: (holidayData: EditHolidayDto) => Promise<any>;
   holiday: HolidayListDto | null;
   fiscalYears?: Array<{ id: UUID; name: string }>;
 }
@@ -35,6 +36,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (holiday) {
@@ -86,23 +88,49 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (!validateForm()) {
+      toast.error('Please fix the validation errors');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
       const submitData: EditHolidayDto = {
         ...formData,
         date: new Date(formData.date).toISOString(), // Ensure ISO format
         name: formData.name.trim(),
         isPublic: formData.isPublic,
       };
-      onSave(submitData);
+      
+      const response = await onSave(submitData);
+
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error updating holiday:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleClose = () => {
-    setErrors({});
-    onClose();
+    if (!isLoading) {
+      setErrors({});
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -124,6 +152,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            disabled={isLoading}
           >
             <X size={24} />
           </button>
@@ -145,6 +174,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
@@ -160,6 +190,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
               </div>
@@ -192,6 +223,7 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
                   id="isPublic"
                   checked={formData.isPublic}
                   onCheckedChange={(checked) => handleInputChange('isPublic', checked)}
+                  disabled={isLoading}
                 />
               </div>
               <p className="text-sm text-gray-500 -mt-2">
@@ -208,15 +240,16 @@ export const EditHolidayModal: React.FC<EditHolidayModalProps> = ({
                 <Button
                   type="submit"
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
-                  disabled={!formData.name.trim() || !formData.date}
+                  disabled={!formData.name.trim() || !formData.date || isLoading}
                 >
-                  Save Changes
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleClose}
                   className="cursor-pointer px-6"
+                  disabled={isLoading}
                 >
                   Cancel
                 </Button>

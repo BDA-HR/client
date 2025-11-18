@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import type { BranchListDto, UUID } from "../../../types/core/branch";
 import { Button } from "../../ui/button";
+import toast from 'react-hot-toast';
 
 interface DeleteBranchModalProps {
   branch: BranchListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (branchId: UUID) => void;
+  onConfirm: (branchId: UUID) => Promise<any>;
 }
 
 const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
@@ -17,11 +18,40 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
   onClose,
   onConfirm,
 }) => {
-  if (!isOpen || !branch) return null;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirm = () => {
-    onConfirm(branch.id);
+  const handleConfirm = async () => {
+    if (!branch) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await onConfirm(branch.id);
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error deleting branch:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleClose = () => {
+    if (!isLoading) {
+      onClose();
+    }
+  };
+
+  if (!isOpen || !branch) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
@@ -54,13 +84,15 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
               variant="destructive"
               onClick={handleConfirm}
               className="cursor-pointer px-6"
+              disabled={isLoading}
             >
-              Delete
+              {isLoading ? 'Deleting...' : 'Delete'}
             </Button>
             <Button
-              onClick={onClose}
+              onClick={handleClose}
               variant="outline"
               className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
+              disabled={isLoading}
             >
               Cancel
             </Button>

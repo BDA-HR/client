@@ -9,9 +9,10 @@ import type { AddDeptDto } from '../../../types/core/dept';
 import type { BranchCompListDto } from '../../../types/core/branch';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import { branchService } from '../../../services/core/branchservice';
+import toast from 'react-hot-toast';
 
 interface AddDeptModalProps {
-  onAddDepartment: (department: AddDeptDto) => void;
+  onAddDepartment: (department: AddDeptDto) => Promise<any>;
 }
 
 const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
@@ -24,6 +25,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
     nameAm: '',
     branchId: '' as UUID
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -60,27 +62,50 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
     }
   };
 
-  const handleSubmit = () => {
-    if (!newDepartment.name || !newDepartment.nameAm || !newDepartment.branchId) return;
+  const handleSubmit = async () => {
+    if (!newDepartment.name || !newDepartment.nameAm || !newDepartment.branchId) {
+      toast.error('Please fill all required fields');
+      return;
+    }
 
-    onAddDepartment({
-      name: newDepartment.name,
-      nameAm: newDepartment.nameAm,
-      branchId: newDepartment.branchId,
-    });
+    setIsSubmitting(true);
 
-    // Reset form
-    setNewDepartment({ 
-      name: '', 
-      nameAm: '',       
-      branchId: '' as UUID
-    });
-    setSelectedBranch(undefined);
-    setIsOpen(false);
+    try {
+      const response = await onAddDepartment({
+        name: newDepartment.name.trim(),
+        nameAm: newDepartment.nameAm.trim(),
+        branchId: newDepartment.branchId,
+      });
+
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+
+      // Reset form
+      setNewDepartment({ 
+        name: '', 
+        nameAm: '',       
+        branchId: '' as UUID
+      });
+      setSelectedBranch(undefined);
+      setIsOpen(false);
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error adding department:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    if (!isSubmitting) {
+      setIsOpen(false);
+    }
   };
 
   const isFormValid = newDepartment.name && newDepartment.nameAm && newDepartment.branchId;
@@ -114,6 +139,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
               <button
                 onClick={handleClose}
                 className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                disabled={isSubmitting}
               >
                 <X size={24} />
               </button>
@@ -131,7 +157,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
                     label="Select Branch"
                     placeholder="Select a branch"
                     required
-                    disabled={loading}
+                    disabled={loading || isSubmitting}
                   />
                   {loading && <p className="text-sm text-gray-500">Loading branches...</p>}
                 </div>
@@ -147,6 +173,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
                     onChange={handleAmharicChange}
                     placeholder="ፋይናንስ"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -162,6 +189,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
                     }
                     placeholder="Finance"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -173,14 +201,15 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
                 <Button
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
                   onClick={handleSubmit}
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || isSubmitting}
                 >
-                  Save
+                  {isSubmitting ? 'Saving...' : 'Save'}
                 </Button>
                 <Button
                   variant="outline"
                   className="cursor-pointer px-6"
                   onClick={handleClose}
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </Button>

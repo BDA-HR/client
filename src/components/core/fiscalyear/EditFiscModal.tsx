@@ -6,11 +6,12 @@ import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import type { EditFiscYearDto, FiscYearListDto, UUID } from '../../../types/core/fisc';
+import toast from 'react-hot-toast';
 
 interface EditFiscModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (fiscalYearData: EditFiscYearDto) => void;
+  onSave: (fiscalYearData: EditFiscYearDto) => Promise<any>;
   fiscalYear: FiscYearListDto | null;
 }
 
@@ -32,11 +33,12 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
     name: '',
     dateStart: '',
     dateEnd: '',
-    isActive: '0', // Default to "0" (Yes/Active)
+    isActive: '0',
     rowVersion: '',
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (fiscalYear) {
@@ -92,23 +94,48 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (!validateForm()) {
+      toast.error('Please fix the validation errors');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
       const submitData: EditFiscYearDto = {
         ...formData,
         dateStart: formData.dateStart,
         dateEnd: formData.dateEnd,
       };
-      onSave(submitData);
+      
+      const response = await onSave(submitData);
+
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
       handleClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error updating fiscal year:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleClose = () => {
-    setErrors({});
-    onClose();
+    if (!isLoading) {
+      setErrors({});
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -130,6 +157,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            disabled={isLoading}
           >
             <X size={24} />
           </button>
@@ -151,6 +179,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
               </div>
@@ -167,6 +196,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
                     value={formData.dateStart}
                     onChange={(e) => handleInputChange('dateStart', e.target.value)}
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isLoading}
                   />
                   {errors.dateStart && <p className="text-red-500 text-sm">{errors.dateStart}</p>}
                 </div>
@@ -181,6 +211,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
                     value={formData.dateEnd}
                     onChange={(e) => handleInputChange('dateEnd', e.target.value)}
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isLoading}
                   />
                   {errors.dateEnd && <p className="text-red-500 text-sm">{errors.dateEnd}</p>}
                 </div>
@@ -195,6 +226,7 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
                   <Select
                     value={formData.isActive}
                     onValueChange={(value) => handleInputChange('isActive', value)}
+                    disabled={isLoading}
                   >
                     <SelectTrigger className="w-full h-12 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
                       <SelectValue placeholder="Select status" />
@@ -215,15 +247,16 @@ export const EditFiscModal: React.FC<EditFiscModalProps> = ({
                 <Button
                   type="submit"
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
-                  disabled={!formData.name.trim() || !formData.dateStart || !formData.dateEnd}
+                  disabled={!formData.name.trim() || !formData.dateStart || !formData.dateEnd || isLoading}
                 >
-                  Save Changes
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleClose}
                   className="cursor-pointer px-6"
+                  disabled={isLoading}
                 >
                   Cancel
                 </Button>

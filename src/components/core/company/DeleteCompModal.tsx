@@ -8,12 +8,14 @@ import {
 import { Button } from '../../../components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 import type { CompListDto, UUID } from '../../../types/core/comp';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface DeleteCompModalProps {
   company: CompListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (companyId: UUID) => void;
+  onConfirm: (companyId: UUID) => Promise<any>;
 }
 
 const DeleteCompModal: React.FC<DeleteCompModalProps> = ({ 
@@ -22,14 +24,40 @@ const DeleteCompModal: React.FC<DeleteCompModalProps> = ({
   onClose, 
   onConfirm 
 }) => {
-  const handleConfirm = () => {
-    if (company) {
-      onConfirm(company.id);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    if (!company) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await onConfirm(company.id);
+        const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+            onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || 'Failed to delete company';
+      toast.error(errorMessage);
+      console.error('Error deleting company:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isLoading) {
+      onClose();
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <div className="flex items-center justify-center p-3 bg-red-100 rounded-full gap-2 text-red-600 mx-auto">
@@ -58,11 +86,12 @@ const DeleteCompModal: React.FC<DeleteCompModalProps> = ({
             variant="destructive" 
             onClick={handleConfirm}
             className="cursor-pointer px-6"
+            disabled={isLoading}
           >
-            Delete
+            {isLoading ? 'Deleting...' : 'Delete'}
           </Button>
           <DialogClose asChild>
-            <Button variant="outline" className="cursor-pointer px-6">
+            <Button variant="outline" className="cursor-pointer px-6" disabled={isLoading}>
               Cancel
             </Button>
           </DialogClose>

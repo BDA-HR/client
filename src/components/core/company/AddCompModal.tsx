@@ -6,14 +6,16 @@ import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
 import type { AddCompDto } from '../../../types/core/comp';
 import { amharicRegex } from '../../../utils/amharic-regex';
+import toast from 'react-hot-toast';
 
 interface AddCompModalProps {
-  onAddCompany: (company: AddCompDto) => void;
+  onAddCompany: (company: AddCompDto) => Promise<any>;
 }
 
 const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -22,19 +24,44 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
     }
   };
 
-  const handleSubmit = () => {
-    if (!newCompany.name || !newCompany.nameAm) return;
+  const handleSubmit = async () => {
+    if (!newCompany.name.trim() || !newCompany.nameAm.trim()) {
+      toast.error('Please fill all required fields');
+      return;
+    }
 
-    onAddCompany({
-      name: newCompany.name,
-      nameAm: newCompany.nameAm,
-    });
+    setIsLoading(true);
 
-    setNewCompany({ name: '', nameAm: '' });
-    setIsOpen(false);
+    try {
+      const response = await onAddCompany({
+        name: newCompany.name.trim(),
+        nameAm: newCompany.nameAm.trim(),
+      });
+
+      // Extract success message from backend response
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      // Reset form and close modal
+      setNewCompany({ name: '', nameAm: '' });
+      setIsOpen(false);
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error adding company:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
+    // Reset form when closing
+    setNewCompany({ name: '', nameAm: '' });
     setIsOpen(false);
   };
 
@@ -67,6 +94,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
               <button
                 onClick={handleClose}
                 className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                disabled={isLoading}
               >
                 <X size={24} />
               </button>
@@ -86,6 +114,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
                     onChange={handleAmharicChange}
                     placeholder="ምሳሌ፡ አክሜ ኢንት 1"
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -102,6 +131,7 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
                     placeholder="Eg. Acme int 1"
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -113,14 +143,15 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
                 <Button
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
                   onClick={handleSubmit}
-                  disabled={!newCompany.name.trim() || !newCompany.nameAm.trim()}
+                  disabled={!newCompany.name.trim() || !newCompany.nameAm.trim() || isLoading}
                 >
-                  Save
+                  {isLoading ? 'Saving...' : 'Save'}
                 </Button>
                 <Button
                   variant="outline"
                   className="cursor-pointer px-6"
                   onClick={handleClose}
+                  disabled={isLoading}
                 >
                   Cancel
                 </Button>

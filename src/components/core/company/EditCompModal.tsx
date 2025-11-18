@@ -6,12 +6,13 @@ import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
 import type { CompListDto } from '../../../types/core/comp';
 import { amharicRegex } from '../../../utils/amharic-regex';
+import toast from 'react-hot-toast';
 
 interface EditCompModalProps {
   company: CompListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (company: CompListDto) => void;
+  onSave: (company: CompListDto) => Promise<any>;
 }
 
 const EditCompModal: React.FC<EditCompModalProps> = ({ 
@@ -21,6 +22,7 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
   onSave 
 }) => {
   const [editedCompany, setEditedCompany] = useState({ name: '', nameAm: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (company) {
@@ -38,20 +40,43 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
     }
   };
 
-  const handleSubmit = () => {
-    if (!editedCompany.name || !editedCompany.nameAm || !company) return;
+  const handleSubmit = async () => {
+    if (!editedCompany.name.trim() || !editedCompany.nameAm.trim() || !company) {
+      toast.error('Please fill all required fields');
+      return;
+    }
 
-    onSave({
-      ...company,
-      name: editedCompany.name,
-      nameAm: editedCompany.nameAm
-    });
+    setIsLoading(true);
 
-    onClose();
+    try {
+      const response = await onSave({
+        ...company,
+        name: editedCompany.name.trim(),
+        nameAm: editedCompany.nameAm.trim()
+      });
+
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error updating company:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
-    onClose();
+    if (!isLoading) {
+      onClose();
+    }
   };
 
   if (!isOpen || !company) return null;
@@ -73,6 +98,7 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            disabled={isLoading}
           >
             <X size={24} />
           </button>
@@ -92,6 +118,7 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
                 onChange={handleAmharicChange}
                 placeholder="ምሳሌ፡ አክሜ ኢንት 1"
                 className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                disabled={isLoading}
               />
             </div>
 
@@ -106,6 +133,7 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
                 placeholder="Eg. Acme int 1"
                 className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -117,14 +145,15 @@ const EditCompModal: React.FC<EditCompModalProps> = ({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!editedCompany.name.trim() || !editedCompany.nameAm.trim()}
+              disabled={!editedCompany.name.trim() || !editedCompany.nameAm.trim() || isLoading}
             >
-              Save Changes
+              {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>
             <Button
               variant="outline"
               className="cursor-pointer px-6"
               onClick={handleClose}
+              disabled={isLoading}
             >
               Cancel
             </Button>

@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import type { HolidayListDto, UUID } from "../../../types/core/holiday";
 import { Button } from "../../ui/button";
+import toast from 'react-hot-toast';
 
 interface DeleteHolidayModalProps {
   holiday: HolidayListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (holidayId: UUID) => void;
+  onConfirm: (holidayId: UUID) => Promise<any>;
 }
 
 export const DeleteHolidayModal: React.FC<DeleteHolidayModalProps> = ({ 
@@ -17,11 +18,41 @@ export const DeleteHolidayModal: React.FC<DeleteHolidayModalProps> = ({
   onClose, 
   onConfirm 
 }) => {
-  if (!isOpen || !holiday) return null;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirm = () => {
-    onConfirm(holiday.id);
+  const handleConfirm = async () => {
+    if (!holiday) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await onConfirm(holiday.id);
+      
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error deleting holiday:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleClose = () => {
+    if (!isLoading) {
+      onClose();
+    }
+  };
+
+  if (!isOpen || !holiday) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
@@ -54,13 +85,15 @@ export const DeleteHolidayModal: React.FC<DeleteHolidayModalProps> = ({
               variant="destructive"
               onClick={handleConfirm}
               className="cursor-pointer px-6"
+              disabled={isLoading}
             >
-              Delete
+              {isLoading ? 'Deleting...' : 'Delete'}
             </Button>
             <Button
-              onClick={onClose}
+              onClick={handleClose}
               variant="outline"
               className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
+              disabled={isLoading}
             >
               Cancel
             </Button>

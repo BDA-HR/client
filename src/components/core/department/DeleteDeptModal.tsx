@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import type { DeptListDto, UUID } from '../../../types/core/dept';
+import toast from 'react-hot-toast';
 
 interface DeleteDeptModalProps {
   department: DeptListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (departmentId: UUID) => void;
+  onConfirm: (departmentId: UUID) => Promise<any>;
 }
 
 const DeleteDeptModal: React.FC<DeleteDeptModalProps> = ({ 
@@ -17,11 +18,40 @@ const DeleteDeptModal: React.FC<DeleteDeptModalProps> = ({
   onClose, 
   onConfirm 
 }) => {
-  if (!isOpen || !department) return null;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirm = () => {
-    onConfirm(department.id);
+  const handleConfirm = async () => {
+    if (!department) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await onConfirm(department.id);
+        const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+      
+      onClose();
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error deleting department:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleClose = () => {
+    if (!isLoading) {
+      onClose();
+    }
+  };
+
+  if (!isOpen || !department) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
@@ -59,13 +89,15 @@ const DeleteDeptModal: React.FC<DeleteDeptModalProps> = ({
               variant="destructive"
               onClick={handleConfirm}
               className="cursor-pointer px-6"
+              disabled={isLoading}
             >
-              Delete
+              {isLoading ? 'Deleting...' : 'Delete'}
             </Button>
             <Button
-              onClick={onClose}
+              onClick={handleClose}
               variant="outline"
               className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
+              disabled={isLoading}
             >
               Cancel
             </Button>

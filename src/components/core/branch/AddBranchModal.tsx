@@ -14,9 +14,10 @@ import {
 import { amharicRegex } from "../../../utils/amharic-regex";
 import type { AddBranchDto, UUID } from "../../../types/core/branch";
 import { BranchType } from "../../../types/core/enum";
+import toast from 'react-hot-toast';
 
 interface AddBranchModalProps {
-  onAddBranch: (branch: AddBranchDto) => void;
+  onAddBranch: (branch: AddBranchDto) => Promise<any>;
   defaultCompanyId?: string;
 }
 
@@ -33,6 +34,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     () => new Date().toISOString().split("T")[0]
   );
   const [branchType, setBranchType] = useState<BranchType>(BranchType["0"]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const branchTypeOptions = Object.entries(BranchType).map(([key, value]) => ({
     key,
@@ -46,33 +48,55 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
     }
   };
 
-  const handleSubmit = () => {
-    if (!branchName.trim() || !defaultCompanyId) return;
+  const handleSubmit = async () => {
+    if (!branchName.trim() || !defaultCompanyId) {
+      toast.error('Please fill all required fields');
+      return;
+    }
 
-    const newBranch: AddBranchDto = {
-      name: branchName.trim(),
-      nameAm: branchNameAm.trim(),
-      code: branchCode.trim(),
-      location: branchLocation.trim(),
-      dateOpened: new Date(dateOpened).toISOString(),
-      branchType: branchType,
-      compId: defaultCompanyId as UUID,
-    };
+    setIsLoading(true);
 
-    onAddBranch(newBranch);
+    try {
+      const newBranch: AddBranchDto = {
+        name: branchName.trim(),
+        nameAm: branchNameAm.trim(),
+        code: branchCode.trim(),
+        location: branchLocation.trim(),
+        dateOpened: new Date(dateOpened).toISOString(),
+        branchType: branchType,
+        compId: defaultCompanyId as UUID,
+      };
 
-    // Reset form
-    setBranchName("");
-    setBranchNameAm("");
-    setBranchCode("");
-    setBranchLocation("");
-    setDateOpened(new Date().toISOString().split("T")[0]);
-    setBranchType(BranchType["0"]);
-    setIsOpen(false);
+      const response = await onAddBranch(newBranch);
+
+      const successMessage = 
+        response?.data?.message || 
+        response?.message || 
+        '';
+      
+      toast.success(successMessage);
+
+      setBranchName("");
+      setBranchNameAm("");
+      setBranchCode("");
+      setBranchLocation("");
+      setDateOpened(new Date().toISOString().split("T")[0]);
+      setBranchType(BranchType["0"]);
+      setIsOpen(false);
+      
+    } catch (error: any) {
+      const errorMessage = error.message || '';
+      toast.error(errorMessage);
+      console.error('Error adding branch:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    if (!isLoading) {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -104,6 +128,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
               <button
                 onClick={handleClose}
                 className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                disabled={isLoading}
               >
                 <X size={24} />
               </button>
@@ -126,6 +151,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                     onChange={handleAmharicChange}
                     placeholder="ምሳሌ፡ ቅርንጫፍ 1"
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -141,6 +167,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                     placeholder="Eg. Branch 1"
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -159,6 +186,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                       value={dateOpened}
                       onChange={(e) => setDateOpened(e.target.value)}
                       className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -170,6 +198,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                   <Select
                     value={branchType}
                     onValueChange={(value: BranchType) => setBranchType(value)}
+                    disabled={isLoading}
                   >
                     <SelectTrigger
                       id="branchType"
@@ -200,6 +229,7 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                     onChange={(e) => setBranchLocation(e.target.value)}
                     placeholder="Eg. Addis Ababa"
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -211,14 +241,15 @@ const AddBranchModal: React.FC<AddBranchModalProps> = ({
                 <Button
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
                   onClick={handleSubmit}
-                  disabled={!branchName.trim() || !defaultCompanyId}
+                  disabled={!branchName.trim() || !defaultCompanyId || isLoading}
                 >
-                  Save
+                  {isLoading ? 'Saving...' : 'Save'}
                 </Button>
                 <Button
                   variant="outline"
                   className="cursor-pointer px-6"
                   onClick={handleClose}
+                  disabled={isLoading}
                 >
                   Cancel
                 </Button>
