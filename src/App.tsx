@@ -48,6 +48,7 @@ import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
 import PageAnnualLeave from './pages/hr/settings/pageAnnualLeave';
 import LeavePolicyAccrualPage  from './pages/hr/settings/leavepolicyaccrual/LeavePolicyAccrualPage';
 import { PageHolidayHist } from './pages/core/pageHolidayHist';
+import ProfilePage from './pages/profile';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -81,6 +82,8 @@ function App() {
             <Route path='/crm' element={<CRMDashboard />} />          
             <Route path='/finance' element={<Finance />} />
             <Route path='/procurement' element={<Procurement />} />
+            <Route path='/profile' element={<ProfilePage />} />
+
             {/* End MENU ROUTES */}
 
             {/* START HR ROUTES */}

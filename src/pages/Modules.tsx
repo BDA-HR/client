@@ -165,7 +165,7 @@ function Modules() {
             <DropdownMenuContent>
     <DropdownMenuLabel>My Account</DropdownMenuLabel>
     <DropdownMenuSeparator />
-    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
     <DropdownMenuItem onClick={() => navigate("/login")}>logout</DropdownMenuItem>
   </DropdownMenuContent>
             </DropdownMenu>
