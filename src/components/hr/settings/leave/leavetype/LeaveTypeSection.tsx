@@ -10,8 +10,6 @@ import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto } from '../../.
 interface LeaveTypeSectionProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "list") => void;
   leaveTypes: LeaveTypeListDto[];
   onEdit: (leaveType: LeaveTypeListDto | LeaveTypeModDto) => void;
   onDelete: (leaveType: LeaveTypeListDto) => void;
@@ -24,8 +22,6 @@ interface LeaveTypeSectionProps {
 const LeaveTypeSection: React.FC<LeaveTypeSectionProps> = ({
   searchTerm,
   setSearchTerm,
-  viewMode,
-  setViewMode,
   leaveTypes,
   onEdit,
   onDelete,
@@ -71,27 +67,24 @@ const LeaveTypeSection: React.FC<LeaveTypeSectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="px-6"
+        className="px-6 pb-2"
       >
         <LeaveSearchFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          leaveTypeData={leaveTypes}
           onAddClick={onOpenAddModal}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
         />
       </motion.div>
 
-      {/* Leave Types Content */}
+      {/* Leave Types Content - Grid View */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="p-6"
+        className="px-6 pt-0 pb-0 -mt-2"
       >
         {leaveTypes.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-6">
             <div className="text-gray-500 text-lg">
               No leave types found matching your search.
             </div>
@@ -100,16 +93,11 @@ const LeaveTypeSection: React.FC<LeaveTypeSectionProps> = ({
             </p>
           </div>
         ) : (
-          <div className={
-            viewMode === 'grid' 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              : "space-y-4"
-          }>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {leaveTypes.map((leaveType) => (
               <LeaveTypeCard
                 key={leaveType.id}
                 leaveType={leaveType}
-                viewMode={viewMode}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />

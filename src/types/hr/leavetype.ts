@@ -6,33 +6,23 @@ export type { UUID };
 // Leave Type Types
 export interface LeaveTypeListDto extends BaseDto {
   name: string;
-  code: string; // enum.LeaveTypeCode (0/1)
   isPaid: boolean;
-  codeStr: string;
   isPaidStr: string;
 }
 
 export interface LeaveTypeAddDto {
   name: string;
-  code: string; // enum.LeaveTypeCode (0/1)
   isPaid: boolean;
 }
 
 export interface LeaveTypeModDto {
   id: UUID;
   name: string;
-  code: string; // enum.LeaveTypeCode (0/1)
   isPaid: boolean;
   rowVersion: string;
 }
 
 // Service response types (if needed for dropdowns/selects)
-export interface LeaveTypeCodeDto {
-  id: string; // '0' or '1'
-  name: string;
-  nameAm?: string;
-}
-
 export interface PaidStatusDto {
   id: boolean;
   name: string;
@@ -43,13 +33,11 @@ export interface PaidStatusDto {
 export type LeaveTypeFilterType = 
   | 'all' 
   | 'paid' 
-  | 'unpaid' 
-  | 'byCode';
+  | 'unpaid';
 
 export interface LeaveTypeFilters {
   searchTerm: string;
   isPaid?: boolean;
-  code?: string;
 }
 
 export interface LeaveTypeTableData {
@@ -62,7 +50,6 @@ export interface LeaveTypeTableData {
 // Form data types
 export interface LeaveTypeFormData {
   name: string;
-  code: string;
   isPaid: boolean;
 }
 
@@ -71,7 +58,31 @@ export interface LeaveTypeValidationResult {
   isValid: boolean;
   errors: {
     name?: string;
-    code?: string;
     isPaid?: string;
   };
+}
+
+// Card display props
+export interface LeaveTypeCardProps {
+  leaveType: LeaveTypeListDto;
+  viewMode: 'grid' | 'list';
+  onEdit: (leaveType: LeaveTypeListDto) => void;
+  onDelete: (leaveType: LeaveTypeListDto) => void;
+}
+
+// Modal props
+export interface LeaveTypeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave?: (leaveType: LeaveTypeModDto) => void;
+  onAddLeaveType?: (leaveType: LeaveTypeAddDto) => void;
+  leaveType?: LeaveTypeListDto | null;
+}
+
+// Search and filter props
+export interface LeaveSearchFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  leaveTypeData: LeaveTypeListDto[];
+  onAddClick: () => void;
 }

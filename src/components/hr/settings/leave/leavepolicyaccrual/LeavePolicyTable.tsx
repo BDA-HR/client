@@ -61,7 +61,7 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
       className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm overflow-hidden"
     >
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-whit-200">
           <thead className="bg-white">
             <motion.tr
               initial={{ opacity: 0, y: -10 }}

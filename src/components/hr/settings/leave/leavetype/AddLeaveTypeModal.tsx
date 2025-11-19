@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, BadgePlus, ChevronDown } from 'lucide-react';
+import { X, BadgePlus } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Label } from '../../../../ui/label';
 import { Input } from '../../../../ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../../ui/dropdown-menu';
 import type { LeaveTypeAddDto } from '../../../../../types/hr/leavetype';
 
 interface AddLeaveTypeModalProps {
@@ -25,20 +19,15 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<LeaveTypeAddDto>({
     name: '',
-    code: '0', // Default to '0' (Annual Leave)
     isPaid: true, // Default to paid leave
   });
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCategorySelect = (code: string) => {
-    setFormData((prev) => ({ ...prev, code }));
-    setIsDropdownOpen(false);
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
   };
 
   const handleSubmit = () => {
@@ -49,14 +38,9 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
     // Reset form to default values
     setFormData({
       name: '',
-      code: '0',
       isPaid: true,
     });
     onClose();
-  };
-
-  const getCategoryDisplayName = (code: string) => {
-    return code === '0' ? 'Annual Leave' : 'Sick Leave';
   };
 
   if (!isOpen) return null;
@@ -73,7 +57,7 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <BadgePlus size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Add New</h2>
+            <h2 className="text-lg font-bold text-gray-800">Add New </h2>
           </div>
           <button
             onClick={onClose}
@@ -100,48 +84,6 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
                 className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
                 required
               />
-            </div>
-
-            {/* Leave Type Category Dropdown */}
-            <div className="space-y-2">
-              <Label className="text-sm text-gray-500">
-                Leave Category <span className="text-red-500">*</span>
-              </Label>
-              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between border-gray-300 hover:bg-gray-50 focus:ring-1 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <span className="text-sm">{getCategoryDisplayName(formData.code)}</span>
-                    <ChevronDown className="h-4 w-4 opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full min-w-[var(--radix-dropdown-menu-trigger-width)]">
-                  <DropdownMenuItem
-                    onClick={() => handleCategorySelect('0')}
-                    className="cursor-pointer text-sm"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">Annual Leave</span>
-                      <span className="text-xs text-gray-500 mt-1">
-                        For vacation and personal time off
-                      </span>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleCategorySelect('1')}
-                    className="cursor-pointer text-sm"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">Sick Leave</span>
-                      <span className="text-xs text-gray-500 mt-1">
-                        For medical reasons and health-related absences
-                      </span>
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
 
             {/* Paid Status */}

@@ -1,21 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import type { LeaveTypeListDto } from '../../../../../types/hr/leavetype';
-import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
 interface LeaveTypeCardProps {
   leaveType: LeaveTypeListDto;
-  viewMode: 'grid' | 'list';
   onEdit: (leaveType: LeaveTypeListDto) => void;
   onDelete: (leaveType: LeaveTypeListDto) => void;
 }
 
 const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
   leaveType,
-  viewMode,
   onEdit,
   onDelete
 }) => {
@@ -23,7 +20,6 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   // Close menu when clicking outside
   React.useEffect(() => {
@@ -52,12 +48,6 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
     e.stopPropagation();
     setShowMenu(false);
     onDelete(leaveType);
-  };
-
-  const handleCardClick = () => {
-    navigate(`/hr/settings/leavetype/${leaveType.id}`, {
-      state: { leaveType }
-    });
   };
 
   const handleMenuClick = (e: React.MouseEvent) => {
@@ -112,11 +102,10 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
 
   return (
     <>
-      <div
-        onClick={handleCardClick}
-        className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer ${
-          viewMode === 'grid' ? 'p-5' : 'p-4 flex items-start'
-        }`}
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer group p-6"
       >
         {/* More Options Menu Button */}
         <div className="absolute top-3 right-3">
@@ -131,39 +120,21 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
           </Button>
         </div>
 
-        {viewMode === 'grid' ? (
-          <>
-            <div className="flex items-center mb-4">
-              <div className="p-3 rounded-full bg-green-50 mr-4">
-                <Calendar className="text-green-600" size={24} />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-black mb-1">
-                  {leaveType.name}
-                </h3>
-                <p className="text-sm text-gray-500">ID: {leaveType.id}</p>
-              </div>
-            </div>
-          </>
-        ) : (
-          // List View - Only name and ID
-          <>
-            <div className="p-2 rounded-md bg-green-50 mr-4">
-              <Calendar className="text-green-600" size={20} />
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-black">
-                    {leaveType.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">ID: {leaveType.id}</p>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+        {/* Grid View  */}
+        <div className="flex items-center mb-4">
+        
+          <div className="flex-1">
+            <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
+              {leaveType.name}
+            </h3>
+            <p className={`text-sm font-medium ${
+              leaveType.isPaid ? 'text-green-400' : 'text-red-400'
+            }`}>
+              {leaveType.isPaid ? 'Paid' : 'Unpaid'}
+            </p>
+          </div>
+        </div>
+      </motion.div>
       <DropdownMenu />
     </>
   );

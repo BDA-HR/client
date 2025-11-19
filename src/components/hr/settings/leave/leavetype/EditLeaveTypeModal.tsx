@@ -4,12 +4,6 @@ import { X, Edit, Calendar } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Label } from '../../../../ui/label';
 import { Input } from '../../../../ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../../ui/dropdown-menu';
 import type { LeaveTypeListDto, LeaveTypeModDto, UUID } from '../../../../../types/hr/leavetype';
 
 interface EditLeaveTypeModalProps {
@@ -28,11 +22,9 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
   const [formData, setFormData] = useState<LeaveTypeModDto>({
     id: '' as UUID,
     name: '',
-    code: '0',
     isPaid: true,
     rowVersion: ''
   });
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Create a proper close handler
   const handleClose = useCallback(() => {
@@ -45,17 +37,11 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
       setFormData({
         id: leaveType.id,
         name: leaveType.name,
-        code: leaveType.code,
         isPaid: leaveType.isPaid,
         rowVersion: leaveType.rowVersion || ''
       });
     }
   }, [leaveType]);
-
-  const handleCategorySelect = (code: string) => {
-    setFormData(prev => ({ ...prev, code }));
-    setIsDropdownOpen(false);
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -71,13 +57,6 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
     onSave(formData);
     handleClose();
   };
-
-  const getCategoryDisplayName = (code: string) => {
-    return code === '0' ? 'Annual Leave' : 'Sick Leave';
-  };
-
-  
-
 
   // Add escape key to close
   useEffect(() => {
@@ -122,7 +101,7 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
               {/* Leave Type Name */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm text-gray-700 font-medium">
-                  Leave Type Name <span className="text-red-500">*</span>
+                  Leave Type Name <span className="text-red-400">*</span>
                 </Label>
                 <Input
                   id="name"
@@ -135,61 +114,10 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
                 />
               </div>
 
-              {/* Leave Type Category Dropdown */}
-              <div className="space-y-2">
-                <Label className="text-sm text-gray-700 font-medium">
-                  Leave Category <span className="text-red-500">*</span>
-                </Label>
-                <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-between border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    >
-                      <span className="text-sm">{getCategoryDisplayName(formData.code)}</span>
-                      <svg
-                        className={`h-4 w-4 opacity-50 transition-transform ${
-                          isDropdownOpen ? 'rotate-180' : ''
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-full min-w-[var(--radix-dropdown-menu-trigger-width)]">
-                    <DropdownMenuItem
-                      onClick={() => handleCategorySelect('0')}
-                      className="cursor-pointer text-sm"
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">Annual Leave</span>
-                        <span className="text-xs text-gray-500 mt-1">
-                          For vacation and personal time off
-                        </span>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleCategorySelect('1')}
-                      className="cursor-pointer text-sm"
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">Sick Leave</span>
-                        <span className="text-xs text-gray-500 mt-1">
-                          For medical reasons and health-related absences
-                        </span>
-                      </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
               {/* Paid Status */}
               <div className="space-y-2">
                 <Label className="text-sm text-gray-700 font-medium">
-                  Payment Status <span className="text-red-500">*</span>
+                  Payment Status <span className="text-red-400">*</span>
                 </Label>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Paid Leave Option */}
@@ -217,12 +145,12 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
                     onClick={() => setFormData(prev => ({ ...prev, isPaid: false }))}
                     className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
                       formData.isPaid === false
-                        ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-sm'
+                        ? 'border-red-400 bg-red-50 text-red-400 shadow-sm'
                         : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
                     }`}
                   >
                     <div className={`p-2 rounded-full ${
-                      formData.isPaid === false ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'
+                      formData.isPaid === false ? 'bg-red-100 text-red-400' : 'bg-gray-100 text-gray-400'
                     }`}>
                       <Calendar className="h-5 w-5" />
                     </div>
@@ -230,9 +158,7 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
                     <span className="text-xs opacity-75">No payment during leave</span>
                   </button>
                 </div>
-
               </div>
-              
             </div>
           </div>
 
