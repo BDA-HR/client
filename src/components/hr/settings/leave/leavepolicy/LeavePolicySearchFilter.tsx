@@ -1,24 +1,18 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Search, BadgePlus, Grid, List, X } from "lucide-react";
+import { Search, BadgePlus, X } from "lucide-react";
 import { Button } from "../../../../ui/button";
-import type { LeavePolicyListDto } from "../../../../../types/hr/leavepolicy";
 
 interface LeavePolicySearchFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  leavePolicyData: LeavePolicyListDto[];
   onAddClick: () => void;
-  viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "list") => void;
 }
 
 const LeavePolicySearchFilters: React.FC<LeavePolicySearchFiltersProps> = ({
   searchTerm,
   setSearchTerm,
   onAddClick,
-  viewMode,
-  setViewMode,
 }) => {
   const clearSearch = () => {
     setSearchTerm("");
@@ -67,41 +61,14 @@ const LeavePolicySearchFilters: React.FC<LeavePolicySearchFiltersProps> = ({
           </div>
         </div>
 
-        {/* 🎚 Controls - Positioned at the end */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-          {/* View Mode */}
-          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-            {/* View Mode Toggle */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 cursor-pointer border-green-300 text-green-700 hover:bg-green-100 hover:text-green-800 whitespace-nowrap w-full sm:w-auto"
-              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-            >
-              {viewMode === "grid" ? (
-                <>
-                  <List className="h-4 w-4" />
-                  List View
-                </>
-              ) : (
-                <>
-                  <Grid className="h-4 w-4" />
-                  Grid View
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* ➕ Add Leave Policy Button */}
-          <Button
-            onClick={onAddClick}
-            size="sm"
-            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
-          >
-            <BadgePlus className="h-4 w-4" />
-            Add New
-          </Button>
-        </div>
+        <Button
+          onClick={onAddClick}
+          size="sm"
+          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
+        >
+          <BadgePlus className="h-4 w-4" />
+          Add New
+        </Button>
       </div>
     </motion.div>
   );

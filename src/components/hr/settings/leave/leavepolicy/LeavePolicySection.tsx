@@ -11,8 +11,6 @@ import type { LeavePolicyListDto, LeavePolicyAddDto, LeavePolicyModDto, LeaveTyp
 interface LeavePolicySectionProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "list") => void;
   leavePolicies: LeavePolicyListDto[];
   onEdit: (policy: LeavePolicyListDto | LeavePolicyModDto) => void;
   onDelete: (policy: LeavePolicyListDto) => void;
@@ -27,8 +25,6 @@ interface LeavePolicySectionProps {
 const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
   searchTerm,
   setSearchTerm,
-  viewMode,
-  setViewMode,
   leavePolicies,
   onEdit,
   onDelete,
@@ -84,27 +80,24 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="px-6"
+        className="px-6 pb-2" // Reduced bottom padding
       >
         <LeavePolicySearchFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          leavePolicyData={leavePolicies}
           onAddClick={onOpenAddPolicyModal}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
         />
       </motion.div>
 
-      {/* Leave Policies Content */}
+      {/* Leave Policies Content - Grid View Only */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="p-6"
+        className="px-6 pt-0 pb-0" // Removed top padding
       >
         {leavePolicies.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-8"> {/* Reduced padding */}
             <div className="text-gray-500 text-lg">
               No leave policies found matching your search.
             </div>
@@ -113,16 +106,12 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
             </p>
           </div>
         ) : (
-          <div className={
-            viewMode === 'grid' 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              : "space-y-4"
-          }>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Grid only */}
             {leavePolicies.map((policy) => (
               <LeavePolicyCard
                 key={policy.id}
                 leavePolicy={policy}
-                viewMode={viewMode}
+                viewMode="grid" // Hardcoded to grid
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />

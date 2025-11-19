@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MoreVertical, Edit, Trash2, ArrowRight } from 'lucide-react';
+import {  MoreVertical, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import type { LeavePolicyListDto } from '../../../../../types/hr/leavepolicy';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +54,6 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
     onDelete(leavePolicy);
   };
 
-  // FIXED: Use :Id (capital I) to match App.tsx route
   const handleCardClick = () => {
     navigate(`/hr/settings/annualleave/${leavePolicy.id}/policy`, {
       state: { leavePolicy }
@@ -73,23 +72,6 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
     }
     
     setShowMenu(!showMenu);
-  };
-
-  // Format boolean values to display
-  const formatBoolean = (value: boolean): string => {
-    return value ? 'Yes' : 'No';
-  };
-
-  // Format duration for display
-  const formatDuration = (days: number): string => {
-    return `${days} day${days !== 1 ? 's' : ''}`;
-  };
-
-  // Get badge color based on requirements
-  const getBadgeColor = (condition: boolean) => {
-    return condition 
-      ? 'bg-orange-100 text-orange-800 border-orange-200' 
-      : 'bg-green-100 text-green-800 border-green-200';
   };
 
   // Dropdown menu component using portal
@@ -160,37 +142,12 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
           // Grid View
           <>
             <div className="flex items-center mb-4">
-              <div className="p-3 rounded-full bg-green-50 mr-4 group-hover:bg-green-100 transition-colors">
-                <Calendar className="text-green-600" size={24} />
-              </div>
+              
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">
                   {leavePolicy.name}
                 </h3>
                 <p className="text-sm text-gray-600">{leavePolicy.leaveType}</p>
-              </div>
-            </div>
-            
-            {/* Policy Details */}
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="text-center p-2 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Min Duration</p>
-                  <p className="font-semibold text-gray-900">{formatDuration(leavePolicy.minDurPerReq)}</p>
-                </div>
-                <div className="text-center p-2 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Max Duration</p>
-                  <p className="font-semibold text-gray-900">{formatDuration(leavePolicy.maxDurPerReq)}</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getBadgeColor(leavePolicy.requiresAttachment)}`}>
-                  {leavePolicy.requiresAttachment ? '📎 Attachment Required' : '✅ No Attachment'}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getBadgeColor(leavePolicy.holidaysAsLeave)}`}>
-                  {leavePolicy.holidaysAsLeave ? '🎯 Holidays as Leave' : '📅 Exclude Holidays'}
-                </span>
               </div>
             </div>
 
@@ -202,45 +159,9 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
             </div>
           </>
         ) : (
-          // List View
+          
           <>
-            <div className="p-2 rounded-md bg-green-50 mr-4 group-hover:bg-green-100 transition-colors">
-              <Calendar className="text-green-600" size={20} />
-            </div>
             
-            <div className="flex-1">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-gray-900 group-hover:text-green-700 transition-colors">
-                    {leavePolicy.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">{leavePolicy.leaveType}</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-4 gap-4 mt-3 text-sm">
-                <div className="text-center">
-                  <p className="text-xs text-gray-500">Min Duration</p>
-                  <p className="font-semibold text-gray-900">{formatDuration(leavePolicy.minDurPerReq)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500">Max Duration</p>
-                  <p className="font-semibold text-gray-900">{formatDuration(leavePolicy.maxDurPerReq)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500">Attachment</p>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(leavePolicy.requiresAttachment)}`}>
-                    {formatBoolean(leavePolicy.requiresAttachment)}
-                  </span>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500">Holidays</p>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(leavePolicy.holidaysAsLeave)}`}>
-                    {formatBoolean(leavePolicy.holidaysAsLeave)}
-                  </span>
-                </div>
-              </div>
-            </div>
           </>
         )}
       </motion.div>

@@ -32,7 +32,7 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
 
   if (isLoading && data.length === 0) {
     return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-8 flex items-center justify-center">
+      <div className="bg-white rounded-xl shadow-sm p-8 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-green-600" />
           <p className="text-gray-600">Loading leave policies...</p>
@@ -58,10 +58,10 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
           }
         }
       }}
-      className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm overflow-hidden"
+      className="bg-white rounded-xl shadow-sm overflow-hidden"
     >
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-whit-200">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-white">
             <motion.tr
               initial={{ opacity: 0, y: -10 }}
