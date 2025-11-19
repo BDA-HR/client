@@ -4,7 +4,7 @@ import LeaveHeader from '../../../components/hr/settings/leave/leavetype/LeaveHe
 import LeaveTypeSection from '../../../components/hr/settings/leave/leavetype/LeaveTypeSection';
 import LeavePolicySection from '../../../components/hr/settings/leave/leavepolicy/LeavePolicySection';
 import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto } from '../../../types/hr/leavetype';
-import type { LeavePolicyListDto } from '../../../types/hr/leavepolicy';
+import type { LeavePolicyListDto, LeavePolicyAddDto, LeavePolicyModDto, LeaveTypeOptionDto } from '../../../types/hr/leavepolicy';
 
 const PageAnnualLeave = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,6 +12,8 @@ const PageAnnualLeave = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [policyViewMode, setPolicyViewMode] = useState<"grid" | "list">("grid");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
+  
   const [leaveTypes, setLeaveTypes] = useState<LeaveTypeListDto[]>([
     {
       id: '1',
@@ -54,8 +56,7 @@ const PageAnnualLeave = () => {
     },
   ]);
 
-  // Sample leave policy data - replace with actual data from your API
-  const sampleLeavePolicies: LeavePolicyListDto[] = [
+  const [leavePolicies, setLeavePolicies] = useState<LeavePolicyListDto[]>([
     {
       id: '1',
       leaveTypeId: '1',
@@ -72,7 +73,8 @@ const PageAnnualLeave = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
+      rowVersion: '1'
     },
     {
       id: '2',
@@ -90,7 +92,8 @@ const PageAnnualLeave = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
+      rowVersion: '1'
     },
     {
       id: '3',
@@ -108,9 +111,16 @@ const PageAnnualLeave = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
+      rowVersion: '1'
     },
-  ];
+  ]);
+
+  // Convert leave types to options for the dropdown
+  const leaveTypeOptions: LeaveTypeOptionDto[] = leaveTypes.map(lt => ({
+    id: lt.id as UUID,
+    name: lt.name
+  }));
 
   // Filter leave types based on search term
   const filteredLeaveTypes = leaveTypes.filter(leaveType =>
@@ -119,7 +129,7 @@ const PageAnnualLeave = () => {
   );
 
   // Filter leave policies based on search term
-  const filteredLeavePolicies = sampleLeavePolicies.filter(policy =>
+  const filteredLeavePolicies = leavePolicies.filter(policy =>
     policy.name.toLowerCase().includes(policySearchTerm.toLowerCase()) ||
     policy.leaveType.toLowerCase().includes(policySearchTerm.toLowerCase())
   );
@@ -148,11 +158,6 @@ const PageAnnualLeave = () => {
           : lt
       ));
     }
-    // If it's just the edit action (from card click)
-    else {
-      console.log('Opening edit modal for:', leaveType);
-      // The actual edit modal opening is handled in LeaveTypeSection
-    }
   };
 
   const handleDelete = (leaveType: LeaveTypeListDto) => {
@@ -160,9 +165,6 @@ const PageAnnualLeave = () => {
     
     // Remove the leave type from state
     setLeaveTypes(prev => prev.filter(lt => lt.id !== leaveType.id));
-    
-    // Show success message or handle error
-    // You might want to add a confirmation dialog here
   };
 
   const handleAddLeaveType = (leaveTypeData: LeaveTypeAddDto) => {
@@ -170,7 +172,7 @@ const PageAnnualLeave = () => {
     
     // Create a new leave type with generated ID and additional fields
     const newLeaveType: LeaveTypeListDto = {
-      id: Date.now().toString(), // Generate a simple ID (replace with proper ID generation)
+      id: Date.now().toString(),
       name: leaveTypeData.name,
       code: leaveTypeData.code,
       isPaid: leaveTypeData.isPaid,
@@ -178,14 +180,87 @@ const PageAnnualLeave = () => {
       isPaidStr: leaveTypeData.isPaid ? 'Paid' : 'Unpaid',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      createdBy: 'user', // Replace with actual user
-      updatedBy: 'user',  // Replace with actual user
+      createdBy: 'user',
+      updatedBy: 'user',
       rowVersion: '1'
     };
 
     // Add the new leave type to the state
     setLeaveTypes(prev => [...prev, newLeaveType]);
     setIsAddModalOpen(false);
+  };
+
+  const handleAddLeavePolicy = (policyData: LeavePolicyAddDto) => {
+    console.log('Adding new leave policy:', policyData);
+    
+    // Find the leave type name for display
+    const leaveType = leaveTypes.find(lt => lt.id === policyData.leaveTypeId);
+    
+    // Create a new leave policy with generated ID and additional fields
+    const newLeavePolicy: LeavePolicyListDto = {
+      id: Date.now().toString(),
+      leaveTypeId: policyData.leaveTypeId,
+      name: policyData.name,
+      requiresAttachment: policyData.requiresAttachment,
+      minDurPerReq: policyData.minDurPerReq,
+      maxDurPerReq: policyData.maxDurPerReq,
+      holidaysAsLeave: policyData.holidaysAsLeave,
+      leaveType: leaveType?.name || 'Unknown',
+      requiresAttachmentStr: policyData.requiresAttachment ? 'Yes' : 'No',
+      minDurPerReqStr: `${policyData.minDurPerReq} day${policyData.minDurPerReq !== 1 ? 's' : ''}`,
+      maxDurPerReqStr: `${policyData.maxDurPerReq} day${policyData.maxDurPerReq !== 1 ? 's' : ''}`,
+      holidaysAsLeaveStr: policyData.holidaysAsLeave ? 'Yes' : 'No',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'user',
+      updatedBy: 'user',
+      rowVersion: '1'
+    };
+
+    // Add the new leave policy to the state
+    setLeavePolicies(prev => [...prev, newLeavePolicy]);
+    setIsAddPolicyModalOpen(false);
+  };
+
+  const handlePolicyEdit = (policy: LeavePolicyListDto | LeavePolicyModDto) => {
+    console.log('Edit leave policy:', policy);
+    
+    // If it's a modification (from edit modal)
+    if ('rowVersion' in policy) {
+      const updatedPolicy = policy as LeavePolicyModDto;
+      
+      // Find the leave type name for display
+      const leaveType = leaveTypes.find(lt => lt.id === updatedPolicy.leaveTypeId);
+      
+      // Update the leave policy in state
+      setLeavePolicies(prev => prev.map(p => 
+        p.id === updatedPolicy.id 
+          ? { 
+              ...p, 
+              name: updatedPolicy.name,
+              requiresAttachment: updatedPolicy.requiresAttachment,
+              minDurPerReq: updatedPolicy.minDurPerReq,
+              maxDurPerReq: updatedPolicy.maxDurPerReq,
+              holidaysAsLeave: updatedPolicy.holidaysAsLeave,
+              leaveTypeId: updatedPolicy.leaveTypeId,
+              leaveType: leaveType?.name || 'Unknown',
+              requiresAttachmentStr: updatedPolicy.requiresAttachment ? 'Yes' : 'No',
+              minDurPerReqStr: `${updatedPolicy.minDurPerReq} day${updatedPolicy.minDurPerReq !== 1 ? 's' : ''}`,
+              maxDurPerReqStr: `${updatedPolicy.maxDurPerReq} day${updatedPolicy.maxDurPerReq !== 1 ? 's' : ''}`,
+              holidaysAsLeaveStr: updatedPolicy.holidaysAsLeave ? 'Yes' : 'No',
+              updatedAt: new Date().toISOString(),
+              updatedBy: 'user',
+              rowVersion: updatedPolicy.rowVersion
+            }
+          : p
+      ));
+    }
+  };
+
+  const handlePolicyDelete = (policy: LeavePolicyListDto) => {
+    console.log('Delete leave policy:', policy);
+    // Remove the leave policy from state
+    setLeavePolicies(prev => prev.filter(p => p.id !== policy.id));
   };
 
   const handleOpenAddModal = () => {
@@ -196,19 +271,16 @@ const PageAnnualLeave = () => {
     setIsAddModalOpen(false);
   };
 
-  const handlePolicyEdit = (policy: LeavePolicyListDto) => {
-    console.log('Edit leave policy:', policy);
-    // Implement edit logic here
+  const handleOpenAddPolicyModal = () => {
+    setIsAddPolicyModalOpen(true);
   };
 
-  const handlePolicyDelete = (policy: LeavePolicyListDto) => {
-    console.log('Delete leave policy:', policy);
-    // Implement delete logic here
+  const handleCloseAddPolicyModal = () => {
+    setIsAddPolicyModalOpen(false);
   };
 
   const handlePolicyAddClick = () => {
-    console.log('Add new leave policy clicked');
-    // Implement add logic here
+    handleOpenAddPolicyModal();
   };
 
   return (
@@ -246,6 +318,11 @@ const PageAnnualLeave = () => {
         onEdit={handlePolicyEdit}
         onDelete={handlePolicyDelete}
         onAddClick={handlePolicyAddClick}
+        leaveTypeOptions={leaveTypeOptions}
+        onAddLeavePolicy={handleAddLeavePolicy}
+        isAddPolicyModalOpen={isAddPolicyModalOpen}
+        onCloseAddPolicyModal={handleCloseAddPolicyModal}
+        onOpenAddPolicyModal={handleOpenAddPolicyModal}
       />
     </motion.section>
   );

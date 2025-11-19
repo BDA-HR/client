@@ -1,8 +1,12 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import LeavePolicyHeader from './LeavePolicyHeader';
 import LeavePolicySearchFilters from './LeavePolicySearchFilter';
 import LeavePolicyCard from "./LeavePolicyCard";
-import type { LeavePolicyListDto } from '../../../../../types/hr/leavepolicy';
+import AddLeavePolicyModal from "./AddLeavePolicyModal";
+import EditLeavePolicyModal from "./EditLeavePolicyModal";
+import DeleteLeavePolicyModal from "./DeleteLeavePolicyModal";
+import type { LeavePolicyListDto, LeavePolicyAddDto, LeavePolicyModDto, LeaveTypeOptionDto } from '../../../../../types/hr/leavepolicy';
 
 interface LeavePolicySectionProps {
   searchTerm: string;
@@ -10,9 +14,14 @@ interface LeavePolicySectionProps {
   viewMode: "grid" | "list";
   setViewMode: (mode: "grid" | "list") => void;
   leavePolicies: LeavePolicyListDto[];
-  onEdit: (policy: LeavePolicyListDto) => void;
+  onEdit: (policy: LeavePolicyListDto | LeavePolicyModDto) => void;
   onDelete: (policy: LeavePolicyListDto) => void;
   onAddClick: () => void;
+  leaveTypeOptions: LeaveTypeOptionDto[];
+  onAddLeavePolicy: (policy: LeavePolicyAddDto) => void;
+  isAddPolicyModalOpen: boolean;
+  onCloseAddPolicyModal: () => void;
+  onOpenAddPolicyModal: () => void;
 }
 
 const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
@@ -23,8 +32,42 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
   leavePolicies,
   onEdit,
   onDelete,
-  onAddClick
+  leaveTypeOptions,
+  onAddLeavePolicy,
+  isAddPolicyModalOpen,
+  onCloseAddPolicyModal,
+  onOpenAddPolicyModal
 }) => {
+  const [editingPolicy, setEditingPolicy] = useState<LeavePolicyListDto | null>(null);
+  const [deletingPolicy, setDeletingPolicy] = useState<LeavePolicyListDto | null>(null);
+
+  const handleEdit = (policy: LeavePolicyListDto) => {
+    setEditingPolicy(policy);
+  };
+
+  const handleDelete = (policy: LeavePolicyListDto) => {
+    setDeletingPolicy(policy);
+  };
+
+  const handleSaveEdit = (updatedPolicy: LeavePolicyModDto) => {
+    console.log('Updating policy:', updatedPolicy);
+    onEdit(updatedPolicy);
+    setEditingPolicy(null);
+  };
+
+  const handleConfirmDelete = (policy: LeavePolicyListDto) => {
+    onDelete(policy);
+    setDeletingPolicy(null);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingPolicy(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeletingPolicy(null);
+  };
+
   return (
     <>
       {/* Leave Policy Header Section */}
@@ -47,7 +90,7 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           leavePolicyData={leavePolicies}
-          onAddClick={onAddClick}
+          onAddClick={onOpenAddPolicyModal}
           viewMode={viewMode}
           setViewMode={setViewMode}
         />
@@ -80,13 +123,38 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
                 key={policy.id}
                 leavePolicy={policy}
                 viewMode={viewMode}
-                onEdit={onEdit}
-                onDelete={onDelete}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
               />
             ))}
           </div>
         )}
       </motion.div>
+
+      {/* Add Leave Policy Modal */}
+      <AddLeavePolicyModal
+        isOpen={isAddPolicyModalOpen}
+        onClose={onCloseAddPolicyModal}
+        onAddLeavePolicy={onAddLeavePolicy}
+        leaveTypeOptions={leaveTypeOptions}
+      />
+
+      {/* Edit Leave Policy Modal */}
+      <EditLeavePolicyModal
+        isOpen={!!editingPolicy}
+        onClose={handleCloseEditModal}
+        onSave={handleSaveEdit}
+        policy={editingPolicy}
+        leaveTypeOptions={leaveTypeOptions}
+      />
+
+      {/* Delete Leave Policy Modal */}
+      <DeleteLeavePolicyModal
+        policy={deletingPolicy}
+        isOpen={!!deletingPolicy}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
     </>
   );
 };
