@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import BranchTable from "../../components/core/branch/BranchTable";
@@ -18,8 +18,8 @@ interface BranchesPageProps {
 }
 
 const BranchesPage: React.FC<BranchesPageProps> = () => {
-  const [searchParams] = useSearchParams();
-  const companyId = searchParams.get("companyId");
+  const location = useLocation();
+  const companyId = location.state?.companyId;
 
   const [branches, setBranches] = useState<BranchListDto[]>([]);
   const [loading, setLoading] = useState(true);

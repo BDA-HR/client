@@ -7,6 +7,7 @@ export interface CompListDto extends BaseDto {
   name: string;
   nameAm: string;
   branchCount: string;
+  slug: string;
 }
 
 export interface AddCompDto {
@@ -20,3 +21,11 @@ export interface EditCompDto {
   nameAm: string;
   rowVersion: string;
 }
+
+export const generateSlug = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .substring(0, 50); 
+};

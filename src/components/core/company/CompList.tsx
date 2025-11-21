@@ -26,9 +26,11 @@ const CompList: React.FC<CompListProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleViewBranches = (companyId: UUID) => {
-    onViewBranches(companyId as UUID);
-    navigate(`/branches?companyId=${companyId}`);
+  const handleViewBranches = (company: CompListDto) => {
+    onViewBranches(company.id);
+    navigate(`/core/company/${company.slug}/branches`, { 
+      state: { companyId: company.id } 
+    });
   };
 
   return (
@@ -63,7 +65,7 @@ const CompList: React.FC<CompListProps> = ({
               <Button
                 className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 cursor-pointer"
                 size="sm"
-                onClick={() => handleViewBranches(company.id)}
+                onClick={() => handleViewBranches(company)}
               >
                 View Branches
               </Button>
@@ -82,14 +84,13 @@ const CompList: React.FC<CompListProps> = ({
                       <PenBox size={16}/>
                     Edit
                   </DropdownMenuItem>
- <DropdownMenuItem
-  onClick={() => onDeleteCompany(company)}
-  className="flex items-center gap-2 text-red-600 data-[highlighted]:!bg-red-50 data-[highlighted]:text-red-700"
->
-  <Trash2 size={16} className="text-red-600" />
-  <p className="text-red-600">Delete</p>
-</DropdownMenuItem>
-
+                  <DropdownMenuItem
+                    onClick={() => onDeleteCompany(company)}
+                    className="flex items-center gap-2 text-red-600 data-[highlighted]:!bg-red-50 data-[highlighted]:text-red-700"
+                  >
+                    <Trash2 size={16} className="text-red-600" />
+                    <p className="text-red-600">Delete</p>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
