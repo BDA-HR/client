@@ -1,9 +1,8 @@
 import React from 'react';
 import { Button } from '../../../../ui/button';
-import { Plus } from 'lucide-react';
+import { BadgePlus } from 'lucide-react';
 
 interface LeavePolicyTableHeaderProps {
-  totalCount: number;
   onAdd: () => void;
   onExport?: () => void;
   onImport?: () => void;
@@ -26,7 +25,7 @@ const LeavePolicyAccrualHeader: React.FC<LeavePolicyTableHeaderProps> = ({
           onClick={onAdd} 
           className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
         >
-          <Plus className="h-4 w-4" />
+          <BadgePlus className="h-4 w-4" />
           Add Accrual
         </Button>
       </div>

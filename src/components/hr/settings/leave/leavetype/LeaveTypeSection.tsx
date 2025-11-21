@@ -67,7 +67,7 @@ const LeaveTypeSection: React.FC<LeaveTypeSectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="px-6 pb-2"
+        className="pb-2"
       >
         <LeaveSearchFilters
           searchTerm={searchTerm}
@@ -81,7 +81,7 @@ const LeaveTypeSection: React.FC<LeaveTypeSectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="px-6 pt-0 pb-0 -mt-2"
+        className="pt-0 pb-0 -mt-2"
       >
         {leaveTypes.length === 0 ? (
           <div className="text-center py-6">

@@ -80,7 +80,7 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="px-6 pb-2" // Reduced bottom padding
+        className="pb-2" // Reduced bottom padding
       >
         <LeavePolicySearchFilters
           searchTerm={searchTerm}
@@ -94,7 +94,7 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="px-6 pt-0 pb-0" // Removed top padding
+        className="pt-0 pb-0" // Removed top padding
       >
         {leavePolicies.length === 0 ? (
           <div className="text-center py-8"> {/* Reduced padding */}
@@ -106,7 +106,7 @@ const LeavePolicySection: React.FC<LeavePolicySectionProps> = ({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Grid only */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"> {/* Grid only */}
             {leavePolicies.map((policy) => (
               <LeavePolicyCard
                 key={policy.id}

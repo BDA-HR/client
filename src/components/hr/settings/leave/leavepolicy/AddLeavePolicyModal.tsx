@@ -89,7 +89,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <BadgePlus size={20} className="text-green-600" />
+            <BadgePlus size={20} />
             <h2 className="text-lg font-bold text-gray-800">Add New</h2>
           </div>
           <button
@@ -285,7 +285,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                 type="submit"
                 disabled={!formData.name.trim() || !formData.leaveTypeId}
               >
-                Create 
+                Save 
               </Button>
             </div>
           </div>
