@@ -7,7 +7,6 @@ export interface CompListDto extends BaseDto {
   name: string;
   nameAm: string;
   branchCount: string;
-  slug: string;
 }
 
 export interface AddCompDto {

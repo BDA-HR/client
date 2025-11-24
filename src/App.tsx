@@ -35,7 +35,7 @@ import UserOverview from './pages/core/pageUserManagement';
 import DepartmentOverview from './pages/core/pageDepartments';
 import CompanyBranchesPage from './pages/core/pageCompanies';
 // import CompanyDetailsPage from './components/core/company/CompDetails';
-// import BranchesPage from './pages/core/pageBranches';
+import BranchesPage from './pages/core/pageBranches';
 import FiscalYearHistory from './pages/core/pageFiscYearHist';
 import PagePeriod from './pages/core/pagePeriod';
 import PageSettings from './pages/hr/settings/pageSettings';
@@ -121,8 +121,8 @@ function App() {
             {/* End FINANCE ROUTES */}
             
             {/*sTART CORE ROUTES */}
-<Route path='/core/company/:slug/branches' element={<CompanyBranchesPage />} />
-            <Route path='/core/company' element={<CompanyBranchesPage />} />
+            <Route path='/core/company/:companyId/branches' element={<CompanyBranchesPage />} />
+                                <Route path="/branches" element={<BranchesPage />} />            <Route path='/core/company' element={<CompanyBranchesPage />} />
             {/* <Route path='/core/branch' element={<BranchOverview />} /> */}
             <Route path='/core/fiscal-year' element={<FiscalYearOverview />} />
             <Route path="/core/fiscal-year/history" element={<FiscalYearHistory />} />

@@ -26,13 +26,10 @@ const CompList: React.FC<CompListProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleViewBranches = (company: CompListDto) => {
-    onViewBranches(company.id);
-    navigate(`/core/company/${company.slug}/branches`, { 
-      state: { companyId: company.id } 
-    });
-  };
-
+ const handleViewBranches = (companyId: UUID) => {
+    onViewBranches(companyId as UUID);
+    navigate(`/branches?companyId=${companyId}`);
+ }
   return (
     <motion.div
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -65,8 +62,7 @@ const CompList: React.FC<CompListProps> = ({
               <Button
                 className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 cursor-pointer"
                 size="sm"
-                onClick={() => handleViewBranches(company)}
-              >
+                onClick={() => handleViewBranches(company.id)}              >
                 View Branches
               </Button>
             </div>
