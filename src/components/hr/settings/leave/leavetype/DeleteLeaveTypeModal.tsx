@@ -60,7 +60,7 @@ const DeleteLeaveTypeModal: React.FC<DeleteLeaveTypeModalProps> = ({
             <Button
               onClick={onClose}
               variant="outline"
-              className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
+              className="px-6 py-2 cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
             >
               Cancel
             </Button>

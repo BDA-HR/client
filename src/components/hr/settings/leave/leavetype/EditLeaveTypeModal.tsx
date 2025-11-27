@@ -83,7 +83,7 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <Edit size={20} className="text-green-600" />
+            <Edit size={20} />
             <h2 className="text-lg font-bold text-gray-800">Edit </h2>
           </div>
           <button

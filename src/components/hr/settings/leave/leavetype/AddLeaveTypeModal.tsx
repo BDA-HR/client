@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, BadgePlus } from 'lucide-react';
+import { X, BadgePlus, Calendar } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Label } from '../../../../ui/label';
 import { Input } from '../../../../ui/input';
@@ -23,10 +23,10 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -35,7 +35,7 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
 
     onAddLeaveType(formData);
 
-    // Reset form to default values
+    // Reset after save
     setFormData({
       name: '',
       isPaid: true,
@@ -72,7 +72,7 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
           <div className="py-4 space-y-4">
             {/* Leave Type Name */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm text-gray-500">
+              <Label htmlFor="name" className="text-sm text-gray-700 font-medium">
                 Leave Type Name <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -81,42 +81,65 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Eg. Annual Leave, Sick Leave, Unpaid Leave"
-                className="w-full focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               />
             </div>
 
-            {/* Paid Status */}
+            {/* Payment Status (Card Style) */}
             <div className="space-y-2">
-              <Label className="text-sm text-gray-500">
-                Payment Status
+              <Label className="text-sm text-gray-700 font-medium">
+                Payment Status <span className="text-red-500">*</span>
               </Label>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="isPaid"
-                    value="true"
-                    checked={formData.isPaid === true}
-                    onChange={() => setFormData(prev => ({ ...prev, isPaid: true }))}
-                    className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
-                  />
-                  <span className="text-sm text-gray-700">Paid Leave</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="isPaid"
-                    value="false"
-                    checked={formData.isPaid === false}
-                    onChange={() => setFormData(prev => ({ ...prev, isPaid: false }))}
-                    className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
-                  />
-                  <span className="text-sm text-gray-700">Unpaid Leave</span>
-                </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                {/* Paid */}
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, isPaid: true }))}
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
+                    formData.isPaid === true
+                      ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
+                      : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded-full ${
+                      formData.isPaid === true
+                        ? 'bg-green-100 text-green-600'
+                        : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <span className="font-medium text-sm">Paid Leave</span>
+                  <span className="text-xs opacity-75">Employee receives pay</span>
+                </button>
+
+                {/* Unpaid */}
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, isPaid: false }))}
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
+                    formData.isPaid === false
+                      ? 'border-red-400 bg-red-50 text-red-400 shadow-sm'
+                      : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded-full ${
+                      formData.isPaid === false
+                        ? 'bg-red-100 text-red-400'
+                        : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <span className="font-medium text-sm">Unpaid Leave</span>
+                  <span className="text-xs opacity-75">No payment during leave</span>
+                </button>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -135,7 +158,7 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
               onClick={handleSubmit}
               disabled={!formData.name.trim()}
             >
-              Save 
+              Save
             </Button>
           </div>
         </div>
