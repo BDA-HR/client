@@ -26,7 +26,7 @@ class LeavePolicyAccrualService {
     return 'An unexpected error occurred';
   }
 
-  // GET: /api/core/hrmm/v1/LeavePolicyAccrual/AllLeavePolicyAccrual
+  // GET: /AllLeavePolicyAccrual
   async getAllLeavePolicyAccruals(): Promise<LeavePolicyAccrualListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllLeavePolicyAcc`);
@@ -38,7 +38,7 @@ class LeavePolicyAccrualService {
     }
   }
 
-  // GET: /api/core/hrmm/v1/LeavePolicyAccrual/GetLeavePolicyAccrual/{id}
+  // GET: /GetLeavePolicyAccrual/{id}
   async getLeavePolicyAccrualById(id: UUID): Promise<LeavePolicyAccrualListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetLeavePolicyAcc/${id}`);
@@ -50,7 +50,7 @@ class LeavePolicyAccrualService {
     }
   }
 
-  // POST: /api/core/hrmm/v1/LeavePolicyAccrual/AddLeavePolicyAccrual
+  // POST: /AddLeavePolicyAccrual
   async createLeavePolicyAccrual(leavePolicyAccrual: LeavePolicyAccrualAddDto): Promise<LeavePolicyAccrualListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddLeavePolicyAcc`, leavePolicyAccrual);
@@ -63,7 +63,7 @@ class LeavePolicyAccrualService {
     }
   }
 
-  // PUT: /api/core/hrmm/v1/LeavePolicyAccrual/ModLeavePolicyAccrual/{id}
+  // PUT: /ModLeavePolicyAccrual/{id}
   async updateLeavePolicyAccrual(updateData: LeavePolicyAccrualModDto): Promise<LeavePolicyAccrualListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModLeavePolicyAcc/${updateData.id}`, updateData);
@@ -75,7 +75,7 @@ class LeavePolicyAccrualService {
     }
   }
 
-  // DELETE: /api/core/hrmm/v1/LeavePolicyAccrual/DelLeavePolicyAccrual/{id}
+  // DELETE: /DelLeavePolicyAccrual/{id}
   async deleteLeavePolicyAccrual(id: UUID): Promise<void> {
     try {
       const response = await api.delete(`${this.baseUrl}/DelLeavePolicyAcc/${id}`);

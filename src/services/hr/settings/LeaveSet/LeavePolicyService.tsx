@@ -26,7 +26,7 @@ class LeavePolicyService {
     return 'An unexpected error occurred';
   }
 
-  // GET: /api/core/hrmm/v1/LeavePolicy/AllLeavePolicy
+  // GET: /AllLeavePolicy
   async getAllLeavePolicies(): Promise<LeavePolicyListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllLeavePolicy`);
@@ -38,7 +38,7 @@ class LeavePolicyService {
     }
   }
 
-  // GET: /api/core/hrmm/v1/LeavePolicy/GetLeavePolicy/{id}
+  // GET: /GetLeavePolicy/{id}
   async getLeavePolicyById(id: UUID): Promise<LeavePolicyListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetLeavePolicy/${id}`);
@@ -50,7 +50,7 @@ class LeavePolicyService {
     }
   }
 
-  // POST: /api/core/hrmm/v1/LeavePolicy/AddLeavePolicy
+  // POST: /AddLeavePolicy
   async createLeavePolicy(leavePolicy: LeavePolicyAddDto): Promise<LeavePolicyListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddLeavePolicy`, leavePolicy);
@@ -63,7 +63,7 @@ class LeavePolicyService {
     }
   }
 
-  // PUT: /api/core/hrmm/v1/LeavePolicy/ModLeavePolicy/{id}
+  // PUT: /ModLeavePolicy/{id}
   async updateLeavePolicy(updateData: LeavePolicyModDto): Promise<LeavePolicyListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModLeavePolicy/${updateData.id}`, updateData);
@@ -75,7 +75,7 @@ class LeavePolicyService {
     }
   }
 
-  // DELETE: /api/core/hrmm/v1/LeavePolicy/DelLeavePolicy/{id}
+  // DELETE: /DelLeavePolicy/{id}
   async deleteLeavePolicy(id: UUID): Promise<void> {
     try {
       const response = await api.delete(`${this.baseUrl}/DelLeavePolicy/${id}`);

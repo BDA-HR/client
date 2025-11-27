@@ -26,7 +26,7 @@ class LeaveTypeService {
     return 'An unexpected error occurred';
   }
 
-  // GET: /api/core/hrmm/v1/LeaveType/AllLeaveType
+  // GET: /AllLeaveType
   async getAllLeaveTypes(): Promise<LeaveTypeListDto[]> {
     try {
       const response = await api.get(`${this.baseUrl}/AllLeaveType`);
@@ -38,7 +38,7 @@ class LeaveTypeService {
     }
   }
 
-  // GET: /api/core/hrmm/v1/LeaveType/GetLeaveType/{id}
+  // GET: GetLeaveType/{id}
   async getLeaveTypeById(id: UUID): Promise<LeaveTypeListDto> {
     try {
       const response = await api.get(`${this.baseUrl}/GetLeaveType/${id}`);
@@ -50,7 +50,7 @@ class LeaveTypeService {
     }
   }
 
-  // POST: /api/core/hrmm/v1/LeaveType/AddLeaveType
+  // POST: /AddLeaveType
   async createLeaveType(leaveType: LeaveTypeAddDto): Promise<LeaveTypeListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddLeaveType`, leaveType);
@@ -63,7 +63,7 @@ class LeaveTypeService {
     }
   }
 
-  // PUT: /api/core/hrmm/v1/LeaveType/ModLeaveType/{id}
+  // PUT: /ModLeaveType/{id}
   async updateLeaveType(updateData: LeaveTypeModDto): Promise<LeaveTypeListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModLeaveType/${updateData.id}`, updateData);
@@ -75,7 +75,7 @@ class LeaveTypeService {
     }
   }
 
-  // DELETE: /api/core/hrmm/v1/LeaveType/DelLeaveType/{id}
+  // DELETE: /DelLeaveType/{id}
   async deleteLeaveType(id: UUID): Promise<void> {
     try {
       const response = await api.delete(`${this.baseUrl}/DelLeaveType/${id}`);
