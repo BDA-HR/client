@@ -1,14 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { LeaveTypeListDto } from "../../../../../types/hr/leavetype";
+import type { LeaveTypeListDto, UUID } from "../../../../../types/hr/leavetype";
 import { Button } from "../../../../ui/button";
 
 interface DeleteLeaveTypeModalProps {
   leaveType: LeaveTypeListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (leaveType: LeaveTypeListDto) => void;
+  onConfirm: (leaveType: UUID) => void;
 }
 
 const DeleteLeaveTypeModal: React.FC<DeleteLeaveTypeModalProps> = ({
@@ -20,7 +20,7 @@ const DeleteLeaveTypeModal: React.FC<DeleteLeaveTypeModalProps> = ({
   if (!isOpen || !leaveType) return null;
 
   const handleConfirm = () => {
-    onConfirm(leaveType);
+    onConfirm(leaveType.id);
   };
 
   return (
