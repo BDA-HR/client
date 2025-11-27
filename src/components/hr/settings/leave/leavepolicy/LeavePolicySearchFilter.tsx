@@ -64,7 +64,7 @@ const LeavePolicySearchFilters: React.FC<LeavePolicySearchFiltersProps> = ({
         <Button
           onClick={onAddClick}
           size="sm"
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
+          className="flex cursor-pointer items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
         >
           <BadgePlus className="h-4 w-4" />
           Add New

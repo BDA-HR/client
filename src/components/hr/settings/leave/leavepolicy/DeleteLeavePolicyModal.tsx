@@ -1,14 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { LeavePolicyListDto } from "../../../../../types/hr/leavepolicy";
+import type { LeavePolicyListDto, UUID } from "../../../../../types/hr/leavepolicy";
 import { Button } from "../../../../ui/button";
 
 interface DeleteLeavePolicyModalProps {
   policy: LeavePolicyListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (policy: LeavePolicyListDto) => void;
+  onConfirm: (policy: UUID) => void;
 }
 
 const DeleteLeavePolicyModal: React.FC<DeleteLeavePolicyModalProps> = ({
@@ -20,7 +20,7 @@ const DeleteLeavePolicyModal: React.FC<DeleteLeavePolicyModalProps> = ({
   if (!isOpen || !policy) return null;
 
   const handleConfirm = () => {
-    onConfirm(policy);
+    onConfirm(policy.id);
   };
 
   return (
