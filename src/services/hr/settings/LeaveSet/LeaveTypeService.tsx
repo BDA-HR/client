@@ -1,13 +1,13 @@
 import { api } from '../../../api';
-import type { 
-  LeaveTypeListDto, 
-  LeaveTypeAddDto, 
-  LeaveTypeModDto, 
-  UUID 
+import type {
+  LeaveTypeListDto,
+  LeaveTypeAddDto,
+  LeaveTypeModDto,
+  UUID
 } from '../../../../types/hr/leavetype';
 
 class LeaveTypeService {
-  private baseUrl = `${import.meta.env.VITE_HRMM_MODULE_URL}/LeaveType`;
+  private baseUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL}/LeaveType`;
 
   // Helper method to extract error messages
   private extractErrorMessage(error: any): string {
