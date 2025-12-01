@@ -148,10 +148,6 @@ function LeavePolicyAccrualPage() {
 
   const handleSaveChanges = async () => {
     try {
-      // Here you would typically make an API call to save the changes
-      // For now, we'll simulate an API call
-      
-      // Update the policy and accrual state with new data
       if (policy && accrual) {
         const updatedPolicy = {
           ...policy,
@@ -192,8 +188,6 @@ function LeavePolicyAccrualPage() {
   };
 
   const handleAddAccrual = async (accrualData: any) => {
-    // Here you would typically make an API call to add the accrual
-    // For now, we'll simulate an API call
     const newAccrual: LeavePolicyAccrualListDto = {
       id: `accrual-${Date.now()}` as UUID,
       leavePolicyId: id! as UUID,
