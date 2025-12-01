@@ -3,8 +3,10 @@ import LeavePolicyAccrualHeader from '../../../../components/hr/settings/leave/l
 import { Button } from '../../../../components/ui/button'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Calendar, FileText, Clock, Settings, Pen } from 'lucide-react';
-import type { LeavePolicyListDto } from '../../../../types/hr/leavepolicy';
+import type { LeavePolicyListDto, UUID } from '../../../../types/hr/leavepolicy';
 import type { LeavePolicyAccrualListDto } from '../../../../types/hr/leavepolicyaccrual';
+import AddLeavePolicyAccrualModal from '../../../../components/hr/settings/leave/leavepolicyaccrual/AddLeavePolicyAccrualModal';
+import toast from 'react-hot-toast';
 
 function LeavePolicyAccrualPage() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ function LeavePolicyAccrualPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Local state for editable fields
   const [formData, setFormData] = useState({
@@ -46,8 +49,8 @@ function LeavePolicyAccrualPage() {
         setLoading(true);
         
         const mockPolicy: LeavePolicyListDto = {
-          id: id!,
-          leaveTypeId: 'leave-type-id',
+          id: id! as UUID,
+          leaveTypeId: 'leave-type-id' as UUID,
           name: 'Annual Leave Policy',
           requiresAttachment: true,
           minDurPerReq: 0.5,
@@ -61,19 +64,7 @@ function LeavePolicyAccrualPage() {
           rowVersion: '1'
         };
 
-        const mockAccrual: LeavePolicyAccrualListDto = {
-          id: 'accrual-id',
-          leavePolicyId: id!,
-          entitlement: 20,
-          frequency: 'Monthly',
-          accrualRate: 1.67,
-          minServiceMonths: 3,
-          maxCarryoverDays: 10,
-          carryoverExpiryDays: 90,
-          frequencyStr: 'Monthly',
-          leavePolicy: 'Annual Leave Policy',
-          rowVersion: '1'
-        };
+        const mockAccrual: LeavePolicyAccrualListDto | null = null; // Initially no accrual
 
         setPolicy(mockPolicy);
         setAccrual(mockAccrual);
@@ -91,18 +82,19 @@ function LeavePolicyAccrualPage() {
             maxDurPerReq: mockPolicy.maxDurPerReq,
           },
           accrualSettings: {
-            entitlement: mockAccrual.entitlement,
-            frequency: mockAccrual.frequency,
-            accrualRate: mockAccrual.accrualRate,
+            entitlement: 0,
+            frequency: '',
+            accrualRate: 0,
           },
           carryoverSettings: {
-            minServiceMonths: mockAccrual.minServiceMonths,
-            maxCarryoverDays: mockAccrual.maxCarryoverDays,
-            carryoverExpiryDays: mockAccrual.carryoverExpiryDays,
+            minServiceMonths: 0,
+            maxCarryoverDays: 0,
+            carryoverExpiryDays: 0,
           }
         });
       } catch (error) {
         console.error('Error fetching policy details:', error);
+        toast.error('Failed to load policy details');
       } finally {
         setLoading(false);
       }
@@ -154,39 +146,84 @@ function LeavePolicyAccrualPage() {
     }
   };
 
-  const handleSaveChanges = () => {
-    console.log('Saving changes:', formData);
-    // Here you would typically make an API call to save the changes
-    setIsEditing(false);
-    setEditingSection(null);
-    setHasChanges(false);
-    
-    // Update the policy and accrual state with new data
-    if (policy && accrual) {
-      setPolicy({
-        ...policy,
-        name: formData.policyInfo.name,
-        leaveType: formData.policyInfo.leaveType,
-        requiresAttachment: formData.policyInfo.requiresAttachment,
-        holidaysAsLeave: formData.policyInfo.holidaysAsLeave,
-        minDurPerReq: formData.durationLimits.minDurPerReq,
-        maxDurPerReq: formData.durationLimits.maxDurPerReq,
-        requiresAttachmentStr: formData.policyInfo.requiresAttachment ? 'Yes' : 'No',
-        holidaysAsLeaveStr: formData.policyInfo.holidaysAsLeave ? 'Yes' : 'No',
-        minDurPerReqStr: `${formData.durationLimits.minDurPerReq} days`,
-        maxDurPerReqStr: `${formData.durationLimits.maxDurPerReq} days`,
-      });
+  const handleSaveChanges = async () => {
+    try {
+      // Here you would typically make an API call to save the changes
+      // For now, we'll simulate an API call
+      
+      // Update the policy and accrual state with new data
+      if (policy && accrual) {
+        const updatedPolicy = {
+          ...policy,
+          name: formData.policyInfo.name,
+          leaveType: formData.policyInfo.leaveType,
+          requiresAttachment: formData.policyInfo.requiresAttachment,
+          holidaysAsLeave: formData.policyInfo.holidaysAsLeave,
+          minDurPerReq: formData.durationLimits.minDurPerReq,
+          maxDurPerReq: formData.durationLimits.maxDurPerReq,
+          requiresAttachmentStr: formData.policyInfo.requiresAttachment ? 'Yes' : 'No',
+          holidaysAsLeaveStr: formData.policyInfo.holidaysAsLeave ? 'Yes' : 'No',
+          minDurPerReqStr: `${formData.durationLimits.minDurPerReq} days`,
+          maxDurPerReqStr: `${formData.durationLimits.maxDurPerReq} days`,
+        };
 
-      setAccrual({
-        ...accrual,
-        entitlement: formData.accrualSettings.entitlement,
-        frequency: formData.accrualSettings.frequency,
-        accrualRate: formData.accrualSettings.accrualRate,
-        minServiceMonths: formData.carryoverSettings.minServiceMonths,
-        maxCarryoverDays: formData.carryoverSettings.maxCarryoverDays,
-        carryoverExpiryDays: formData.carryoverSettings.carryoverExpiryDays,
-      });
+        const updatedAccrual = {
+          ...accrual,
+          entitlement: formData.accrualSettings.entitlement,
+          frequency: formData.accrualSettings.frequency,
+          accrualRate: formData.accrualSettings.accrualRate,
+          minServiceMonths: formData.carryoverSettings.minServiceMonths,
+          maxCarryoverDays: formData.carryoverSettings.maxCarryoverDays,
+          carryoverExpiryDays: formData.carryoverSettings.carryoverExpiryDays,
+        };
+
+        setPolicy(updatedPolicy);
+        setAccrual(updatedAccrual);
+      }
+
+      toast.success('Changes saved successfully');
+      setIsEditing(false);
+      setEditingSection(null);
+      setHasChanges(false);
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      toast.error('Failed to save changes');
     }
+  };
+
+  const handleAddAccrual = async (accrualData: any) => {
+    // Here you would typically make an API call to add the accrual
+    // For now, we'll simulate an API call
+    const newAccrual: LeavePolicyAccrualListDto = {
+      id: `accrual-${Date.now()}` as UUID,
+      leavePolicyId: id! as UUID,
+      entitlement: accrualData.entitlement,
+      frequency: accrualData.frequency,
+      accrualRate: accrualData.accrualRate,
+      minServiceMonths: accrualData.minServiceMonths,
+      maxCarryoverDays: accrualData.maxCarryoverDays,
+      carryoverExpiryDays: accrualData.carryoverExpiryDays,
+      frequencyStr: accrualData.frequency,
+      leavePolicy: policy?.name || '',
+      rowVersion: '1'
+    };
+
+    // Update the accrual settings in form data
+    setFormData(prev => ({
+      ...prev,
+      accrualSettings: {
+        entitlement: newAccrual.entitlement,
+        frequency: newAccrual.frequency,
+        accrualRate: newAccrual.accrualRate,
+      },
+      carryoverSettings: {
+        minServiceMonths: newAccrual.minServiceMonths,
+        maxCarryoverDays: newAccrual.maxCarryoverDays,
+        carryoverExpiryDays: newAccrual.carryoverExpiryDays,
+      }
+    }));
+
+    setAccrual(newAccrual);
   };
 
   const handleInputChange = (section: string, field: string, value: any) => {
@@ -242,6 +279,15 @@ function LeavePolicyAccrualPage() {
     return <span className="text-sm text-gray-900">{value}</span>;
   };
 
+  const handleAddClick = () => {
+    if (accrual) {
+      // If accrual already exists, show an edit modal instead
+      toast.error('Accrual rule already exists. Please edit the existing rule.');
+      return;
+    }
+    setIsAddModalOpen(true);
+  };
+
   if (loading) {
     return (
       <section className="p-6">
@@ -277,7 +323,7 @@ function LeavePolicyAccrualPage() {
         Back to Leave Settings
       </Button>
       
-      <LeavePolicyAccrualHeader onAdd={() => console.log("Add clicked")} />
+      <LeavePolicyAccrualHeader onAdd={handleAddClick} />
 
       {/* Policy Details Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
@@ -357,93 +403,116 @@ function LeavePolicyAccrualPage() {
           </div>
         </div>
 
-        {/* Accrual Information - Only show if accrual data exists */}
-        {accrual && (
-          <>
-            <div className="bg-white rounded-lg border border-gray-200 p-6 relative">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-purple-600" />
-                  Accrual Settings
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEditSection('accrualSettings')}
-                  className="h-8 w-8 p-0 cursor-pointer"
-                >
-                  <Pen size={16} />
-                </Button>
+        {/* Accrual Information */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 relative">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-purple-600" />
+              Accrual Settings
+            </h2>
+            {accrual ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEditSection('accrualSettings')}
+                className="h-8 w-8 p-0 cursor-pointer"
+              >
+                <Pen size={16} />
+              </Button>
+            ) : (
+              <div className="text-sm text-gray-500 italic">
+                No accrual settings configured
+              </div>
+            )}
+          </div>
+          
+          {accrual ? (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-sm font-medium text-gray-600">Annual Entitlement</span>
+                <div className="flex items-center gap-2">
+                  {renderField('accrualSettings', 'entitlement', 'Annual Entitlement', formData.accrualSettings.entitlement)}
+                  <span className="text-sm text-gray-500">days</span>
+                </div>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Annual Entitlement</span>
-                  <div className="flex items-center gap-2">
-                    {renderField('accrualSettings', 'entitlement', 'Annual Entitlement', formData.accrualSettings.entitlement)}
-                    <span className="text-sm text-gray-500">days</span>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Accrual Frequency</span>
-                  {renderField('accrualSettings', 'frequency', 'Accrual Frequency', formData.accrualSettings.frequency)}
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Accrual Rate</span>
-                  <div className="flex items-center gap-2">
-                    {renderField('accrualSettings', 'accrualRate', 'Accrual Rate', formData.accrualSettings.accrualRate)}
-                    <span className="text-sm text-gray-500">days per period</span>
-                  </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-sm font-medium text-gray-600">Accrual Frequency</span>
+                {renderField('accrualSettings', 'frequency', 'Accrual Frequency', formData.accrualSettings.frequency)}
+              </div>
+              
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-sm font-medium text-gray-600">Accrual Rate</span>
+                <div className="flex items-center gap-2">
+                  {renderField('accrualSettings', 'accrualRate', 'Accrual Rate', formData.accrualSettings.accrualRate)}
+                  <span className="text-sm text-gray-500">days per period</span>
                 </div>
               </div>
             </div>
+          ) : (
+            <div className="py-4 text-center">
+              <p className="text-gray-500 mb-3">No accrual settings have been configured for this policy.</p>
+              <p className="text-sm text-gray-400">Click "Add Accrual" in the header to configure accrual settings.</p>
+            </div>
+          )}
+        </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-6 relative">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-orange-600" />
-                  Carryover Settings
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEditSection('carryoverSettings')}
-                  className="h-8 w-8 p-0 cursor-pointer"
-                >
-                  <Pen size={16} />
-                </Button>
+        {/* Carryover Settings */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 relative">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Settings className="h-5 w-5 text-orange-600" />
+              Carryover Settings
+            </h2>
+            {accrual ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEditSection('carryoverSettings')}
+                className="h-8 w-8 p-0 cursor-pointer"
+              >
+                <Pen size={16} />
+              </Button>
+            ) : (
+              <div className="text-sm text-gray-500 italic">
+                No carryover settings configured
+              </div>
+            )}
+          </div>
+          
+          {accrual ? (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-sm font-medium text-gray-600">Minimum Service Months</span>
+                <div className="flex items-center gap-2">
+                  {renderField('carryoverSettings', 'minServiceMonths', 'Minimum Service Months', formData.carryoverSettings.minServiceMonths)}
+                  <span className="text-sm text-gray-500">months</span>
+                </div>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Minimum Service Months</span>
-                  <div className="flex items-center gap-2">
-                    {renderField('carryoverSettings', 'minServiceMonths', 'Minimum Service Months', formData.carryoverSettings.minServiceMonths)}
-                    <span className="text-sm text-gray-500">months</span>
-                  </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-sm font-medium text-gray-600">Maximum Carryover Days</span>
+                <div className="flex items-center gap-2">
+                  {renderField('carryoverSettings', 'maxCarryoverDays', 'Maximum Carryover Days', formData.carryoverSettings.maxCarryoverDays)}
+                  <span className="text-sm text-gray-500">days</span>
                 </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Maximum Carryover Days</span>
-                  <div className="flex items-center gap-2">
-                    {renderField('carryoverSettings', 'maxCarryoverDays', 'Maximum Carryover Days', formData.carryoverSettings.maxCarryoverDays)}
-                    <span className="text-sm text-gray-500">days</span>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Carryover Expiry</span>
-                  <div className="flex items-center gap-2">
-                    {renderField('carryoverSettings', 'carryoverExpiryDays', 'Carryover Expiry', formData.carryoverSettings.carryoverExpiryDays)}
-                    <span className="text-sm text-gray-500">days</span>
-                  </div>
+              </div>
+              
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-sm font-medium text-gray-600">Carryover Expiry</span>
+                <div className="flex items-center gap-2">
+                  {renderField('carryoverSettings', 'carryoverExpiryDays', 'Carryover Expiry', formData.carryoverSettings.carryoverExpiryDays)}
+                  <span className="text-sm text-gray-500">days</span>
                 </div>
               </div>
             </div>
-          </>
-        )}
+          ) : (
+            <div className="py-4 text-center">
+              <p className="text-gray-500 mb-3">No carryover settings have been configured for this policy.</p>
+              <p className="text-sm text-gray-400">These settings will be available after adding accrual rules.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Action Buttons - Only show when there are changes */}
@@ -460,6 +529,15 @@ function LeavePolicyAccrualPage() {
           </Button>
         </div>
       )}
+
+      {/* Add Accrual Modal */}
+      <AddLeavePolicyAccrualModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleAddAccrual}
+        policyId={id! as UUID}
+        policyName={policy.name}
+      />
     </section>
   );
 }
