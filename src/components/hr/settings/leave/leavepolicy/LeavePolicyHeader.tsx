@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { FileText } from "lucide-react";
 
@@ -36,8 +35,8 @@ const LeavePolicyHeader = () => {
               className="inline-block"
             >
               <span className="bg-gradient-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
-                Leave Policies
-              </span>{" "}
+                Leave 
+              </span>{" "}Policies
              
             </motion.span>
           </h1>
