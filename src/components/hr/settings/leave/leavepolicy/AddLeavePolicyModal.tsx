@@ -10,20 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../../../ui/dropdown-menu';
-import type { LeavePolicyAddDto, LeaveTypeOptionDto, UUID} from '../../../../../types/hr/leavepolicy';
-
+import type { LeavePolicyAddDto, UUID } from '../../../../../types/hr/leavepolicy';
+import type { LeaveTypeListDto } from '../../../../../types/hr/leavetype';
+import { leaveTypeService } from '../../../../../services/hr/settings/LeaveSet/LeaveTypeService';
+import toast from 'react-hot-toast';
 interface AddLeavePolicyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddLeavePolicy: (policy: LeavePolicyAddDto) => void;
-  leaveTypeOptions: LeaveTypeOptionDto[];
+  onAddLeavePolicy: (policy: LeavePolicyAddDto) => Promise<void>;
 }
 
 const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
   isOpen,
   onClose,
   onAddLeavePolicy,
-  leaveTypeOptions
 }) => {
   const [formData, setFormData] = useState<LeavePolicyAddDto>({
     name: '',
@@ -33,48 +33,140 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
     holidaysAsLeave: false,
     leaveTypeId: '' as UUID
   });
+  const [leaveTypeOptions, setLeaveTypeOptions] = useState<LeaveTypeListDto[]>([]);
+  const [loadingLeaveTypes, setLoadingLeaveTypes] = useState(false);
   const [isLeaveTypeDropdownOpen, setIsLeaveTypeDropdownOpen] = useState(false);
-  const [selectedLeaveType, setSelectedLeaveType] = useState<LeaveTypeOptionDto | null>(null);
+  const [selectedLeaveType, setSelectedLeaveType] = useState<LeaveTypeListDto | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchLeaveTypes();
+      setFormErrors({});
+    }
+  }, [isOpen]);
+
+  const fetchLeaveTypes = async () => {
+    try {
+      setLoadingLeaveTypes(true);
+      const leaveTypesData = await leaveTypeService.getAllLeaveTypes();
+      setLeaveTypeOptions(leaveTypesData);
+    } catch (error) {
+      console.error("Error fetching leave types:", error);
+      toast.error("Failed to load leave types");
+      setLeaveTypeOptions([]);
+    } finally {
+      setLoadingLeaveTypes(false);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) {
       // Reset form when modal closes
-      setFormData({
-        name: '',
-        requiresAttachment: false,
-        minDurPerReq: 1,
-        maxDurPerReq: 30,
-        holidaysAsLeave: false,
-        leaveTypeId: '' as UUID
-      });
-      setSelectedLeaveType(null);
+      resetForm();
     }
   }, [isOpen]);
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      requiresAttachment: false,
+      minDurPerReq: 1,
+      maxDurPerReq: 30,
+      holidaysAsLeave: false,
+      leaveTypeId: '' as UUID
+    });
+    setSelectedLeaveType(null);
+    setFormErrors({});
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.name?.trim()) {
+      errors.name = "Policy name is required";
+    }
+
+    if (!formData.leaveTypeId) {
+      errors.leaveTypeId = "Leave type is required";
+    }
+
+    if (formData.minDurPerReq <= 0) {
+      errors.minDurPerReq = "Minimum duration must be greater than 0";
+    }
+
+    if (formData.maxDurPerReq <= 0) {
+      errors.maxDurPerReq = "Maximum duration must be greater than 0";
+    }
+
+    if (formData.maxDurPerReq < formData.minDurPerReq) {
+      errors.maxDurPerReq = "Maximum duration must be greater than or equal to minimum duration";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : 
+                    type === 'number' ? Number(value) : value;
+    
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : 
-              type === 'number' ? Number(value) : value
+      [name]: newValue
     }));
+
+    // Clear error for this field when user starts typing
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
-  const handleLeaveTypeSelect = (leaveType: LeaveTypeOptionDto) => {
+  const handleLeaveTypeSelect = (leaveType: LeaveTypeListDto) => {
     setSelectedLeaveType(leaveType);
-    setFormData(prev => ({ ...prev, leaveTypeId: leaveType.id }));
+    setFormData(prev => ({ 
+      ...prev, 
+      leaveTypeId: leaveType.id 
+    }));
     setIsLeaveTypeDropdownOpen(false);
+    
+    // Clear error for this field
+    if (formErrors.leaveTypeId) {
+      setFormErrors((prev) => ({ ...prev, leaveTypeId: "" }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.leaveTypeId) return;
+    
+    if (!validateForm()) {
+      toast.error("Please fix the form errors before submitting");
+      return;
+    }
 
-    onAddLeavePolicy(formData);
-    onClose();
+    setLoading(true);
+
+    try {
+      await onAddLeavePolicy(formData);
+      toast.success("Leave policy added successfully");
+      onClose();
+    } catch (error: any) {
+      const errorMessage = error.message || 'Failed to add leave policy';
+      toast.error(errorMessage);
+      console.error("Error adding leave policy:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
- 
+  const handleCancel = () => {
+    if (!loading) {
+      resetForm();
+      onClose();
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -90,11 +182,12 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <BadgePlus size={20} />
-            <h2 className="text-lg font-bold text-gray-800">Add New</h2>
+            <h2 className="text-lg font-bold text-gray-800">Add Leave Policy</h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleCancel}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            disabled={loading}
           >
             <X size={20} />
           </button>
@@ -115,9 +208,15 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Eg. Annual Leave Policy 2024"
-                  className="w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className={`w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    formErrors.name ? "border-red-500" : ""
+                  }`}
                   required
+                  disabled={loading}
                 />
+                {formErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                )}
               </div>
 
               {/* Leave Type Selection */}
@@ -125,14 +224,24 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                 <Label className="text-sm text-gray-700 font-medium">
                   Leave Type <span className="text-red-500">*</span>
                 </Label>
-                <DropdownMenu open={isLeaveTypeDropdownOpen} onOpenChange={setIsLeaveTypeDropdownOpen}>
+                <DropdownMenu 
+                  open={isLeaveTypeDropdownOpen} 
+                  onOpenChange={setIsLeaveTypeDropdownOpen}
+                >
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`w-full justify-between focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                        formErrors.leaveTypeId ? "border-red-500" : "border-gray-300"
+                      } ${loadingLeaveTypes ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <span className="text-sm">
-                        {selectedLeaveType ? selectedLeaveType.name : 'Select a leave type'}
+                        {selectedLeaveType 
+                          ? selectedLeaveType.name 
+                          : loadingLeaveTypes 
+                            ? "Loading leave types..." 
+                            : "Select a leave type"
+                        }
                       </span>
                       <svg
                         className={`h-4 w-4 opacity-50 transition-transform ${
@@ -146,7 +255,9 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                       </svg>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-full min-w-[var(--radix-dropdown-menu-trigger-width)] max-h-60 overflow-y-auto">
+                  <DropdownMenuContent 
+                    className="w-full min-w-[var(--radix-dropdown-menu-trigger-width)] max-h-60 overflow-y-auto"
+                  >
                     {leaveTypeOptions.map((leaveType) => (
                       <DropdownMenuItem
                         key={leaveType.id}
@@ -156,8 +267,19 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                         {leaveType.name}
                       </DropdownMenuItem>
                     ))}
+                    {leaveTypeOptions.length === 0 && !loadingLeaveTypes && (
+                      <DropdownMenuItem className="text-sm text-gray-500" disabled>
+                        No leave types available
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
+                {loadingLeaveTypes && (
+                  <p className="text-sm text-gray-500 mt-1">Loading leave types...</p>
+                )}
+                {formErrors.leaveTypeId && !loadingLeaveTypes && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.leaveTypeId}</p>
+                )}
               </div>
 
               {/* Duration Settings */}
@@ -176,11 +298,17 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                       placeholder="1"
                       min="0.5"
                       step="0.5"
-                      className="w-full pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`w-full pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                        formErrors.minDurPerReq ? "border-red-500" : ""
+                      }`}
                       required
+                      disabled={loading}
                     />
                     <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   </div>
+                  {formErrors.minDurPerReq && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.minDurPerReq}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -195,13 +323,19 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                       value={formData.maxDurPerReq}
                       onChange={handleChange}
                       placeholder="30"
-                      min={formData.minDurPerReq + 0.5}
+                      min={formData.minDurPerReq}
                       step="0.5"
-                      className="w-full pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`w-full pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                        formErrors.maxDurPerReq ? "border-red-500" : ""
+                      }`}
                       required
+                      disabled={loading}
                     />
                     <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   </div>
+                  {formErrors.maxDurPerReq && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.maxDurPerReq}</p>
+                  )}
                 </div>
               </div>
 
@@ -220,6 +354,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                         checked={formData.requiresAttachment === true}
                         onChange={() => setFormData(prev => ({ ...prev, requiresAttachment: true }))}
                         className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
+                        disabled={loading}
                       />
                       <span className="text-sm text-gray-700">Yes</span>
                     </label>
@@ -230,6 +365,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                         checked={formData.requiresAttachment === false}
                         onChange={() => setFormData(prev => ({ ...prev, requiresAttachment: false }))}
                         className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
+                        disabled={loading}
                       />
                       <span className="text-sm text-gray-700">No</span>
                     </label>
@@ -249,6 +385,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                         checked={formData.holidaysAsLeave === true}
                         onChange={() => setFormData(prev => ({ ...prev, holidaysAsLeave: true }))}
                         className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
+                        disabled={loading}
                       />
                       <span className="text-sm text-gray-700">Yes</span>
                     </label>
@@ -259,13 +396,13 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                         checked={formData.holidaysAsLeave === false}
                         onChange={() => setFormData(prev => ({ ...prev, holidaysAsLeave: false }))}
                         className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
+                        disabled={loading}
                       />
                       <span className="text-sm text-gray-700">No</span>
                     </label>
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -275,17 +412,18 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
               <Button
                 variant="outline"
                 className="cursor-pointer px-6 border-gray-300 hover:bg-gray-100"
-                onClick={onClose}
+                onClick={handleCancel}
                 type="button"
+                disabled={loading}
               >
                 Cancel
               </Button>
               <Button
                 className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
                 type="submit"
-                disabled={!formData.name.trim() || !formData.leaveTypeId}
+                disabled={loading || loadingLeaveTypes || !formData.name.trim() || !formData.leaveTypeId}
               >
-                Save 
+                {loading ? "Saving..." : "Save Policy"}
               </Button>
             </div>
           </div>
