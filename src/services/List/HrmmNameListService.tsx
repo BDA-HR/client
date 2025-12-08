@@ -134,6 +134,17 @@ class NameListService {
     }
   }
 
+  // Department Position endpoints
+  async getBranchComp(): Promise<NameListDto[]> {
+    try {
+      const response = await api.get(`${this.moduleBaseUrl}/BranchCompList`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching department positions:', error);
+      throw error;
+    }
+  }
+
   // Department Name endpoints (from module service)
   async getAllDepartmentNames(): Promise<NameListItem[]> {
     try {

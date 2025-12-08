@@ -10,10 +10,10 @@ import type { Step1Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
 import { amharicRegex } from '../../../../../utils/amharic-regex';
 import List from '../../../../List/list';
-import { branchService } from '../../../../../services/core/branchservice';
+//import { branchService } from '../../../../../services/core/branchservice';
 import { nameListService } from '../../../../../services/List/HrmmNameListService';
 import type { ListItem } from '../../../../../types/List/list';
-import type { BranchCompListDto } from '../../../../../types/core/branch';
+//import type { BranchCompListDto } from '../../../../../types/core/branch';
 import type { NameListDto } from '../../../../../types/hr/NameListDto';
 import type { NameListItem } from '../../../../../types/NameList/nameList';
 
@@ -47,7 +47,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   onNext,
   loading = false
 }) => {
-  const [branches, setBranches] = useState<BranchCompListDto[]>([]);
+  const [branches, setBranches] = useState<NameListItem[]>([]);
   const [departments, setDepartments] = useState<NameListItem[]>([]);
   const [positions, setPositions] = useState<NameListDto[]>([]);
   const [jobGrades, setJobGrades] = useState<NameListItem[]>([]);
@@ -60,11 +60,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Scroll to top function
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
-    
+
     if (document.body) {
       document.body.scrollTop = 0;
     }
@@ -116,7 +116,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     const fetchBranches = async () => {
       try {
         setLoadingBranches(true);
-        const branchesData = await branchService.getBranchCompanyList();
+        const branchesData = await nameListService.getBranchComp();
         setBranches(branchesData);
 
         // Auto-select first branch if none is selected and we have branches
@@ -742,7 +742,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             <div className="w-2 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full"></div>
             <h3 className="text-xl font-semibold text-gray-800">Profile Picture</h3>
           </div>
-          
+
           <div className="flex flex-col items-center">
             <div className="w-80 h-80"> {/* Increased size */}
               <ProfilePictureUpload
@@ -773,6 +773,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           </button>
         </div>
       </form>
-    </motion.div> 
+    </motion.div>
   );
 };
