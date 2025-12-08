@@ -5,6 +5,7 @@ import type { NameListDto } from '../../types/hr/NameListDto';
 
 class NameListService {
   private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || '/core/hrmm/v1'}/Names`;
+  private moduleBaseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || '/core/module/v1'}/Names`;
 
   // Address Name endpoints
   async getAllAddressNames(): Promise<NameListItem[]> {
@@ -69,6 +70,27 @@ class NameListService {
     }
   }
 
+  // Job Grade Name endpoints
+  async getAllJobGradeNames(): Promise<NameListItem[]> {
+    try {
+      const response = await api.get(`${this.baseUrl}/AllJobGradeName`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching job grade names:', error);
+      throw error;
+    }
+  }
+
+  async getJobGradeNameById(id: UUID): Promise<NameListItem> {
+    try {
+      const response = await api.get(`${this.baseUrl}/GetJobGradeName/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching job grade name:', error);
+      throw error;
+    }
+  }
+
   // Job Grade Step Name endpoints
   //   async getAllJgStepNames(): Promise<JgStepNameItem[]> {
   //     try {
@@ -112,6 +134,26 @@ class NameListService {
     }
   }
 
+  // Department Name endpoints (from module service)
+  async getAllDepartmentNames(): Promise<NameListItem[]> {
+    try {
+      const response = await api.get(`${this.moduleBaseUrl}/AllDeptName`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching department names:', error);
+      throw error;
+    }
+  }
+
+  async getDepartmentNameById(id: UUID): Promise<NameListItem> {
+    try {
+      const response = await api.get(`${this.moduleBaseUrl}/GetDeptName/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching department name:', error);
+      throw error;
+    }
+  }
 }
 
 export const nameListService = new NameListService();

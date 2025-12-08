@@ -11,14 +11,11 @@ import type { UUID } from 'crypto';
 import { amharicRegex } from '../../../../../utils/amharic-regex';
 import List from '../../../../List/list';
 import { branchService } from '../../../../../services/core/branchservice';
-import { departmentService } from '../../../../../services/core/deptservice';
 import { nameListService } from '../../../../../services/List/HrmmNameListService';
-import { jobGradeService } from '../../../../../services/hr/settings/JobGradeServives';
 import type { ListItem } from '../../../../../types/List/list';
 import type { BranchCompListDto } from '../../../../../types/core/branch';
 import type { NameListDto } from '../../../../../types/hr/NameListDto';
-import type { JobGradeListDto } from '../../../../../types/hr/jobgrade';
-import type { BranchDeptList } from '../../../../../types/core/dept';
+import type { NameListItem } from '../../../../../types/NameList/nameList';
 
 interface BasicInfoStepProps {
   data: Partial<Step1Dto & { branchId: UUID }>;
@@ -51,9 +48,9 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   loading = false
 }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
-  const [departments, setDepartments] = useState<BranchDeptList[]>([]);
+  const [departments, setDepartments] = useState<NameListItem[]>([]);
   const [positions, setPositions] = useState<NameListDto[]>([]);
-  const [jobGrades, setJobGrades] = useState<JobGradeListDto[]>([]);
+  const [jobGrades, setJobGrades] = useState<NameListItem[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(false);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [loadingPositions, setLoadingPositions] = useState(false);
@@ -138,37 +135,28 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     fetchBranches();
   }, []);
 
-  // Fetch departments when branch selection changes
+  // Fetch all departments when component mounts (using nameListService)
   useEffect(() => {
-    const fetchDepartmentsByBranch = async () => {
-      if (!formik.values.branchId) {
-        setDepartments([]);
-        return;
-      }
-
+    const fetchAllDepartments = async () => {
       try {
         setLoadingDepartments(true);
-        formik.setFieldValue('departmentId', '');
-        formik.setFieldValue('positionId', '');
-
-        const departmentsData = await departmentService.getBranchDepartmentNames(formik.values.branchId);
+        const departmentsData = await nameListService.getAllDepartmentNames();
         setDepartments(departmentsData);
 
-        // Auto-select first department if we have departments
-        if (departmentsData.length > 0) {
+        // Auto-select first department if none is selected and we have departments
+        if (!formik.values.departmentId && departmentsData.length > 0) {
           formik.setFieldValue('departmentId', departmentsData[0].id);
         }
       } catch (error) {
-        console.error('Error fetching departments by branch:', error);
+        console.error('Error fetching departments:', error);
         setSubmitError('Failed to load departments');
-        setDepartments([]);
       } finally {
         setLoadingDepartments(false);
       }
     };
 
-    fetchDepartmentsByBranch();
-  }, [formik.values.branchId]);
+    fetchAllDepartments();
+  }, []);
 
   // Fetch positions when department selection changes
   useEffect(() => {
@@ -203,12 +191,12 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     fetchPositionsByDepartment();
   }, [formik.values.departmentId]);
 
-  // Fetch job grades when component mounts
+  // Fetch job grades using nameListService when component mounts
   useEffect(() => {
     const fetchJobGrades = async () => {
       try {
         setLoadingJobGrades(true);
-        const jobGradesData = await jobGradeService.getAllJobGrades();
+        const jobGradesData = await nameListService.getAllJobGradeNames();
         setJobGrades(jobGradesData);
 
         if (!formik.values.jobGradeId && jobGradesData.length > 0) {
@@ -234,13 +222,13 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   // Convert departments to ListItem format
   const departmentListItems: ListItem[] = departments.map(dept => ({
     id: dept.id,
-    name: dept.dept
+    name: dept.name
   }));
 
-  // Convert positions to ListItem format (using NameListDto)
+  // Convert positions to ListItem format
   const positionListItems: ListItem[] = positions.map(position => ({
     id: position.id,
-    name: position.name // Using 'name' field from NameListDto
+    name: position.name
   }));
 
   // Convert job grades to ListItem format
@@ -343,7 +331,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       }
     });
   };
-
 
   return (
     <motion.div
@@ -612,20 +599,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 selectedValue={formik.values.departmentId}
                 onSelect={handleDepartmentSelect}
                 label="Select Department"
-                placeholder={
-                  !formik.values.branchId
-                    ? "Select a branch first"
-                    : departments.length === 0
-                      ? "No departments available"
-                      : "Select a department"
-                }
-                disabled={loadingDepartments || loading || !formik.values.branchId || departments.length === 0}
+                placeholder={departments.length === 0 ? "No departments available" : "Select a department"}
+                disabled={loadingDepartments || loading || departments.length === 0}
               />
               {loadingDepartments && (
                 <p className="text-sm text-gray-500">Loading departments...</p>
-              )}
-              {formik.values.branchId && departments.length === 0 && !loadingDepartments && (
-                <p className="text-sm text-gray-500">No departments available for this branch</p>
               )}
               {getErrorMessage('departmentId') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('departmentId')}</div>
@@ -779,7 +757,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
         {/* Navigation Buttons */}
         <div className="flex justify-end pt-6">
-
           <button
             type="submit"
             disabled={!isFormValid || loading}
