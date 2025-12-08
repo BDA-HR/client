@@ -128,7 +128,6 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
 
   const getModuleLabel = (moduleId: string) => {
     const moduleMap: Record<string, string> = {
-      'core': 'Core',
       'hr': 'HR',
       'crm': 'CRM',
       'file': 'File Management',
@@ -143,8 +142,7 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
   const getModuleSelectionStats = (modulePermissions: typeof permissions) => {
     const selectedCount = modulePermissions.filter(p => formData.permissions.includes(p.id)).length;
     const totalCount = modulePermissions.length;
-    const percentage = totalCount > 0 ? Math.round((selectedCount / totalCount) * 100) : 0;
-    return { selectedCount, totalCount, percentage };
+    return { selectedCount, totalCount };
   };
 
   return (
@@ -235,23 +233,10 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
                             {modulePermissions.length} permissions
                           </span>
                         </div>
-                        <div className="mt-2 flex items-center gap-4">
+                        <div className="mt-2">
                           <span className="text-sm text-gray-600">
                             {stats.selectedCount} of {stats.totalCount} selected
                           </span>
-                          {stats.totalCount > 0 && (
-                            <div className="flex items-center gap-2">
-                              <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-emerald-500 transition-all duration-300"
-                                  style={{ width: `${stats.percentage}%` }}
-                                />
-                              </div>
-                              <span className="text-xs font-medium text-gray-700">
-                                {stats.percentage}%
-                              </span>
-                            </div>
-                          )}
                         </div>
                       </div>
                       
@@ -319,7 +304,7 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
           )}
         </div>
 
-        {/* Action Buttons - Fixed at bottom */}
+        {/* Action Buttons */}
         <div className="sticky bottom-0 bg-white pt-6 pb-2 mt-8 border-t border-gray-200">
           <div className="flex justify-between">
             <Button

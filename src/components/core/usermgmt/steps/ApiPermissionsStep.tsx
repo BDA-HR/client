@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search,  Check } from 'lucide-react';
+import { Search, Check } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { Input } from '../../../../components/ui/input';
 import { Checkbox } from '../../../../components/ui/checkbox';
@@ -16,10 +16,16 @@ interface ApiPermissionsStepProps {
     id: string;
     name: string;
     mainPermissionId: string;
-    endpoint: string;
-    method: string;
+    action: string;
+    resource: string;
+    description?: string;
   }>;
   selectedPermissions: string[];
+  mainPermissionsList?: Array<{
+    id: string;
+    name: string;
+    description?: string;
+  }>;
 }
 
 export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
@@ -29,6 +35,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
   isLoading,
   apiPermissions,
   selectedPermissions,
+  mainPermissionsList = [],
 }) => {
   const [search, setSearch] = useState('');
   const [formData, setFormData] = useState(initialData);
@@ -37,7 +44,16 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
     setFormData(initialData);
   }, [initialData]);
 
-  // Group API permissions by main permission
+  // Get main permission name from ID
+  const getMainPermissionName = (permissionId: string) => {
+    if (mainPermissionsList && mainPermissionsList.length > 0) {
+      const mainPerm = mainPermissionsList.find(p => p.id === permissionId);
+      return mainPerm?.name || permissionId.replace('perm_', '').replace(/_/g, ' ');
+    }
+    return permissionId.replace('perm_', '').replace(/_/g, ' ');
+  };
+
+  // Group detailed permissions by main permission
   const groupedApiPermissions = useMemo(() => {
     const grouped: Record<string, typeof apiPermissions> = {};
     
@@ -51,15 +67,16 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
     return grouped;
   }, [apiPermissions]);
 
-  // Filter API permissions based on search
+  // Filter detailed permissions based on search
   const filteredApiPermissions = useMemo(() => {
     const filtered: Record<string, typeof apiPermissions> = {};
     
     Object.entries(groupedApiPermissions).forEach(([mainPermId, groupPermissions]) => {
       const filteredGroupPermissions = groupPermissions.filter(apiPermission =>
         apiPermission.name.toLowerCase().includes(search.toLowerCase()) ||
-        apiPermission.endpoint.toLowerCase().includes(search.toLowerCase()) ||
-        apiPermission.method.toLowerCase().includes(search.toLowerCase())
+        apiPermission.action.toLowerCase().includes(search.toLowerCase()) ||
+        apiPermission.resource.toLowerCase().includes(search.toLowerCase()) ||
+        (apiPermission.description && apiPermission.description.toLowerCase().includes(search.toLowerCase()))
       );
       
       if (filteredGroupPermissions.length > 0) {
@@ -121,7 +138,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
     e.preventDefault();
     
     if (apiPermissions.length === 0) {
-      alert('No API permissions available based on selected main permissions.');
+      alert('No detailed permissions available based on selected main permissions.');
       return;
     }
     
@@ -137,7 +154,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
     >
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800">
-          API Permissions
+          Detailed Permissions
         </h2>
         <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
           <p className="text-sm text-emerald-700">
@@ -153,7 +170,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mt-1">
-                {formData.apiPermissions.length} API permissions selected
+                {formData.apiPermissions.length} detailed permissions selected
               </p>
             </div>
             <div className="flex gap-3">
@@ -184,7 +201,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search API permissions by name, endpoint, or method..."
+              placeholder="Search permissions by name, action, or resource..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-4 py-3 w-full"
@@ -209,25 +226,12 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-bold text-lg text-gray-800">
-                          Main Permission {mainPermId.replace('perm_', '')}
+                          {getMainPermissionName(mainPermId)}
                         </h3>
-                        <div className="mt-2 flex items-center gap-4">
+                        <div className="mt-2">
                           <span className="text-sm text-gray-600">
-                            {selectedInGroup} of {totalInGroup} selected
+                            {selectedInGroup} of {totalInGroup} detailed permissions selected
                           </span>
-                          {totalInGroup > 0 && (
-                            <div className="flex items-center gap-2">
-                              <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-blue-500 transition-all duration-300"
-                                  style={{ width: `${(selectedInGroup / totalInGroup) * 100}%` }}
-                                />
-                              </div>
-                              <span className="text-xs font-medium text-gray-700">
-                                {Math.round((selectedInGroup / totalInGroup) * 100)}%
-                              </span>
-                            </div>
-                          )}
                         </div>
                       </div>
                       
@@ -244,7 +248,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
                     </div>
                   </div>
                   
-                  {/* API Permissions List */}
+                  {/* Detailed Permissions List */}
                   <div className="p-4 bg-white">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {groupPermissions.map(apiPermission => (
@@ -252,7 +256,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
                           key={apiPermission.id} 
                           className={`p-3 rounded-lg border transition-all duration-200 ${
                             formData.apiPermissions.includes(apiPermission.id) 
-                              ? 'bg-blue-50 border-blue-200' 
+                              ? 'bg-green-50 border-green-200' 
                               : 'bg-gray-50 border-gray-200 hover:border-gray-300'
                           }`}
                         >
@@ -262,7 +266,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
                               checked={formData.apiPermissions.includes(apiPermission.id)}
                               onCheckedChange={() => handleApiPermissionChange(apiPermission.id)}
                               disabled={isLoading}
-                              className="mt-1 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white data-[state=checked]:border-blue-600"
+                              className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:text-white data-[state=checked]:border-green-600"
                             />
                             <div className="flex-1">
                               <div className="mb-2">
@@ -273,12 +277,19 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
                                   {apiPermission.name}
                                 </label>
                               </div>
-                              <div className="space-y-1">
-                                <div className="text-xs text-gray-500 font-mono bg-gray-100 p-2 rounded">
-                                  {apiPermission.endpoint}
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                  Method: {apiPermission.method}
+                              <div className="space-y-2">
+                                {apiPermission.description && (
+                                  <div className="text-xs text-gray-600">
+                                    {apiPermission.description}
+                                  </div>
+                                )}
+                                <div className="flex gap-2">
+                                  <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                                    {apiPermission.action}
+                                  </span>
+                                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                                    {apiPermission.resource}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -292,7 +303,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
             })
           ) : (
             <div className="p-8 text-center bg-gray-50 border border-gray-200 rounded-xl">
-              <p className="text-gray-500">No API permissions found matching your search.</p>
+              <p className="text-gray-500">No detailed permissions found matching your search.</p>
               {selectedPermissions.length === 0 && (
                 <p className="text-sm mt-2 text-gray-400">Please select main permissions in Step 2 first.</p>
               )}
@@ -300,7 +311,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
           )}
         </div>
 
-        {/* Summary */}
+        {/* Summary - Removed status bar */}
         <div className="bg-gray-50 rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
@@ -308,8 +319,8 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
               <div className="text-sm text-gray-600">Main Permissions</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{formData.apiPermissions.length}</div>
-              <div className="text-sm text-gray-600">API Permissions</div>
+              <div className="text-2xl font-bold text-green-600">{formData.apiPermissions.length}</div>
+              <div className="text-sm text-gray-600">Detailed Permissions</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">

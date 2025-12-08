@@ -86,10 +86,10 @@ const UserManagement: React.FC = () => {
           />
         </div>
       ) : (
-        <section className="w-full min-h-screen bg-gray-50 p-6 overflow-auto"> {/* Added overflow-auto */}
-          <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6">
-              <div className="flex justify-between items-center border-b pb-4">
+        <section className="w-full min-h-screen bg-gray-50 overflow-auto"> {/* Added overflow-auto */}
+          <div>
+            <div >
+              <div className="flex justify-between items-center pb-4">
                 <h1 className="text-2xl font-semibold text-gray-800">User Management</h1>
               </div>
               

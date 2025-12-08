@@ -9,7 +9,7 @@ import { AddAccountStepHeader } from './AddAccountStepHeader';
 const steps = [
   { id: 1, title: 'Basic Info', icon: Lock },
   { id: 2, title: 'Main Permissions', icon: Shield },
-  { id: 3, title: 'API Permissions', icon: Key },
+  { id: 3, title: 'Detailed Permissions', icon: Key }, // Changed from 'API Permissions'
 ];
 
 interface AddAccountStepFormProps {
@@ -46,7 +46,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Mock data - replace with API calls
+  // Mock data for main permissions
   const MOCK_PERMISSIONS = Array.from({ length: 50 }, (_, i) => ({
     id: `perm_${i + 1}`,
     name: `Permission ${i + 1}`,
@@ -56,12 +56,30 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     description: `Description for permission ${i + 1}`,
   }));
 
-  const MOCK_API_PERMISSIONS = Array.from({ length: 30 }, (_, i) => ({
-    id: `api_perm_${i + 1}`,
-    name: `API Permission ${i + 1}`,
-    mainPermissionId: `perm_${Math.floor(Math.random() * 50) + 1}`,
-    endpoint: `/api/${['users', 'reports', 'data', 'files'][Math.floor(Math.random() * 4)]}`,
-    method: ['GET', 'POST', 'PUT', 'DELETE'][Math.floor(Math.random() * 4)],
+  // Mock data for detailed permissions - UPDATED to match ApiPermissionsStep props
+  const MOCK_DETAILED_PERMISSIONS = Array.from({ length: 30 }, (_, i) => {
+    const actions = ['view', 'create', 'edit', 'delete', 'approve', 'export'];
+    const resources = ['accounts', 'users', 'inventory', 'finance', 'reports', 'files', 'settings'];
+    
+    const action = actions[Math.floor(Math.random() * actions.length)];
+    const resource = resources[Math.floor(Math.random() * resources.length)];
+    const permissionName = `${action.charAt(0).toUpperCase() + action.slice(1)} ${resource}`;
+    
+    return {
+      id: `detailed_perm_${i + 1}`,
+      name: permissionName,
+      mainPermissionId: `perm_${Math.floor(Math.random() * 50) + 1}`,
+      action: action, // Changed from 'endpoint'
+      resource: resource, // Changed from 'method'
+      description: `Allows ${action} access to ${resource}`
+    };
+  });
+
+  // Mock data for main permissions list (for display names)
+  const MOCK_MAIN_PERMISSIONS_LIST = Array.from({ length: 50 }, (_, i) => ({
+    id: `perm_${i + 1}`,
+    name: `Main Permission ${i + 1}`,
+    description: `Description for main permission ${i + 1}`
   }));
 
   // Filter permissions based on selected modules
@@ -72,11 +90,11 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     );
   };
 
-  // Filter API permissions based on selected main permissions
-  const getFilteredApiPermissions = () => {
+  // Filter detailed permissions based on selected main permissions
+  const getFilteredDetailedPermissions = () => {
     if (formData.step2.permissions.length === 0) return [];
-    return MOCK_API_PERMISSIONS.filter(apiPermission =>
-      formData.step2.permissions.includes(apiPermission.mainPermissionId)
+    return MOCK_DETAILED_PERMISSIONS.filter(permission =>
+      formData.step2.permissions.includes(permission.mainPermissionId)
     );
   };
 
@@ -282,7 +300,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         </div>
       )}
 
- 
       <div>
         <AnimatePresence mode="wait">
           {currentStep === 1 && (
@@ -315,8 +332,9 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               onSubmit={handleStep3Submit}
               onBack={handleBack}
               isLoading={loading}
-              apiPermissions={getFilteredApiPermissions()}
+              apiPermissions={getFilteredDetailedPermissions()}
               selectedPermissions={formData.step2.permissions}
+              mainPermissionsList={MOCK_MAIN_PERMISSIONS_LIST}
             />
           )}
         </AnimatePresence>

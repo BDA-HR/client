@@ -33,7 +33,6 @@ interface AccountBasicInfoStepProps {
 }
 
 const MODULE_OPTIONS = [
-  { id: 'core', label: 'Core' },
   { id: 'hr', label: 'HR' },
   { id: 'crm', label: 'CRM' },
   { id: 'file', label: 'File Management' },
