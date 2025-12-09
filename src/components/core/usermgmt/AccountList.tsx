@@ -16,17 +16,17 @@ interface EmpSearchRes {
 
 interface EmployeeListProps {
   employees: EmpSearchRes[];
-  onAddAccount: () => void; 
+  onAddAccount: () => void;
 }
 
 const EmployeeList: React.FC<EmployeeListProps> = ({
   employees,
-  onAddAccount, 
+  onAddAccount,
 }) => {
-  
+
   const getInitials = (name: string | undefined | null): string => {
     if (!name || name.trim() === "") return "??";
-    
+
     try {
       return name
         .split(' ')
@@ -41,7 +41,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
     }
   };
 
-  
+
   const getDisplayValue = (value: string | undefined | null, fallback: string = "N/A"): string => {
     return value && value.trim() !== "" ? value : fallback;
   };
@@ -54,14 +54,14 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
           <User className="w-8 h-8 text-gray-400" />
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">No employees found</h3>
-        
+
       </div>
     );
   }
 
-  
+
   const employee = employees[0];
-  
+
   const {
     photo,
     code = "EMP0012345",
@@ -92,7 +92,8 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                 {photo ? (
                   <div className="w-full h-56 rounded-xl overflow-hidden border border-gray-200">
                     <img
-                      src={photo}
+                      src={`data:image/png;base64,${photo}`}
+                      // src={photo}
                       alt={getDisplayValue(fullName, "Employee")}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -114,7 +115,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                     </div>
                   </div>
                 )}
-                
+
                 {/* Code Display at Bottom */}
                 <div className="mt-4 text-center">
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
@@ -128,15 +129,15 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
 
             {/* Right Column - Employee Details */}
             <div className="md:w-3/5 space-y-4">
-              
+
               <div className="space-y-2">
                 <h2 className="text-xl font-bold text-gray-800">
                   {getDisplayValue(fullName)}
                 </h2>
-              
+
                 {fullNameAm && fullNameAm.trim() !== "" && (
                   <div className="flex items-center gap-2">
-                   
+
                     <p className="text-gray-700 text-sm">
                       {fullNameAm}
                     </p>
@@ -153,7 +154,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                 </div>
               </div>
 
-        
+
               <div className="flex items-center gap-3">
                 <div>
                   <p className="text-sm text-gray-600">Position</p>
@@ -166,7 +167,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
               <div className="flex items-center gap-3">
                 <div>
                   <p className="text-sm text-gray-600">Gender</p>
-                 <p className="text-base font-medium text-gray-800 capitalize">
+                  <p className="text-base font-medium text-gray-800 capitalize">
                     {getDisplayValue(gender)}
                   </p>
                 </div>
@@ -176,7 +177,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                 <Button
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                   size="lg"
-                  onClick={onAddAccount} 
+                  onClick={onAddAccount}
                 >
                   Add Account
                 </Button>
