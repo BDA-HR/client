@@ -37,11 +37,6 @@ const validationSchema = yup.object({
   country: yup.string().required('Country is required'),
   region: yup.string().required('Region is required'),
   telephone: yup.string().required('Telephone is required'),
-  wereda: yup.string().required('Wereda is required'),
-  kebele: yup.string().required('Kebele is required'),
-  zone: yup.string().required('Zone is required'),
-  subcity: yup.string().required('Subcity is required'),
-  housenumber: yup.string().required('House number is required'),
 });
 
 export const GuarantorStep: React.FC<GuarantorStepProps> = ({
@@ -90,7 +85,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       houseNo: data.houseNo || '',
       telephone: data.telephone || '',
       poBox: data.poBox || '',
-      fax: data.fax || ' ',
+      fax: data.fax || '',
       email: data.email || '',
       website: data.website || '',
       File: data.File || null,
@@ -98,13 +93,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     validationSchema,
     enableReinitialize: true,
     validateOnMount: false,
-    validateOnChange: false, 
-    validateOnBlur: false,
     onSubmit: (values) => {
-      // Clear previous errors when submitting
       setSubmitError(null);
-
-      // Scroll to top before calling onNext
       scrollToTop();
       onNext(values);
     },
@@ -143,10 +133,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Handle relation selection
   const handleRelationSelect = (item: ListItem) => {
     formik.setFieldValue('relationId', item.id);
-    // Clear error when user selects a relation
-    if (submitError && formik.errors.relationId) {
-      setSubmitError(null);
-    }
   };
 
   // Amharic input handlers
@@ -163,7 +149,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Handle phone input change
   const handlePhoneChange = (value: string) => {
     formik.setFieldValue('telephone', value);
-    formik.setFieldTouched('telephone', true, false);
+    formik.setFieldTouched('telephone', true);
   };
 
   const handleGuarantorFileSelect = (file: File) => {
@@ -174,8 +160,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     formik.setFieldValue('File', null);
   };
 
-
-  // Helper function to safely get error messages (kept for display purposes only)
+  // Helper function to safely get error messages
   const getErrorMessage = (fieldName: string): string => {
     const error = formik.errors[fieldName as keyof typeof formik.errors];
     const touched = formik.touched[fieldName as keyof typeof formik.touched];
@@ -189,10 +174,25 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Get the selected relation name for display
   const selectedRelation = relations.find(relation => relation.id === formik.values.relationId);
 
-  // Handle form submission without validation
+  // Handle form submission - same as EmergencyContactStep
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
+    
+    // Validate form before submission
+    const errors = formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      // Set touched for all fields to show errors
+      const allTouched = Object.keys(formik.values).reduce((acc, key) => {
+        acc[key as keyof Step4Dto] = true;
+        return acc;
+      }, {} as Record<keyof Step4Dto, boolean>);
+      formik.setTouched(allTouched);
+      
+      // Scroll to first error
+      scrollToTop();
+      return;
+    }
     
     // Scroll to top before form submission
     scrollToTop();
@@ -213,7 +213,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
-      {/* Error Display - Similar to Step 3 */}
+      {/* Error Display - Similar to EmergencyContactStep */}
       {submitError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -574,7 +574,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               )}
             </div>
 
-            {/* Subcity */}
+            {/* Optional Fields (same as EmergencyContactStep) */}
             <div className="space-y-2">
               <label htmlFor="subcity" className="block text-sm font-medium text-gray-700 mb-1">
                 Subcity
@@ -591,7 +591,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Zone */}
             <div className="space-y-2">
               <label htmlFor="zone" className="block text-sm font-medium text-gray-700 mb-1">
                 Zone
@@ -608,7 +607,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Woreda */}
             <div className="space-y-2">
               <label htmlFor="woreda" className="block text-sm font-medium text-gray-700 mb-1">
                 Woreda
@@ -625,7 +623,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Kebele */}
             <div className="space-y-2">
               <label htmlFor="kebele" className="block text-sm font-medium text-gray-700 mb-1">
                 Kebele
@@ -642,7 +639,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* House Number */}
             <div className="space-y-2">
               <label htmlFor="houseNo" className="block text-sm font-medium text-gray-700 mb-1">
                 House Number
@@ -659,7 +655,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Email */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -677,7 +672,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* P.O. Box */}
             <div className="space-y-2">
               <label htmlFor="poBox" className="block text-sm font-medium text-gray-700 mb-1">
                 P.O. Box
@@ -694,7 +688,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Fax */}
             <div className="space-y-2">
               <label htmlFor="fax" className="block text-sm font-medium text-gray-700 mb-1">
                 Fax
@@ -711,7 +704,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Website */}
             <div className="space-y-2">
               <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
                 Website
@@ -732,7 +724,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
 
         {/* Guarantor Document Upload Section - Centered */}
         <div className="flex justify-center mb-8">
-          <div className="w-full max-w-2xl"> {/* Added max-width constraint */}
+          <div className="w-full max-w-2xl">
             <GuarantorProfileUpload
               guarantorFile={formik.values.File}
               onGuarantorFileSelect={handleGuarantorFileSelect}
@@ -753,7 +745,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
           </button>
           <button
             type="submit"
-            disabled={loading} // Only disable when loading, not based on form validation
+            disabled={loading}
             className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading ? (
