@@ -91,7 +91,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
     },
     validationSchema,
     enableReinitialize: true,
-    validateOnMount: true,
+    validateOnMount: false,
     onSubmit: (values) => {
       // Clear previous errors when submitting
       setSubmitError(null);
@@ -153,15 +153,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
     formik.setFieldValue('telephone', value);
   };
 
-  // Simplified form validation
-  const isFormValid = React.useMemo(() => {
-    if (loadingRelations || loading) return false;
-    if (!employeeId && !formik.values.employeeId) return false;
-
-    return formik.isValid && formik.dirty;
-  }, [formik.isValid, formik.dirty, loadingRelations, loading, employeeId, formik.values.employeeId]);
-
-  // Helper function to safely get error messages
+  // Helper function to safely get error messages (kept for display purposes only)
   const getErrorMessage = (fieldName: string): string => {
     const error = formik.errors[fieldName as keyof typeof formik.errors];
     const touched = formik.touched[fieldName as keyof typeof formik.touched];
@@ -172,30 +164,14 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
     return '';
   };
 
-  // Handle form submission with validation and scroll to top
+  // Handle form submission without validation
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate all fields
-    formik.validateForm().then(errors => {
-      if (Object.keys(errors).length === 0) {
-        // No errors, submit the form
-        // Scroll to top before form submission
-        scrollToTop();
-        formik.handleSubmit();
-      } else {
-        // Set a general error message
-        setSubmitError('Please fill in all required fields correctly before submitting.');
-
-        // Mark all fields as touched to show errors
-        const allFields = Object.keys(formik.values) as Array<keyof Step3Dto>;
-        const touchedFields: Partial<Record<keyof Step3Dto, boolean>> = {};
-        allFields.forEach(field => {
-          touchedFields[field] = true;
-        });
-        formik.setTouched(touchedFields);
-      }
-    });
+    setSubmitError(null);
+    
+    // Scroll to top before form submission
+    scrollToTop();
+    formik.handleSubmit();
   };
 
   // Handle back button click with scroll to top
@@ -460,7 +436,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {/* Address Type - Required */}
+            {/* Address Type */}
             <div className="space-y-2">
               <label htmlFor="addressType" className="block text-sm font-medium text-gray-700 mb-1">
                 Address Type *
@@ -487,7 +463,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
               )}
             </div>
 
-            {/* Country - Required */}
+            {/* Country */}
             <div className="space-y-2">
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
                 Country *
@@ -508,7 +484,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
               )}
             </div>
 
-            {/* Region - Required */}
+            {/* Region */}
             <div className="space-y-2">
               <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-1">
                 Region *
@@ -529,7 +505,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
               )}
             </div>
 
-            {/* Telephone - Required with PhoneInput */}
+            {/* Telephone */}
             <div className="space-y-2">
               <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
                 Telephone *
@@ -543,7 +519,6 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
                   disabled={loading}
                   inputProps={{
                     name: "telephone",
-                    required: true,
                     onBlur: formik.handleBlur,
                     disabled: loading
                   }}
@@ -745,7 +720,7 @@ export const EmergencyContactStep: React.FC<EmergencyContactStepProps> = ({
           </button>
           <button
             type="submit"
-            disabled={!isFormValid || loading}
+            disabled={loading} // Only disable when loading, not based on form validation
             className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading ? (

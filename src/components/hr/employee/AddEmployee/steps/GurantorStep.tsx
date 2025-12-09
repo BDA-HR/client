@@ -97,9 +97,9 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     },
     validationSchema,
     enableReinitialize: true,
-    validateOnMount: true,
-    validateOnChange: true,
-    validateOnBlur: true,
+    validateOnMount: false,
+    validateOnChange: false, 
+    validateOnBlur: false,
     onSubmit: (values) => {
       // Clear previous errors when submitting
       setSubmitError(null);
@@ -174,15 +174,8 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     formik.setFieldValue('File', null);
   };
 
-  // Simplified form validation
-  const isFormValid = React.useMemo(() => {
-    if (loadingRelations || loading) return false;
-    if (!employeeId && !formik.values.employeeId) return false;
 
-    return formik.isValid && formik.dirty;
-  }, [formik.isValid, formik.dirty, loadingRelations, loading, employeeId, formik.values.employeeId]);
-
-  // Helper function to safely get error messages
+  // Helper function to safely get error messages (kept for display purposes only)
   const getErrorMessage = (fieldName: string): string => {
     const error = formik.errors[fieldName as keyof typeof formik.errors];
     const touched = formik.touched[fieldName as keyof typeof formik.touched];
@@ -196,30 +189,14 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   // Get the selected relation name for display
   const selectedRelation = relations.find(relation => relation.id === formik.values.relationId);
 
-  // Handle form submission with validation and scroll to top
+  // Handle form submission without validation
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate all fields
-    formik.validateForm().then(errors => {
-      if (Object.keys(errors).length === 0) {
-        // No errors, submit the form
-        // Scroll to top before form submission
-        scrollToTop();
-        formik.handleSubmit();
-      } else {
-        // Set a general error message
-        setSubmitError('Please fill in all required fields correctly before submitting.');
-
-        // Mark all fields as touched to show errors
-        const allFields = Object.keys(formik.values) as Array<keyof Step4Dto>;
-        const touchedFields: Partial<Record<keyof Step4Dto, boolean>> = {};
-        allFields.forEach(field => {
-          touchedFields[field] = true;
-        });
-        formik.setTouched(touchedFields);
-      }
-    });
+    setSubmitError(null);
+    
+    // Scroll to top before form submission
+    scrollToTop();
+    formik.handleSubmit();
   };
 
   // Handle back button click with scroll to top
@@ -481,7 +458,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {/* Address Type - Required */}
+            {/* Address Type */}
             <div className="space-y-2">
               <label htmlFor="addressType" className="block text-sm font-medium text-gray-700 mb-1">
                 Address Type *
@@ -508,7 +485,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               )}
             </div>
 
-            {/* Country - Required */}
+            {/* Country */}
             <div className="space-y-2">
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
                 Country *
@@ -529,7 +506,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               )}
             </div>
 
-            {/* Region - Required */}
+            {/* Region */}
             <div className="space-y-2">
               <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-1">
                 Region *
@@ -550,7 +527,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               )}
             </div>
 
-            {/* Telephone - Required with PhoneInput */}
+            {/* Telephone */}
             <div className="space-y-2">
               <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
                 Telephone *
@@ -564,7 +541,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
                   disabled={loading}
                   inputProps={{
                     name: "telephone",
-                    required: true,
                     onBlur: formik.handleBlur,
                     disabled: loading
                   }}
@@ -598,7 +574,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               )}
             </div>
 
-            {/* Subcity - Optional */}
+            {/* Subcity */}
             <div className="space-y-2">
               <label htmlFor="subcity" className="block text-sm font-medium text-gray-700 mb-1">
                 Subcity
@@ -615,7 +591,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Zone - Optional */}
+            {/* Zone */}
             <div className="space-y-2">
               <label htmlFor="zone" className="block text-sm font-medium text-gray-700 mb-1">
                 Zone
@@ -632,7 +608,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Woreda - Optional */}
+            {/* Woreda */}
             <div className="space-y-2">
               <label htmlFor="woreda" className="block text-sm font-medium text-gray-700 mb-1">
                 Woreda
@@ -649,7 +625,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Kebele - Optional */}
+            {/* Kebele */}
             <div className="space-y-2">
               <label htmlFor="kebele" className="block text-sm font-medium text-gray-700 mb-1">
                 Kebele
@@ -666,7 +642,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* House Number - Optional */}
+            {/* House Number */}
             <div className="space-y-2">
               <label htmlFor="houseNo" className="block text-sm font-medium text-gray-700 mb-1">
                 House Number
@@ -683,7 +659,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-                        {/* Email - Optional */}
+            {/* Email */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -701,7 +677,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* P.O. Box - Optional */}
+            {/* P.O. Box */}
             <div className="space-y-2">
               <label htmlFor="poBox" className="block text-sm font-medium text-gray-700 mb-1">
                 P.O. Box
@@ -718,7 +694,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Fax - Optional */}
+            {/* Fax */}
             <div className="space-y-2">
               <label htmlFor="fax" className="block text-sm font-medium text-gray-700 mb-1">
                 Fax
@@ -735,7 +711,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
               />
             </div>
 
-            {/* Website - Optional */}
+            {/* Website */}
             <div className="space-y-2">
               <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
                 Website
@@ -777,7 +753,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
           </button>
           <button
             type="submit"
-            disabled={!isFormValid || loading}
+            disabled={loading} // Only disable when loading, not based on form validation
             className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading ? (

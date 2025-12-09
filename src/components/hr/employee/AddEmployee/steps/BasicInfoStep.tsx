@@ -10,10 +10,8 @@ import type { Step1Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
 import { amharicRegex } from '../../../../../utils/amharic-regex';
 import List from '../../../../List/list';
-//import { branchService } from '../../../../../services/core/branchservice';
 import { nameListService } from '../../../../../services/List/HrmmNameListService';
 import type { ListItem } from '../../../../../types/List/list';
-//import type { BranchCompListDto } from '../../../../../types/core/branch';
 import type { NameListDto } from '../../../../../types/hr/NameListDto';
 import type { NameListItem } from '../../../../../types/NameList/nameList';
 
@@ -96,7 +94,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     },
     validationSchema,
     enableReinitialize: true,
-    validateOnMount: true,
+    validateOnMount: false, // Disable validation on mount
     onSubmit: async (values) => {
       setSubmitError(null);
 
@@ -294,13 +292,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     formik.setFieldValue('File', null);
   };
 
-  // Simplified form validation
-  const isFormValid = React.useMemo(() => {
-    if (loading) return false;
-    return formik.isValid && formik.dirty;
-  }, [formik.isValid, formik.dirty, loading]);
-
-  // Helper function to safely get error messages
+  // Helper function to safely get error messages (kept for display purposes only)
   const getErrorMessage = (fieldName: string): string => {
     const error = formik.errors[fieldName as keyof typeof formik.errors];
     const touched = formik.touched[fieldName as keyof typeof formik.touched];
@@ -311,25 +303,14 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     return '';
   };
 
-  // Handle form submission with validation and scroll to top
+  // Handle form submission without validation
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    formik.validateForm().then(errors => {
-      if (Object.keys(errors).length === 0) {
-        // Scroll to top before form submission
-        scrollToTop();
-        formik.handleSubmit();
-      } else {
-        setSubmitError('Please fill in all required fields correctly before submitting.');
-        const allFields = Object.keys(formik.values) as Array<keyof (Step1Dto & { branchId: UUID })>;
-        const touchedFields: Partial<Record<keyof (Step1Dto & { branchId: UUID }), boolean>> = {};
-        allFields.forEach(field => {
-          touchedFields[field] = true;
-        });
-        formik.setTouched(touchedFields);
-      }
-    });
+    setSubmitError(null);
+    
+    // Scroll to top before form submission
+    scrollToTop();
+    formik.handleSubmit();
   };
 
   return (
@@ -672,7 +653,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 onBlur={formik.handleBlur}
                 className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentDate') ? "border-red-500" : "border-gray-300"
                   }`}
-                required
                 disabled={loading}
               />
               {getErrorMessage('employmentDate') && (
@@ -759,7 +739,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         <div className="flex justify-end pt-6">
           <button
             type="submit"
-            disabled={!isFormValid || loading}
+            disabled={loading} // Only disable when loading, not based on form validation
             className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading ? (
