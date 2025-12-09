@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Key, Shield } from 'lucide-react';
+import { Eye, EyeOff, Shield } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { Label } from '../../../../components/ui/label';
 import { Input } from '../../../../components/ui/input';
@@ -73,20 +73,8 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
   };
 
   const validateForm = () => {
-    if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters long');
-      return false;
-    }
-    if (!/(?=.*[a-z])/.test(formData.password)) {
-      toast.error('Password must contain at least one lowercase letter');
-      return false;
-    }
-    if (!/(?=.*[A-Z])/.test(formData.password)) {
-      toast.error('Password must contain at least one uppercase letter');
-      return false;
-    }
-    if (!/(?=.*\d)/.test(formData.password)) {
-      toast.error('Password must contain at least one number');
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -114,7 +102,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
 
   const isFormValid = () => {
     return (
-      formData.password.length >= 8 &&
+      formData.password.length >= 6 &&
       formData.confirmPassword === formData.password &&
       formData.role &&
       formData.modules.length > 0
@@ -138,8 +126,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm text-gray-500 flex items-center gap-2">
-              <Key size={14} />
+            <Label htmlFor="password" className="text-sm text-gray-500">
               Password <span className="text-red-500">*</span>
             </Label>
             <div className="relative">

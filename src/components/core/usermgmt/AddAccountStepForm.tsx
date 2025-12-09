@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Lock, Shield, Key, CheckCircle } from 'lucide-react';
+import { Lock, Shield, Key } from 'lucide-react';
 import { AccountBasicInfoStep } from './steps/AccountBasicInfoStep';
 import { MainPermissionsStep } from './steps/MainPermissionsStep';
 import { ApiPermissionsStep } from './steps/ApiPermissionsStep';
 import { AddAccountStepHeader } from './AddAccountStepHeader';
-import type{ EmpSearchRes } from '../../../types/core/EmpSearchRes';
+import type { EmpSearchRes } from '../../../types/core/EmpSearchRes';
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: Lock },
-  { id: 2, title: 'Main Permissions', icon: Shield },
+  { id: 2, title: 'Menu Permissions', icon: Shield },
   { id: 3, title: 'Detailed Permissions', icon: Key },
 ];
 
 interface AddAccountStepFormProps {
   onBackToAccounts: () => void;
   onAccountAdded: (result: any) => void;
-  employee?: EmpSearchRes; 
+  employee?: EmpSearchRes;
 }
 
 export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
@@ -74,8 +74,8 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
   // Mock data for main permissions list
   const MOCK_MAIN_PERMISSIONS_LIST = Array.from({ length: 50 }, (_, i) => ({
     id: `perm_${i + 1}`,
-    name: `Main Permission ${i + 1}`,
-    description: `Description for main permission ${i + 1}`
+    name: `Menu Permission ${i + 1}`,
+    description: `Description for menu permission ${i + 1}`
   }));
 
   // Generate email from employee data
@@ -291,47 +291,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700 text-sm">{error}</p>
-        </div>
-      )}
-
-      {/* Employee Info Banner */}
-      {employee && (
-        <div className="mb-6 bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-emerald-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800">Creating Account for Employee</h3>
-                <div className="flex items-center gap-4 mt-1">
-                  <p className="text-sm text-gray-600">{getEmployeeDisplayName()}</p>
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
-                    Code: {getEmployeeCode()}
-                  </span>
-                  {getEmployeeEmail() && (
-                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
-                      {getEmployeeEmail()}
-                    </span>
-                  )}
-                  {/* Additional employee info if needed */}
-                  {employee.dept && (
-                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
-                      Dept: {employee.dept}
-                    </span>
-                  )}
-                  {employee.position && (
-                    <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
-                      {employee.position}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-500">Step {currentStep} of 3</p>
-            </div>
-          </div>
         </div>
       )}
 

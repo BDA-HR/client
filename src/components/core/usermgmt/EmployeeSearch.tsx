@@ -18,8 +18,8 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
 
   // Validate code input - only allow 10 alphanumeric characters
   const validateCode = (code: string): boolean => {
-    if (code === "") return true; // Empty is valid (for clearing)
-    return /^[a-zA-Z0-9]{0,10}$/.test(code); // Allow up to 10 alphanumeric characters
+    if (code === "") return true; 
+    return /^[a-zA-Z0-9]{0,10}$/.test(code); 
   };
 
   const handleInputChange = (value: string) => {
@@ -59,11 +59,11 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
       transition={{ duration: 0.4 }}
       className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6"
     >
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        {/* Search Input - Left side */}
-        <div className="flex-1">
-          <form onSubmit={handleSubmit}>
-            <div className="relative max-w-md">
+      <form onSubmit={handleSubmit} className="w-full">
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          {/* Search Input Container with fixed width */}
+          <div className="w-full sm:w-auto">
+            <div className="relative w-full sm:w-80"> {/* Increased to 320px */}
               <label htmlFor="employee-search" className="sr-only">
                 Search employees
               </label>
@@ -113,22 +113,21 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
                 {error}
               </div>
             )}
-          </form>
-        </div>
+          </div>
 
-        {/* Search Button - Right side */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            type="submit"
-            onClick={handleSubmit}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md cursor-pointer"
-            disabled={searchQuery.length === 0}
-          >
-            <UserSearch className="h-4 w-4" />
-            Search Employee
-          </Button>
+          {/* Search Button - Positioned closer to search bar */}
+          <div className="flex-shrink-0">
+            <Button
+              type="submit"
+              className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md cursor-pointer whitespace-nowrap"
+              disabled={searchQuery.length === 0}
+            >
+              <UserSearch className="h-4 w-4" />
+              Search Employee
+            </Button>
+          </div>
         </div>
-      </div>
+      </form>
     </motion.div>
   );
 };

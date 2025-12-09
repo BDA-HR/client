@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
+import { Search, Check, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { Input } from '../../../../components/ui/input';
 import { Checkbox } from '../../../../components/ui/checkbox';
@@ -31,10 +31,22 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
 }) => {
   const [search, setSearch] = useState('');
   const [formData, setFormData] = useState(initialData);
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setFormData(initialData);
   }, [initialData]);
+
+  // Initialize expanded modules
+  useEffect(() => {
+    const initialExpanded: Record<string, boolean> = {};
+    permissions.forEach(permission => {
+      if (!initialExpanded[permission.module]) {
+        initialExpanded[permission.module] = false; // Start collapsed
+      }
+    });
+    setExpandedModules(initialExpanded);
+  }, [permissions]);
 
   // Group permissions by module
   const groupedPermissions = useMemo(() => {
@@ -115,6 +127,29 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
     setFormData({ permissions: [] });
   };
 
+  const toggleModuleExpansion = (moduleName: string) => {
+    setExpandedModules(prev => ({
+      ...prev,
+      [moduleName]: !prev[moduleName]
+    }));
+  };
+
+  const expandAllModules = () => {
+    const newExpanded: Record<string, boolean> = {};
+    Object.keys(groupedPermissions).forEach(module => {
+      newExpanded[module] = true;
+    });
+    setExpandedModules(newExpanded);
+  };
+
+  const collapseAllModules = () => {
+    const newExpanded: Record<string, boolean> = {};
+    Object.keys(groupedPermissions).forEach(module => {
+      newExpanded[module] = false;
+    });
+    setExpandedModules(newExpanded);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -150,14 +185,14 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white"
+      className="bg-white p-6"
     >
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800">
-          Main Permissions
+          Menu Permissions
         </h2>
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-700">
+        <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+          <p className="text-sm text-emerald-700">
             <span className="font-semibold">Selected Modules:</span>{' '}
             {selectedModules.map(getModuleLabel).join(', ')} ({selectedModules.length} modules)
           </p>
@@ -174,6 +209,26 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
               </p>
             </div>
             <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={expandAllModules}
+                disabled={isLoading || permissions.length === 0}
+                className="px-4"
+              >
+                Expand All
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={collapseAllModules}
+                disabled={isLoading || permissions.length === 0}
+                className="px-4"
+              >
+                Collapse All
+              </Button>
               <Button
                 type="button"
                 variant="outline"
@@ -210,33 +265,39 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
           </div>
         </div>
 
-        {/* Module Cards */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {Object.keys(filteredPermissions).length > 0 ? (
             Object.entries(filteredPermissions).map(([moduleName, modulePermissions]) => {
+              const isExpanded = expandedModules[moduleName] || false;
               const stats = getModuleSelectionStats(modulePermissions);
               
               return (
                 <div 
                   key={moduleName} 
-                  className="border border-gray-200 rounded-xl overflow-hidden"
+                  className="border border-gray-200 rounded-xl overflow-hidden transition-all duration-200"
                 >
-                  {/* Module Card Header */}
-                  <div className="bg-gray-50 p-4 border-b border-gray-200">
+                  {/* Module Header - Clickable to expand/collapse */}
+                  <div 
+                    className="bg-gray-50 p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => toggleModuleExpansion(moduleName)}
+                  >
                     <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <h3 className="font-bold text-lg text-gray-800">
-                            {getModuleLabel(moduleName)}
-                          </h3>
-                          <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded">
-                            {modulePermissions.length} permissions
-                          </span>
+                      <div className="flex items-center gap-3">
+                        <div className="text-gray-500">
+                          {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                         </div>
-                        <div className="mt-2">
-                          <span className="text-sm text-gray-600">
-                            {stats.selectedCount} of {stats.totalCount} selected
-                          </span>
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+                            {getModuleLabel(moduleName)}
+                            <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded">
+                              {modulePermissions.length} permissions
+                            </span>
+                          </h3>
+                          <div className="mt-2 ml-8">
+                            <span className="text-sm text-gray-600">
+                              {stats.selectedCount} of {stats.totalCount} selected
+                            </span>
+                          </div>
                         </div>
                       </div>
                       
@@ -244,7 +305,10 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSelectAllInModule(moduleName, modulePermissions)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent toggling expansion
+                          handleSelectAllInModule(moduleName, modulePermissions);
+                        }}
                         disabled={isLoading}
                         className="px-4"
                       >
@@ -253,44 +317,52 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
                     </div>
                   </div>
                   
-                  {/* Permissions List */}
-                  <div className="p-4 bg-white">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {modulePermissions.map(permission => (
-                        <div 
-                          key={permission.id} 
-                          className={`p-3 rounded-lg border transition-all duration-200 ${
-                            formData.permissions.includes(permission.id) 
-                              ? 'bg-emerald-50 border-emerald-200' 
-                              : 'bg-gray-50 border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <Checkbox
-                              id={`permission-${permission.id}`}
-                              checked={formData.permissions.includes(permission.id)}
-                              onCheckedChange={() => handlePermissionChange(permission.id)}
-                              disabled={isLoading}
-                              className="mt-1 data-[state=checked]:bg-emerald-600 data-[state=checked]:text-white data-[state=checked]:border-emerald-600"
-                            />
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-1">
-                                <label
-                                  htmlFor={`permission-${permission.id}`}
-                                  className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
-                                >
-                                  {permission.name}
-                                </label>
-                              </div>
-                              <div className="text-xs text-gray-500 leading-relaxed">
-                                {permission.description}
+                  {/* Permissions List - Collapsible */}
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="p-4 bg-white"
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {modulePermissions.map(permission => (
+                          <div 
+                            key={permission.id} 
+                            className={`p-3 rounded-lg border transition-all duration-200 ${
+                              formData.permissions.includes(permission.id) 
+                                ? 'bg-green-50 border-green-200' 
+                                : 'bg-gray-50 border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <Checkbox
+                                id={`permission-${permission.id}`}
+                                checked={formData.permissions.includes(permission.id)}
+                                onCheckedChange={() => handlePermissionChange(permission.id)}
+                                disabled={isLoading}
+                                className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:text-white data-[state=checked]:border-green-600"
+                              />
+                              <div className="flex-1">
+                                <div className="mb-2">
+                                  <label
+                                    htmlFor={`permission-${permission.id}`}
+                                    className="text-sm font-medium text-gray-700 cursor-pointer block"
+                                  >
+                                    {permission.name}
+                                  </label>
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  {permission.description}
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               );
             })
@@ -304,33 +376,55 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="sticky bottom-0 bg-white pt-6 pb-2 mt-8 border-t border-gray-200">
-          <div className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onBack}
-              disabled={isLoading}
-              className="px-8"
-            >
-              Back
-            </Button>
-            <div className="flex items-center gap-6">
-              <div className="text-right">
-                <div className="text-2xl font-bold text-emerald-600">
-                  {formData.permissions.length}
-                </div>
-                <div className="text-xs text-gray-500">Total Permissions Selected</div>
-              </div>
-              <Button
-                type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
-                disabled={isLoading || permissions.length === 0}
-              >
-                {isLoading ? 'Saving...' : 'Save & Continue'}
-              </Button>
+        <div className="bg-gray-50 rounded-lg p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-emerald-600">{selectedModules.length}</div>
+              <div className="text-sm text-gray-600">Selected Modules</div>
             </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{formData.permissions.length}</div>
+              <div className="text-sm text-gray-600">Menu Permissions</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">{permissions.length}</div>
+              <div className="text-sm text-gray-600">Total Available Permissions</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between pt-8 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            disabled={isLoading}
+            className="px-8"
+          >
+            Back
+          </Button>
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <div className="text-2xl font-bold text-emerald-600">
+                {formData.permissions.length}
+              </div>
+              <div className="text-xs text-gray-500">Total Permissions Selected</div>
+            </div>
+            <Button
+              type="submit"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
+              disabled={isLoading || permissions.length === 0}
+            >
+              {isLoading ? (
+                'Saving...'
+              ) : (
+                <>
+                  <Check size={18} className="mr-2" />
+                  Save & Continue
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </form>

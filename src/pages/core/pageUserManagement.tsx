@@ -12,15 +12,12 @@ const UserManagement: React.FC = () => {
   const [searchedEmployees, setSearchedEmployees] = useState<EmpSearchRes[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [hasSearched, setHasSearched] = useState(false); 
   const handleAddAccountFromList = () => {
-    
     if (searchedEmployees.length > 0) {
       setSelectedEmployee(searchedEmployees[0]);
-    } else {
-      setSelectedEmployee(null);
+      setShowAccountForm(true);
     }
-    setShowAccountForm(true);
   };
 
   const handleAccountAdded = (result: any) => {
@@ -29,6 +26,7 @@ const UserManagement: React.FC = () => {
     setSelectedEmployee(null);
     setSearchedEmployees([]); 
     setError(null); 
+    setHasSearched(false); // Reset search flag
   };
 
   const handleBackToAccounts = () => {
@@ -36,14 +34,17 @@ const UserManagement: React.FC = () => {
     setSelectedEmployee(null);
     setSearchedEmployees([]); 
     setError(null); 
+    setHasSearched(false); // Reset search flag
   };
 
+  // Handle search query changes
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setError(null); 
     
     if (value.length === 0) {
       setSearchedEmployees([]);
+      setHasSearched(false); // Reset search flag when clearing
     }
   };
 
@@ -51,19 +52,21 @@ const UserManagement: React.FC = () => {
   const handleSearchEmployee = async () => {
     if (!searchQuery || searchQuery.length !== 10 || !/^[A-Za-z0-9]{10}$/.test(searchQuery)) {
       setError("Please enter a valid 10-character employee code");
+      setHasSearched(false);
       return;
     }
 
+    setHasSearched(true); // Mark that a search has been performed
     setLoading(true);
     setError(null);
     
     try {
       const employee = await userManagementService.getEmployeeByCode(searchQuery);
       setSearchedEmployees([employee]);
+      setLoading(false);
     } catch (err: any) {
       setError(err.message || "Failed to search employee. Please try again.");
       setSearchedEmployees([]);
-    } finally {
       setLoading(false);
     }
   };
@@ -80,9 +83,9 @@ const UserManagement: React.FC = () => {
         </div>
       ) : (
         <section className="w-full min-h-screen bg-gray-50 overflow-auto">
-          <div>
+          <div className="p-6">
             <div>
-              <div className="flex justify-between items-center pb-4">
+              <div className="pb-4">
                 <h1 className="text-2xl font-semibold text-gray-800">User Management</h1>
               </div>
               
@@ -90,6 +93,7 @@ const UserManagement: React.FC = () => {
               {error && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-2 text-red-700">
+                    <span>❌</span>
                     <span className="font-medium">Error:</span> {error}
                   </div>
                 </div>
@@ -113,15 +117,23 @@ const UserManagement: React.FC = () => {
               
               {/* Show search results when we have employees */}
               {searchedEmployees.length > 0 ? (
-                <EmployeeList
-                  employees={searchedEmployees}
-                  onAddAccount={handleAddAccountFromList}
-                />
+                <div className="space-y-6">
+                  <EmployeeList
+                    employees={searchedEmployees}
+                    onAddAccount={handleAddAccountFromList}
+                  />
+                </div>
               ) : (
-                // Show empty state when no results
-                searchQuery.length === 10 && !loading && !error && (
+                
+                hasSearched && !loading && (
                   <div className="text-center py-12 text-gray-500">
-                    No employee found with code: {searchQuery}
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No employee found</h3>
+                    <p className="text-gray-600">Please check the employee code and try again</p>
                   </div>
                 )
               )}
