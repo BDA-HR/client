@@ -90,7 +90,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
       houseNo: data.houseNo || '',
       telephone: data.telephone || '',
       poBox: data.poBox || '',
-      fax: data.fax || ' ',
+      fax: data.fax || '',
       email: data.email || '',
       website: data.website || '',
       File: data.File || null,
@@ -98,7 +98,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     validationSchema,
     enableReinitialize: true,
     validateOnMount: false,
-    validateOnChange: false, 
+    validateOnChange: false,
     validateOnBlur: false,
     onSubmit: (values) => {
       // Clear previous errors when submitting
@@ -193,7 +193,7 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
-    
+
     // Scroll to top before form submission
     scrollToTop();
     formik.handleSubmit();

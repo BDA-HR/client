@@ -28,7 +28,7 @@ class EmpService {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             console.info('Employee step 1 completed successfully:', response.data.data.id);
-            return response.data.data;
+            return response.data.data.id;
         } catch (error) {
             const errorMessage = this.extractErrorMessage(error);
             console.error("Failed to create employee step 1:", errorMessage);
@@ -41,7 +41,7 @@ class EmpService {
         try {
             const response = await api.post(`${this.baseUrl}/Step2`, step2);
             console.info('Employee step 2 completed successfully:', response.data.data.id);
-            return response.data.data;
+            return response.data.data.id;
         } catch (error) {
             const errorMessage = this.extractErrorMessage(error);
             console.error("Failed to create employee step 2:", errorMessage);
@@ -54,7 +54,7 @@ class EmpService {
         try {
             const response = await api.post(`${this.baseUrl}/Step3`, step3);
             console.info('Employee step 3 completed successfully:', response.data.data.id);
-            return response.data.data;
+            return response.data.data.id;
         } catch (error) {
             const errorMessage = this.extractErrorMessage(error);
             console.error("Failed to create employee step 3:", errorMessage);
@@ -69,7 +69,7 @@ class EmpService {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             console.info('Employee step 4 completed successfully:', response.data.data.id);
-            return response.data.data;
+            return response.data.data.id;
         } catch (error) {
             const errorMessage = this.extractErrorMessage(error);
             console.error("Failed to create employee step 4:", errorMessage);
@@ -93,7 +93,7 @@ class EmpService {
     async submitEmployee(step5Data: Step5Dto): Promise<EmpAddRes> {
         try {
             const response = await api.post(`${this.baseUrl}/Step5`, step5Data);
-            console.info('Employee submission completed successfully:', response.data.data.id);
+            console.info('Employee submission completed successfully:', response.data.data);
             return response.data.data;
         } catch (error) {
             const errorMessage = this.extractErrorMessage(error);

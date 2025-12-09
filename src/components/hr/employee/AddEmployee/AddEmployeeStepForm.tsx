@@ -47,19 +47,19 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
-    
+
     if (document.body) {
       document.body.scrollTop = 0;
     }
-    
+
     if (formContainerRef.current) {
       formContainerRef.current.scrollTop = 0;
     }
-    
+
     if (stepContentRef.current) {
       stepContentRef.current.scrollTop = 0;
     }
@@ -387,7 +387,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
           </div>
         )}
 
-        <div 
+        <div
           ref={stepContentRef}
           className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 px-8 py-4"
         >
