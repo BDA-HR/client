@@ -10,23 +10,25 @@ import { useNavigate } from 'react-router-dom';
 interface ReviewStepProps {
   employeeId?: UUID;
   employeeCode?: string;
-  onSubmit: (step5Data: Step5Dto) => void;
+  onConfirm: () => void;
   onBack: () => void;
   loading?: boolean;
   onClearTempData?: () => void;
+  isReviewComplete?: boolean;
 }
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
   employeeId,
-  onSubmit,
+  onConfirm,
   onBack,
   loading = false,
-  onClearTempData
+  onClearTempData,
 }) => {
   const navigate = useNavigate();
   const [reviewData, setReviewData] = useState<Step5Dto | null>(null);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting'>('idle');
 
   // Scroll to top function
   const scrollToTop = () => {
@@ -52,6 +54,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       try {
         setFetchLoading(true);
         setFetchError(null);
+        // Only use getStep5Data service method
         const data = await empService.getStep5Data(employeeId);
         setReviewData(data);
       } catch (error) {
@@ -103,19 +106,26 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     console.log('Temporary employee data cleared');
   };
 
-  const handleSubmit = async () => {
-    if (reviewData) {
-      scrollToTop();
+  const handleConfirm = async () => {
+    if (!reviewData) {
+      setFetchError('No review data available');
+      return;
+    }
 
-      try {
-        await onSubmit(reviewData);
+    scrollToTop();
+    setSubmissionStatus('submitting');
 
-        clearTemporaryData();
-
-        navigate('/hr/employees/record');
-      } catch (error) {
-        console.error('Submission failed:', error);
-      }
+    try {
+      // Call onConfirm (parent component handles the rest)
+      onConfirm();
+      
+      // Redirect immediately after calling onConfirm
+      navigate('/hr/employees/record');
+      
+    } catch (error) {
+      console.error('Confirmation failed:', error);
+      setFetchError('Failed to confirm. Please try again.');
+      setSubmissionStatus('idle');
     }
   };
 
@@ -358,8 +368,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       <div id="employee-review-content">
         <div className="text-center mb-8">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Print Employee Information</h2>
-          <p className="text-gray-600">Please review all the information before submitting</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Employee Information</h2>
+          <p className="text-gray-600">Please review all the information before confirming</p>
         </div>
 
         {/* Step 1: Basic Information */}
@@ -688,19 +698,19 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
           <button
             type="button"
-            onClick={handleSubmit}
-            disabled={loading}
+            onClick={handleConfirm}
+            disabled={loading || submissionStatus === 'submitting'}
             className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center"
           >
-            {loading ? (
+            {submissionStatus === 'submitting' || loading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                Submitting...
+                Confirming...
               </>
             ) : (
               <>
                 <CheckCircle className="w-5 h-5 mr-2" />
-                Finish
+                Confirm & Finish
               </>
             )}
           </button>

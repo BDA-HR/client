@@ -88,19 +88,6 @@ class EmpService {
             throw new Error(errorMessage);
         }
     }
-
-    // POST: api/hrm/profile/v1/Step5 - NEW: Submit final employee data
-    async submitEmployee(step5Data: Step5Dto): Promise<EmpAddRes> {
-        try {
-            const response = await api.post(`${this.baseUrl}/Step5`, step5Data);
-            console.info('Employee submission completed successfully:', response.data.data.id);
-            return response.data.data;
-        } catch (error) {
-            const errorMessage = this.extractErrorMessage(error);
-            console.error("Failed to complete employee submission:", errorMessage);
-            throw new Error(errorMessage);
-        }
-    }
 }
 
 export const empService = new EmpService();

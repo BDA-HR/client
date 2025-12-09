@@ -417,23 +417,33 @@ export const BiographicalStep: React.FC<BiographicalStepProps> = ({
                 Address Type *
               </label>
               <Select
-                value={formik.values.addressType}
-                onValueChange={(value: AddressType) => formik.setFieldValue('addressType', value)}
-                disabled={loading}
-              >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
-                  getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <SelectValue placeholder="Select address type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(AddressType).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      {value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+  value={formik.values.addressType}
+  onValueChange={(value: AddressType) => formik.setFieldValue('addressType', value)}
+  disabled={loading}
+>
+  <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+    getErrorMessage('addressType') ? "border-red-500" : "border-gray-300"
+  }`}>
+    <SelectValue placeholder="Select address type" />
+  </SelectTrigger>
+  <SelectContent>
+    {Object.entries(AddressType).map(([key, value]) => {
+      const isWorkPlace = key === "1" || value === 'Work Place';
+      return (
+        <SelectItem 
+          key={key} 
+          value={key}
+          disabled={isWorkPlace}
+          className={isWorkPlace ? "opacity-50 cursor-not-allowed" : ""}
+        >
+          <div className="flex items-center justify-between">
+            <span>{value}</span>
+          </div>
+        </SelectItem>
+      );
+    })}
+  </SelectContent>
+</Select>
               {getErrorMessage('addressType') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('addressType')}</div>
               )}

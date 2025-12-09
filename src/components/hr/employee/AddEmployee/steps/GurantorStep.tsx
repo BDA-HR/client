@@ -37,6 +37,11 @@ const validationSchema = yup.object({
   country: yup.string().required('Country is required'),
   region: yup.string().required('Region is required'),
   telephone: yup.string().required('Telephone is required'),
+  woreda: yup.string().required('woreda is required'),
+  // kebele: yup.string().required('Kebele is required'),
+  // zone: yup.string().required('Zone is required'),
+  subcity: yup.string().required('Subcity is required'),
+  houseNo: yup.string().required('House number is required'),
 });
 
 export const GuarantorStep: React.FC<GuarantorStepProps> = ({
