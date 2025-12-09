@@ -22,7 +22,6 @@ export const AddAccountStepHeader: React.FC<AddAccountStepHeaderProps> = ({
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between relative mb-4">
-        {/* Progress Line */}
         <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -translate-y-1/2 z-0" />
         <div 
           className="absolute top-5 left-0 h-0.5 bg-emerald-500 -translate-y-1/2 z-10 transition-all duration-300"

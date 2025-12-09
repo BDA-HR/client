@@ -5,22 +5,18 @@ import { AccountBasicInfoStep } from './steps/AccountBasicInfoStep';
 import { MainPermissionsStep } from './steps/MainPermissionsStep';
 import { ApiPermissionsStep } from './steps/ApiPermissionsStep';
 import { AddAccountStepHeader } from './AddAccountStepHeader';
+import type{ EmpSearchRes } from '../../../types/core/EmpSearchRes';
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: Lock },
   { id: 2, title: 'Main Permissions', icon: Shield },
-  { id: 3, title: 'Detailed Permissions', icon: Key }, // Changed from 'API Permissions'
+  { id: 3, title: 'Detailed Permissions', icon: Key },
 ];
 
 interface AddAccountStepFormProps {
   onBackToAccounts: () => void;
   onAccountAdded: (result: any) => void;
-  employee?: {
-    id: string;
-    name: string;
-    employeeCode: string;
-    email: string;
-  };
+  employee?: EmpSearchRes; 
 }
 
 export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
@@ -56,7 +52,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     description: `Description for permission ${i + 1}`,
   }));
 
-  // Mock data for detailed permissions - UPDATED to match ApiPermissionsStep props
+  // Mock data for detailed permissions
   const MOCK_DETAILED_PERMISSIONS = Array.from({ length: 30 }, (_, i) => {
     const actions = ['view', 'create', 'edit', 'delete', 'approve', 'export'];
     const resources = ['accounts', 'users', 'inventory', 'finance', 'reports', 'files', 'settings'];
@@ -69,18 +65,45 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       id: `detailed_perm_${i + 1}`,
       name: permissionName,
       mainPermissionId: `perm_${Math.floor(Math.random() * 50) + 1}`,
-      action: action, // Changed from 'endpoint'
-      resource: resource, // Changed from 'method'
+      action: action,
+      resource: resource,
       description: `Allows ${action} access to ${resource}`
     };
   });
 
-  // Mock data for main permissions list (for display names)
+  // Mock data for main permissions list
   const MOCK_MAIN_PERMISSIONS_LIST = Array.from({ length: 50 }, (_, i) => ({
     id: `perm_${i + 1}`,
     name: `Main Permission ${i + 1}`,
     description: `Description for main permission ${i + 1}`
   }));
+
+  // Generate email from employee data
+  const getEmployeeEmail = () => {
+    if (!employee) return '';
+    
+    // Try to extract email from code, or create a placeholder
+    if (employee.code) {
+      if (employee.code.includes('@')) {
+        return employee.code;
+      }
+      return `${employee.code.toLowerCase()}@company.com`;
+    }
+    
+    return '';
+  };
+
+  // Get employee display name
+  const getEmployeeDisplayName = () => {
+    if (!employee) return '';
+    return employee.fullName || '';
+  };
+
+  // Get employee code
+  const getEmployeeCode = () => {
+    if (!employee) return '';
+    return employee.code || '';
+  };
 
   // Filter permissions based on selected modules
   const getFilteredPermissions = () => {
@@ -193,12 +216,14 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     try {
       const finalData = {
         employeeId: employee?.id || '',
-        email: employee?.email || '',
+        employeeCode: getEmployeeCode(),
+        employeeName: getEmployeeDisplayName(),
+        email: getEmployeeEmail(), // Use generated email
         password: formData.step1.password,
         role: formData.step1.role,
         modules: formData.step1.modules,
         permissions: formData.step2.permissions,
-        apiPermissions: step3Data.apiPermissions,
+        detailedPermissions: step3Data.apiPermissions,
       };
 
       console.log('Submitting account data:', finalData);
@@ -211,10 +236,8 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         accountId: `ACC-${Date.now()}`
       };
 
-      // Clear all temporary data after successful submission
       clearTemporaryData();
 
-      // Call the parent callback with the result
       onAccountAdded(result);
     } catch (error) {
       console.error('Failed to create account:', error);
@@ -235,7 +258,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     }
   };
 
-  // Load saved form data on component mount
   useEffect(() => {
     const savedFormData = localStorage.getItem('accountFormData');
 
@@ -283,13 +305,26 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               <div>
                 <h3 className="font-semibold text-gray-800">Creating Account for Employee</h3>
                 <div className="flex items-center gap-4 mt-1">
-                  <p className="text-sm text-gray-600">{employee.name}</p>
+                  <p className="text-sm text-gray-600">{getEmployeeDisplayName()}</p>
                   <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
-                    Code: {employee.employeeCode}
+                    Code: {getEmployeeCode()}
                   </span>
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
-                    {employee.email}
-                  </span>
+                  {getEmployeeEmail() && (
+                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                      {getEmployeeEmail()}
+                    </span>
+                  )}
+                  {/* Additional employee info if needed */}
+                  {employee.dept && (
+                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                      Dept: {employee.dept}
+                    </span>
+                  )}
+                  {employee.position && (
+                    <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
+                      {employee.position}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -309,7 +344,12 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               onSubmit={handleStep1Submit}
               onBack={handleBack}
               isLoading={loading}
-              employee={employee}
+              employee={{
+                id: employee?.id || '',
+                name: getEmployeeDisplayName(),
+                employeeCode: getEmployeeCode(),
+                email: getEmployeeEmail(),
+              }}
             />
           )}
           

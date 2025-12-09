@@ -311,7 +311,6 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
           )}
         </div>
 
-        {/* Summary - Removed status bar */}
         <div className="bg-gray-50 rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
