@@ -98,8 +98,6 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
     validationSchema,
     enableReinitialize: true,
     validateOnMount: false,
-    validateOnChange: false,
-    validateOnBlur: false,
     onSubmit: (values) => {
       setSubmitError(null);
       scrollToTop();
@@ -185,7 +183,22 @@ export const GuarantorStep: React.FC<GuarantorStepProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
-
+    
+    // Validate form before submission
+    const errors = formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      // Set touched for all fields to show errors
+      const allTouched = Object.keys(formik.values).reduce((acc, key) => {
+        acc[key as keyof Step4Dto] = true;
+        return acc;
+      }, {} as Record<keyof Step4Dto, boolean>);
+      formik.setTouched(allTouched);
+      
+      // Scroll to first error
+      scrollToTop();
+      return;
+    }
+    
     // Scroll to top before form submission
     scrollToTop();
     formik.handleSubmit();
