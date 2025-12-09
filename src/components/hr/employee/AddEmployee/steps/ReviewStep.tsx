@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 interface ReviewStepProps {
   employeeId?: UUID;
   employeeCode?: string;
-  onConfirm: () => void;
+  // onConfirm: () => void;
   onBack: () => void;
   loading?: boolean;
   onClearTempData?: () => void;
@@ -19,7 +19,7 @@ interface ReviewStepProps {
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
   employeeId,
-  onConfirm,
+  // onConfirm,
   onBack,
   loading = false,
   onClearTempData,
@@ -117,11 +117,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
     try {
       // Call onConfirm (parent component handles the rest)
-      onConfirm();
-      
+      // onConfirm();
+
       // Redirect immediately after calling onConfirm
       navigate('/hr/employees/record');
-      
+
     } catch (error) {
       console.error('Confirmation failed:', error);
       setFetchError('Failed to confirm. Please try again.');
