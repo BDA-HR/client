@@ -46,8 +46,8 @@ class FiscalYearService {
   async createFiscalYear(fiscalYear: AddFiscYearDto): Promise<FiscYearListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddFiscalYear`, fiscalYear);
-      console.info('Fiscal year created successfully:', response.data.id);
-      return response.data;
+      console.info('Fiscal year created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating fiscal year:', errorMessage);
@@ -58,7 +58,7 @@ class FiscalYearService {
   async updateFiscalYear(updateData: EditFiscYearDto): Promise<FiscYearListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModFiscalYear/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating fiscal year:', errorMessage);

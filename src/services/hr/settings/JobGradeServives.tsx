@@ -1,9 +1,9 @@
 import { api } from '../../api';
-import type { 
-  JobGradeListDto, 
-  JobGradeAddDto, 
-  JobGradeModDto, 
-  UUID 
+import type {
+  JobGradeListDto,
+  JobGradeAddDto,
+  JobGradeModDto,
+  UUID
 } from '../../../types/hr/jobgrade';
 
 class JobGradeService {
@@ -54,8 +54,8 @@ class JobGradeService {
   async createJobGrade(jobGrade: JobGradeAddDto): Promise<JobGradeListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddJobGrade`, jobGrade);
-      console.info('Job grade created successfully:', response.data.id);
-      return response.data;
+      console.info('Job grade created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating job grade:', errorMessage);
@@ -67,7 +67,7 @@ class JobGradeService {
   async updateJobGrade(updateData: JobGradeModDto): Promise<JobGradeListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModJobGrade/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating job grade:', errorMessage);

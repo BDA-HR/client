@@ -1,10 +1,10 @@
 // services/hr/JgStepService.ts
 import { api } from '../../api';
-import type { 
-  JgStepListDto, 
-  JgStepAddDto, 
-  JgStepModDto, 
-  UUID 
+import type {
+  JgStepListDto,
+  JgStepAddDto,
+  JgStepModDto,
+  UUID
 } from '../../../types/hr/JgStep';
 
 class JgStepService {
@@ -55,8 +55,8 @@ class JgStepService {
   async createJgStep(jgStep: JgStepAddDto): Promise<JgStepListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddJgStep`, jgStep);
-      console.info('Job grade step created successfully:', response.data.id);
-      return response.data;
+      console.info('Job grade step created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating job grade step:', errorMessage);
@@ -68,7 +68,7 @@ class JgStepService {
   async updateJgStep(updateData: JgStepModDto): Promise<JgStepListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModJgStep/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating job grade step:', errorMessage);

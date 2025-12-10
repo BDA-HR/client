@@ -1,9 +1,9 @@
 import { api } from '../../api';
-import type { 
-  BenefitSetListDto, 
-  BenefitSetAddDto, 
-  BenefitSetModDto, 
-  UUID 
+import type {
+  BenefitSetListDto,
+  BenefitSetAddDto,
+  BenefitSetModDto,
+  UUID
 } from '../../../types/hr/benefit';
 
 class BenefitSetService {
@@ -54,8 +54,8 @@ class BenefitSetService {
   async createBenefitSet(benefitSet: BenefitSetAddDto): Promise<BenefitSetListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddBenefitSet`, benefitSet);
-      console.info('Benefit set created successfully:', response.data.id);
-      return response.data;
+      console.info('Benefit set created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating benefit set:', errorMessage);
@@ -67,7 +67,7 @@ class BenefitSetService {
   async updateBenefitSet(updateData: BenefitSetModDto): Promise<BenefitSetListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModBenefitSet/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating benefit set:', errorMessage);

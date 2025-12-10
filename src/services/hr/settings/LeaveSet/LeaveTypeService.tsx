@@ -54,8 +54,8 @@ class LeaveTypeService {
   async createLeaveType(leaveType: LeaveTypeAddDto): Promise<LeaveTypeListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddLeaveType`, leaveType);
-      console.info('Leave type created successfully:', response.data.id);
-      return response.data;
+      console.info('Leave type created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating leave type:', errorMessage);
@@ -67,7 +67,7 @@ class LeaveTypeService {
   async updateLeaveType(updateData: LeaveTypeModDto): Promise<LeaveTypeListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModLeaveType/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating leave type:', errorMessage);

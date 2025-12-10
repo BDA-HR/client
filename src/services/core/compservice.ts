@@ -48,8 +48,8 @@ class CompanyService {
   async createCompany(company: AddCompDto): Promise<CompListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddCompany`, company);
-      console.info('Company created successfully:', response.data.id);
-      return response.data;
+      console.info('Company created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating company:', errorMessage);
@@ -60,7 +60,7 @@ class CompanyService {
   async updateCompany(updateData: EditCompDto): Promise<CompListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModCompany/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating company:', errorMessage);

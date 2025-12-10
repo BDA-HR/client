@@ -47,7 +47,7 @@ class HierarchyService {
     try {
       const response = await api.post(`${this.baseUrl}/AddHierarchy`, hierarchy);
       console.info('Hierarchy created successfully:', response.data.id);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating hierarchy:', errorMessage);
@@ -58,7 +58,7 @@ class HierarchyService {
   async updateHierarchy(updateData: EditHierDto): Promise<HierListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModHierarchy/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating hierarchy:', errorMessage);

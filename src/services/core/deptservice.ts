@@ -47,8 +47,8 @@ class DepartmentService {
   async createDepartment(department: AddDeptDto): Promise<DeptListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddDept`, department);
-      console.info('Department created successfully:', response.data.id);
-      return response.data;
+      console.info('Department created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating department:', errorMessage);
@@ -59,7 +59,7 @@ class DepartmentService {
   async updateDepartment(updateData: EditDeptDto): Promise<DeptListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModDept/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating department:', errorMessage);

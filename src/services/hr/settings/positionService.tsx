@@ -19,21 +19,16 @@ import type {
 } from "../../../types/hr/position";
 
 class PositionService {
-  private baseUrl = `${
-    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
-  }/Position`;
-  private benefitUrl = `${
-    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
-  }/PositionBenefit`;
-  private eduUrl = `${
-    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
-  }/PositionEdu`;
-  private expUrl = `${
-    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
-  }/PositionExp`;
-  private reqUrl = `${
-    import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
-  }/PositionReq`;
+  private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+    }/Position`;
+  private benefitUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+    }/PositionBenefit`;
+  private eduUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+    }/PositionEdu`;
+  private expUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+    }/PositionExp`;
+  private reqUrl = `${import.meta.env.VITE_CORE_HRMM_URL || "core/hrmm/v1"
+    }/PositionReq`;
 
   // Helper method to extract error messages
   private extractErrorMessage(error: any): string {
@@ -82,8 +77,8 @@ class PositionService {
   async createPosition(position: PositionAddDto): Promise<PositionListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddPosition`, position);
-      console.info('Position created successfully:', response.data.id);
-      return response.data;
+      console.info('Position created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error creating position:", errorMessage);
@@ -94,11 +89,8 @@ class PositionService {
   // PUT: /api/core/hrmm/v1/Position/ModPosition/{id}
   async updatePosition(updateData: PositionModDto): Promise<PositionListDto> {
     try {
-      const response = await api.put(
-        `${this.baseUrl}/ModPosition/${updateData.id}`,
-        updateData
-      );
-      return response.data;
+      const response = await api.put(`${this.baseUrl}/ModPosition/${updateData.id}`, updateData);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error updating position:", errorMessage);
@@ -123,9 +115,7 @@ class PositionService {
   // GET: /api/core/hrmm/v1/PositionBenefit/AllPositionBenefit/{id}
   async getAllPositionBenefits(id: UUID): Promise<PositionBenefitListDto[]> {
     try {
-      const response = await api.get(
-        `${this.benefitUrl}/AllPositionBenefit/${id}`
-      );
+      const response = await api.get(`${this.benefitUrl}/AllPositionBenefit/${id}`);
       return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
@@ -139,12 +129,9 @@ class PositionService {
     benefit: PositionBenefitAddDto
   ): Promise<PositionBenefitListDto> {
     try {
-      const response = await api.post(
-        `${this.benefitUrl}/AddPositionBenefit`,
-        benefit
-      );
+      const response = await api.post(`${this.benefitUrl}/AddPositionBenefit`, benefit);
       console.info('Position benefit created successfully:', response.data.id);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error creating position benefit:", errorMessage);
@@ -157,11 +144,8 @@ class PositionService {
     updateData: PositionBenefitModDto
   ): Promise<PositionBenefitListDto> {
     try {
-      const response = await api.put(
-        `${this.benefitUrl}/ModPositionBenefit/${updateData.id}`,
-        updateData
-      );
-      return response.data;
+      const response = await api.put(`${this.benefitUrl}/ModPositionBenefit/${updateData.id}`, updateData);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error updating position benefit:", errorMessage);
@@ -200,12 +184,9 @@ class PositionService {
     education: PositionEduAddDto
   ): Promise<PositionEduListDto> {
     try {
-      const response = await api.post(
-        `${this.eduUrl}/AddPositionEdu`,
-        education
-      );
+      const response = await api.post(`${this.eduUrl}/AddPositionEdu`, education);
       console.info('Position education created successfully:', response.data.id);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error creating position education:", errorMessage);
@@ -218,11 +199,8 @@ class PositionService {
     updateData: PositionEduModDto
   ): Promise<PositionEduListDto> {
     try {
-      const response = await api.put(
-        `${this.eduUrl}/ModPositionEdu/${updateData.id}`,
-        updateData
-      );
-      return response.data;
+      const response = await api.put(`${this.eduUrl}/ModPositionEdu/${updateData.id}`, updateData);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error updating position education:", errorMessage);
@@ -261,12 +239,9 @@ class PositionService {
     experience: PositionExpAddDto
   ): Promise<PositionExpListDto> {
     try {
-      const response = await api.post(
-        `${this.expUrl}/AddPositionExp`,
-        experience
-      );
+      const response = await api.post(`${this.expUrl}/AddPositionExp`, experience);
       console.info('Position experience created successfully:', response.data.id);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error creating position experience:", errorMessage);
@@ -279,11 +254,8 @@ class PositionService {
     updateData: PositionExpModDto
   ): Promise<PositionExpListDto> {
     try {
-      const response = await api.put(
-        `${this.expUrl}/ModPositionExp/${updateData.id}`,
-        updateData
-      );
-      return response.data;
+      const response = await api.put(`${this.expUrl}/ModPositionExp/${updateData.id}`, updateData);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error updating position experience:", errorMessage);
@@ -322,12 +294,9 @@ class PositionService {
     requirement: PositionReqAddDto
   ): Promise<PositionReqListDto> {
     try {
-      const response = await api.post(
-        `${this.reqUrl}/AddPositionReq`,
-        requirement
-      );
+      const response = await api.post(`${this.reqUrl}/AddPositionReq`, requirement);
       console.info('Position requirement created successfully:', response.data.id);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error creating position requirement:", errorMessage);
@@ -340,11 +309,8 @@ class PositionService {
     updateData: PositionReqModDto
   ): Promise<PositionReqListDto> {
     try {
-      const response = await api.put(
-        `${this.reqUrl}/ModPositionReq/${updateData.id}`,
-        updateData
-      );
-      return response.data;
+      const response = await api.put(`${this.reqUrl}/ModPositionReq/${updateData.id}`, updateData);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error("Error updating position requirement:", errorMessage);

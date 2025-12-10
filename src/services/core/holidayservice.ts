@@ -20,7 +20,7 @@ class HolidayService {
     }
     return 'An unexpected error occurred';
   }
-  
+
   // GET: baseurl/AllHoliday
   async getAllHolidays(): Promise<HolidayListDto[]> {
     try {
@@ -49,8 +49,8 @@ class HolidayService {
   async createHoliday(holiday: AddHolidayDto): Promise<HolidayListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddHoliday`, holiday);
-      console.info('Holiday created successfully:', response.data.id);
-      return response.data;
+      console.info('Holiday created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating holiday:', errorMessage);
@@ -62,7 +62,7 @@ class HolidayService {
   async updateHoliday(updateData: EditHolidayDto): Promise<HolidayListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModHoliday/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating holiday:', errorMessage);

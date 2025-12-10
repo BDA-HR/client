@@ -46,8 +46,8 @@ class PeriodService {
   async createPeriod(period: AddPeriodDto): Promise<PeriodListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddPeriod`, period);
-      console.info('Period created successfully:', response.data.id);
-      return response.data;
+      console.info('Period created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating period:', errorMessage);
@@ -58,7 +58,7 @@ class PeriodService {
   async updatePeriod(updateData: EditPeriodDto): Promise<PeriodListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModPeriod/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating period:', errorMessage);

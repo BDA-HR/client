@@ -74,8 +74,8 @@ class BranchService {
   async createBranch(branch: AddBranchDto): Promise<BranchListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddBranch`, branch);
-      console.info('Branch created successfully:', response.data.id);
-      return response.data;
+      console.info('Branch created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating branch:', errorMessage);
@@ -87,7 +87,7 @@ class BranchService {
   async updateBranch(updateData: EditBranchDto): Promise<BranchListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModBranch/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating branch:', errorMessage);

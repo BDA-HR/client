@@ -1,9 +1,9 @@
 import { api } from '../../../api';
-import type { 
-  LeavePolicyListDto, 
-  LeavePolicyAddDto, 
-  LeavePolicyModDto, 
-  UUID 
+import type {
+  LeavePolicyListDto,
+  LeavePolicyAddDto,
+  LeavePolicyModDto,
+  UUID
 } from '../../../../types/hr/leavepolicy';
 
 class LeavePolicyService {
@@ -54,8 +54,8 @@ class LeavePolicyService {
   async createLeavePolicy(leavePolicy: LeavePolicyAddDto): Promise<LeavePolicyListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddLeavePolicy`, leavePolicy);
-      console.info('Leave policy created successfully:', response.data.id);
-      return response.data;
+      console.info('Leave policy created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating leave policy:', errorMessage);
@@ -67,7 +67,7 @@ class LeavePolicyService {
   async updateLeavePolicy(updateData: LeavePolicyModDto): Promise<LeavePolicyListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModLeavePolicy/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating leave policy:', errorMessage);

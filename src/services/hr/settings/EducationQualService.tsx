@@ -1,9 +1,9 @@
 import { api } from '../../api';
-import type { 
-  EducationQualListDto, 
-  EducationQualAddDto, 
-  EducationQualModDto, 
-  UUID 
+import type {
+  EducationQualListDto,
+  EducationQualAddDto,
+  EducationQualModDto,
+  UUID
 } from '../../../types/hr/educationalqual';
 
 class EducationQualService {
@@ -54,8 +54,8 @@ class EducationQualService {
   async createEducationQual(educationQual: EducationQualAddDto): Promise<EducationQualListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddEducationQual`, educationQual);
-      console.info('Educational qualification created successfully:', response.data.id);
-      return response.data;
+      console.info('Educational qualification created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating educational qualification:', errorMessage);
@@ -67,7 +67,7 @@ class EducationQualService {
   async updateEducationQual(updateData: EducationQualModDto): Promise<EducationQualListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModEducationQual/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating educational qualification:', errorMessage);

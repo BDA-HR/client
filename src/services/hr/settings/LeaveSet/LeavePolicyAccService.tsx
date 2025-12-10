@@ -1,9 +1,9 @@
 import { api } from '../../../api';
-import type { 
-  LeavePolicyAccrualListDto, 
-  LeavePolicyAccrualAddDto, 
-  LeavePolicyAccrualModDto, 
-  UUID 
+import type {
+  LeavePolicyAccrualListDto,
+  LeavePolicyAccrualAddDto,
+  LeavePolicyAccrualModDto,
+  UUID
 } from '../../../../types/hr/leavepolicyaccrual';
 
 class LeavePolicyAccrualService {
@@ -54,8 +54,8 @@ class LeavePolicyAccrualService {
   async createLeavePolicyAccrual(leavePolicyAccrual: LeavePolicyAccrualAddDto): Promise<LeavePolicyAccrualListDto> {
     try {
       const response = await api.post(`${this.baseUrl}/AddLeavePolicyAcc`, leavePolicyAccrual);
-      console.info('Leave policy accrual created successfully:', response.data.id);
-      return response.data;
+      console.info('Leave policy accrual created successfully:', response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error creating leave policy accrual:', errorMessage);
@@ -67,7 +67,7 @@ class LeavePolicyAccrualService {
   async updateLeavePolicyAccrual(updateData: LeavePolicyAccrualModDto): Promise<LeavePolicyAccrualListDto> {
     try {
       const response = await api.put(`${this.baseUrl}/ModLeavePolicyAcc/${updateData.id}`, updateData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error updating leave policy accrual:', errorMessage);
