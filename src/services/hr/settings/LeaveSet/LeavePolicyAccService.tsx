@@ -7,7 +7,8 @@ import type {
 } from '../../../../types/hr/leavepolicyaccrual';
 
 class LeavePolicyAccrualService {
-  private baseUrl = `${import.meta.env.VITE_HRMM_MODULE_URL}/LeavePolicyAcc`;
+  // private baseUrl = `${import.meta.env.VITE_HRMM_MODULE_URL}/LeavePolicyAcc`;
+  private baseUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/LeavePolicyAcc`;
 
   // Helper method to extract error messages
   private extractErrorMessage(error: any): string {
