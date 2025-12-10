@@ -54,7 +54,7 @@ function LeavePolicyAccrualPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         if (!id) {
           setError('Policy ID is required');
           return;
@@ -92,7 +92,7 @@ function LeavePolicyAccrualPage() {
 
         // Initialize form data with the first accrual (if exists) or default values
         const firstAccrual = accrualsList.length > 0 ? accrualsList[0] : null;
-        
+
         setFormData({
           policyInfo: {
             name: policyData.name,
@@ -141,7 +141,7 @@ function LeavePolicyAccrualPage() {
     setEditingSection(null);
     setHasChanges(false);
     setError(null);
-    
+
     // Reset form data to original values
     if (policy && accruals.length > 0) {
       const firstAccrual = accruals[0];
@@ -209,14 +209,14 @@ function LeavePolicyAccrualPage() {
           const updatedPolicy = await leavePolicyService.updateLeavePolicy({
             id: id as UUID,
             name: formData.policyInfo.name,
-            leaveTypeId: policy.leaveTypeId, 
+            leaveTypeId: policy.leaveTypeId,
             requiresAttachment: formData.policyInfo.requiresAttachment,
             holidaysAsLeave: formData.policyInfo.holidaysAsLeave,
             minDurPerReq: formData.durationLimits.minDurPerReq,
             maxDurPerReq: formData.durationLimits.maxDurPerReq,
             rowVersion: policy.rowVersion,
           });
-          
+
           setPolicy(updatedPolicy);
           toast.success('Policy updated successfully');
         } catch (error: any) {
@@ -242,7 +242,7 @@ function LeavePolicyAccrualPage() {
           });
 
           // Update local accruals state
-          const updatedAccruals = accruals.map(accrual => 
+          const updatedAccruals = accruals.map(accrual =>
             accrual.id === firstAccrual.id ? updatedAccrual : accrual
           );
           setAccruals(updatedAccruals);
@@ -282,7 +282,7 @@ function LeavePolicyAccrualPage() {
 
       // Call the service to create the accrual
       const newAccrual = await leavePolicyAccrualService.createLeavePolicyAccrual(accrualAddDto);
-      
+
       // Update the local state with the new accrual
       const updatedAccruals = [...accruals, newAccrual];
       setAccruals(updatedAccruals);
@@ -325,11 +325,11 @@ function LeavePolicyAccrualPage() {
 
   const renderField = (section: string, field: string, label: string, value: any, isBoolean = false) => {
     const isEditingThisSection = isEditing && editingSection === section;
-    
+
     if (isEditingThisSection) {
       if (isBoolean) {
         return (
-          <select 
+          <select
             value={value ? 'true' : 'false'}
             onChange={(e) => handleInputChange(section, field, e.target.value === 'true')}
             className="text-sm border border-gray-300 rounded px-2 py-1"
@@ -339,14 +339,14 @@ function LeavePolicyAccrualPage() {
           </select>
         );
       }
-      
+
       return (
-        <input 
+        <input
           type={typeof value === 'number' ? 'number' : 'text'}
           value={value}
           onChange={(e) => handleInputChange(
-            section, 
-            field, 
+            section,
+            field,
             typeof value === 'number' ? parseFloat(e.target.value) : e.target.value
           )}
           className="text-sm border border-gray-300 rounded px-2 py-1 w-32"
@@ -354,7 +354,7 @@ function LeavePolicyAccrualPage() {
         />
       );
     }
-    
+
     if (isBoolean) {
       return (
         <span className={`text-sm ${value ? 'text-red-600' : 'text-green-600'}`}>
@@ -362,7 +362,7 @@ function LeavePolicyAccrualPage() {
         </span>
       );
     }
-    
+
     return <span className="text-sm text-gray-900">{value}</span>;
   };
 
@@ -380,7 +380,7 @@ function LeavePolicyAccrualPage() {
       await leavePolicyAccrualService.deleteLeavePolicyAccrual(accrualId);
       const updatedAccruals = accruals.filter(accrual => accrual.id !== accrualId);
       setAccruals(updatedAccruals);
-      
+
       // If we deleted the last accrual, reset the form data
       if (updatedAccruals.length === 0) {
         setFormData(prev => ({
@@ -397,7 +397,7 @@ function LeavePolicyAccrualPage() {
           }
         }));
       }
-      
+
       toast.success('Accrual rule deleted successfully');
     } catch (error: any) {
       toast.error(error.message || 'Failed to delete accrual rule');
@@ -420,7 +420,7 @@ function LeavePolicyAccrualPage() {
           <ArrowLeft size={16} />
           Back to Leave Settings
         </Button>
-        
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -448,7 +448,7 @@ function LeavePolicyAccrualPage() {
           <ArrowLeft size={16} />
           Back to Leave Settings
         </Button>
-        
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -463,8 +463,8 @@ function LeavePolicyAccrualPage() {
           <p className="text-gray-500 mb-4">
             The requested policy could not be found or has been removed.
           </p>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleBackClick}
             className="cursor-pointer"
           >
@@ -486,7 +486,7 @@ function LeavePolicyAccrualPage() {
         <ArrowLeft size={16} />
         Back to Leave Settings
       </Button>
-      
+
       <LeavePolicyAccrualHeader onAdd={handleAddClick} />
 
       {/* Error Display */}
@@ -545,23 +545,23 @@ function LeavePolicyAccrualPage() {
               <Pen size={16} />
             </Button>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm font-medium text-gray-600">Policy Name</span>
               {renderField('policyInfo', 'name', 'Policy Name', formData.policyInfo.name)}
             </div>
-            
+
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm font-medium text-gray-600">Leave Type</span>
               {renderField('policyInfo', 'leaveType', 'Leave Type', formData.policyInfo.leaveType)}
             </div>
-            
+
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm font-medium text-gray-600">Requires Attachment</span>
               {renderField('policyInfo', 'requiresAttachment', 'Requires Attachment', formData.policyInfo.requiresAttachment, true)}
             </div>
-            
+
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm font-medium text-gray-600">Holidays Count as Leave</span>
               {renderField('policyInfo', 'holidaysAsLeave', 'Holidays Count as Leave', formData.policyInfo.holidaysAsLeave, true)}
@@ -586,7 +586,7 @@ function LeavePolicyAccrualPage() {
               <Pen size={16} />
             </Button>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm font-medium text-gray-600">Minimum Duration per Request</span>
@@ -595,7 +595,7 @@ function LeavePolicyAccrualPage() {
                 <span className="text-sm text-gray-500">days</span>
               </div>
             </div>
-            
+
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm font-medium text-gray-600">Maximum Duration per Request</span>
               <div className="flex items-center gap-2">
@@ -634,7 +634,7 @@ function LeavePolicyAccrualPage() {
               </div>
             )}
           </div>
-          
+
           {accruals.length > 0 ? (
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -644,12 +644,12 @@ function LeavePolicyAccrualPage() {
                   <span className="text-sm text-gray-500">days</span>
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Accrual Frequency</span>
                 {renderField('accrualSettings', 'frequency', 'Accrual Frequency', formData.accrualSettings.frequency)}
               </div>
-              
+
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Accrual Rate</span>
                 <div className="flex items-center gap-2">
@@ -657,7 +657,7 @@ function LeavePolicyAccrualPage() {
                   <span className="text-sm text-gray-500">days per period</span>
                 </div>
               </div>
-              
+
               {/* Accrual Rules List */}
               <div className="mt-4">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Accrual Rules:</h3>
@@ -717,7 +717,7 @@ function LeavePolicyAccrualPage() {
               </div>
             )}
           </div>
-          
+
           {accruals.length > 0 ? (
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -727,7 +727,7 @@ function LeavePolicyAccrualPage() {
                   <span className="text-sm text-gray-500">months</span>
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Maximum Carryover Days</span>
                 <div className="flex items-center gap-2">
@@ -735,7 +735,7 @@ function LeavePolicyAccrualPage() {
                   <span className="text-sm text-gray-500">days</span>
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Carryover Expiry</span>
                 <div className="flex items-center gap-2">
@@ -760,15 +760,15 @@ function LeavePolicyAccrualPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200"
         >
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleCancelEdit}
             disabled={saveLoading}
             className="cursor-pointer"
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             className="bg-green-600 hover:bg-green-700 cursor-pointer"
             onClick={handleSaveChanges}
             disabled={saveLoading}
