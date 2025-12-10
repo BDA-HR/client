@@ -11,7 +11,8 @@ import { Input } from "../components/ui/input"
 import React, { useState } from "react"
 
 type LoginFormProps = {
-  onSignIn?: (email: string, password: string) => void
+  // Updated type for onSignIn to be asynchronous and return a Promise
+  onSignIn?: (code: string, password: string) => Promise<void> | void
   className?: string
 } & Omit<React.ComponentProps<"div">, "onSubmit">
 
@@ -20,15 +21,16 @@ export function LoginForm({
   className,
   ...props
 }: LoginFormProps) {
-  const [email, setEmail] = useState("")
+  const [code, setCode] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!email || !password) {
-      console.error("Email and password are required")
+    if (!code || !password) {
+      console.error("Code and password are required")
+      // You might want to display a user-facing error here
       return
     }
 
@@ -36,11 +38,14 @@ export function LoginForm({
     
     try {
       if (onSignIn) {
-        await onSignIn(email, password)
+        // Call the onSignIn prop with the form data
+        await onSignIn(code, password) 
       }
     } catch (error) {
       console.error("Login failed:", error)
+      // You should handle showing an error message to the user here
     } finally {
+      // The loading state should be set to false regardless of success/failure
       setIsLoading(false)
     }
   }
@@ -66,11 +71,11 @@ export function LoginForm({
                 <FieldLabel htmlFor="code">Code</FieldLabel>
                 <Input
                   id="code"
-                  type="code"
+                  type="text" // Changed type to 'text' as 'code' is not a standard input type
                   placeholder="Enter your code"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
                   disabled={isLoading}
                   className={cn(
                     "border-blue-200 focus:border-blue-400 focus:ring-blue-400/20",
