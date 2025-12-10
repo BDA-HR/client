@@ -476,7 +476,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
             </div>
           </div>
-          
+
           <div className="print-layout">
             {/* Left Column - Profile Photo and Employee Code */}
             <div className="left-column">
@@ -499,7 +499,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                   Profile Photo
                 </p>
               </div>
-              
+
               {reviewData.code && (
                 <div className="employee-code text-center">
                   <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">

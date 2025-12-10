@@ -68,7 +68,8 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
   };
 
   const getFileIcon = (file: File) => {
- if (file.type.includes("pdf")) {
+
+    if (file.type.includes("pdf")) {
       return (
         <div className="w-full h-full flex flex-col items-center justify-center">
           {previewUrl ? (
@@ -154,6 +155,18 @@ export const GuarantorProfileUpload: React.FC<GuarantorProfileUploadProps> = ({
                   </p>
                 </div>
               )}
+              {/* <div className="flex flex-col items-center justify-center p-6 text-center w-full">
+                <Upload className="w-16 h-16 text-gray-400 mb-4" />
+                <p className="text-lg font-medium text-gray-700">
+                  Upload Guarantor Document
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Drag and drop or click to upload
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Supports PDF, Word documents, and images (Max: 10MB)
+                </p>
+              </div> */}
             </div>
           </label>
 
