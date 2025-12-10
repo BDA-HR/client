@@ -13,6 +13,7 @@ const UserManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false); 
+  
   const handleAddAccountFromList = () => {
     if (searchedEmployees.length > 0) {
       setSelectedEmployee(searchedEmployees[0]);
@@ -26,7 +27,7 @@ const UserManagement: React.FC = () => {
     setSelectedEmployee(null);
     setSearchedEmployees([]); 
     setError(null); 
-    setHasSearched(false); // Reset search flag
+    setHasSearched(false);
   };
 
   const handleBackToAccounts = () => {
@@ -34,21 +35,19 @@ const UserManagement: React.FC = () => {
     setSelectedEmployee(null);
     setSearchedEmployees([]); 
     setError(null); 
-    setHasSearched(false); // Reset search flag
+    setHasSearched(false);
   };
 
-  // Handle search query changes
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setError(null); 
     
     if (value.length === 0) {
       setSearchedEmployees([]);
-      setHasSearched(false); // Reset search flag when clearing
+      setHasSearched(false);
     }
   };
 
-  // Handle search employee button click - calls the API
   const handleSearchEmployee = async () => {
     if (!searchQuery || searchQuery.length !== 10 || !/^[A-Za-z0-9]{10}$/.test(searchQuery)) {
       setError("Please enter a valid 10-character employee code");
@@ -56,7 +55,7 @@ const UserManagement: React.FC = () => {
       return;
     }
 
-    setHasSearched(true); // Mark that a search has been performed
+    setHasSearched(true);
     setLoading(true);
     setError(null);
     
@@ -124,7 +123,6 @@ const UserManagement: React.FC = () => {
                   />
                 </div>
               ) : (
-                
                 hasSearched && !loading && (
                   <div className="text-center py-12 text-gray-500">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

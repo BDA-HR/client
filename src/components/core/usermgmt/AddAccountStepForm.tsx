@@ -78,11 +78,9 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     description: `Description for menu permission ${i + 1}`
   }));
 
-  // Generate email from employee data
   const getEmployeeEmail = () => {
     if (!employee) return '';
     
-    // Try to extract email from code, or create a placeholder
     if (employee.code) {
       if (employee.code.includes('@')) {
         return employee.code;
@@ -93,19 +91,16 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     return '';
   };
 
-  // Get employee display name
   const getEmployeeDisplayName = () => {
     if (!employee) return '';
     return employee.fullName || '';
   };
 
-  // Get employee code
   const getEmployeeCode = () => {
     if (!employee) return '';
     return employee.code || '';
   };
 
-  // Filter permissions based on selected modules
   const getFilteredPermissions = () => {
     if (formData.step1.modules.length === 0) return [];
     return MOCK_PERMISSIONS.filter(permission =>
@@ -113,7 +108,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     );
   };
 
-  // Filter detailed permissions based on selected main permissions
   const getFilteredDetailedPermissions = () => {
     if (formData.step2.permissions.length === 0) return [];
     return MOCK_DETAILED_PERMISSIONS.filter(permission =>
@@ -204,7 +198,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
   };
 
   // Handle Step 3 submission
-  const handleStep3Submit = async (step3Data: any) => {
+    const handleStep3Submit = async (step3Data: any) => {
     if (formData.step2.permissions.length === 0) {
       setError('Please select at least one permission in Step 2 first.');
       return;
@@ -218,7 +212,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         employeeId: employee?.id || '',
         employeeCode: getEmployeeCode(),
         employeeName: getEmployeeDisplayName(),
-        email: getEmployeeEmail(), // Use generated email
+        email: getEmployeeEmail(),
         password: formData.step1.password,
         role: formData.step1.role,
         modules: formData.step1.modules,
@@ -229,7 +223,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       console.log('Submitting account data:', finalData);
       
       // Replace with actual API call
-      // const result = await accountService.createAccount(finalData);
+      
       const result = { 
         success: true, 
         message: 'Account created successfully',
@@ -239,6 +233,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       clearTemporaryData();
 
       onAccountAdded(result);
+      
     } catch (error) {
       console.error('Failed to create account:', error);
       setError('Failed to create account. Please try again.');
@@ -252,7 +247,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     } else {
-      // When going back from step 1, clear temporary data if user wants to start fresh
       clearTemporaryData();
       onBackToAccounts();
     }

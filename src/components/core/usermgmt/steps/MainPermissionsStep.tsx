@@ -37,18 +37,17 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
     setFormData(initialData);
   }, [initialData]);
 
-  // Initialize expanded modules
+
   useEffect(() => {
     const initialExpanded: Record<string, boolean> = {};
     permissions.forEach(permission => {
       if (!initialExpanded[permission.module]) {
-        initialExpanded[permission.module] = false; // Start collapsed
+        initialExpanded[permission.module] = false; 
       }
     });
     setExpandedModules(initialExpanded);
   }, [permissions]);
 
-  // Group permissions by module
   const groupedPermissions = useMemo(() => {
     const grouped: Record<string, typeof permissions> = {};
     
@@ -62,14 +61,12 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
     return grouped;
   }, [permissions]);
 
-  // Filter permissions based on search
   const filteredPermissions = useMemo(() => {
     const filtered: Record<string, typeof permissions> = {};
     
     Object.entries(groupedPermissions).forEach(([module, modulePermissions]) => {
       const filteredModulePermissions = modulePermissions.filter(permission =>
-        permission.name.toLowerCase().includes(search.toLowerCase()) ||
-        permission.description.toLowerCase().includes(search.toLowerCase())
+        permission.name.toLowerCase().includes(search.toLowerCase())
       );
       
       if (filteredModulePermissions.length > 0) {
@@ -101,13 +98,11 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
     const allSelected = modulePermissionIds.every(id => formData.permissions.includes(id));
     
     if (allSelected) {
-      // Deselect all in module
       setFormData(prev => ({
         ...prev,
         permissions: prev.permissions.filter(id => !modulePermissionIds.includes(id))
       }));
     } else {
-      // Select all in module
       const newPermissions = [...formData.permissions];
       modulePermissionIds.forEach(id => {
         if (!newPermissions.includes(id)) {
@@ -153,11 +148,6 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (permissions.length === 0) {
-      alert('No permissions available for the selected modules.');
-      return;
-    }
-    
     await onSubmit(formData);
   };
 
@@ -173,7 +163,6 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
     return moduleMap[moduleId] || moduleId;
   };
 
-  // Calculate module selection stats
   const getModuleSelectionStats = (modulePermissions: typeof permissions) => {
     const selectedCount = modulePermissions.filter(p => formData.permissions.includes(p.id)).length;
     const totalCount = modulePermissions.length;
@@ -187,81 +176,74 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
       exit={{ opacity: 0, y: -20 }}
       className="bg-white p-6"
     >
-      <div className="mb-8">
+      {/* Header Section */}
+      <div className="mb-8 flex items-center gap-16">
         <h2 className="text-2xl font-bold text-gray-800">
           Menu Permissions
         </h2>
-        <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-          <p className="text-sm text-emerald-700">
-            <span className="font-semibold">Selected Modules:</span>{' '}
-            {selectedModules.map(getModuleLabel).join(', ')} ({selectedModules.length} modules)
-          </p>
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-md">
+          <span className="text-sm text-emerald-700 font-medium">
+            <span className="font-bold">{selectedModules.length}</span> modules selected
+          </span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Search and Stats */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mt-1">
-                {formData.permissions.length} permissions selected
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={expandAllModules}
-                disabled={isLoading || permissions.length === 0}
-                className="px-4"
-              >
-                Expand All
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={collapseAllModules}
-                disabled={isLoading || permissions.length === 0}
-                className="px-4"
-              >
-                Collapse All
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleSelectAll}
-                disabled={isLoading || permissions.length === 0}
-                className="px-4"
-              >
-                Select All
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleClearAll}
-                disabled={isLoading || formData.permissions.length === 0}
-                className="px-4"
-              >
-                Clear All
-              </Button>
-            </div>
-          </div>
-          
-          <div className="relative">
+        {/* Search and Action Buttons - Side by side */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-lg">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search permissions by name or description..."
+              placeholder="Search permissions by name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-4 py-3 w-full"
               disabled={isLoading}
             />
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={expandAllModules}
+              disabled={isLoading || permissions.length === 0}
+              className="px-4"
+            >
+              Expand All
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={collapseAllModules}
+              disabled={isLoading || permissions.length === 0}
+              className="px-4"
+            >
+              Collapse All
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleSelectAll}
+              disabled={isLoading || permissions.length === 0}
+              className="px-4"
+            >
+              Select All
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleClearAll}
+              disabled={isLoading || formData.permissions.length === 0}
+              className="px-4"
+            >
+              Clear All
+            </Button>
           </div>
         </div>
 
@@ -306,7 +288,7 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
                         variant="outline"
                         size="sm"
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent toggling expansion
+                          e.stopPropagation(); 
                           handleSelectAllInModule(moduleName, modulePermissions);
                         }}
                         disabled={isLoading}
@@ -345,16 +327,13 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
                                 className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:text-white data-[state=checked]:border-green-600"
                               />
                               <div className="flex-1">
-                                <div className="mb-2">
+                                <div className="flex items-center h-full">
                                   <label
                                     htmlFor={`permission-${permission.id}`}
-                                    className="text-sm font-medium text-gray-700 cursor-pointer block"
+                                    className="text-sm font-medium text-gray-700 cursor-pointer"
                                   >
                                     {permission.name}
                                   </label>
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                  {permission.description}
                                 </div>
                               </div>
                             </div>
@@ -376,6 +355,7 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
           )}
         </div>
 
+        {/* Stats Section */}
         <div className="bg-gray-50 rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
@@ -414,7 +394,7 @@ export const MainPermissionsStep: React.FC<MainPermissionsStepProps> = ({
             <Button
               type="submit"
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
-              disabled={isLoading || permissions.length === 0}
+              disabled={isLoading}
             >
               {isLoading ? (
                 'Saving...'

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Check } from 'lucide-react';
+import { Search, Check, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { Input } from '../../../../components/ui/input';
 import { Checkbox } from '../../../../components/ui/checkbox';
@@ -39,12 +39,24 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
 }) => {
   const [search, setSearch] = useState('');
   const [formData, setFormData] = useState(initialData);
+  const [expandedMainPermissions, setExpandedMainPermissions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setFormData(initialData);
   }, [initialData]);
 
-  // Get main permission name from ID
+
+  useEffect(() => {
+    const initialExpanded: Record<string, boolean> = {};
+    apiPermissions.forEach(apiPermission => {
+      if (!initialExpanded[apiPermission.mainPermissionId]) {
+        initialExpanded[apiPermission.mainPermissionId] = false; 
+      }
+    });
+    setExpandedMainPermissions(initialExpanded);
+  }, [apiPermissions]);
+
+  
   const getMainPermissionName = (permissionId: string) => {
     if (mainPermissionsList && mainPermissionsList.length > 0) {
       const mainPerm = mainPermissionsList.find(p => p.id === permissionId);
@@ -108,13 +120,11 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
     const allSelected = groupPermissionIds.every(id => formData.apiPermissions.includes(id));
     
     if (allSelected) {
-      // Deselect all in group
       setFormData(prev => ({
         ...prev,
         apiPermissions: prev.apiPermissions.filter(id => !groupPermissionIds.includes(id))
       }));
     } else {
-      // Select all in group
       const newApiPermissions = [...formData.apiPermissions];
       groupPermissionIds.forEach(id => {
         if (!newApiPermissions.includes(id)) {
@@ -134,6 +144,29 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
     setFormData({ apiPermissions: [] });
   };
 
+  const toggleMainPermissionExpansion = (mainPermId: string) => {
+    setExpandedMainPermissions(prev => ({
+      ...prev,
+      [mainPermId]: !prev[mainPermId]
+    }));
+  };
+
+  const expandAllMainPermissions = () => {
+    const newExpanded: Record<string, boolean> = {};
+    Object.keys(groupedApiPermissions).forEach(mainPermId => {
+      newExpanded[mainPermId] = true;
+    });
+    setExpandedMainPermissions(newExpanded);
+  };
+
+  const collapseAllMainPermissions = () => {
+    const newExpanded: Record<string, boolean> = {};
+    Object.keys(groupedApiPermissions).forEach(mainPermId => {
+      newExpanded[mainPermId] = false;
+    });
+    setExpandedMainPermissions(newExpanded);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -145,6 +178,12 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
     await onSubmit(formData);
   };
 
+  const getGroupSelectionStats = (groupPermissions: typeof apiPermissions) => {
+    const selectedCount = groupPermissions.filter(p => formData.apiPermissions.includes(p.id)).length;
+    const totalCount = groupPermissions.length;
+    return { selectedCount, totalCount };
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -152,86 +191,110 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
       exit={{ opacity: 0, y: -20 }}
       className="bg-white p-6"
     >
-      <div className="mb-8">
+      {/* Header Section*/}
+      <div className="mb-8 flex items-center gap-16">
         <h2 className="text-2xl font-bold text-gray-800">
-          Detailed Permissions
+          Access Permissions
         </h2>
-        <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-          <p className="text-sm text-emerald-700">
-            <span className="font-semibold">Selected Main Permissions:</span>{' '}
-            {selectedPermissions.length} permissions selected
-          </p>
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-md">
+          <span className="text-sm text-emerald-700 font-medium">
+            <span className="font-bold">{selectedPermissions.length}</span> main permissions selected
+          </span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Search and Stats */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mt-1">
-                {formData.apiPermissions.length} detailed permissions selected
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleSelectAll}
-                disabled={isLoading || apiPermissions.length === 0}
-                className="px-4"
-              >
-                Select All
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleClearAll}
-                disabled={isLoading || formData.apiPermissions.length === 0}
-                className="px-4"
-              >
-                Clear All
-              </Button>
-            </div>
-          </div>
-          
-          <div className="relative">
+        {/* Search and Action Buttons - Side by side */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-lg">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search permissions by name, action, or resource..."
+              placeholder="Search detailed permissions by name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-4 py-3 w-full"
               disabled={isLoading}
             />
           </div>
+          
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={expandAllMainPermissions}
+              disabled={isLoading || apiPermissions.length === 0}
+              className="px-4"
+            >
+              Expand All
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={collapseAllMainPermissions}
+              disabled={isLoading || apiPermissions.length === 0}
+              className="px-4"
+            >
+              Collapse All
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleSelectAll}
+              disabled={isLoading || apiPermissions.length === 0}
+              className="px-4"
+            >
+              Select All
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleClearAll}
+              disabled={isLoading || formData.apiPermissions.length === 0}
+              className="px-4"
+            >
+              Clear All
+            </Button>
+          </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-4">
           {Object.keys(filteredApiPermissions).length > 0 ? (
             Object.entries(filteredApiPermissions).map(([mainPermId, groupPermissions]) => {
-              const selectedInGroup = groupPermissions.filter(p => formData.apiPermissions.includes(p.id)).length;
-              const totalInGroup = groupPermissions.length;
+              const isExpanded = expandedMainPermissions[mainPermId] || false;
+              const stats = getGroupSelectionStats(groupPermissions);
               
               return (
                 <div 
                   key={mainPermId} 
-                  className="border border-gray-200 rounded-xl overflow-hidden"
+                  className="border border-gray-200 rounded-xl overflow-hidden transition-all duration-200"
                 >
-                  {/* Group Header */}
-                  <div className="bg-gray-50 p-4 border-b border-gray-200">
+                  {/* Main Permission Header - Clickable to expand/collapse */}
+                  <div 
+                    className="bg-gray-50 p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => toggleMainPermissionExpansion(mainPermId)}
+                  >
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-800">
-                          {getMainPermissionName(mainPermId)}
-                        </h3>
-                        <div className="mt-2">
-                          <span className="text-sm text-gray-600">
-                            {selectedInGroup} of {totalInGroup} detailed permissions selected
-                          </span>
+                      <div className="flex items-center gap-3">
+                        <div className="text-gray-500">
+                          {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+                            {getMainPermissionName(mainPermId)}
+                            <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded">
+                              {groupPermissions.length} detailed permissions
+                            </span>
+                          </h3>
+                          <div className="mt-2 ml-8">
+                            <span className="text-sm text-gray-600">
+                              {stats.selectedCount} of {stats.totalCount} selected
+                            </span>
+                          </div>
                         </div>
                       </div>
                       
@@ -239,65 +302,61 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSelectAllInGroup(mainPermId, groupPermissions)}
+                        onClick={(e) => {
+                          e.stopPropagation(); 
+                          handleSelectAllInGroup(mainPermId, groupPermissions);
+                        }}
                         disabled={isLoading}
                         className="px-4"
                       >
-                        {selectedInGroup === totalInGroup ? 'Deselect All' : 'Select All'}
+                        {stats.selectedCount === groupPermissions.length ? 'Deselect All' : 'Select All'}
                       </Button>
                     </div>
                   </div>
                   
-                  {/* Detailed Permissions List */}
-                  <div className="p-4 bg-white">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {groupPermissions.map(apiPermission => (
-                        <div 
-                          key={apiPermission.id} 
-                          className={`p-3 rounded-lg border transition-all duration-200 ${
-                            formData.apiPermissions.includes(apiPermission.id) 
-                              ? 'bg-green-50 border-green-200' 
-                              : 'bg-gray-50 border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <Checkbox
-                              id={`api-permission-${apiPermission.id}`}
-                              checked={formData.apiPermissions.includes(apiPermission.id)}
-                              onCheckedChange={() => handleApiPermissionChange(apiPermission.id)}
-                              disabled={isLoading}
-                              className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:text-white data-[state=checked]:border-green-600"
-                            />
-                            <div className="flex-1">
-                              <div className="mb-2">
-                                <label
-                                  htmlFor={`api-permission-${apiPermission.id}`}
-                                  className="text-sm font-medium text-gray-700 cursor-pointer block"
-                                >
-                                  {apiPermission.name}
-                                </label>
-                              </div>
-                              <div className="space-y-2">
-                                {apiPermission.description && (
-                                  <div className="text-xs text-gray-600">
-                                    {apiPermission.description}
-                                  </div>
-                                )}
-                                <div className="flex gap-2">
-                                  <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                                    {apiPermission.action}
-                                  </span>
-                                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
-                                    {apiPermission.resource}
-                                  </span>
+                  {/* Detailed Permissions List - Collapsible */}
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="p-4 bg-white"
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {groupPermissions.map(apiPermission => (
+                          <div 
+                            key={apiPermission.id} 
+                            className={`p-3 rounded-lg border transition-all duration-200 ${
+                              formData.apiPermissions.includes(apiPermission.id) 
+                                ? 'bg-green-50 border-green-200' 
+                                : 'bg-gray-50 border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <Checkbox
+                                id={`api-permission-${apiPermission.id}`}
+                                checked={formData.apiPermissions.includes(apiPermission.id)}
+                                onCheckedChange={() => handleApiPermissionChange(apiPermission.id)}
+                                disabled={isLoading}
+                                className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:text-white data-[state=checked]:border-green-600"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center h-full">
+                                  <label
+                                    htmlFor={`api-permission-${apiPermission.id}`}
+                                    className="text-sm font-medium text-gray-700 cursor-pointer"
+                                  >
+                                    {apiPermission.name}
+                                  </label>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               );
             })
@@ -311,6 +370,7 @@ export const ApiPermissionsStep: React.FC<ApiPermissionsStepProps> = ({
           )}
         </div>
 
+        {/* Stats Section */}
         <div className="bg-gray-50 rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
