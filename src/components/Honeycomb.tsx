@@ -46,7 +46,7 @@ export default function Honeycomb({ onModuleSelect }: HoneycombProps) {
     <section className="flex items-center justify-center h-full w-full">
       <div className="relative w-full max-w-[90vmin] h-[90vmin] flex items-center justify-center">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-gradient-to-r from-purple-400 to-pink-600 blur-[10vmin] opacity-20 rounded-full w-[60%] h-[60%] animate-pulse" />
+          <div className="bg-gradient-to-r from-blue-400 to-blue-600 blur-[10vmin] opacity-20 rounded-full w-[60%] h-[60%] animate-pulse" />
         </div>
 
         {modules.map((mod, i) => (

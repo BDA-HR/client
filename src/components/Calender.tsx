@@ -65,7 +65,7 @@ export default function Calendar({ tasks, onTaskToggle }: CalendarProps) {
           key={`day-${i}`} 
           className={`h-8 w-8 flex items-center justify-center rounded-full text-sm font-medium ${
             isToday 
-              ? 'bg-purple-500 text-white' 
+              ? 'bg-blue-500 text-white' 
               : i < today.getDate() 
                 ? 'text-gray-400' 
                 : 'text-gray-700 hover:bg-gray-100'
@@ -149,7 +149,7 @@ export default function Calendar({ tasks, onTaskToggle }: CalendarProps) {
                 type="checkbox"
                 checked={task.completed}
                 onChange={() => onTaskToggle(task.id)}
-                className="h-4 w-4 text-purple-600 rounded mr-3"
+                className="h-4 w-4 text-blue-600 rounded mr-3"
               />
               <div className="flex-1">
                 <span className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
