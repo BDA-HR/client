@@ -62,7 +62,7 @@ export interface Branch extends BaseDto {
   compId: UUID;
   comp: string;
   compAm: string;
-  openDate: string; 
+  openDate: string;
   dateOpenedAm: string;
   dateOpened: string;
 }

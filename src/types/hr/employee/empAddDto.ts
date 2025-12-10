@@ -114,7 +114,7 @@ export interface Step5Dto {
     jobGrade: string;
     position: string;
     department: string;
-    pbranch: string;
+    branch: string;
     employmentType: string;
     employmentNature: string;
 

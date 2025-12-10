@@ -62,7 +62,7 @@ class BranchService {
   async getBranchCompanyList(): Promise<BranchCompListDto[]> {
     try {
       const response = await api.get(`${this.braUrl}/BranchCompList`);
-      return response.data.data; // Fixed: should be response.data.data
+      return response.data; // Fixed: should be response.data.data
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
       console.error('Error fetching branch company list:', errorMessage);

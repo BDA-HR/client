@@ -20,8 +20,8 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState<UUID | undefined>(undefined);
-  const [newDepartment, setNewDepartment] = useState({ 
-    name: '', 
+  const [newDepartment, setNewDepartment] = useState({
+    name: '',
     nameAm: '',
     branchId: '' as UUID
   });
@@ -77,22 +77,22 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
         branchId: newDepartment.branchId,
       });
 
-      const successMessage = 
-        response?.data?.message || 
-        response?.message || 
+      const successMessage =
+        response?.data?.message ||
+        response?.message ||
         '';
-      
+
       toast.success(successMessage);
 
       // Reset form
-      setNewDepartment({ 
-        name: '', 
-        nameAm: '',       
+      setNewDepartment({
+        name: '',
+        nameAm: '',
         branchId: '' as UUID
       });
       setSelectedBranch(undefined);
       setIsOpen(false);
-      
+
     } catch (error: any) {
       const errorMessage = error.message || '';
       toast.error(errorMessage);
