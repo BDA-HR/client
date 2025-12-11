@@ -90,7 +90,7 @@ function Modules() {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   useEffect(() => {
-    document.title = selectedModule ? `BDA | ${selectedModule}` : 'BDA';
+    document.title = selectedModule ? `RST | ${selectedModule}` : 'RST';
   }, [selectedModule]);
 
   const handleModuleSelect = useCallback((moduleName: string) => {
@@ -139,7 +139,7 @@ function Modules() {
           {/* Split header text */}
           <div className="text-center ml-96">
             <h1 className="text-4xl font-bold text-gray-800 drop-shadow">
-              Welcome to the  <i className="text-blue-500 relative">BDA
+              Welcome to the  <i className="text-blue-500 relative">RST
                                               <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
           </i> <span className="text-blue-500"> {" "} ERP</span>
             </h1>

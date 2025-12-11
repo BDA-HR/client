@@ -58,7 +58,7 @@ export function LoginForm({
             <FieldGroup>
               <div className="flex flex-col items-center gap-1 text-center">
                 <h1 className="text-2xl font-bold">
-                  Login to your <i className="text-blue-500 relative">BDA
+                  Login to your <i className="text-blue-500 relative">RST
                     <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-14 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
                   </i> {" "}
                   account
