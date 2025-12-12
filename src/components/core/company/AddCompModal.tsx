@@ -6,13 +6,14 @@ import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
 import type { AddCompDto } from '../../../types/core/comp';
 import { amharicRegex } from '../../../utils/amharic-regex';
-import toast from 'react-hot-toast';
+import useToast from '../../../hooks/useToast';
 
 interface AddCompModalProps {
   onAddCompany: (company: AddCompDto) => Promise<any>;
 }
 
 const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
+  const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', nameAm: '' });
   const [isLoading, setIsLoading] = useState(false);
@@ -32,17 +33,20 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
 
     setIsLoading(true);
 
+    // Show loading toast
+    const loadingToastId = toast.loading('Adding company...');
+
     try {
       const response = await onAddCompany({
         name: newCompany.name.trim(),
         nameAm: newCompany.nameAm.trim(),
-      });
+      });      toast.dismiss(loadingToastId);
 
       // Extract success message from backend response
       const successMessage = 
         response?.data?.message || 
         response?.message || 
-        '';
+        'Company added successfully!';
       
       toast.success(successMessage);
       
@@ -51,7 +55,13 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
       setIsOpen(false);
       
     } catch (error: any) {
-      const errorMessage = error.message || '';
+      toast.dismiss(loadingToastId);
+      
+      const errorMessage = 
+        error.response?.data?.message ||
+        error.message || 
+        'Failed to add company. Please try again.';
+      
       toast.error(errorMessage);
       console.error('Error adding company:', error);
     } finally {
@@ -143,7 +153,6 @@ const AddCompModal: React.FC<AddCompModalProps> = ({ onAddCompany }) => {
                 <Button
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
                   onClick={handleSubmit}
-                  disabled={!newCompany.name.trim() || !newCompany.nameAm.trim() || isLoading}
                 >
                   {isLoading ? 'Saving...' : 'Save'}
                 </Button>

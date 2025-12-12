@@ -2,7 +2,44 @@ import React, {useState} from 'react';
 import { Outlet } from 'react-router';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
+
+// Create custom toast functions for easier use
+export const showToast = {
+  success: (message: string, options = {}) => {
+    toast.success(message, {
+      id: `success-${Date.now()}`,
+      ...options,
+    });
+  },
+  
+  error: (message: string, options = {}) => {
+    toast.error(message, {
+      id: `error-${Date.now()}`,
+      ...options,
+    });
+  },
+  
+  loading: (message: string, options = {}) => {
+    return toast.loading(message, options);
+  },
+  
+  dismiss: (toastId?: string) => {
+    if (toastId) {
+      toast.dismiss(toastId);
+    } else {
+      toast.dismiss();
+    }
+  },
+  
+  promise: <T,>(promise: Promise<T>, messages: { loading: string; success: string; error: string }, options = {}) => {
+    return toast.promise(promise, messages, options);
+  },
+  
+  custom: (message: string, options = {}) => {
+    toast(message, options);
+  },
+};
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -27,32 +64,42 @@ const Layout: React.FC = () => {
         <Header toggleSidebar={toggleSidebar} />
         
         <main className="flex-1 overflow-y-auto py-6 px-4 lg:px-6">
-          {/* React Hot Toast Container */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#10b981',
-              secondary: '#fff',
-            },
-          },
-          error: {
+          <Toaster
+            position="top-right"
+            gutter={12}
+            toastOptions={{
+              duration: 4000,
+              success: {
+                duration: 3000,
+                style: {
+                  background: '#10b981',
+                  color: '#fff',
+                },
+                iconTheme: {
+                  primary: '#fff',
+                  secondary: '#10b981',
+                },
+              },
+              error: {
             duration: 5000,
             iconTheme: {
               primary: '#ef4444',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
-      
+              secondary: '#fff',}
+              },
+              loading: {
+                duration: Infinity,
+                style: {
+                  color: '#000',
+                },
+              },
+            }}
+          />
+          
           <Outlet />
         </main>
       </div>
-    </div>  )
+    </div>
+  );
 }
 
 export default Layout

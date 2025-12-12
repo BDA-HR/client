@@ -9,13 +9,14 @@ import type { AddDeptDto } from '../../../types/core/dept';
 import type { BranchCompListDto } from '../../../types/core/branch';
 import { amharicRegex } from '../../../utils/amharic-regex';
 import { branchService } from '../../../services/core/branchservice';
-import toast from 'react-hot-toast';
+import useToast from '../../../hooks/useToast';
 
 interface AddDeptModalProps {
   onAddDepartment: (department: AddDeptDto) => Promise<any>;
 }
 
 const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
+  const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [branches, setBranches] = useState<BranchCompListDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,6 +41,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
       setBranches(branchesData);
     } catch (error) {
       console.error('Error fetching branches:', error);
+      toast.error('Failed to load branches. Please refresh the page.');
     } finally {
       setLoading(false);
     }
@@ -69,13 +71,14 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
     }
 
     setIsSubmitting(true);
+    const loadingToastId = toast.loading('Adding department...');
 
     try {
       const response = await onAddDepartment({
         name: newDepartment.name.trim(),
         nameAm: newDepartment.nameAm.trim(),
         branchId: newDepartment.branchId,
-      });
+      });      toast.dismiss(loadingToastId);
 
       const successMessage =
         response?.data?.message ||
@@ -94,7 +97,13 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
       setIsOpen(false);
 
     } catch (error: any) {
-      const errorMessage = error.message || '';
+      toast.dismiss(loadingToastId);
+      
+      const errorMessage = 
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to add department. Please try again.';
+      
       toast.error(errorMessage);
       console.error('Error adding department:', error);
     } finally {
