@@ -78,13 +78,19 @@ function LeavePolicyAccrualPage() {
         // Fetch accruals from the service
         let accrualsList: LeavePolicyAccrualListDto[] = [];
         try {
-          accrualsList = await leavePolicyAccrualService.getAllLeavePolicyAccruals();
-          // Filter accruals for this specific policy
-          accrualsList = accrualsList.filter(accrual => accrual.leavePolicyId === id);
+          accrualsList = await leavePolicyAccrualService.getLeavePolicyAccrualsByPolicyId(id as UUID);
         } catch (error) {
-          console.error('Error fetching accruals:', error);
-          setError('Failed to load accrual rules');
-          accrualsList = [];
+          console.error('Error fetching accruals by policy ID:', error);
+          try {
+            console.warn('New endpoint not available, falling back to getAllLeavePolicyAccruals');
+            accrualsList = await leavePolicyAccrualService.getAllLeavePolicyAccruals();
+            // Filter as fallback
+            accrualsList = accrualsList.filter(accrual => accrual.leavePolicyId === id);
+          } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
+            setError('Failed to load accrual rules');
+            accrualsList = [];
+          }
         }
 
         setPolicy(policyData);
