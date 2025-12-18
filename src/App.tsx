@@ -50,6 +50,7 @@ import LeavePolicyAccrualPage  from './pages/hr/settings/leavepolicyaccrual/Leav
 import { PageHolidayHist } from './pages/core/pageHolidayHist';
 import ProfilePage from './pages/profile';
 import PageAddUser from './pages/core/usermanagement/pageAddUser';
+import PageHrSettings from './pages/hr/settings/PageHrSettings';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -91,8 +92,8 @@ function App() {
             <Route path='/hr/employees/record' element={<EmployeeManagementPage />} />
             <Route path='/hr/employees/record/Add' element={<AddEmployeePage />} />
             <Route path="/hr/employees/:id" element={<EmployeeDetailsPage />} />
-            <Route path='/hr/settings/jobgrade' element={<JobGrade />} />
-            <Route path='/hr/settings/jobgrade/:gradeId/steps' element={<JobGradeSubgrades />} />
+            <Route path='/settings/jobgrade' element={<JobGrade />} />
+            <Route path='/settings/jobgrade/:gradeId/steps' element={<JobGradeSubgrades />} />
             <Route path='/hr/employees/termination' element={<Termination />} />
             <Route path='/hr/recruitment/pipeline' element={<CandidatePipeline />} />
             <Route path='/hr/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />
@@ -105,13 +106,14 @@ function App() {
             <Route path='/hr/shift-scheduler' element={<ShiftScheduler />} />
             <Route path='/hr/time-clock' element={<TimeClock />} />
             <Route path="/hr/attendance/form" element={<TimeClockFormContainer />} />
-            <Route path='/hr/settings' element={<PageSettings />} />
-            <Route path="/hr/settings/benefitset" element={<PageBenefitSet />} />
-            <Route path="/hr/settings/educationqual" element={<PageEducationalQual />} />
-            <Route path="/hr/settings/position" element={<PagePosition />} />
-            <Route path="/hr/settings/position/:id" element={<PositionDetails />} />
-            <Route path='/hr/settings/annualleave' element={<PageAnnualLeave />} />
-            <Route path="/hr/settings/annualleave/:id/policy" element={<LeavePolicyAccrualPage />} />
+            <Route path='/settings' element={<PageSettings />} />
+            <Route path="/settings/hr/benefitset" element={<PageBenefitSet />} />
+            <Route path="/settings/hr/educationqual" element={<PageEducationalQual />} />
+            <Route path="/settings/hr/position" element={<PagePosition />} />
+            <Route path="/settings/hr/position/:id" element={<PositionDetails />} />
+            <Route path="/settings/hr/annualleave" element={<PageAnnualLeave />} />
+            <Route path="/settings/hr/annualleave/:id/policy" element={<LeavePolicyAccrualPage />} />
+            <Route path="/settings/hr" element={<PageHrSettings />} />
             <Route path='/hr/training' element={<Training />} />
             {/* END HR ROUTES */}
 

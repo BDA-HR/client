@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Printer } from 'lucide-react';
-import { AddEmployeeStepHeader } from '../../../components/hr/employee/AddEmployee/AddEmployeeStepHeader';
+import { CheckCircle } from 'lucide-react';
 import { BasicInfoStep } from '../../../components/hr/employee/AddEmployee/steps/BasicInfoStep';
 import { BasicInfoReviewStep } from '../../../components/core/usermgmt/AddEmployee/InfoReviewStep';
 import type { Step1Dto } from '../../../types/hr/employee/empAddDto';
@@ -17,10 +16,7 @@ function PageAddUser() {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Define steps for the header
-  const steps = [
-    { id: 1, title: 'Basic Info', icon: User },
-    { id: 2, title: 'Print', icon: Printer },
-  ];
+
 
   // Handle back to employees list
   const handleBackToEmployees = () => {
@@ -274,8 +270,6 @@ function PageAddUser() {
     setIsLoading(true);
     
     try {
-      // Here you would call your API to save the employee
-      // For now, simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Show success
@@ -315,14 +309,6 @@ function PageAddUser() {
   return (
     <section className="w-full bg-gray-50 overflow-auto">
       <div className="max-w-7xl mx-auto">
-        {/* Step Header */}
-        <AddEmployeeStepHeader
-          steps={steps}
-          currentStep={currentStep}
-          onBack={handleBackToEmployees}
-          title="Add New Employee"
-          backButtonText="Back to User Management"
-        />
 
         {/* Step Content */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
