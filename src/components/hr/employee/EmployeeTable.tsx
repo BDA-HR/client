@@ -9,7 +9,7 @@ import {
   Eye,
   PenBox,
   Trash2,
-  UserPlus
+  Lock
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import DeleteEmployeeModal from './DeleteEmployeeModal';
@@ -259,7 +259,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                           className="p-2 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors"
                           title="Add Account"
                         >
-                          <UserPlus className="h-5 w-5" />
+                          <Lock className="h-5 w-5" />
                         </motion.button>
                       ) : (
                         // Original dropdown for HR module
