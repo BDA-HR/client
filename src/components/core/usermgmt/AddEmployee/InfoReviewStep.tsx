@@ -1,4 +1,3 @@
-// components/hr/employee/AddEmployee/steps/BasicInfoReviewStep.tsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, User, Printer } from 'lucide-react';

@@ -9,12 +9,11 @@ import {
   Eye,
   PenBox,
   Trash2,
-  UserPlus // Changed from Lock/Unlock to UserPlus icon
+  UserPlus
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
 import DeleteEmployeeModal from './DeleteEmployeeModal';
 
-// Define Employee type locally to avoid import issues
 interface Employee {
   id: string;
   code: string;
@@ -45,8 +44,8 @@ interface EmployeeTableProps {
   onEmployeeStatusChange: (employeeId: string, newStatus: "active" | "on-leave") => void;
   onEmployeeTerminate: (employeeId: string) => void;
   onEmployeeDelete: (employeeId: string) => void;
-  onAddAccount?: (employee: Employee) => void; // Changed from onLockAccount to onAddAccount
-  showAddAccountButton?: boolean; // Changed from showLockButton to showAddAccountButton
+  onAddAccount?: (employee: Employee) => void;
+  showAddAccountButton?: boolean;
   loading?: boolean;
 }
 
@@ -66,7 +65,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const sortedEmployees = [...employees].sort((a, b) => {
-    // Use createdAt as fallback for sorting if employmentDate doesn't exist
     const dateA = a.employmentDate || a.createdAt || '';
     const dateB = b.employmentDate || b.createdAt || '';
     return new Date(dateB).getTime() - new Date(dateA).getTime();

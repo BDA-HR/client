@@ -4,7 +4,6 @@ import { AddAccountStepForm } from "../../../components/core/usermgmt/AddAccount
 import type { EmpSearchRes } from "../../../types/core/EmpSearchRes";
 import EmployeeTable from "../../../components/hr/employee/EmployeeTable";
 
-// Create a type that matches what EmployeeTable expects
 interface TableEmployee {
   id: string;
   code: string;
@@ -85,7 +84,6 @@ const UserManagement: React.FC = () => {
   const fetchAllEmployees = async (page: number = 1) => {
     setTableLoading(true);
     try {
-      // For now, use mock data
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const mockEmployees = createMockEmployees();
@@ -110,9 +108,7 @@ const UserManagement: React.FC = () => {
     fetchAllEmployees(currentPage);
   }, [currentPage]);
 
-  // Handle when lock button is clicked - this is the key function
   const handleAddAccount = (employeeData: TableEmployee) => {
-    // Convert TableEmployee to EmpSearchRes for the AddAccountStepForm
     const empSearchRes: EmpSearchRes = {
       id: employeeData.id,
       code: employeeData.code,
@@ -167,10 +163,7 @@ const UserManagement: React.FC = () => {
     setError(null);
     
     try {
-      // Mock API call - replace with actual service call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful search
       const mockFoundEmployee: EmpSearchRes = {
         id: `found-emp-${Date.now()}`,
         code: searchQuery,
@@ -299,8 +292,8 @@ const UserManagement: React.FC = () => {
                   onEmployeeStatusChange={() => {}}
                   onEmployeeTerminate={() => {}}
                   onEmployeeDelete={handleEmployeeDelete}
-                  onAddAccount={handleAddAccount} // Changed from onLockAccount to onAddAccount
-                  showAddAccountButton={true} // Changed from showLockButton to showAddAccountButton
+                  onAddAccount={handleAddAccount} 
+                  showAddAccountButton={true}
                   loading={tableLoading}
                 />
               </div>

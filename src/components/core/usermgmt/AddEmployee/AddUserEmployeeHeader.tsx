@@ -1,4 +1,3 @@
-// components/hr/employee/AddEmployee/AddEmployeeStepHeader.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
