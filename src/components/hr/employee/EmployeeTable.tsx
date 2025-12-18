@@ -8,22 +8,32 @@ import {
   Loader2,
   Eye,
   PenBox,
-  Trash2
+  Trash2,
+  UserPlus // Changed from Lock/Unlock to UserPlus icon
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
-import type { EmployeeListDto } from '../../../types/hr/employee';
 import DeleteEmployeeModal from './DeleteEmployeeModal';
 
-// Extended Employee type based on EmployeeListDto with optional fields
-type Employee = EmployeeListDto & {
+// Define Employee type locally to avoid import issues
+interface Employee {
+  id: string;
+  code: string;
+  empFullName: string;
+  empFullNameAm: string;
+  gender: string;
+  department: string;
+  position: string;
+  branch?: string;
+  jobGrade?: string;
+  empType?: string;
+  empNature?: string;
+  photo?: string;
   status?: "active" | "on-leave";
-  // Add optional fields that might not exist in the base type
   employmentDate?: string;
-  nationality?: string;
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
-};
+}
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -35,6 +45,8 @@ interface EmployeeTableProps {
   onEmployeeStatusChange: (employeeId: string, newStatus: "active" | "on-leave") => void;
   onEmployeeTerminate: (employeeId: string) => void;
   onEmployeeDelete: (employeeId: string) => void;
+  onAddAccount?: (employee: Employee) => void; // Changed from onLockAccount to onAddAccount
+  showAddAccountButton?: boolean; // Changed from showLockButton to showAddAccountButton
   loading?: boolean;
 }
 
@@ -45,6 +57,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   totalItems,
   onPageChange,
   onEmployeeDelete,
+  onAddAccount,
+  showAddAccountButton = false,
   loading = false
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
@@ -79,6 +93,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setSelectedEmployee(null);
+  };
+
+  // Handle Add Account button click
+  const handleAddAccountClick = (employee: Employee) => {
+    if (onAddAccount) {
+      onAddAccount(employee);
+    }
   };
 
   if (loading && employees.length === 0) {
@@ -231,49 +252,61 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       </div>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                      <Popover open={popoverOpen === employee.id} onOpenChange={(open) => setPopoverOpen(open ? employee.id : null)}>
-                        <PopoverTrigger asChild>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
-                          >
-                            <MoreVertical className="h-5 w-5 cursor-pointer" />
-                          </motion.button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-48 p-0" align="end">
-                          <div className="py-1">
-                            <button
-                              onClick={() => handleViewDetails(employee)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                      {showAddAccountButton ? (
+                        // Add Account button for User Management
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleAddAccountClick(employee)}
+                          className="p-2 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors"
+                          title="Add Account"
+                        >
+                          <UserPlus className="h-5 w-5" />
+                        </motion.button>
+                      ) : (
+                        // Original dropdown for HR module
+                        <Popover open={popoverOpen === employee.id} onOpenChange={(open) => setPopoverOpen(open ? employee.id : null)}>
+                          <PopoverTrigger asChild>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
                             >
-                              <Eye size={16} />
-                              View Details
-                            </button>
-                            <button 
-                              // onClick={() => handleEdit(employee)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                            >
-                              <PenBox size={16} />
-                              Edit
-                            </button>
-                            <button 
-                              // onClick={() => handleStatusChange(employee)}
-                              className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded flex items-center gap-2"
-                            >
-                              <Trash2 size={16} />
-                              Change Status
-                            </button>
-                            <button 
-                              onClick={() => handleDelete(employee)}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                            >
-                              <Trash2 size={16} />
-                              Delete
-                            </button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                              <MoreVertical className="h-5 w-5 cursor-pointer" />
+                            </motion.button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-48 p-0" align="end">
+                            <div className="py-1">
+                              <button
+                                onClick={() => handleViewDetails(employee)}
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                              >
+                                <Eye size={16} />
+                                View Details
+                              </button>
+                              <button 
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                              >
+                                <PenBox size={16} />
+                                Edit
+                              </button>
+                              <button 
+                                className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded flex items-center gap-2"
+                              >
+                                <Trash2 size={16} />
+                                Change Status
+                              </button>
+                              <button 
+                                onClick={() => handleDelete(employee)}
+                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+                              >
+                                <Trash2 size={16} />
+                                Delete
+                              </button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     </td>
                   </motion.tr>
                 ))

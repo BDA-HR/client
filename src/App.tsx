@@ -31,7 +31,7 @@ import GlPage from './pages/finance/generalledgerpage/GlPage';
 // import BranchOverview from './pages/core/branchpage/BranchOverview';
 import FiscalYearOverview from './pages/core/pageFiscYear';
 // import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
-import UserOverview from './pages/core/pageUserManagement';
+import UserOverview from './pages/core/usermanagement/pageUserManagement';
 import DepartmentOverview from './pages/core/pageDepartments';
 import CompanyBranchesPage from './pages/core/pageCompanies';
 // import CompanyDetailsPage from './components/core/company/CompDetails';
@@ -49,6 +49,7 @@ import PageAnnualLeave from './pages/hr/settings/pageAnnualLeave';
 import LeavePolicyAccrualPage  from './pages/hr/settings/leavepolicyaccrual/LeavePolicyAccrualPage';
 import { PageHolidayHist } from './pages/core/pageHolidayHist';
 import ProfilePage from './pages/profile';
+import PageAddUser from './pages/core/usermanagement/pageAddUser';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -129,6 +130,7 @@ function App() {
             <Route path="/core/fiscal-year/period-history" element={<PagePeriod />} />
             {/* <Route path='/core/hierarchy' element={<HierarchyOverview />} /> */}
             <Route path='/core/users' element={<UserOverview />} />
+            <Route path='/core/Add-Employee' element={<PageAddUser/>} />
             <Route path="/core/department" element={<DepartmentOverview />} />
             {/* <Route path="/core/company/:id" element={<CompanyDetailsPage />} /> */}
             <Route path="/core/fiscal-year/holiday-history" element={<PageHolidayHist />} />

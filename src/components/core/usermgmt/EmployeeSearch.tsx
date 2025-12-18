@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Search, UserSearch } from "lucide-react";
+import { BadgePlus, Search, X } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface EmployeeSearchProps {
   searchQuery: string;
@@ -15,6 +16,7 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
   onSearchEmployee,
 }) => {
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Validate code input - only allow 10 alphanumeric characters
   const validateCode = (code: string): boolean => {
@@ -50,6 +52,10 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
     setError(null);
   };
 
+  const handleAddEmployee = () => {
+    navigate('/core/Add-Employee');
+  };
+
   const hasSearchTerm = searchQuery !== '';
 
   return (
@@ -60,12 +66,12 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
       className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6"
     >
       <form onSubmit={handleSubmit} className="w-full">
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-          {/* Search Input Container with fixed width */}
-          <div className="w-full sm:w-auto">
-            <div className="relative w-full sm:w-80"> {/* Increased to 320px */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* 🔍 Search Input Container */}
+          <div className="w-full lg:flex-1">
+            <div className="relative w-full max-w-md">
               <label htmlFor="employee-search" className="sr-only">
-                Search employees
+                Search Employees
               </label>
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
@@ -75,7 +81,7 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
                 name="employee-search"
                 type="text"
                 placeholder="Search by employee code"
-                className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+                className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 value={searchQuery}
                 onChange={(e) => handleInputChange(e.target.value)}
                 maxLength={10}
@@ -88,19 +94,7 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
                     onClick={clearSearch}
                     className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   >
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <X className="h-4 w-4" />
                     <span className="sr-only">Clear search</span>
                   </button>
                 </div>
@@ -115,15 +109,15 @@ const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
             )}
           </div>
 
-          {/* Search Button - Positioned closer to search bar */}
-          <div className="flex-shrink-0">
+          {/* 🔍 Search Button and ➕ Add Employee Button */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <Button
-              type="submit"
-              className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md cursor-pointer whitespace-nowrap"
-              disabled={searchQuery.length === 0}
+              onClick={handleAddEmployee}
+              size="sm"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white w-full sm:w-auto cursor-pointer"
             >
-              <UserSearch className="h-4 w-4" />
-              Search Employee
+              <BadgePlus className="h-4 w-4" />
+              Add Employee
             </Button>
           </div>
         </div>
