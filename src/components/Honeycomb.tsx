@@ -33,7 +33,7 @@ export default function Honeycomb({ onModuleSelect }: HoneycombProps) {
   const handleModuleClick = (module: typeof modules[0]) => {
     const moduleName = module.label === "Logo" ? "Core" : module.label;
         setActiveModule(moduleName);
-        document.title = `BDA | ${moduleName}`;
+        document.title = `RST | ${moduleName}`;
         if (onModuleSelect) {
       onModuleSelect(moduleName);
     }
