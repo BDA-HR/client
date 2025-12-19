@@ -9,7 +9,7 @@ import InventoryDashboard from './pages/modules/Inventory';
 import CoreDashboard from './pages/modules/Core';
 import Finance from './pages/modules/Finance';
 import Procurement from './pages/modules/Procurement';
-import JobGrade from './pages/hr/settings/jobgrade/JobGrade';
+import JobGrade from './pages/settings/hrSettings/jobgrade/JobGrade';
 import Termination from './pages/hr/employeepage/Termination';
 import CandidatePipeline from './pages/hr/recruitmentpage/CandidatePipeline';
 import OnBoarding from './pages/hr/recruitmentpage/OnBoarding';
@@ -38,19 +38,19 @@ import CompanyBranchesPage from './pages/core/pageCompanies';
 import BranchesPage from './pages/core/pageBranches';
 import FiscalYearHistory from './pages/core/pageFiscYearHist';
 import PagePeriod from './pages/core/pagePeriod';
-import PageSettings from './pages/hr/settings/pageSettings';
-import JobGradeSubgrades from './pages/hr/settings/jobgrade/JobGradeSubgrades';
-import PageBenefitSet from './pages/hr/settings/pageBenefitSet';
-import PageEducationalQual from './pages/hr/settings/pageEducationalQual';
-import PagePosition from './pages/hr/settings/position/pagePosition';
-import PositionDetails from './pages/hr/settings/position/PositionDetails';
+import PageSettings from './pages/settings/pageSettings';
+import JobGradeSubgrades from './pages/settings/hrSettings/jobgrade/JobGradeSubgrades';
+import PageBenefitSet from './pages/settings/hrSettings/pageBenefitSet';
+import PageEducationalQual from './pages/settings/hrSettings/pageEducationalQual';
+import PagePosition from './pages/settings/hrSettings/position/pagePosition';
+import PositionDetails from './pages/settings/hrSettings/position/PositionDetails';
 import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
-import PageAnnualLeave from './pages/hr/settings/pageAnnualLeave';
-import LeavePolicyAccrualPage  from './pages/hr/settings/leavepolicyaccrual/LeavePolicyAccrualPage';
+import PageAnnualLeave from './pages/settings/hrSettings/pageAnnualLeave';
+import LeavePolicyAccrualPage  from './pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage';
 import { PageHolidayHist } from './pages/core/pageHolidayHist';
 import ProfilePage from './pages/profile';
 import PageAddUser from './pages/core/usermanagement/pageAddUser';
-import PageHrSettings from './pages/hr/settings/PageHrSettings';
+import PageHrSettings from './pages/settings/hrSettings/PageHrSettings';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {

@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import LeaveHeader from '../../../components/hr/settings/leave/leavetype/LeaveHeader';
-import LeaveTypeSection from '../../../components/hr/settings/leave/leavetype/LeaveTypeSection';
-import LeavePolicySection from '../../../components/hr/settings/leave/leavepolicy/LeavePolicySection';
+import LeaveHeader from '../../../components/settings/hrSettings/leave/leavetype/LeaveHeader';
+import LeaveTypeSection from '../../../components/settings/hrSettings/leave/leavetype/LeaveTypeSection';
+import LeavePolicySection from '../../../components/settings/hrSettings/leave/leavepolicy/LeavePolicySection';
 import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto } from '../../../types/hr/leavetype';
 import type { LeavePolicyListDto, LeavePolicyAddDto, LeavePolicyModDto, LeaveTypeOptionDto } from '../../../types/hr/leavepolicy';
 

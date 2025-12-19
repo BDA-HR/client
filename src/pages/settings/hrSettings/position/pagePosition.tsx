@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
-import PositionHeader from '../../../../components/hr/settings/position/PositionHeader';
-import PositionSearchFilters from '../../../../components/hr/settings/position/PositonSearchFilter';
-import PositionCard from '../../../../components/hr/settings/position/PositionCard';
-import AddPositionModal from '../../../../components/hr/settings/position/AddPositionModal';
-import EditPositionModal from '../../../../components/hr/settings/position/EditPositionModal';
-import DeletePositionModal from '../../../../components/hr/settings/position/DeletePositionModal';
+import PositionHeader from '../../../../components/settings/hrSettings/position/PositionHeader';
+import PositionSearchFilters from '../../../../components/settings/hrSettings/position/PositonSearchFilter';
+import PositionCard from '../../../../components/settings/hrSettings/position/PositionCard';
+import AddPositionModal from '../../../../components/settings/hrSettings/position/AddPositionModal';
+import EditPositionModal from '../../../../components/settings/hrSettings/position/EditPositionModal';
+import DeletePositionModal from '../../../../components/settings/hrSettings/position/DeletePositionModal';
 import type { PositionListDto, PositionAddDto, PositionModDto } from '../../../../types/hr/position';
 import { positionService } from '../../../../services/hr/settings/positionService';
 import { motion } from 'framer-motion';

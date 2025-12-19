@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { DollarSign } from "lucide-react";
-import BenefitSetHeader from "../../../components/hr/settings/benefit/BenefitSetHeader";
-import BenefitSetCard from "../../../components/hr/settings/benefit/BenefitSetCard";
-import BenefitSearchFilters from "../../../components/hr/settings/benefit/BenefitSearchFilter";
-import AddBenefitModal from "../../../components/hr/settings/benefit/AddBenfitModal";
-import EditBenefitSetModal from "../../../components/hr/settings/benefit/EditBenefitSetModal";
-import DeleteBenefitModal from "../../../components/hr/settings/benefit/DeleteBenefitModal";
+import BenefitSetHeader from "../../../components/settings/hrSettings/benefit/BenefitSetHeader";
+import BenefitSetCard from "../../../components/settings/hrSettings/benefit/BenefitSetCard";
+import BenefitSearchFilters from "../../../components/settings/hrSettings/benefit/BenefitSearchFilter";
+import AddBenefitModal from "../../../components/settings/hrSettings/benefit/AddBenfitModal";
+import EditBenefitSetModal from "../../../components/settings/hrSettings/benefit/EditBenefitSetModal";
+import DeleteBenefitModal from "../../../components/settings/hrSettings/benefit/DeleteBenefitModal";
 import { benefitSetService } from "../../../services/hr/settings/BenefitSetService";
 import type { BenefitSetListDto, BenefitSetAddDto, BenefitSetModDto } from "../../../types/hr/benefit";
 

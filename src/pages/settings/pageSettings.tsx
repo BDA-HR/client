@@ -8,8 +8,8 @@ import {
   FileText,
   Settings as SettingsIcon
 } from 'lucide-react'
-import SettingsHeader from '../../../components/hr/settings/SettingsHeader'
-import SettingCard from '../../../components/hr/settings/SettingCard'
+import SettingsHeader from '../../components/settings/SettingsHeader'
+import SettingCard from '../../components/settings/SettingCard'
 
 // Animation variants
 const containerVariants = {

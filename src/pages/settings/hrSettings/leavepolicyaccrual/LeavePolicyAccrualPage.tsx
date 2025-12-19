@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import LeavePolicyAccrualHeader from '../../../../components/hr/settings/leave/leavepolicyaccrual/LeavePolicyAccrualHeader'
+import LeavePolicyAccrualHeader from '../../../../components/settings/hrSettings/leave/leavepolicyaccrual/LeavePolicyAccrualHeader'
 import { Button } from '../../../../components/ui/button'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Calendar, FileText, Clock, Settings, Pen } from 'lucide-react';
 import type { LeavePolicyListDto, UUID } from '../../../../types/hr/leavepolicy';
 import type { LeavePolicyAccrualListDto, LeavePolicyAccrualAddDto } from '../../../../types/hr/leavepolicyaccrual';
-import AddLeavePolicyAccrualModal from '../../../../components/hr/settings/leave/leavepolicyaccrual/AddLeavePolicyAccrualModal';
+import AddLeavePolicyAccrualModal from '../../../../components/settings/hrSettings/leave/leavepolicyaccrual/AddLeavePolicyAccrualModal';
 import toast from 'react-hot-toast';
 import { leavePolicyAccrualService } from '../../../../services/hr/settings/LeaveSet/LeavePolicyAccService';
 import { leavePolicyService } from '../../../../services/hr/settings/LeaveSet/LeavePolicyService';
