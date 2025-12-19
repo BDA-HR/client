@@ -5,6 +5,7 @@ import { BasicInfoStep } from '../../../components/hr/employee/AddEmployee/steps
 import { BasicInfoReviewStep } from '../../../components/core/usermgmt/AddEmployee/InfoReviewStep';
 import type { Step1Dto } from '../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
+import { usermgmtService } from '../../../services/core/usermgtservice';
 
 function PageAddUser() {
   const navigate = useNavigate();
@@ -14,41 +15,76 @@ function PageAddUser() {
   const [photoData, setPhotoData] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
-  // Define steps for the header
-
+  const [error, setError] = useState<string | null>(null);
 
   // Handle back to employees list
   const handleBackToEmployees = () => {
     navigate(-1);
   };
 
-
   // Handle going back from review to basic info
   const handleBackToBasicInfo = () => {
     setCurrentStep(1);
+    setError(null);
   };
 
   // Handle when Basic Info step is completed
-  const handleBasicInfoComplete = (data: Step1Dto & { branchId: UUID }) => {
-    // Store the data
-    setBasicInfoData(data);
+  const handleBasicInfoComplete = async (data: Step1Dto & { branchId: UUID }) => {
+    setIsLoading(true);
+    setError(null);
     
-    // Generate a temporary employee code (in real app, this would come from API)
-    const tempCode = `EMP${Date.now().toString().slice(-6)}`;
-    setEmployeeCode(tempCode);
-    
-    // If a file is uploaded, create a preview
-    if (data.File) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoData(reader.result as string);
-      };
-      reader.readAsDataURL(data.File);
+    try {
+      // Store the data locally first
+      setBasicInfoData(data);
+      
+      // If a file is uploaded, create a preview
+      if (data.File) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPhotoData(reader.result as string);
+        };
+        reader.readAsDataURL(data.File);
+      }
+      
+      // Call the API to create employee
+      const result = await usermgmtService.addEmployeeStep1(data);
+      
+      console.log('Employee created successfully:', result);
+      
+      // Set employee code from API response
+      setEmployeeCode(result.code);
+      
+      // Move to review step
+      setCurrentStep(2);
+      
+    } catch (err: any) {
+      console.error('Failed to create employee:', err);
+      setError(err.message || 'Failed to create employee. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Handle confirmation and save
+  const handleConfirmAndSave = async () => {
+    setIsLoading(true);
+    setError(null);
     
-    // Move to review step
-    setCurrentStep(2);
+    try {
+      // Show success
+      setSaveSuccess(true);
+      
+      // Redirect after 2 seconds
+      setTimeout(() => {
+        navigate('/core/users');
+      }, 2000);
+      
+    } catch (err: any) {
+      console.error('Failed to complete employee creation:', err);
+      setError(err.message || 'Failed to complete employee creation. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle print functionality
@@ -265,29 +301,6 @@ function PageAddUser() {
     }, 50);
   };
 
-  // Handle confirmation and save
-  const handleConfirmAndSave = async () => {
-    setIsLoading(true);
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Show success
-      setSaveSuccess(true);
-      
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/hr/employees');
-      }, 2000);
-      
-    } catch (error) {
-      console.error('Failed to save employee:', error);
-      alert('Failed to save employee. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Render success message
   if (saveSuccess) {
     return (
@@ -308,7 +321,33 @@ function PageAddUser() {
 
   return (
     <section className="w-full bg-gray-50 overflow-auto">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
+              </div>
+              <div className="ml-auto pl-3">
+                <button
+                  onClick={() => setError(null)}
+                  className="text-red-800 hover:text-red-900"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Step Content */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
