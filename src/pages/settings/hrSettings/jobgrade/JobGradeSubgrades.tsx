@@ -60,7 +60,7 @@ const JobGradeSubgrades: React.FC = () => {
   }, [loadJobGradeAndSteps]); // Only re-run when loadJobGradeAndSteps changes
 
   const handleBack = () => {
-    navigate('/hr/settings/jobgrade');
+    navigate('/settings/hr/jobgrade');
   };
 
   const handleOpenAddModal = () => {

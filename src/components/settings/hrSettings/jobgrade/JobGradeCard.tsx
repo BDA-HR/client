@@ -69,7 +69,7 @@ const JobGradeCard: React.FC<JobGradeCardProps> = ({
 
   // Navigate to subgrades page when card is clicked
   const handleCardClick = () => {
-    navigate(`/hr/settings/jobgrade/${jobGrade.id}/steps`, {
+    navigate(`/settings/hr/jobgrade/${jobGrade.id}/steps`, {
       state: { jobGrade }
     });
   };

@@ -26,7 +26,7 @@ const containerVariants = {
 const mainSettingsCards = [
   {
     id: 1,
-    title: "Core Settings",
+    title: "Core Module",
     icon: SettingsIcon,
     href: "/settings/core",
     color: "from-gray-500 to-gray-600",
@@ -35,7 +35,7 @@ const mainSettingsCards = [
   },
   {
     id: 2,
-    title: "HR Settings",
+    title: "HRM Module",
     icon: Users,
     href: "/settings/hr",
     color: "from-blue-500 to-blue-600",
@@ -44,7 +44,7 @@ const mainSettingsCards = [
   },
   {
     id: 3,
-    title: "CRM Settings",
+    title: "CRM Module",
     icon: Building,
     href: "/settings/crm",
     color: "from-green-500 to-green-600",
@@ -53,7 +53,7 @@ const mainSettingsCards = [
   },
   {
     id: 4,
-    title: "Finance Settings",
+    title: "Finance Module",
     icon: CreditCard,
     href: "/settings/finance",
     color: "from-purple-500 to-purple-600",
@@ -62,7 +62,7 @@ const mainSettingsCards = [
   },
   {
     id: 5,
-    title: "Procurement Settings",
+    title: "Procurement Module",
     icon: ShoppingCart,
     href: "/settings/procurement",
     color: "from-orange-500 to-orange-600",
@@ -71,7 +71,7 @@ const mainSettingsCards = [
   },
   {
     id: 6,
-    title: "Inventory Settings",
+    title: "Inventory Module",
     icon: Package,
     href: "/settings/inventory",
     color: "from-yellow-500 to-yellow-600",
@@ -80,7 +80,7 @@ const mainSettingsCards = [
   },
   {
     id: 7,
-    title: "File Management",
+    title: "File Management Module",
     icon: FileText,
     href: "/settings/file",
     color: "from-red-500 to-red-600",
@@ -103,7 +103,7 @@ function PageSettings() {
         {/* Main Content */}
         <div className="mx-auto w-full">
           {/* Settings Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mainSettingsCards.map((card, index) => (
               <SettingCard
                 key={card.id}

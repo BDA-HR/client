@@ -92,8 +92,8 @@ function App() {
             <Route path='/hr/employees/record' element={<EmployeeManagementPage />} />
             <Route path='/hr/employees/record/Add' element={<AddEmployeePage />} />
             <Route path="/hr/employees/:id" element={<EmployeeDetailsPage />} />
-            <Route path='/settings/jobgrade' element={<JobGrade />} />
-            <Route path='/settings/jobgrade/:gradeId/steps' element={<JobGradeSubgrades />} />
+            <Route path='/settings/hr/jobgrade' element={<JobGrade />} />
+            <Route path='/settings/hr/jobgrade/:gradeId/steps' element={<JobGradeSubgrades />} />
             <Route path='/hr/employees/termination' element={<Termination />} />
             <Route path='/hr/recruitment/pipeline' element={<CandidatePipeline />} />
             <Route path='/hr/recruitment/candidates/:candidateId' element={<CandidatePipeline />} />

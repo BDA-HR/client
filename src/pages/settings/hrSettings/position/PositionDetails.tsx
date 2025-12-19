@@ -149,7 +149,7 @@ function PositionDetails() {
   };
 
   const handleBack = () => {
-    navigate("/hr/settings/position");
+    navigate("/settings/hr/position");
   };
 
   // Experience modal handlers

@@ -133,7 +133,7 @@ function LeavePolicyAccrualPage() {
   }, [id]);
 
   const handleBackClick = () => {
-    navigate('/hr/settings/annualleave');
+    navigate('/settings/hr/annualleave');
   };
 
   const handleEditSection = (section: string) => {

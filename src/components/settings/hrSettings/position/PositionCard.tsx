@@ -56,7 +56,7 @@ const PositionCard: React.FC<PositionCardProps> = ({
 
   // Navigate to position details page with the 4 sub-cards
   const handleCardClick = () => {
-    navigate(`/hr/settings/position/${position.id}`, {
+    navigate(`/settings/hr/position/${position.id}`, {
       state: { position },
     });
   };

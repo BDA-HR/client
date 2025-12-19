@@ -55,7 +55,7 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
   };
 
   const handleCardClick = () => {
-    navigate(`/hr/settings/annualleave/${leavePolicy.id}/policy`, {
+    navigate(`/settings/hr/annualleave/${leavePolicy.id}/policy`, {
       state: { leavePolicy }
     });
   };

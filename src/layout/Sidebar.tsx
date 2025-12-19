@@ -321,8 +321,8 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-{activeModule === 'HR' || activeModule === 'Core' && (      <div className="p-4 border-t border-gray-200">
-        <NavItem to="/settings" icon={<Settings size={18} />} label="Settings" {...theme} /> 
+{(activeModule === 'HR' || activeModule === 'Core') && (      <div className="p-4 border-t border-gray-200">
+        <NavItem  to={activeModule === 'HR' ? '/settings/hr' : '/settings'} icon={<Settings size={18} />} label="Settings" {...theme} /> 
       </div>)}
     </div>
   );

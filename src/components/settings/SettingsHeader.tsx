@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Settings, ChevronRight } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 // Module color mapping
@@ -48,11 +48,11 @@ function SettingsHeader() {
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={`text-2xl font-bold bg-gradient-to-r ${colors.from} ${colors.to} bg-clip-text text-transparent dark:text-white`}
+                className={`text-2xl font-bold bg-gradient-to-r ${colors.from} ${colors.to} bg-clip-text text-transparent dark:text-white uppercase mr-1.5`}
               >
-                {moduleName}
+             {moduleName} 
               </motion.span>
-              <ChevronRight className="w-5 h-5 text-gray-400 mx-2" />
+              {/* <ChevronRight className="w-5 h-5 text-gray-400 mx-2" /> */}
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -73,7 +73,7 @@ function SettingsHeader() {
         </div>
       </motion.div>
       
-      {/* Optional: Breadcrumb for nested paths */}
+      {/* Optional: Breadcrumb for nested paths
       {location.pathname.includes('/settings/') && location.pathname.split('/').length > 3 && (
         <motion.div 
           initial={{ opacity: 0 }}
@@ -89,7 +89,7 @@ function SettingsHeader() {
             </span>
           ))}
         </motion.div>
-      )}
+      )} */}
     </div>
   );
 }
