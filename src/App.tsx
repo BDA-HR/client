@@ -51,6 +51,9 @@ import { PageHolidayHist } from './pages/core/pageHolidayHist';
 import ProfilePage from './pages/profile';
 import PageAddUser from './pages/core/usermanagement/pageAddUser';
 import PageHrSettings from './pages/settings/hrSettings/PageHrSettings';
+import PageCoreSettings from './pages/settings/coreSettings/PageCoreSettings';
+import PageApiSettings from './pages/settings/coreSettings/PageApiSettings';
+import PageMenuSettings from './pages/settings/coreSettings/PageMenuSettings';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -136,6 +139,9 @@ function App() {
             <Route path="/core/department" element={<DepartmentOverview />} />
             {/* <Route path="/core/company/:id" element={<CompanyDetailsPage />} /> */}
             <Route path="/core/fiscal-year/holiday-history" element={<PageHolidayHist />} />
+            <Route path='/settings/core' element={<PageCoreSettings />} />
+            <Route path='/settings/core/api-permissions' element={<PageApiSettings />} />
+            <Route path='/settings/core/menu-permissions' element={<PageMenuSettings />} />
 
           </Route>
           {/* END CORE ROUTES */}
