@@ -1,6 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Briefcase } from "lucide-react";
+import { Briefcase, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../../../ui/button";
 import type { JobGradeListDto } from "../../../../types/hr/jobgrade";
 
 interface JobGradeHeaderProps {
@@ -22,12 +24,30 @@ const itemVariants = {
 };
 
 const JobGradeHeader: React.FC<JobGradeHeaderProps> = () => {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
     <motion.div
       variants={itemVariants}
       className="mb-4 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
     >
       <div className="flex items-center gap-3">
+        {/* Back Button */}
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Back</span>
+        </Button>
+
+        {/* Icon and Title */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
