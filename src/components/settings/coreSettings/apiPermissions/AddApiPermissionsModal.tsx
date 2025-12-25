@@ -108,9 +108,6 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     disabled={isLoading}
                   />
-                  <p className="text-xs text-gray-500">
-                    Format: api.module.resource.action (e.g., api.hr.employee.create)
-                  </p>
                 </div>
 
                 {/* Description */}
@@ -128,9 +125,6 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     disabled={isLoading}
                   />
-                  <p className="text-xs text-gray-500">
-                    This will be displayed as the permission name
-                  </p>
                 </div>
               </div>
             </div>

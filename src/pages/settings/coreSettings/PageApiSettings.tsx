@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import ApiPermissionHeader from "../../../components/settings/coreSettings/apiPermissions/ApiPermissionsHeader";
-import ApiPermissionTable from "../../../components/settings/coreSettings/apiPermissions/ApiPermissionsTable";
 import ApiPermissionSearchFilters from "../../../components/settings/coreSettings/apiPermissions/ApiPermissionsSerachFilters";
+import ApiPermissionTable from "../../../components/settings/coreSettings/apiPermissions/ApiPermissionsTable";
+import EditApiPermissionModal from "../../../components/settings/coreSettings/apiPermissions/EditApiPermissionsModal";
+import DeleteApiPermissionModal from "../../../components/settings/coreSettings/apiPermissions/DeleteApiPermissionsModal";
 import type { 
   PerApiListDto, 
-  PerApiModDto 
-, UUID} from '../../../types/core/Settings/api-permission';
-
+  PerApiModDto,
+  PerApiAddDto,
+  UUID
+} from '../../../types/core/Settings/api-permission';
 
 // Mock data for demonstration
 const mockApiPermissions: PerApiListDto[] = [
@@ -117,146 +121,323 @@ const mockApiPermissions: PerApiListDto[] = [
   }
 ];
 
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      when: "beforeChildren",
+    },
+  },
+};
+
 function PageApiSettings() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [editingPermission, setEditingPermission] = useState<PerApiListDto | null>(null);
+  const [deletingPermission, setDeletingPermission] = useState<PerApiListDto | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [permissions, setPermissions] = useState<PerApiListDto[]>([]);
   const [filteredPermissions, setFilteredPermissions] = useState<PerApiListDto[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const itemsPerPage = 10;
 
-  // Filter permissions based on search term
+  // Load permissions on component mount
+  useEffect(() => {
+    loadPermissions();
+  }, []);
+
+  const loadPermissions = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Simulate API loading delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // For now, using mock data
+      const data = mockApiPermissions;
+      
+      setPermissions(data);
+      setFilteredPermissions(data);
+    } catch (err) {
+      console.error("Error loading API permissions:", err);
+      setError("Failed to load API permissions. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddPermission = async (newPermission: PerApiAddDto) => {
+    try {
+      setError(null);
+      
+      // Generate a new UUID for the permission
+      const generateUUID = () => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      };
+      
+      const newId = generateUUID() as UUID;
+      
+      // Create new permission object
+      const permissionToAdd: PerApiListDto = {
+        id: newId,
+        perMenuId: newPermission.perMenuId,
+        key: newPermission.key,
+        name: newPermission.desc,
+        perMenu: 'New Menu'
+      };
+      
+      const updatedPermissions = [...permissions, permissionToAdd];
+      const updatedFiltered = [...filteredPermissions, permissionToAdd];
+      
+      setPermissions(updatedPermissions);
+      setFilteredPermissions(updatedFiltered);
+      setCurrentPage(1);
+      
+      console.log('API permission added successfully!');
+      return { success: true, data: permissionToAdd };
+      
+    } catch (err) {
+      console.error("Error creating API permission:", err);
+      setError("Failed to create API permission. Please try again.");
+      throw err;
+    }
+  };
+
+  const handleEditClick = (permission: PerApiListDto) => {
+    setEditingPermission(permission);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdatePermission = async (updatedPermission: PerApiModDto) => {
+    try {
+      setError(null);
+      
+      const updatedPerm: PerApiListDto = {
+        id: updatedPermission.id,
+        perMenuId: updatedPermission.perMenuId,
+        key: updatedPermission.key,
+        name: updatedPermission.desc,
+        perMenu: permissions.find(p => p.id === updatedPermission.id)?.perMenu || 'Updated Menu'
+      };
+      
+      const updatedPermissions = permissions.map((perm) => 
+        perm.id === updatedPerm.id ? updatedPerm : perm
+      );
+      
+      const updatedFiltered = filteredPermissions.map((perm) => 
+        perm.id === updatedPerm.id ? updatedPerm : perm
+      );
+      
+      setPermissions(updatedPermissions);
+      setFilteredPermissions(updatedFiltered);
+      setIsEditModalOpen(false);
+      setEditingPermission(null);
+      
+      console.log('API permission updated successfully!');
+      return { success: true, data: updatedPerm };
+      
+    } catch (err) {
+      console.error("Error updating API permission:", err);
+      setError("Failed to update API permission. Please try again.");
+      throw err;
+    }
+  };
+
+  const handleDeleteClick = (permission: PerApiListDto) => {
+    setDeletingPermission(permission);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeletePermission = async (permissionId: UUID) => {
+    try {
+      setError(null);
+      
+      const updatedPermissions = permissions.filter((perm) => perm.id !== permissionId);
+      const updatedFiltered = filteredPermissions.filter((perm) => perm.id !== permissionId);
+      
+      setPermissions(updatedPermissions);
+      setFilteredPermissions(updatedFiltered);
+      
+      console.log('API permission deleted successfully!');
+      return { success: true, message: 'API permission deleted successfully!' };
+      
+    } catch (err) {
+      console.error("Error deleting API permission:", err);
+      setError("Failed to delete API permission. Please try again.");
+      throw err;
+    }
+  };
+
+  const handleDeleteConfirm = async (permissionId: UUID) => {
+    await handleDeletePermission(permissionId);
+    setIsDeleteModalOpen(false);
+    setDeletingPermission(null);
+  };
+
+  // Enhanced filter function
   const filterPermissions = (permissions: PerApiListDto[], term: string) => {
     if (!term.trim()) return permissions;
     
-    const lowerTerm = term.toLowerCase();
+    const searchLower = term.toLowerCase();
+    
     return permissions.filter(permission => 
-      permission.key.toLowerCase().includes(lowerTerm) ||
-      permission.name.toLowerCase().includes(lowerTerm) ||
-      permission.perMenu.toLowerCase().includes(lowerTerm)
+      permission.key.toLowerCase().includes(searchLower) ||
+      permission.name.toLowerCase().includes(searchLower) ||
+      permission.perMenu.toLowerCase().includes(searchLower)
     );
   };
-
-  // Load mock data on mount
-  useEffect(() => {
-    const itemsPerPage = 10;
-    
-    // Simulate API loading delay
-    const timer = setTimeout(() => {
-      const filtered = searchTerm ? filterPermissions(mockApiPermissions, searchTerm) : mockApiPermissions;
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      
-      setPermissions(filtered.slice(startIndex, endIndex));
-      setFilteredPermissions(filtered);
-      setTotalItems(filtered.length);
-      setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [currentPage, searchTerm]);
 
   // Handle search term change
   useEffect(() => {
     if (searchTerm) {
       const filtered = filterPermissions(mockApiPermissions, searchTerm);
       setFilteredPermissions(filtered);
-      setTotalItems(filtered.length);
-      setTotalPages(Math.ceil(filtered.length / 10));
-      
-      // Reset to first page when searching
       setCurrentPage(1);
-      const startIndex = 0;
-      const endIndex = 10;
-      setPermissions(filtered.slice(startIndex, endIndex));
     } else {
       setFilteredPermissions(mockApiPermissions);
-      setTotalItems(mockApiPermissions.length);
-      setTotalPages(Math.ceil(mockApiPermissions.length / 10));
-      
-      const startIndex = (currentPage - 1) * 10;
-      const endIndex = startIndex + 10;
-      setPermissions(mockApiPermissions.slice(startIndex, endIndex));
     }
   }, [searchTerm]);
 
-  // Handle page change
-  const handlePageChange = (page: number) => {
-    setIsLoading(true);
-    setCurrentPage(page);
-    
-    // Simulate API loading
-    setTimeout(() => {
-      const itemsPerPage = 10;
-      const startIndex = (page - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      
-      setPermissions(filteredPermissions.slice(startIndex, endIndex));
-      setIsLoading(false);
-    }, 300);
-  };
-
-  // Handle edit permission
-  const handleEditPermission = async (permission: PerApiModDto) => {
-    console.log('Editing permission:', permission);
-    
-    // Mock update
-    const updatedPermissions = permissions.map(p => 
-      p.id === permission.id 
-        ? { ...p, key: permission.key, name: permission.desc }
-        : p
-    );
-    setPermissions(updatedPermissions);
-    
-    // Show success message in console
-    console.log('API permission updated successfully!');
-  };
-
-  // Handle delete permission
-  const handleDeletePermission = async (id: string) => {
-    console.log('Deleting permission with ID:', id);
-    
-    // Mock delete
-    const filteredPermissions = permissions.filter(p => p.id !== id);
-    setPermissions(filteredPermissions);
-    setTotalItems(totalItems - 1);
-    setTotalPages(Math.ceil((totalItems - 1) / 10));
-    
-    // Show success message in console
-    console.log('API permission deleted successfully!');
-  };
+  // Pagination logic
+  const totalPages = Math.ceil(filteredPermissions.length / itemsPerPage);
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setPermissions(filteredPermissions.slice(startIndex, endIndex));
+  }, [filteredPermissions, currentPage]);
 
   return (
-    <div>
-      <ApiPermissionHeader />
-      
-      {/* Search Filters */}
-      <ApiPermissionSearchFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-      />
-      
-      {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading API permissions...</p>
-          </div>
+    <>
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className={`w-full h-full flex flex-col space-y-6 ${
+          isEditModalOpen || isDeleteModalOpen ? "blur-sm" : ""
+        }`}
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <ApiPermissionHeader apiPermissions={permissions} />
         </div>
-      ) : (
-        <ApiPermissionTable
-          permissions={permissions}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={totalItems}
-          onPageChange={handlePageChange}
-          onEditPermission={handleEditPermission}
-          onPermissionDelete={handleDeletePermission}
+
+        {/* Main content area */}
+        <div className="flex-1">
+          {/* Loading State */}
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex justify-center items-center py-12"
+            >
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading API permissions...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {!isLoading && (
+            <div className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">
+                      {error.includes("load") ? (
+                        <>
+                          Failed to load API permissions.{" "}
+                          <button
+                            onClick={loadPermissions}
+                            className="underline hover:text-red-800 font-semibold focus:outline-none"
+                          >
+                            Try again
+                          </button>{" "}
+                          later.
+                        </>
+                      ) : error.includes("create") ? (
+                        "Failed to create API permission. Please try again."
+                      ) : error.includes("update") ? (
+                        "Failed to update API permission. Please try again."
+                      ) : error.includes("delete") ? (
+                        "Failed to delete API permission. Please try again."
+                      ) : (
+                        error
+                      )}
+                    </span>
+                    <button
+                      onClick={() => setError(null)}
+                      className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Search Filters */}
+              <ApiPermissionSearchFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                onAddPermission={handleAddPermission}
+              />
+
+              {/* API Permissions Table */}
+              <ApiPermissionTable
+                permissions={permissions}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredPermissions.length}
+                onPageChange={setCurrentPage}
+                onEditPermission={handleEditClick}
+                onDeletePermission={handleDeleteClick}
+              />
+            </div>
+          )}
+        </div>
+      </motion.section>
+
+      {/* Edit API Permission Modal */}
+      {isEditModalOpen && editingPermission && (
+        <EditApiPermissionModal
+          permission={editingPermission}
+          onEditPermission={handleUpdatePermission}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingPermission(null);
+          }}
         />
       )}
-    </div>
+
+      {/* Delete API Permission Modal */}
+      {isDeleteModalOpen && deletingPermission && (
+        <DeleteApiPermissionModal
+          permission={deletingPermission}
+          onConfirm={handleDeleteConfirm}
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setDeletingPermission(null);
+          }}
+        />
+      )}
+    </>
   );
 }
 

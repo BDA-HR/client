@@ -108,9 +108,6 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     disabled={isLoading}
                   />
-                  <p className="text-xs text-gray-500">
-                    Format: menu.module.feature (e.g., menu.hr.dashboard)
-                  </p>
                 </div>
 
                 {/* Description */}
@@ -128,9 +125,6 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                     className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
                     disabled={isLoading}
                   />
-                  <p className="text-xs text-gray-500">
-                    This will be displayed as the menu name
-                  </p>
                 </div>
               </div>
             </div>
