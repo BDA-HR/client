@@ -1,32 +1,36 @@
+import type { UUID } from "crypto";
+
+export type { UUID };
+
 export interface NameList {
-  id: string;
+  id: UUID;
   name: string;
 }
 
 // Main DTOs
 export interface MenuPerApiListDto {
-  perMenuId: string; // PerMenu
+  perMenuId: UUID; // PerMenu
   perMenu: string; // PerMenu
   perApiList: NameList[];
 }
 
 export interface PerApiListDto {
-  id: string;
-  perMenuId: string; // PerMenu
+  id: UUID;
+  perMenuId: UUID;
   key: string;
   name: string;
-  perMenu: string; // PerMenu
+  perMenu: string;
 }
 
 export interface PerApiAddDto {
-  perMenuId: string; // PerMenu
+  perMenuId: UUID; // PerMenu
   key: string;
   desc: string;
 }
 
 export interface PerApiModDto {
-  perMenuId: string; // PerMenu
-  id: string;
+  perMenuId: UUID; // PerMenu
+  id: UUID;
   key: string;
   desc: string;
 }

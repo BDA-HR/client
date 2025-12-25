@@ -22,7 +22,7 @@ const containerVariants = {
 const coreSettingsCards = [
   {
     id: 1,
-    title: "API Permissions",
+    title: "Access Permissions",
     description: "Manage API permissions, access keys, and endpoint security settings",
     icon: Key,
     href: "/settings/core/api-permissions",

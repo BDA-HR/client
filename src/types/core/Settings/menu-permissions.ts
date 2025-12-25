@@ -1,3 +1,7 @@
+import type { UUID } from "crypto";
+
+export type { UUID };
+
 export interface NameList {
   id: string;
   name: string;
@@ -11,22 +15,22 @@ export interface ModPerMenuListDto {
 }
 
 export interface PerMenuListDto {
-  id: string;
-  perModuleId: string; // PerModule
+  id: UUID;
+  perModuleId: UUID; // PerModule
   key: string;
   name: string;
   module: string; // PerModule
 }
 
 export interface PerMenuAddDto {
-  perModuleId: string; // PerModule
+  perModuleId: UUID; // PerModule
   key: string;
   desc: string;
 }
 
 export interface PerMenuModDto {
-  perModuleId: string; // PerModule
-  id: string;
+  perModuleId: UUID; // PerModule
+  id: UUID;
   key: string;
   desc: string;
 }
