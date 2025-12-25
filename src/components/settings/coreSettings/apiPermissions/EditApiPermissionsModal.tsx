@@ -118,7 +118,7 @@ const EditApiPermissionModal: React.FC<EditApiPermissionModalProps> = ({
         <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <PenBox size={20} className="text-emerald-600" />
-            <h2 className="text-lg font-bold text-gray-800">Edit API Permission</h2>
+            <h2 className="text-lg font-bold text-gray-800">Edit Access Permission</h2>
           </div>
           <button
             onClick={handleClose}
@@ -158,7 +158,7 @@ const EditApiPermissionModal: React.FC<EditApiPermissionModalProps> = ({
             {/* API Key */}
             <div className="space-y-2">
               <Label htmlFor="edit-key" className="text-sm text-gray-500">
-                API Key <span className="text-red-500">*</span>
+                Key <span className="text-red-500">*</span>
               </Label>
               <input
                 id="edit-key"

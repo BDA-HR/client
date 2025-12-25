@@ -20,8 +20,19 @@ const containerVariants = {
 
 // Core specific settings card data
 const coreSettingsCards = [
+  
   {
     id: 1,
+    title: "Menu Permissions",
+    description: "Configure menu permissions, navigation access, and module visibility",
+    icon: Menu,
+    href: "/settings/core/menu-permissions",
+    color: "from-teal-500 to-teal-600",
+    bgColor: "bg-teal-50",
+    iconColor: "text-teal-600"
+  },
+  {
+    id: 2,
     title: "Access Permissions",
     description: "Manage API permissions, access keys, and endpoint security settings",
     icon: Key,
@@ -30,16 +41,6 @@ const coreSettingsCards = [
     bgColor: "bg-indigo-50",
     iconColor: "text-indigo-600"
   },
-  {
-    id: 2,
-    title: "Menu Permissions",
-    description: "Configure menu permissions, navigation access, and module visibility",
-    icon: Menu,
-    href: "/settings/core/menu-permissions",
-    color: "from-teal-500 to-teal-600",
-    bgColor: "bg-teal-50",
-    iconColor: "text-teal-600"
-  }
 ]
 
 function PageCoreSettings() {

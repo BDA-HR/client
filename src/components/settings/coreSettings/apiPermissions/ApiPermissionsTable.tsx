@@ -5,7 +5,6 @@ import {
   ChevronRight,
   MoreVertical,
   Trash2,
-  Eye,
   PenBox,
   Key,
 } from 'lucide-react';
@@ -34,11 +33,6 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
   onDeletePermission,
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
-
-  const handleViewDetails = (permission: PerApiListDto) => {
-    console.log('View details for permission:', permission);
-    setPopoverOpen(null);
-  };
 
   const handleEdit = (permission: PerApiListDto) => {
     onEditPermission(permission);
@@ -146,7 +140,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
                         <motion.button 
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
+                          className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100 cursor-pointer"
                         >
                           <MoreVertical className="h-5 w-5" />
                         </motion.button>
@@ -154,22 +148,15 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
                       <PopoverContent className="w-48 p-0" align="end">
                         <div className="py-1">
                           <button 
-                            onClick={() => handleViewDetails(permission)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                          >
-                            <Eye size={16} />
-                            View Details
-                          </button>
-                          <button 
                             onClick={() => handleEdit(permission)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                            className="w-full cursor-pointer text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                           >
                             <PenBox size={16} />
                             Edit
                           </button>
                           <button 
                             onClick={() => handleDelete(permission)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+                            className="w-full cursor-pointer text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                           >
                             <Trash2 size={16} />
                             Delete
