@@ -74,7 +74,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
           <thead className="bg-white">
             <tr>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                API Key
+                Access Key
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Permission Name
@@ -91,7 +91,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
             {permissions.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
-                  No API permissions found
+                  No Access permissions found
                 </td>
               </tr>
             ) : (
@@ -195,7 +195,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
             <p className="text-sm text-gray-700">
               Showing <span className="font-medium">{startItem}</span> to{' '}
               <span className="font-medium">{endItem}</span> of{' '}
-              <span className="font-medium">{totalItems}</span> API permissions
+              <span className="font-medium">{totalItems}</span> Access permissions
             </p>
           </div>
           <div>

@@ -4,81 +4,46 @@ import { X, BadgePlus } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Label } from '../../../ui/label';
 import { Input } from '../../../ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../../ui/select';
-import type { PerApiAddDto, UUID } from '../../../../types/core/Settings/api-permission';
+import type { PerApiAddDto } from '../../../../types/core/Settings/api-permission';
 import toast from 'react-hot-toast';
 
 interface AddApiPermissionModalProps {
   onAddPermission: (permission: PerApiAddDto) => Promise<any>;
 }
 
-// Mock menu data
-const mockMenus = [
-  { id: 'menu-hr', name: 'HR Management' },
-  { id: 'menu-finance', name: 'Finance' },
-  { id: 'menu-crm', name: 'CRM' },
-  { id: 'menu-inventory', name: 'Inventory' },
-  { id: 'menu-procurement', name: 'Procurement' },
-  { id: 'menu-settings', name: 'Settings' },
-  { id: 'menu-reports', name: 'Reports' },
-  { id: 'menu-dashboard', name: 'Dashboard' },
-  { id: 'menu-employee', name: 'Employee Management' },
-  { id: 'menu-payroll', name: 'Payroll' },
-  { id: 'menu-attendance', name: 'Attendance' },
-  { id: 'menu-leave', name: 'Leave Management' },
-  { id: 'menu-performance', name: 'Performance' },
-  { id: 'menu-recruitment', name: 'Recruitment' },
-  { id: 'menu-training', name: 'Training' },
-  { id: 'menu-assets', name: 'Assets' },
-  { id: 'menu-projects', name: 'Projects' },
-  { id: 'menu-tasks', name: 'Tasks' },
-  { id: 'menu-clients', name: 'Clients' },
-  { id: 'menu-vendors', name: 'Vendors' },
-  { id: 'menu-purchases', name: 'Purchases' },
-  { id: 'menu-sales', name: 'Sales' },
-  { id: 'menu-marketing', name: 'Marketing' },
-  { id: 'menu-support', name: 'Support' },
-  { id: 'menu-analytics', name: 'Analytics' },
-  { id: 'menu-security', name: 'Security' },
-  { id: 'menu-integrations', name: 'Integrations' },
-  { id: 'menu-notifications', name: 'Notifications' },
-];
-
-const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPermission }) => {
+const AddApiPermissionsModal: React.FC<AddApiPermissionModalProps> = ({ onAddPermission }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newPermission, setNewPermission] = useState<PerApiAddDto>({
-    perMenuId: '' as UUID,
+    perMenuKey: '',
     key: '',
     desc: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{
-    perMenuId?: string;
+    perMenuKey?: string;
     key?: string;
     desc?: string;
   }>({});
 
   const validateForm = () => {
     const newErrors: {
-      perMenuId?: string;
+      perMenuKey?: string;
       key?: string;
       desc?: string;
     } = {};
 
-    if (!newPermission.perMenuId) {
-      newErrors.perMenuId = 'Please select a menu';
+    if (!newPermission.perMenuKey.trim()) {
+      newErrors.perMenuKey = 'Menu key is required';
+    } else if (!/^[a-z]+(?:\.[a-z]+)*$/.test(newPermission.perMenuKey)) {
+      newErrors.perMenuKey = 'Menu key should be lowercase with dots for hierarchy (e.g., hr.employee, finance.payroll)';
     }
 
     if (!newPermission.key.trim()) {
       newErrors.key = 'API key is required';
     } else if (!newPermission.key.includes('api.')) {
       newErrors.key = 'API key must start with "api."';
+    } else if (!/^api\.[a-z]+(?:\.[a-z]+)*(?:\.[a-z]+)+$/.test(newPermission.key)) {
+      newErrors.key = 'API key format: api.module.feature.action (e.g., api.hr.employee.create)';
     }
 
     if (!newPermission.desc.trim()) {
@@ -100,26 +65,27 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
     try {
       const response = await onAddPermission({
         ...newPermission,
-        key: newPermission.key.trim(),
+        perMenuKey: newPermission.perMenuKey.trim().toLowerCase(),
+        key: newPermission.key.trim().toLowerCase(),
         desc: newPermission.desc.trim(),
       });
 
       const successMessage = 
         response?.data?.message || 
         response?.message || 
-        'API permission added successfully!';
+        'Access permission added successfully!';
       
       toast.success(successMessage);
       
       // Reset form and close modal
-      setNewPermission({ perMenuId: '' as UUID, key: '', desc: '' });
+      setNewPermission({ perMenuKey: '', key: '', desc: '' });
       setErrors({});
       setIsOpen(false);
       
     } catch (error: any) {
-      const errorMessage = error.message || 'Failed to add API permission';
+      const errorMessage = error.message || 'Failed to add Access permission';
       toast.error(errorMessage);
-      console.error('Error adding API permission:', error);
+      console.error('Error adding Access permission:', error);
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +94,7 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
   const handleClose = () => {
     if (!isLoading) {
       // Reset form when closing
-      setNewPermission({ perMenuId: '' as UUID, key: '', desc: '' });
+      setNewPermission({ perMenuKey: '', key: '', desc: '' });
       setErrors({});
       setIsOpen(false);
     }
@@ -179,9 +145,9 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
             {/* Header */}
             <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
               <div className="flex items-center gap-3">
-                  <BadgePlus size={20} className="text-emerald-600" />
+                <BadgePlus size={20} className="text-emerald-600" />
                 <div>
-                  <h2 className="text-lg font-bold text-gray-800">Add API Permission</h2>
+                  <h2 className="text-lg font-bold text-gray-800">Add Access Permission</h2>
                 </div>
               </div>
               <button
@@ -196,44 +162,33 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
 
             {/* Body */}
             <div className="p-6 space-y-6">
-              {/* Menu Selection Dropdown */}
+              {/* Menu Key Input */}
               <div className="space-y-3">
-                <Label htmlFor="perMenuId" className="text-sm font-medium text-gray-700">
-                  Menu <span className="text-red-500">*</span>
+                <Label htmlFor="perMenuKey" className="text-sm font-medium text-gray-700">
+                  Menu Key <span className="text-red-500">*</span>
                 </Label>
-                <Select
-                  value={newPermission.perMenuId}
-                  onValueChange={(value) => {
-                    setNewPermission(prev => ({ ...prev, perMenuId: value as UUID }));
-                    if (errors.perMenuId) setErrors(prev => ({ ...prev, perMenuId: undefined }));
+                <Input
+                  id="perMenuKey"
+                  value={newPermission.perMenuKey}
+                  onChange={(e) => {
+                    setNewPermission(prev => ({ ...prev, perMenuKey: e.target.value }));
+                    if (errors.perMenuKey) setErrors(prev => ({ ...prev, perMenuKey: undefined }));
                   }}
+                  placeholder="hr.employee, finance.payroll, crm.contacts"
+                  className={`w-full ${errors.perMenuKey ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}`}
                   disabled={isLoading}
-                >
-                  <SelectTrigger 
-                    id="perMenuId"
-                    className={`w-full ${errors.perMenuId ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}`}
-                  >
-                    <SelectValue placeholder="Select a menu" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {mockMenus.map((menu) => (
-                      <SelectItem key={menu.id} value={menu.id}>
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-700">{menu.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.perMenuId && (
-                  <p className="text-sm text-red-500">{errors.perMenuId}</p>
+                  aria-invalid={!!errors.perMenuKey}
+                  aria-describedby={errors.perMenuKey ? "perMenuKey-error" : undefined}
+                />
+                {errors.perMenuKey && (
+                  <p id="perMenuKey-error" className="text-sm text-red-500">{errors.perMenuKey}</p>
                 )}
               </div>
 
               {/* API Key */}
               <div className="space-y-3">
                 <Label htmlFor="key" className="text-sm font-medium text-gray-700">
-                  API Key <span className="text-red-500">*</span>
+                  Access Key <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="key"
@@ -275,35 +230,6 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
                   <p id="desc-error" className="text-sm text-red-500">{errors.desc}</p>
                 )}
               </div>
-
-              {/* Preview Section */}
-              {newPermission.key && newPermission.desc && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="bg-gray-50 p-4 rounded-lg border border-gray-200"
-                >
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Preview</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-gray-500">Menu:</span>
-                      <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">
-                        {mockMenus.find(m => m.id === newPermission.perMenuId)?.name || 'Not selected'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-gray-500">API Key:</span>
-                      <code className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">
-                        {newPermission.key}
-                      </code>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-gray-500">Description:</span>
-                      <span className="text-sm text-gray-700">{newPermission.desc}</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
             </div>
 
             {/* Footer */}
@@ -342,4 +268,4 @@ const AddApiPermissionModal: React.FC<AddApiPermissionModalProps> = ({ onAddPerm
   );
 };
 
-export default AddApiPermissionModal;
+export default AddApiPermissionsModal;

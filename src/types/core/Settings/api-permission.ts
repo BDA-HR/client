@@ -17,13 +17,14 @@ export interface MenuPerApiListDto {
 export interface PerApiListDto {
   id: UUID;
   perMenuId: UUID;
+  perMenuKey: string;
   key: string;
   name: string;
   perMenu: string;
 }
 
 export interface PerApiAddDto {
-  perMenuId: UUID; // PerMenu
+  perMenuKey: string; // PerMenu
   key: string;
   desc: string;
 }
