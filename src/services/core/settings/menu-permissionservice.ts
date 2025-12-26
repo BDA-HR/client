@@ -9,13 +9,11 @@ import type {
 class MenuPermissionService {
   private baseUrl = `${import.meta.env.VITE_AUTH_MODULE_URL || 'auth/v1'}/PerMenu`;
 
-  // Helper method to extract error messages
   private extractErrorMessage(error: any): string {
     if (error.response?.data?.message) {
       return error.response.data.message;
     }
     if (error.response?.data?.errors) {
-      // Handle validation errors (object with field names as keys)
       const errors = error.response.data.errors;
       const errorMessages = Object.values(errors).flat();
       return errorMessages.join(', ');

@@ -5,6 +5,7 @@ import MenuPermissionSearchFilters from "../../../components/settings/coreSettin
 import MenuPermissionTable from "../../../components/settings/coreSettings/menuPermissions/MenuPermissionsTable";
 import EditMenuPermissionModal from "../../../components/settings/coreSettings/menuPermissions/EditMenuPermissionModal";
 import DeleteMenuPermissionModal from "../../../components/settings/coreSettings/menuPermissions/DeleteMenuPermissionModal";
+import { menuPermissionService } from "../../../services/core/settings/menu-permissionservice";
 import type { 
   PerMenuListDto, 
   PerMenuModDto,
@@ -12,184 +13,6 @@ import type {
   ModPerMenuListDto,
   UUID
 } from '../../../types/core/Settings/menu-permissions';
-
-// Mock data for demonstration
-const mockMenuPermissions: PerMenuListDto[] = [
-  {
-    id: 'menu-perm-001' as UUID,
-    perModuleId: 'module-hr' as UUID,
-    key: 'menu.hr.dashboard',
-    name: 'HR Dashboard',
-    module: 'Human Resources'
-  },
-  {
-    id: 'menu-perm-002' as UUID,
-    perModuleId: 'module-hr' as UUID,
-    key: 'menu.hr.employees',
-    name: 'Employees Management',
-    module: 'Human Resources'
-  },
-  {
-    id: 'menu-perm-003' as UUID,
-    perModuleId: 'module-hr' as UUID,
-    key: 'menu.hr.attendance',
-    name: 'Attendance Tracking',
-    module: 'Human Resources'
-  },
-  {
-    id: 'menu-perm-004' as UUID,
-    perModuleId: 'module-hr' as UUID,
-    key: 'menu.hr.payroll',
-    name: 'Payroll Management',
-    module: 'Human Resources'
-  },
-  {
-    id: 'menu-perm-005' as UUID,
-    perModuleId: 'module-finance' as UUID,
-    key: 'menu.finance.dashboard',
-    name: 'Finance Dashboard',
-    module: 'Finance'
-  },
-  {
-    id: 'menu-perm-006' as UUID,
-    perModuleId: 'module-finance' as UUID,
-    key: 'menu.finance.invoices',
-    name: 'Invoice Management',
-    module: 'Finance'
-  },
-  {
-    id: 'menu-perm-007' as UUID,
-    perModuleId: 'module-finance' as UUID,
-    key: 'menu.finance.reports',
-    name: 'Financial Reports',
-    module: 'Finance'
-  },
-  {
-    id: 'menu-perm-008' as UUID,
-    perModuleId: 'module-crm' as UUID,
-    key: 'menu.crm.dashboard',
-    name: 'CRM Dashboard',
-    module: 'CRM'
-  },
-  {
-    id: 'menu-perm-009' as UUID,
-    perModuleId: 'module-crm' as UUID,
-    key: 'menu.crm.leads',
-    name: 'Leads Management',
-    module: 'CRM'
-  },
-  {
-    id: 'menu-perm-010' as UUID,
-    perModuleId: 'module-crm' as UUID,
-    key: 'menu.crm.customers',
-    name: 'Customer Management',
-    module: 'CRM'
-  },
-  {
-    id: 'menu-perm-011' as UUID,
-    perModuleId: 'module-inventory' as UUID,
-    key: 'menu.inventory.dashboard',
-    name: 'Inventory Dashboard',
-    module: 'Inventory'
-  },
-  {
-    id: 'menu-perm-012' as UUID,
-    perModuleId: 'module-inventory' as UUID,
-    key: 'menu.inventory.products',
-    name: 'Product Management',
-    module: 'Inventory'
-  },
-  {
-    id: 'menu-perm-013' as UUID,
-    perModuleId: 'module-procurement' as UUID,
-    key: 'menu.procurement.dashboard',
-    name: 'Procurement Dashboard',
-    module: 'Procurement'
-  },
-  {
-    id: 'menu-perm-014' as UUID,
-    perModuleId: 'module-procurement' as UUID,
-    key: 'menu.procurement.orders',
-    name: 'Order Management',
-    module: 'Procurement'
-  },
-  {
-    id: 'menu-perm-015' as UUID,
-    perModuleId: 'module-settings' as UUID,
-    key: 'menu.settings.dashboard',
-    name: 'Settings Dashboard',
-    module: 'Settings'
-  },
-  {
-    id: 'menu-perm-016' as UUID,
-    perModuleId: 'module-settings' as UUID,
-    key: 'menu.settings.users',
-    name: 'User Management',
-    module: 'Settings'
-  },
-  {
-    id: 'menu-perm-017' as UUID,
-    perModuleId: 'module-settings' as UUID,
-    key: 'menu.settings.permissions',
-    name: 'Permission Management',
-    module: 'Settings'
-  },
-  {
-    id: 'menu-perm-018' as UUID,
-    perModuleId: 'module-hr' as UUID,
-    key: 'menu.hr.recruitment',
-    name: 'Recruitment',
-    module: 'Human Resources'
-  },
-  {
-    id: 'menu-perm-019' as UUID,
-    perModuleId: 'module-finance' as UUID,
-    key: 'menu.finance.budget',
-    name: 'Budget Planning',
-    module: 'Finance'
-  },
-  {
-    id: 'menu-perm-020' as UUID,
-    perModuleId: 'module-crm' as UUID,
-    key: 'menu.crm.marketing',
-    name: 'Marketing Automation',
-    module: 'CRM'
-  }
-];
-
-// Mock modules data for the dropdown
-const mockModules: ModPerMenuListDto[] = [
-  {
-    perModuleId: 'module-hr',
-    perModule: 'Human Resources',
-    perMenuList: []
-  },
-  {
-    perModuleId: 'module-finance',
-    perModule: 'Finance',
-    perMenuList: []
-  },
-  {
-    perModuleId: 'module-crm',
-    perModule: 'CRM',
-    perMenuList: []
-  },
-  {
-    perModuleId: 'module-inventory',
-    perModule: 'Inventory',
-    perMenuList: []
-  },
-  {
-    perModuleId: 'module-procurement',
-    perModule: 'Procurement',
-    perMenuList: []
-  },
-  {
-    perModuleId: 'module-settings',
-    perModule: 'Settings',
-    perMenuList: []
-  }
-];
 
 // Animation variants
 const containerVariants = {
@@ -212,28 +35,33 @@ function PageMenuSettings() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [permissions, setPermissions] = useState<PerMenuListDto[]>([]);
   const [filteredPermissions, setFilteredPermissions] = useState<PerMenuListDto[]>([]);
+  const [modules, setModules] = useState<ModPerMenuListDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 10;
 
   useEffect(() => {
-    loadPermissions();
+    loadData();
   }, []);
 
-  const loadPermissions = async () => {
+  const loadData = async () => {
     try {
       setIsLoading(true);
       setError(null);
       
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Fetch all permissions and modules in parallel
+      const [permissionsData, modulesData] = await Promise.all([
+        menuPermissionService.getAllMenuPermissions(),
+        menuPermissionService.getMenuPermissionsByModule()
+      ]);
       
-      const data = mockMenuPermissions;
+      setPermissions(permissionsData);
+      setFilteredPermissions(permissionsData);
+      setModules(modulesData);
       
-      setPermissions(data);
-      setFilteredPermissions(data);
-    } catch (err) {
-      console.error("Error loading menu permissions:", err);
-      setError("Failed to load menu permissions. Please try again.");
+    } catch (err: any) {
+      console.error("Error loading data:", err);
+      setError(err.message || "Failed to load data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -243,37 +71,25 @@ function PageMenuSettings() {
     try {
       setError(null);
       
-      const generateUUID = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          const r = Math.random() * 16 | 0;
-          const v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      };
+      const createdPermission = await menuPermissionService.createMenuPermission(newPermission);
       
-      const newId = generateUUID() as UUID;
-      
-      const permissionToAdd: PerMenuListDto = {
-        id: newId,
-        perModuleId: newPermission.perModuleId,
-        key: newPermission.key,
-        name: newPermission.desc,
-        module: mockModules.find(m => m.perModuleId === newPermission.perModuleId)?.perModule || 'New Module'
-      };
-      
-      const updatedPermissions = [...permissions, permissionToAdd];
-      const updatedFiltered = [...filteredPermissions, permissionToAdd];
+      const updatedPermissions = [...permissions, createdPermission];
+      const updatedFiltered = [...filteredPermissions, createdPermission];
       
       setPermissions(updatedPermissions);
       setFilteredPermissions(updatedFiltered);
       setCurrentPage(1);
       
       console.log('Menu permission added successfully!');
-      return { success: true, data: permissionToAdd };
       
-    } catch (err) {
+      // Reload modules to ensure data consistency
+      await reloadModules();
+      
+      return { success: true, data: createdPermission };
+      
+    } catch (err: any) {
       console.error("Error creating menu permission:", err);
-      setError("Failed to create menu permission. Please try again.");
+      setError(err.message || "Failed to create menu permission. Please try again.");
       throw err;
     }
   };
@@ -287,13 +103,7 @@ function PageMenuSettings() {
     try {
       setError(null);
       
-      const updatedPerm: PerMenuListDto = {
-        id: updatedPermission.id,
-        perModuleId: updatedPermission.perModuleId,
-        key: updatedPermission.key,
-        name: updatedPermission.desc,
-        module: mockModules.find(m => m.perModuleId === updatedPermission.perModuleId)?.perModule || 'Updated Module'
-      };
+      const updatedPerm = await menuPermissionService.updateMenuPermission(updatedPermission);
       
       const updatedPermissions = permissions.map((perm) => 
         perm.id === updatedPerm.id ? updatedPerm : perm
@@ -309,11 +119,15 @@ function PageMenuSettings() {
       setEditingPermission(null);
       
       console.log('Menu permission updated successfully!');
+      
+      // Reload modules to ensure data consistency
+      await reloadModules();
+      
       return { success: true, data: updatedPerm };
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error updating menu permission:", err);
-      setError("Failed to update menu permission. Please try again.");
+      setError(err.message || "Failed to update menu permission. Please try again.");
       throw err;
     }
   };
@@ -327,6 +141,10 @@ function PageMenuSettings() {
     try {
       setError(null);
       
+      // Delete permission via API
+      await menuPermissionService.deleteMenuPermission(permissionId);
+      
+      // Update local state
       const updatedPermissions = permissions.filter((perm) => perm.id !== permissionId);
       const updatedFiltered = filteredPermissions.filter((perm) => perm.id !== permissionId);
       
@@ -334,11 +152,15 @@ function PageMenuSettings() {
       setFilteredPermissions(updatedFiltered);
       
       console.log('Menu permission deleted successfully!');
+      
+      // Reload modules to ensure data consistency
+      await reloadModules();
+      
       return { success: true, message: 'Menu permission deleted successfully!' };
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error deleting menu permission:", err);
-      setError("Failed to delete menu permission. Please try again.");
+      setError(err.message || "Failed to delete menu permission. Please try again.");
       throw err;
     }
   };
@@ -347,6 +169,15 @@ function PageMenuSettings() {
     await handleDeletePermission(permissionId);
     setIsDeleteModalOpen(false);
     setDeletingPermission(null);
+  };
+
+  const reloadModules = async () => {
+    try {
+      const modulesData = await menuPermissionService.getMenuPermissionsByModule();
+      setModules(modulesData);
+    } catch (err) {
+      console.error("Error reloading modules:", err);
+    }
   };
 
   const filterPermissions = (permissions: PerMenuListDto[], term: string) => {
@@ -361,24 +192,27 @@ function PageMenuSettings() {
     );
   };
 
-
+  // Handle search filtering
   useEffect(() => {
     if (searchTerm) {
-      const filtered = filterPermissions(mockMenuPermissions, searchTerm);
+      const filtered = filterPermissions(permissions, searchTerm);
       setFilteredPermissions(filtered);
       setCurrentPage(1);
     } else {
-      setFilteredPermissions(mockMenuPermissions);
+      setFilteredPermissions(permissions);
     }
-  }, [searchTerm]);
+  }, [searchTerm, permissions]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredPermissions.length / itemsPerPage);
+  const paginatedPermissions = filteredPermissions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   useEffect(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    setPermissions(filteredPermissions.slice(startIndex, endIndex));
-  }, [filteredPermissions, currentPage]);
+    setCurrentPage(1);
+  }, [filteredPermissions]);
 
   return (
     <>
@@ -397,7 +231,7 @@ function PageMenuSettings() {
 
         {/* Main content area */}
         <div className="flex-1">
-          {/* Loading State */}
+      
           {isLoading && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -423,23 +257,16 @@ function PageMenuSettings() {
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-medium">
-                      {error.includes("load") ? (
+                      {error.includes("Failed to load") ? (
                         <>
                           Failed to load menu permissions.{" "}
                           <button
-                            onClick={loadPermissions}
+                            onClick={loadData}
                             className="underline hover:text-red-800 font-semibold focus:outline-none"
                           >
                             Try again
-                          </button>{" "}
-                          later.
+                          </button>
                         </>
-                      ) : error.includes("create") ? (
-                        "Failed to create menu permission. Please try again."
-                      ) : error.includes("update") ? (
-                        "Failed to update menu permission. Please try again."
-                      ) : error.includes("delete") ? (
-                        "Failed to delete menu permission. Please try again."
                       ) : (
                         error
                       )}
@@ -458,12 +285,13 @@ function PageMenuSettings() {
               <MenuPermissionSearchFilters
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                modules={modules}
                 onAddPermission={handleAddPermission}
               />
 
               {/* Menu Permissions Table */}
               <MenuPermissionTable
-                permissions={permissions}
+                permissions={paginatedPermissions}
                 currentPage={currentPage}
                 totalPages={totalPages}
                 totalItems={filteredPermissions.length}
@@ -480,7 +308,7 @@ function PageMenuSettings() {
       {isEditModalOpen && editingPermission && (
         <EditMenuPermissionModal
           permission={editingPermission}
-          modules={mockModules}
+          modules={modules}
           onEditPermission={handleUpdatePermission}
           onClose={() => {
             setIsEditModalOpen(false);
