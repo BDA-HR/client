@@ -64,9 +64,10 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
 
     if (!newPermission.key.trim()) {
       newErrors.key = 'Menu key is required';
-    } else if (!newPermission.key.includes('menu.')) {
-      newErrors.key = 'Menu key must start with "menu."';
     }
+    // else if (!newPermission.key.includes('menu.')) {
+    //   newErrors.key = 'Menu key must start with "menu."';
+    // }
 
     if (!newPermission.desc.trim()) {
       newErrors.desc = 'Description is required';
@@ -91,19 +92,19 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
         desc: newPermission.desc.trim(),
       });
 
-      const successMessage = 
-        response?.data?.message || 
-        response?.message || 
+      const successMessage =
+        response?.data?.message ||
+        response?.message ||
         'Menu permission added successfully!';
-      
+
       toast.success(successMessage);
-      
+
       // Reset form and close modal
       setNewPermission({ perModuleId: '' as UUID, key: '', desc: '' });
       setSelectedModule(undefined);
       setErrors({});
       setIsOpen(false);
-      
+
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to add menu permission';
       toast.error(errorMessage);
@@ -170,7 +171,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
             {/* Header */}
             <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
               <div className="flex items-center gap-3">
-                  <BadgePlus size={20} className="text-emerald-600" />
+                <BadgePlus size={20} className="text-emerald-600" />
                 <div>
                   <h2 className="text-lg font-bold text-gray-800">Add Menu Permission</h2>
                 </div>

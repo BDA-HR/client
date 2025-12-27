@@ -7,7 +7,7 @@ import type {
 } from '../../../types/core/Settings/menu-permissions';
 
 class MenuPermissionService {
-  private baseUrl = `${import.meta.env.VITE_AUTH_MODULE_URL || 'auth/v1'}/PerMenu`;
+  private baseUrl = `${import.meta.env.VITE_AUTH_URL || 'auth/v1'}/PerMenu`;
 
   private extractErrorMessage(error: any): string {
     if (error.response?.data?.message) {

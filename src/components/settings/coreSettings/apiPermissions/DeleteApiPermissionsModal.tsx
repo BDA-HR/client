@@ -18,11 +18,11 @@ interface DeleteApiPermissionModalProps {
   onConfirm: (permissionId: UUID) => Promise<any>;
 }
 
-const DeleteApiPermissionModal: React.FC<DeleteApiPermissionModalProps> = ({ 
-  permission, 
-  isOpen, 
-  onClose, 
-  onConfirm 
+const DeleteApiPermissionModal: React.FC<DeleteApiPermissionModalProps> = ({
+  permission,
+  isOpen,
+  onClose,
+  onConfirm
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -33,14 +33,14 @@ const DeleteApiPermissionModal: React.FC<DeleteApiPermissionModalProps> = ({
 
     try {
       const response = await onConfirm(permission.id);
-      const successMessage = 
-        response?.data?.message || 
-        response?.message || 
+      const successMessage =
+        response?.data?.message ||
+        response?.message ||
         'API permission deleted successfully!';
-      
+
       toast.success(successMessage);
       onClose();
-      
+
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to delete API permission';
       toast.error(errorMessage);
@@ -66,7 +66,7 @@ const DeleteApiPermissionModal: React.FC<DeleteApiPermissionModalProps> = ({
         </DialogHeader>
         {permission && (
           <div className="py-4 text-center space-y-4">
-            <div className="flex items-center justify-center gap-3">
+            {/* <div className="flex items-center justify-center gap-3">
               <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
                 <Key className="h-6 w-6 text-emerald-600" />
               </div>
@@ -74,18 +74,18 @@ const DeleteApiPermissionModal: React.FC<DeleteApiPermissionModalProps> = ({
                 <p className="font-medium text-gray-900">{permission.name}</p>
                 <p className="text-sm text-gray-500">{permission.key}</p>
               </div>
-            </div>
-            
+            </div> */}
+
             <p className="text-lg font-medium text-red-600">
               Are you sure you want to delete this API permission?
             </p>
           </div>
         )}
-        
+
         <DialogFooter className="border-t pt-6">
           <div className='mx-auto flex justify-center items-center gap-1.5'>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleConfirm}
               className="cursor-pointer px-6"
               disabled={isLoading}

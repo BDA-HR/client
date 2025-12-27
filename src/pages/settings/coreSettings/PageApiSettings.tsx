@@ -5,8 +5,8 @@ import ApiPermissionSearchFilters from "../../../components/settings/coreSetting
 import ApiPermissionTable from "../../../components/settings/coreSettings/apiPermissions/ApiPermissionsTable";
 import EditApiPermissionModal from "../../../components/settings/coreSettings/apiPermissions/EditApiPermissionsModal";
 import DeleteApiPermissionModal from "../../../components/settings/coreSettings/apiPermissions/DeleteApiPermissionsModal";
-import type { 
-  PerApiListDto, 
+import type {
+  PerApiListDto,
   PerApiModDto,
   PerApiAddDto,
   UUID
@@ -47,10 +47,10 @@ function PageApiSettings() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Use the service to fetch data
       const data = await apiPermissionService.getAllApiPermissions();
-      
+
       setPermissions(data);
       setFilteredPermissions(data);
     } catch (err: any) {
@@ -64,19 +64,19 @@ function PageApiSettings() {
   const handleAddPermission = async (newPermission: PerApiAddDto) => {
     try {
       setError(null);
-      
+
       // Use the service to create new permission
       const createdPermission = await apiPermissionService.createApiPermission(newPermission);
-      
+
       const updatedPermissions = [...permissions, createdPermission];
       const updatedFiltered = [...filteredPermissions, createdPermission];
-      
+
       setPermissions(updatedPermissions);
       setFilteredPermissions(updatedFiltered);
       setCurrentPage(1);
-      
+
       return { success: true, data: createdPermission };
-      
+
     } catch (err: any) {
       console.error("Error creating API permission:", err);
       setError(err.message || "Failed to create API permission. Please try again.");
@@ -92,25 +92,25 @@ function PageApiSettings() {
   const handleUpdatePermission = async (updatedPermission: PerApiModDto) => {
     try {
       setError(null);
-      
+
       // Use the service to update permission
       const updatedPerm = await apiPermissionService.updateApiPermission(updatedPermission);
-      
-      const updatedPermissions = permissions.map((perm) => 
+
+      const updatedPermissions = permissions.map((perm) =>
         perm.id === updatedPerm.id ? updatedPerm : perm
       );
-      
-      const updatedFiltered = filteredPermissions.map((perm) => 
+
+      const updatedFiltered = filteredPermissions.map((perm) =>
         perm.id === updatedPerm.id ? updatedPerm : perm
       );
-      
+
       setPermissions(updatedPermissions);
       setFilteredPermissions(updatedFiltered);
       setIsEditModalOpen(false);
       setEditingPermission(null);
-      
+
       return { success: true, data: updatedPerm };
-      
+
     } catch (err: any) {
       console.error("Error updating API permission:", err);
       setError(err.message || "Failed to update API permission. Please try again.");
@@ -126,23 +126,23 @@ function PageApiSettings() {
   const handleDeletePermission = async (permissionId: UUID) => {
     try {
       setError(null);
-      
+
       // Use the service to delete permission
       await apiPermissionService.deleteApiPermission(permissionId);
-      
+
       const updatedPermissions = permissions.filter((perm) => perm.id !== permissionId);
       const updatedFiltered = filteredPermissions.filter((perm) => perm.id !== permissionId);
-      
+
       setPermissions(updatedPermissions);
       setFilteredPermissions(updatedFiltered);
-      
+
       // If we're on a page that's now empty, go back one page
       if (paginatedPermissions.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
-      
+
       return { success: true, message: 'API permission deleted successfully!' };
-      
+
     } catch (err: any) {
       console.error("Error deleting API permission:", err);
       setError(err.message || "Failed to delete API permission. Please try again.");
@@ -159,10 +159,10 @@ function PageApiSettings() {
   // Filter function
   const filterPermissions = (permissionsList: PerApiListDto[], term: string) => {
     if (!term.trim()) return permissionsList;
-    
+
     const searchLower = term.toLowerCase();
-    
-    return permissionsList.filter(permission => 
+
+    return permissionsList.filter(permission =>
       permission.key.toLowerCase().includes(searchLower) ||
       permission.name.toLowerCase().includes(searchLower) ||
       permission.perMenu.toLowerCase().includes(searchLower) ||
@@ -194,9 +194,8 @@ function PageApiSettings() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className={`w-full h-full flex flex-col space-y-6 ${
-          isEditModalOpen || isDeleteModalOpen ? "blur-sm" : ""
-        }`}
+        className={`w-full h-full flex flex-col space-y-6 ${isEditModalOpen || isDeleteModalOpen ? "blur-sm" : ""
+          }`}
       >
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -215,7 +214,7 @@ function PageApiSettings() {
             >
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading API permissions...</p>
+                <p className="text-gray-600">Loading ACCESS permissions...</p>
               </div>
             </motion.div>
           )}

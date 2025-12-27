@@ -7,7 +7,7 @@ import type {
 } from '../../../types/core/Settings/api-permission';
 
 class ApiPermissionService {
-  private baseUrl = `${import.meta.env.VITE_AUTH_MODULE_URL || 'auth/v1'}/PerApi`;
+  private baseUrl = `${import.meta.env.VITE_AUTH_URL || 'auth/v1'}/PerApi`;
 
   // Helper method to extract error messages
   private extractErrorMessage(error: any): string {

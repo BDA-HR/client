@@ -9,7 +9,7 @@ import {
   Key,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../../ui/popover';
-import type { 
+import type {
   PerApiListDto,
 } from '../../../../types/core/Settings/api-permission';
 
@@ -63,7 +63,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -96,7 +96,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
               </tr>
             ) : (
               permissions.map((permission, index) => (
-                <motion.tr 
+                <motion.tr
                   key={permission.id}
                   custom={index}
                   initial="hidden"
@@ -106,7 +106,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
                 >
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center">
-                      <motion.div 
+                      <motion.div
                         whileHover={{ rotate: 10 }}
                         className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
                       >
@@ -137,7 +137,7 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
                   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                     <Popover open={popoverOpen === permission.id} onOpenChange={(open) => setPopoverOpen(open ? permission.id : null)}>
                       <PopoverTrigger asChild>
-                        <motion.button 
+                        <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100 cursor-pointer"
@@ -147,14 +147,14 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
                       </PopoverTrigger>
                       <PopoverContent className="w-48 p-0" align="end">
                         <div className="py-1">
-                          <button 
+                          <button
                             onClick={() => handleEdit(permission)}
                             className="w-full cursor-pointer text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                           >
                             <PenBox size={16} />
                             Edit
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(permission)}
                             className="w-full cursor-pointer text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                           >
@@ -212,11 +212,10 @@ const ApiPermissionTable: React.FC<ApiPermissionTableProps> = ({
                 <button
                   key={page}
                   onClick={() => onPageChange(page)}
-                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                    currentPage === page
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
                       ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
                       : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>

@@ -17,11 +17,11 @@ interface DeleteMenuPermissionModalProps {
   onConfirm: (permissionId: UUID) => Promise<any>;
 }
 
-const DeleteMenuPermissionModal: React.FC<DeleteMenuPermissionModalProps> = ({ 
-  permission, 
-  isOpen, 
-  onClose, 
-  onConfirm 
+const DeleteMenuPermissionModal: React.FC<DeleteMenuPermissionModalProps> = ({
+  permission,
+  isOpen,
+  onClose,
+  onConfirm
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +34,7 @@ const DeleteMenuPermissionModal: React.FC<DeleteMenuPermissionModalProps> = ({
       const response = await onConfirm(permission.id);
       console.log('Menu permission deleted successfully:', response);
       onClose();
-      
+
     } catch (error: any) {
       console.error('Error deleting menu permission:', error);
       alert(error.message || 'Failed to delete menu permission');
@@ -59,7 +59,7 @@ const DeleteMenuPermissionModal: React.FC<DeleteMenuPermissionModalProps> = ({
         </DialogHeader>
         {permission && (
           <div className="py-4 text-center space-y-4">
-            <div className="flex items-center justify-center gap-3">
+            {/* <div className="flex items-center justify-center gap-3">
               <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
                 <Menu className="h-6 w-6 text-emerald-600" />
               </div>
@@ -70,19 +70,19 @@ const DeleteMenuPermissionModal: React.FC<DeleteMenuPermissionModalProps> = ({
                   Module: <span className="font-medium">{permission.module}</span>
                 </p>
               </div>
-            </div>
-            
+            </div> */}
+
             <p className="text-lg font-medium text-red-600">
               Are you sure you want to delete this menu permission?
             </p>
-            
+
           </div>
         )}
-        
+
         <DialogFooter className="border-t pt-6">
           <div className='mx-auto flex justify-center items-center gap-1.5'>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleConfirm}
               className="cursor-pointer px-6"
               disabled={isLoading}

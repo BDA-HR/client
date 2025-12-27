@@ -40,11 +40,12 @@ const AddApiPermissionsModal: React.FC<AddApiPermissionModalProps> = ({ onAddPer
 
     if (!newPermission.key.trim()) {
       newErrors.key = 'API key is required';
-    } else if (!newPermission.key.includes('api.')) {
-      newErrors.key = 'API key must start with "api."';
-    } else if (!/^api\.[a-z]+(?:\.[a-z]+)*(?:\.[a-z]+)+$/.test(newPermission.key)) {
-      newErrors.key = 'API key format: api.module.feature.action (e.g., api.hr.employee.create)';
     }
+    // else if (!newPermission.key.includes('api.')) {
+    //   newErrors.key = 'API key must start with "api."';
+    // } else if (!/^api\.[a-z]+(?:\.[a-z]+)*(?:\.[a-z]+)+$/.test(newPermission.key)) {
+    //   newErrors.key = 'API key format: api.module.feature.action (e.g., api.hr.employee.create)';
+    // }
 
     if (!newPermission.desc.trim()) {
       newErrors.desc = 'Description is required';
@@ -70,18 +71,18 @@ const AddApiPermissionsModal: React.FC<AddApiPermissionModalProps> = ({ onAddPer
         desc: newPermission.desc.trim(),
       });
 
-      const successMessage = 
-        response?.data?.message || 
-        response?.message || 
+      const successMessage =
+        response?.data?.message ||
+        response?.message ||
         'Access permission added successfully!';
-      
+
       toast.success(successMessage);
-      
+
       // Reset form and close modal
       setNewPermission({ perMenuKey: '', key: '', desc: '' });
       setErrors({});
       setIsOpen(false);
-      
+
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to add Access permission';
       toast.error(errorMessage);
