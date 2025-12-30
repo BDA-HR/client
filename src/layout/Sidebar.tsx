@@ -26,6 +26,18 @@ import {
   Building,
   Network,
   Circle,
+  File,
+  Folder,
+  Archive,
+  Shield,
+  Clock,
+  Upload,
+  FolderOpen,
+  Eye,
+  FileSearch,
+  Image,
+  User,
+  Trash2,
 } from 'lucide-react';
 import { useModule } from '../ModuleContext';
 
@@ -166,6 +178,7 @@ const Sidebar: React.FC = () => {
     CRM: { textColor: 'text-orange-700', activeBg: 'bg-orange-100', hoverBg: 'hover:bg-orange-50' },
     Finance: { textColor: 'text-indigo-700', activeBg: 'bg-indigo-100', hoverBg: 'hover:bg-indigo-50' },
     Procurement: { textColor: 'text-purple-700', activeBg: 'bg-purple-100', hoverBg: 'hover:bg-purple-50' },
+    File: { textColor: 'text-emerald-700', activeBg: 'bg-emerald-100', hoverBg: 'hover:bg-emerald-50' }, // Added File module theme
     Logo: { textColor: 'text-cyan-700', activeBg: 'bg-cyan-100', hoverBg: 'hover:bg-cyan-50' },
     default: { textColor: 'text-gray-600', activeBg: 'bg-gray-100', hoverBg: 'hover:bg-gray-50' },
   };
@@ -203,6 +216,7 @@ const Sidebar: React.FC = () => {
                     activeModule === 'CRM' ? '/crm' :
                       activeModule === 'Finance' ? '/finance' :
                         activeModule === 'Procurement' ? '/procurement' :
+                          activeModule === 'File' ? '/file' : // Added File module
                           '/dashboard'
             }
             icon={<LayoutDashboard size={18} />}
@@ -317,6 +331,66 @@ const Sidebar: React.FC = () => {
               <NavItem to="/procurement/analytics" icon={<BarChart4 size={18} />} label="Analytics" {...theme} />
             </>
           )}
+
+          {activeModule === 'File' && (
+            <>              
+              <NavGroup
+                icon={<Folder size={18} />}
+                label="Folders"
+                isOpen={openGroup === 'FileFolders'}
+                onToggle={() => toggleGroup('FileFolders')}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem to="/file/folders/all" icon={<FolderOpen size={18} />} label="All Folders" {...theme} isChild />
+                <NavItem to="/file/folders/shared" icon={<Users size={18} />} label="Shared Folders" {...theme} isChild />
+                <NavItem to="/file/folders/personal" icon={<User size={18} />} label="Personal Folders" {...theme} isChild />
+                <NavItem to="/file/folders/archived" icon={<Archive size={18} />} label="Archived Folders" {...theme} isChild />
+              </NavGroup>
+
+              <NavGroup
+                icon={<File size={18} />}
+                label="Documents"
+                isOpen={openGroup === 'FileDocuments'}
+                onToggle={() => toggleGroup('FileDocuments')}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem to="/file/documents/all" icon={<FileText size={18} />} label="All Documents" {...theme} isChild />
+                <NavItem to="/file/documents/recent" icon={<Clock size={18} />} label="Recent" {...theme} isChild />
+                <NavItem to="/file/documents/favorites" icon={<FileCheck size={18} />} label="Favorites" {...theme} isChild />
+                <NavItem to="/file/documents/trash" icon={<Trash2 size={18} />} label="Trash" {...theme} isChild />
+              </NavGroup>
+
+              <NavItem to="/file/uploads" icon={<Upload size={18} />} label="Upload Manager" {...theme} />
+              
+              <NavGroup
+                icon={<Shield size={18} />}
+                label="Security"
+                isOpen={openGroup === 'FileSecurity'}
+                onToggle={() => toggleGroup('FileSecurity')}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem to="/file/permissions/users" icon={<Users size={18} />} label="User Permissions" {...theme} isChild />
+                <NavItem to="/file/permissions/groups" icon={<Users size={18} />} label="Group Permissions" {...theme} isChild />
+                <NavItem to="/file/permissions/shared-links" icon={<Eye size={18} />} label="Shared Links" {...theme} isChild />
+                <NavItem to="/file/permissions/audit-logs" icon={<ClipboardList size={18} />} label="Audit Logs" {...theme} isChild />
+              </NavGroup>
+
+              <NavItem to="/file/analytics" icon={<BarChart4 size={18} />} label="Analytics & Reports" {...theme} />
+              
+              <NavGroup
+                icon={<Archive size={18} />}
+                label="Storage"
+                isOpen={openGroup === 'FileStorage'}
+                onToggle={() => toggleGroup('FileStorage')}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem to="/file/storage/overview" icon={<BarChart4 size={18} />} label="Storage Overview" {...theme} isChild />
+                <NavItem to="/file/storage/quota" icon={<FileSearch size={18} />} label="Quota Management" {...theme} isChild />
+                <NavItem to="/file/storage/backup" icon={<Archive size={18} />} label="Backup & Restore" {...theme} isChild />
+                <NavItem to="/file/storage/file-types" icon={<Image size={18} />} label="File Types" {...theme} isChild />
+              </NavGroup>
+            </>
+          )}
         </div>
       </div>
 
@@ -324,9 +398,9 @@ const Sidebar: React.FC = () => {
         <NavItem to={'/settings'} icon={<Settings size={18} />} label="Settings" {...theme} />
       </div>)}
 
-      {/* {(activeModule === 'HR' || activeModule === 'Core') && (<div className="p-4 border-t border-gray-200">
-        <NavItem to={activeModule === 'HR' ? '/settings/hr' : '/settings'} icon={<Settings size={18} />} label="Settings" {...theme} />
-      </div>)} */}
+      {(activeModule === 'File') && (<div className="p-4 border-t border-gray-200">
+        <NavItem to={'/file/settings'} icon={<Settings size={18} />} label="File Settings" {...theme} />
+      </div>)}
     </div>
   );
 };

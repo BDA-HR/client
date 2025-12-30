@@ -20,6 +20,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     Inventory: { bg: 'bg-yellow-100', border: 'border-yellow-200', text: 'text-yellow-700' },
     HR: { bg: 'bg-green-100', border: 'border-green-200', text: 'text-green-700' },
     Core: { bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-700' },
+    File: { bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-700' },
     CRM: { bg: 'bg-orange-100', border: 'border-orange-200', text: 'text-orange-700' },
     Finance: { bg: 'bg-indigo-100', border: 'border-indigo-200', text: 'text-indigo-700' },
     Procurement: { bg: 'bg-purple-100', border: 'border-purple-200', text: 'text-purple-700' },

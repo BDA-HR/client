@@ -54,6 +54,7 @@ import PageHrSettings from './pages/settings/hrSettings/PageHrSettings';
 import PageCoreSettings from './pages/settings/coreSettings/PageCoreSettings';
 import PageApiSettings from './pages/settings/coreSettings/PageApiSettings';
 import PageMenuSettings from './pages/settings/coreSettings/PageMenuSettings';
+import FileDashboard from './pages/modules/File';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -88,6 +89,7 @@ function App() {
             <Route path='/finance' element={<Finance />} />
             <Route path='/procurement' element={<Procurement />} />
             <Route path='/profile' element={<ProfilePage />} />
+            <Route path='/file' element={<FileDashboard />} />
 
             {/* End MENU ROUTES */}
 
@@ -145,6 +147,7 @@ function App() {
 
           </Route>
           {/* END CORE ROUTES */}
+          {/*START CORE ROUTES */}
 
           {/* Modules route at /menu */}
           <Route
