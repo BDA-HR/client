@@ -5,9 +5,11 @@ import type {
   PerMenuAddDto,
   PerMenuModDto
 } from '../../../types/core/Settings/menu-permissions';
+import type { NameListItem } from '../../../types/NameList/nameList';
 
 class MenuPermissionService {
-  private baseUrl = `${import.meta.env.VITE_AUTH_URL || 'auth/v1'}/PerMenu`;
+  private baseUrl = `/auth/v1/PerMenu`; 
+  private namesBaseUrl = `/auth/v1/Names`;
 
   private extractErrorMessage(error: any): string {
     if (error.response?.data?.message) {
@@ -22,6 +24,33 @@ class MenuPermissionService {
       return error.message;
     }
     return 'An unexpected error occurred';
+  }
+
+  // GET: /api/auth/v1/Names/AllModuleName
+  async getAllModuleNames(): Promise<NameListItem[]> {
+    try {
+      console.log('Fetching modules from:', `${this.namesBaseUrl}/AllModuleName`);
+      const response = await api.get(`${this.namesBaseUrl}/AllModuleName`);
+      console.log('Module names response:', response.data);
+      const modules = response.data?.data || response.data;
+      return Array.isArray(modules) ? modules : [];
+    } catch (error) {
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error fetching module names:', errorMessage);
+      throw new Error(errorMessage);
+    }
+  }
+
+  // GET: /api/auth/v1/Names/GetModuleName/{id}
+  async getModuleNameById(id: string): Promise<NameListItem> {
+    try {
+      const response = await api.get(`${this.namesBaseUrl}/GetModuleName/${id}`);
+      return response.data?.data || response.data;
+    } catch (error) {
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error fetching module name:', errorMessage);
+      throw new Error(errorMessage);
+    }
   }
 
   // GET: /api/auth/v1/PerMenu/AllPerMenu

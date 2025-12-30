@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, BadgePlus } from 'lucide-react';
 import { Button } from '../../../ui/button';
@@ -7,18 +7,9 @@ import { Input } from '../../../ui/input';
 import List from '../../../List/list';
 import type { ListItem } from '../../../../types/List/list';
 import type { PerMenuAddDto, UUID } from '../../../../types/core/Settings/menu-permissions';
+import type { NameListItem } from '../../../../types/NameList/nameList';
+import { menuPermissionService } from '../../../../services/core/settings/menu-permissionservice';
 import toast from 'react-hot-toast';
-
-// Mock module data - convert string IDs to UUID format
-const mockModules = [
-  { id: '1' as UUID, name: 'HR Management' },
-  { id: '2' as UUID, name: 'Finance' },
-  { id: '3' as UUID, name: 'CRM' },
-  { id: '4' as UUID, name: 'Inventory' },
-  { id: '5' as UUID, name: 'Procurement' },
-  { id: '6' as UUID, name: 'Core' },
-  { id: '7' as UUID, name: 'File' },
-];
 
 interface AddMenuPermissionModalProps {
   onAddPermission: (permission: PerMenuAddDto) => Promise<any>;
@@ -38,12 +29,53 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     key?: string;
     desc?: string;
   }>({});
+  
+  // New state for module names
+  const [moduleNames, setModuleNames] = useState<NameListItem[]>([]);
+  const [isFetchingModules, setIsFetchingModules] = useState(false);
+  const [moduleError, setModuleError] = useState<string | null>(null);
 
-  // Prepare list items for the List component
-  const moduleListItems: ListItem[] = mockModules.map(module => ({
-    id: module.id,
-    name: module.name
-  }));
+  // Fetch module names when modal opens
+  const fetchModuleNames = async () => {
+    if (isOpen) {
+      setIsFetchingModules(true);
+      setModuleError(null);
+      try {
+        const modules = await menuPermissionService.getAllModuleNames();
+        
+        if (Array.isArray(modules)) {
+          setModuleNames(modules);
+        } else {
+          console.error('Modules is not an array:', modules);
+          setModuleError('Invalid response format from server');
+          setModuleNames([]);
+        }
+      } catch (error: any) {
+        const errorMessage = error.message || 'Failed to load modules';
+        console.error('Error fetching module names:', error);
+        setModuleError(errorMessage);
+        setModuleNames([]);
+      } finally {
+        setIsFetchingModules(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && moduleNames.length === 0 && !isFetchingModules && !moduleError) {
+      fetchModuleNames();
+    }
+  }, [isOpen]);
+
+  // Prepare list items for the List component with safety check
+  const moduleListItems: ListItem[] = Array.isArray(moduleNames) 
+    ? moduleNames
+        .filter(module => module && module.id && module.name) 
+        .map(module => ({
+          id: module.id,
+          name: module.name
+        }))
+    : [];
 
   const handleSelectModule = (item: ListItem) => {
     setSelectedModule(item.id);
@@ -65,9 +97,6 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     if (!newPermission.key.trim()) {
       newErrors.key = 'Menu key is required';
     }
-    // else if (!newPermission.key.includes('menu.')) {
-    //   newErrors.key = 'Menu key must start with "menu."';
-    // }
 
     if (!newPermission.desc.trim()) {
       newErrors.desc = 'Description is required';
@@ -120,6 +149,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
       setNewPermission({ perModuleId: '' as UUID, key: '', desc: '' });
       setSelectedModule(undefined);
       setErrors({});
+      setModuleError(null);
       setIsOpen(false);
     }
   };
@@ -190,17 +220,39 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
             <div className="p-6 space-y-6">
               {/* Module Selection using List Component */}
               <div className="space-y-3">
-                <List
-                  items={moduleListItems}
-                  selectedValue={selectedModule}
-                  onSelect={handleSelectModule}
-                  label="Select Module"
-                  placeholder="Select a module"
-                  required
-                  disabled={isLoading}
-                />
-                {errors.perModuleId && (
-                  <p className="text-sm text-red-500 mt-1">{errors.perModuleId}</p>
+                <Label className="text-sm font-medium text-gray-700">
+                  Select Module <span className="text-red-500">*</span>
+                </Label>
+                
+                {isFetchingModules ? (
+                  <div className="flex items-center justify-center p-4 border rounded-lg bg-gray-50">
+                    <div className="h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
+                    <span className="text-sm text-gray-600">Loading modules...</span>
+                  </div>
+                ) : moduleError ? (
+                  <div className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                    <p className="text-sm text-red-600">{moduleError}</p>
+                  </div>
+                ) : (
+                  <>
+                    <List
+                      items={moduleListItems}
+                      selectedValue={selectedModule}
+                      onSelect={handleSelectModule}
+                      label=""
+                      placeholder="Select a module"
+                      required
+                      disabled={isLoading}
+                    />
+                    {errors.perModuleId && (
+                      <p className="text-sm text-red-500 mt-1">{errors.perModuleId}</p>
+                    )}
+                    {moduleListItems.length === 0 && !moduleError && (
+                      <p className="text-sm text-amber-600 mt-1">
+                        No modules available
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -218,7 +270,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                   }}
                   placeholder="menu.module.feature (e.g., menu.hr.dashboard)"
                   className={`w-full ${errors.key ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}`}
-                  disabled={isLoading}
+                  disabled={isLoading || isFetchingModules}
                   aria-invalid={!!errors.key}
                   aria-describedby={errors.key ? "key-error" : undefined}
                 />
@@ -241,7 +293,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                   }}
                   placeholder="Enter permission description"
                   className={`w-full ${errors.desc ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}`}
-                  disabled={isLoading}
+                  disabled={isLoading || isFetchingModules}
                   aria-invalid={!!errors.desc}
                   aria-describedby={errors.desc ? "desc-error" : undefined}
                 />
@@ -258,7 +310,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                   variant="outline"
                   className="cursor-pointer px-6 min-w-[100px]"
                   onClick={handleClose}
-                  disabled={isLoading}
+                  disabled={isLoading || isFetchingModules}
                   type="button"
                 >
                   Cancel
@@ -266,7 +318,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                 <Button
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6 min-w-[100px] shadow-sm hover:shadow transition-shadow duration-200"
                   onClick={handleSubmit}
-                  disabled={!isFormValid || isLoading}
+                  disabled={!isFormValid || isLoading || isFetchingModules || moduleError !== null || moduleListItems.length === 0}
                   type="button"
                 >
                   {isLoading ? (
