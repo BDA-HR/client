@@ -41,35 +41,35 @@ interface NavItemProps {
   isChild?: boolean; // New prop to identify child items for bullet points
 }
 
-const NavItem: React.FC<NavItemProps> = ({ 
-  to, 
-  icon, 
-  label, 
-  end = false, 
-  activeBg, 
-  textColor, 
+const NavItem: React.FC<NavItemProps> = ({
+  to,
+  icon,
+  label,
+  end = false,
+  activeBg,
+  textColor,
   hoverBg,
   matchPaths = [],
   isChild = false // Default to false
 }) => {
   const location = useLocation();
-  
+
   // Function to check if the current path matches
   const isActive = () => {
     const currentPath = location.pathname;
-    
+
     // Check if current path matches the main 'to' path
     if (end) {
       if (currentPath === to) return true;
     } else {
       if (currentPath.startsWith(to)) return true;
     }
-    
+
     // Check if current path matches any of the additional matchPaths
     if (matchPaths.length > 0) {
       return matchPaths.some(path => currentPath.startsWith(path));
     }
-    
+
     return false;
   };
 
@@ -80,11 +80,10 @@ const NavItem: React.FC<NavItemProps> = ({
       to={to}
       end={end}
       className={() => {
-        return `flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-          active 
-            ? `${activeBg} ${textColor}` 
-            : `text-gray-600 ${hoverBg}`
-        }`;
+        return `flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${active
+          ? `${activeBg} ${textColor}`
+          : `text-gray-600 ${hoverBg}`
+          }`;
       }}
     >
       {icon && (
@@ -199,12 +198,12 @@ const Sidebar: React.FC = () => {
           <NavItem
             to={
               activeModule === 'Inventory' ? '/inventory' :
-              activeModule === 'Core' ? '/core' :
-              activeModule === 'HR' ? '/hr' :
-              activeModule === 'CRM' ? '/crm' :
-              activeModule === 'Finance' ? '/finance' :
-              activeModule === 'Procurement' ? '/procurement' :
-              '/dashboard'
+                activeModule === 'Core' ? '/core' :
+                  activeModule === 'HR' ? '/hr' :
+                    activeModule === 'CRM' ? '/crm' :
+                      activeModule === 'Finance' ? '/finance' :
+                        activeModule === 'Procurement' ? '/procurement' :
+                          '/dashboard'
             }
             icon={<LayoutDashboard size={18} />}
             label="Dashboard"
@@ -214,25 +213,25 @@ const Sidebar: React.FC = () => {
 
           {activeModule === 'HR' && (
             <>
-            <NavItem to="/hr/employees/record" icon={<Users size={18} />} label="Employees" {...theme} />
-            
-              <NavGroup 
-                icon={<Building2 size={18} />} 
-                label="Recruitment" 
-                isOpen={openGroup === 'Recruitment'} 
-                onToggle={() => toggleGroup('Recruitment')} 
+              <NavItem to="/hr/employees/record" icon={<Users size={18} />} label="Employees" {...theme} />
+
+              <NavGroup
+                icon={<Building2 size={18} />}
+                label="Recruitment"
+                isOpen={openGroup === 'Recruitment'}
+                onToggle={() => toggleGroup('Recruitment')}
                 hoverBg={theme.hoverBg}
               >
                 <NavItem to="/hr/recruitment/list" icon={<Building2 size={18} />} label="Recruitment List" {...theme} isChild />
                 <NavItem to="/hr/recruitment/pipeline" icon={<Building2 size={18} />} label="Candidate Pipeline" {...theme} isChild />
                 <NavItem to="/hr/recruitment/onboarding" icon={<Users size={18} />} label="On Boarding" {...theme} isChild />
               </NavGroup>
-              
-              <NavGroup 
-                icon={<Building2 size={18} />} 
-                label="Leave" 
-                isOpen={openGroup === 'Leave'} 
-                onToggle={() => toggleGroup('Leave')} 
+
+              <NavGroup
+                icon={<Building2 size={18} />}
+                label="Leave"
+                isOpen={openGroup === 'Leave'}
+                onToggle={() => toggleGroup('Leave')}
                 hoverBg={theme.hoverBg}
               >
                 <NavItem to="/hr/leave/list" icon={<Building2 size={18} />} label="Leave List" {...theme} isChild />
@@ -240,11 +239,11 @@ const Sidebar: React.FC = () => {
                 <NavItem to="/hr/leave/Entitlement" icon={<Users size={18} />} label="Leave Entitlement" {...theme} isChild />
               </NavGroup>
 
-              <NavGroup 
-                icon={<Building2 size={18} />} 
-                label="Attendance" 
-                isOpen={openGroup === 'Attendance'} 
-                onToggle={() => toggleGroup('Attendance')} 
+              <NavGroup
+                icon={<Building2 size={18} />}
+                label="Attendance"
+                isOpen={openGroup === 'Attendance'}
+                onToggle={() => toggleGroup('Attendance')}
                 hoverBg={theme.hoverBg}
               >
                 <NavItem to="/hr/attendance/list" icon={<Building2 size={18} />} label="Attendance List" {...theme} isChild />
@@ -252,7 +251,7 @@ const Sidebar: React.FC = () => {
                 <NavItem to="/hr/time-clock" icon={<Users size={18} />} label="Time clock" {...theme} isChild />
                 <NavItem to="/hr/attendance/form" icon={<Users size={18} />} label="Attendance Form" {...theme} isChild />
               </NavGroup>
-              
+
               <NavItem to="/hr/training" icon={<GraduationCap size={18} />} label="Training" {...theme} />
               <NavItem to="/hr/reports" icon={<FileSpreadsheet size={18} />} label="Reports" {...theme} />
             </>
@@ -271,14 +270,14 @@ const Sidebar: React.FC = () => {
 
           {activeModule === 'Core' && (
             <>
-              <NavItem 
-                to="/core/company" 
-                icon={<Building size={18} />} 
-                label="Companies" 
+              <NavItem
+                to="/core/company"
+                icon={<Building size={18} />}
+                label="Companies"
                 {...theme}
                 matchPaths={['/branches']} // This will make it active for /branches routes
               />
-              <NavItem to="/core/department" icon={<Network size={18} />} label="Department" {...theme} /> 
+              <NavItem to="/core/department" icon={<Network size={18} />} label="Department" {...theme} />
               <NavItem to="/core/fiscal-year" icon={<FileText size={18} />} label="Fiscal Year" {...theme} />
               <NavItem to="/core/users" icon={<Users size={18} />} label="User Management" {...theme} />
             </>
@@ -295,7 +294,7 @@ const Sidebar: React.FC = () => {
               <NavItem to="/crm/analytics" icon={<BarChart4 size={18} />} label="Analytics & Reporting" {...theme} />
             </>
           )}
-          
+
           {activeModule === 'Finance' && (
             <>
               <NavItem to="/finance/gl" icon={<FileText size={18} />} label="General Ledger" {...theme} />
@@ -321,9 +320,13 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-{(activeModule === 'HR' || activeModule === 'Core') && (      <div className="p-4 border-t border-gray-200">
-        <NavItem  to={activeModule === 'HR' ? '/settings/hr' : '/settings'} icon={<Settings size={18} />} label="Settings" {...theme} /> 
+      {(activeModule === 'Core') && (<div className="p-4 border-t border-gray-200">
+        <NavItem to={'/settings'} icon={<Settings size={18} />} label="Settings" {...theme} />
       </div>)}
+
+      {/* {(activeModule === 'HR' || activeModule === 'Core') && (<div className="p-4 border-t border-gray-200">
+        <NavItem to={activeModule === 'HR' ? '/settings/hr' : '/settings'} icon={<Settings size={18} />} label="Settings" {...theme} />
+      </div>)} */}
     </div>
   );
 };
