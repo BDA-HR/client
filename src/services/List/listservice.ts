@@ -38,44 +38,44 @@ class ListService {
     }
   }
 
-  
+
 
   // ========== Module Name Services ==========
-  
+
   // GET: /api/auth/v1/Names/AllModuleName
-  async getAllModuleNames(): Promise<NameListItem[]> {
-    try {
-      const response = await api.get('/auth/v1/Names/AllModuleName');
-      return response.data?.data || response.data || [];
-    } catch (error) {
-      console.error('Error fetching module names:', error);
-      throw error;
-    }
-  }
+  // async getAllModuleNames(): Promise<NameListItem[]> {
+  //   try {
+  //     const response = await api.get('/auth/v1/Names/AllModuleName');
+  //     return response.data?.data || response.data || [];
+  //   } catch (error) {
+  //     console.error('Error fetching module names:', error);
+  //     throw error;
+  //   }
+  // }
 
   // GET: /api/auth/v1/Names/GetModuleName/{id}
-  async getModuleNameById(id: string): Promise<NameListItem> {
-    try {
-      const response = await api.get(`/auth/v1/Names/GetModuleName/${id}`);
-      return response.data?.data || response.data;
-    } catch (error) {
-      console.error('Error fetching module name:', error);
-      throw error;
-    }
-  }
+  // async getModuleNameById(id: string): Promise<NameListItem> {
+  //   try {
+  //     const response = await api.get(`/auth/v1/Names/GetModuleName/${id}`);
+  //     return response.data?.data || response.data;
+  //   } catch (error) {
+  //     console.error('Error fetching module name:', error);
+  //     throw error;
+  //   }
+  // }
 
-    // ========== Role Services ==========
-  
+  // ========== Role Services ==========
+
   // GET: /api/auth/v1/Permission/AllRole
-  async getAllRoles(): Promise<NameListItem[]> {
-    try {
-      const response = await api.get('/auth/v1/Permission/AllRole');
-      return response.data?.data || response.data || [];
-    } catch (error) {
-      console.error('Error fetching roles:', error);
-      throw error;
-    }
-  }
+  // async getAllRoles(): Promise<NameListItem[]> {
+  //   try {
+  //     const response = await api.get('/auth/v1/Permission/AllRole');
+  //     return response.data?.data || response.data || [];
+  //   } catch (error) {
+  //     console.error('Error fetching roles:', error);
+  //     throw error;
+  //   }
+  // }
 
 }
 

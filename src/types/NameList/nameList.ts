@@ -5,6 +5,11 @@ export interface NameListItem {
   name: string;
 }
 
+export interface RoleListItem {
+  id: UUID;
+  role: string;
+}
+
 // export interface JgStepNameItem {
 //   id: UUID;
 //   name: string; // JOB GRADE STEP NAME

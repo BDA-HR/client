@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from '../../../../components/ui/select';
 import { Checkbox } from '../../../../components/ui/checkbox';
-import { listService } from '../../../../services/List/listservice'; 
-import type { NameListItem } from '../../../../types/NameList/nameList';
+import { nameListService } from '../../../../services/List/AuthList';
+import type { NameListItem, RoleListItem } from '../../../../types/NameList/nameList';
 import toast from 'react-hot-toast';
 
 interface AccountBasicInfoStepProps {
@@ -61,7 +61,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [moduleOptions, setModuleOptions] = useState<NameListItem[]>([]);
-  const [roleOptions, setRoleOptions] = useState<NameListItem[]>([]);
+  const [roleOptions, setRoleOptions] = useState<RoleListItem[]>([]);
   const [isFetchingModules, setIsFetchingModules] = useState(false);
   const [isFetchingRoles, setIsFetchingRoles] = useState(false);
 
@@ -71,7 +71,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
       // Fetch modules
       setIsFetchingModules(true);
       try {
-        const modules = await listService.getAllModuleNames();
+        const modules = await nameListService.getAllModuleNames();
         if (Array.isArray(modules)) {
           setModuleOptions(modules);
         } else {
@@ -88,7 +88,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
       // Fetch roles
       setIsFetchingRoles(true);
       try {
-        const roles = await listService.getAllRoles();
+        const roles = await nameListService.getAllRoles();
         if (Array.isArray(roles)) {
           setRoleOptions(roles);
         } else {
@@ -153,7 +153,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
         {({ values, errors, touched, handleChange, handleBlur, setFieldValue, isSubmitting, isValid }) => (
           <Form className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
+
               {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm text-gray-500">
@@ -168,11 +168,10 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter password"
-                    className={`w-full px-3 py-2 border rounded-md pr-10 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
-                      errors.password && touched.password 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md pr-10 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${errors.password && touched.password
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-gray-300'
+                      }`}
                     disabled={isLoadingData}
                   />
                   <button
@@ -203,11 +202,10 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Confirm password"
-                    className={`w-full px-3 py-2 border rounded-md pr-10 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${
-                      errors.confirmPassword && touched.confirmPassword 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md pr-10 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent ${errors.confirmPassword && touched.confirmPassword
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-gray-300'
+                      }`}
                     disabled={isLoadingData}
                   />
                   <button
@@ -244,15 +242,14 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                     onValueChange={(value) => setFieldValue('role', value)}
                     disabled={isLoadingData}
                   >
-                    <SelectTrigger className={`w-full focus:ring-1 focus:ring-emerald-500 ${
-                      errors.role && touched.role ? 'border-red-300' : ''
-                    }`}>
+                    <SelectTrigger className={`w-full focus:ring-1 focus:ring-emerald-500 ${errors.role && touched.role ? 'border-red-300' : ''
+                      }`}>
                       <SelectValue placeholder="Select a role" />
                     </SelectTrigger>
                     <SelectContent>
                       {roleOptions.map((role) => (
                         <SelectItem key={role.id} value={role.id}>
-                          {role.name}
+                          {role.role}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -275,7 +272,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                   <span className="text-xs text-gray-500">Loading modules...</span>
                 )}
               </div>
-              
+
               {isFetchingModules ? (
                 <div className="flex items-center justify-center p-8 border border-gray-200 rounded-lg bg-gray-50">
                   <div className="h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-3" />
