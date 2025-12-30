@@ -1,5 +1,6 @@
 import { api } from '../api';
 import type { ListItem } from '../../types/List/list';
+import type { NameListItem } from '../../types/NameList/nameList'; // Add this import
 
 class ListService {
   private baseUrl = `${import.meta.env.VITE_LUP_URL || '/lup/v1'}`;
@@ -33,6 +34,30 @@ class ListService {
       return response.data;
     } catch (error) {
       console.error('Error fetching relations:', error);
+      throw error;
+    }
+  }
+
+  // ========== Module Name Services ==========
+  
+  // GET: /api/auth/v1/Names/AllModuleName
+  async getAllModuleNames(): Promise<NameListItem[]> {
+    try {
+      const response = await api.get('/auth/v1/Names/AllModuleName');
+      return response.data?.data || response.data || [];
+    } catch (error) {
+      console.error('Error fetching module names:', error);
+      throw error;
+    }
+  }
+
+  // GET: /api/auth/v1/Names/GetModuleName/{id}
+  async getModuleNameById(id: string): Promise<NameListItem> {
+    try {
+      const response = await api.get(`/auth/v1/Names/GetModuleName/${id}`);
+      return response.data?.data || response.data;
+    } catch (error) {
+      console.error('Error fetching module name:', error);
       throw error;
     }
   }
