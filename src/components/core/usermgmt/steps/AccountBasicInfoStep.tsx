@@ -61,11 +61,14 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [moduleOptions, setModuleOptions] = useState<NameListItem[]>([]);
+  const [roleOptions, setRoleOptions] = useState<NameListItem[]>([]);
   const [isFetchingModules, setIsFetchingModules] = useState(false);
+  const [isFetchingRoles, setIsFetchingRoles] = useState(false);
 
-  // Fetch modules from backend using listService
+  // Fetch modules and roles from backend using listService
   useEffect(() => {
-    const fetchModules = async () => {
+    const fetchData = async () => {
+      // Fetch modules
       setIsFetchingModules(true);
       try {
         const modules = await listService.getAllModuleNames();
@@ -81,9 +84,26 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
       } finally {
         setIsFetchingModules(false);
       }
+
+      // Fetch roles
+      setIsFetchingRoles(true);
+      try {
+        const roles = await listService.getAllRoles();
+        if (Array.isArray(roles)) {
+          setRoleOptions(roles);
+        } else {
+          console.error('Roles is not an array:', roles);
+          toast.error('Invalid role data received from server');
+        }
+      } catch (error: any) {
+        console.error('Error fetching roles:', error);
+        toast.error('Failed to load roles');
+      } finally {
+        setIsFetchingRoles(false);
+      }
     };
 
-    fetchModules();
+    fetchData();
   }, []);
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
@@ -102,6 +122,8 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
     role: initialData.role,
     modules: initialData.modules,
   };
+
+  const isLoadingData = isLoading || isFetchingModules || isFetchingRoles;
 
   return (
     <motion.div
@@ -151,13 +173,13 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300'
                     }`}
-                    disabled={isLoading || isFetchingModules}
+                    disabled={isLoadingData}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    disabled={isLoading || isFetchingModules}
+                    disabled={isLoadingData}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -186,13 +208,13 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300'
                     }`}
-                    disabled={isLoading || isFetchingModules}
+                    disabled={isLoadingData}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    disabled={isLoading || isFetchingModules}
+                    disabled={isLoadingData}
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -207,25 +229,35 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                 <Label htmlFor="role" className="text-sm text-gray-500">
                   Role <span className="text-red-500">*</span>
                 </Label>
-                <Select
-                  value={values.role}
-                  onValueChange={(value) => setFieldValue('role', value)}
-                  disabled={isLoading || isFetchingModules}
-                >
-                  <SelectTrigger className={`w-full focus:ring-1 focus:ring-emerald-500 ${
-                    errors.role && touched.role ? 'border-red-300' : ''
-                  }`}>
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="supervisor">Supervisor</SelectItem>
-                    <SelectItem value="user">Regular User</SelectItem>
-                    <SelectItem value="viewer">Viewer Only</SelectItem>
-                    <SelectItem value="auditor">Auditor</SelectItem>
-                  </SelectContent>
-                </Select>
+                {isFetchingRoles ? (
+                  <div className="flex items-center justify-center p-3 border border-gray-200 rounded-md bg-gray-50">
+                    <div className="h-4 w-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
+                    <span className="text-sm text-gray-600">Loading roles...</span>
+                  </div>
+                ) : roleOptions.length === 0 ? (
+                  <div className="p-3 border border-amber-200 bg-amber-50 rounded-md">
+                    <p className="text-sm text-amber-800">No roles available</p>
+                  </div>
+                ) : (
+                  <Select
+                    value={values.role}
+                    onValueChange={(value) => setFieldValue('role', value)}
+                    disabled={isLoadingData}
+                  >
+                    <SelectTrigger className={`w-full focus:ring-1 focus:ring-emerald-500 ${
+                      errors.role && touched.role ? 'border-red-300' : ''
+                    }`}>
+                      <SelectValue placeholder="Select a role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roleOptions.map((role) => (
+                        <SelectItem key={role.id} value={role.id}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 {errors.role && touched.role && (
                   <div className="text-red-500 text-xs mt-1">{errors.role}</div>
                 )}
@@ -270,7 +302,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                             setFieldValue('modules', values.modules.filter(id => id !== module.id));
                           }
                         }}
-                        disabled={isLoading || isFetchingModules}
+                        disabled={isLoadingData}
                         className="data-[state=checked]:bg-emerald-600 data-[state=changed]:bg-emerald-600 data-[state=checked]:text-white data-[state=checked]:border-emerald-600 h-5 w-5"
                       />
                       <label
@@ -294,7 +326,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
                 type="button"
                 variant="outline"
                 onClick={onBack}
-                disabled={isLoading || isSubmitting || isFetchingModules}
+                disabled={isLoadingData || isSubmitting}
                 className="px-8"
               >
                 {employee ? 'Cancel' : 'Back'}
@@ -302,7 +334,7 @@ export const AccountBasicInfoStep: React.FC<AccountBasicInfoStepProps> = ({
               <Button
                 type="submit"
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
-                disabled={isLoading || isSubmitting || isFetchingModules || !isValid || moduleOptions.length === 0}
+                disabled={isLoadingData || isSubmitting || !isValid || moduleOptions.length === 0 || roleOptions.length === 0}
               >
                 {isLoading || isSubmitting ? 'Saving...' : 'Save & Continue'}
               </Button>

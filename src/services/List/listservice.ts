@@ -38,6 +38,8 @@ class ListService {
     }
   }
 
+  
+
   // ========== Module Name Services ==========
   
   // GET: /api/auth/v1/Names/AllModuleName
@@ -61,6 +63,20 @@ class ListService {
       throw error;
     }
   }
+
+    // ========== Role Services ==========
+  
+  // GET: /api/auth/v1/Permission/AllRole
+  async getAllRoles(): Promise<NameListItem[]> {
+    try {
+      const response = await api.get('/auth/v1/Permission/AllRole');
+      return response.data?.data || response.data || [];
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+      throw error;
+    }
+  }
+
 }
 
 export const listService = new ListService();
