@@ -15,7 +15,7 @@ function LeavePolicyAccrualPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [policy, setPolicy] = useState<LeavePolicyListDto | null>(null);
-  const [accruals, setAccruals] = useState<LeavePolicyAccrualListDto[]>([]);
+  const [accruals, setAccruals] = useState<LeavePolicyAccrualListDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -23,7 +23,7 @@ function LeavePolicyAccrualPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
-  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  // const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
 
   // Local state for editable fields
   const [formData, setFormData] = useState({
@@ -76,28 +76,28 @@ function LeavePolicyAccrualPage() {
         }
 
         // Fetch accruals from the service
-        let accrualsList: LeavePolicyAccrualListDto[] = [];
+        let accrualsList: LeavePolicyAccrualListDto | null = null;
         try {
           accrualsList = await leavePolicyAccrualService.getLeavePolicyAccrualsByPolicyId(id as UUID);
         } catch (error) {
           console.error('Error fetching accruals by policy ID:', error);
-          try {
-            console.warn('New endpoint not available, falling back to getAllLeavePolicyAccruals');
-            accrualsList = await leavePolicyAccrualService.getAllLeavePolicyAccruals();
-            // Filter as fallback
-            accrualsList = accrualsList.filter(accrual => accrual.leavePolicyId === id);
-          } catch (fallbackError) {
-            console.error('Fallback also failed:', fallbackError);
-            setError('Failed to load accrual rules');
-            accrualsList = [];
-          }
+          // try {
+          //   console.warn('New endpoint not available, falling back to getAllLeavePolicyAccruals');
+          //   accrualsList = await leavePolicyAccrualService.getAllLeavePolicyAccruals();
+          //   // Filter as fallback
+          //   accrualsList = accrualsList.filter(accrual => accrual.leavePolicyId === id);
+          // } catch (fallbackError) {
+          //   console.error('Fallback also failed:', fallbackError);
+          //   setError('Failed to load accrual rules');
+          //   accrualsList = [];
+          // }
         }
 
         setPolicy(policyData);
         setAccruals(accrualsList);
 
         // Initialize form data with the first accrual (if exists) or default values
-        const firstAccrual = accrualsList.length > 0 ? accrualsList[0] : null;
+        // const firstAccrual = accrualsList.length > 0 ? accrualsList[0] : null;
 
         setFormData({
           policyInfo: {
@@ -111,14 +111,14 @@ function LeavePolicyAccrualPage() {
             maxDurPerReq: policyData.maxDurPerReq,
           },
           accrualSettings: {
-            entitlement: firstAccrual?.entitlement || 0,
-            frequency: firstAccrual?.frequency || '',
-            accrualRate: firstAccrual?.accrualRate || 0,
+            entitlement: accrualsList?.entitlement || 0,
+            frequency: accrualsList?.frequency || '',
+            accrualRate: accrualsList?.accrualRate || 0,
           },
           carryoverSettings: {
-            minServiceMonths: firstAccrual?.minServiceMonths || 0,
-            maxCarryoverDays: firstAccrual?.maxCarryoverDays || 0,
-            carryoverExpiryDays: firstAccrual?.carryoverExpiryDays || 0,
+            minServiceMonths: accrualsList?.minServiceMonths || 0,
+            maxCarryoverDays: accrualsList?.maxCarryoverDays || 0,
+            carryoverExpiryDays: accrualsList?.carryoverExpiryDays || 0,
           }
         });
       } catch (error) {
@@ -149,8 +149,8 @@ function LeavePolicyAccrualPage() {
     setError(null);
 
     // Reset form data to original values
-    if (policy && accruals.length > 0) {
-      const firstAccrual = accruals[0];
+    if (policy && accruals) {
+      const firstAccrual = accruals;
       setFormData({
         policyInfo: {
           name: policy.name,
@@ -232,32 +232,32 @@ function LeavePolicyAccrualPage() {
       }
 
       // Update accrual information if it was edited and accruals exist
-      if ((editingSection === 'accrualSettings' || editingSection === 'carryoverSettings') && accruals.length > 0) {
-        const firstAccrual = accruals[0];
-        try {
-          const updatedAccrual = await leavePolicyAccrualService.updateLeavePolicyAccrual({
-            id: firstAccrual.id,
-            leavePolicyId: id as UUID,
-            entitlement: formData.accrualSettings.entitlement,
-            frequency: formData.accrualSettings.frequency,
-            accrualRate: formData.accrualSettings.accrualRate,
-            minServiceMonths: formData.carryoverSettings.minServiceMonths,
-            maxCarryoverDays: formData.carryoverSettings.maxCarryoverDays,
-            carryoverExpiryDays: formData.carryoverSettings.carryoverExpiryDays,
-            rowVersion: firstAccrual.rowVersion,
-          });
+      // if ((editingSection === 'accrualSettings' || editingSection === 'carryoverSettings') && accruals) {
+      //   const firstAccrual = accruals;
+      //   try {
+      //     const updatedAccrual = await leavePolicyAccrualService.updateLeavePolicyAccrual({
+      //       id: firstAccrual.id,
+      //       leavePolicyId: id as UUID,
+      //       entitlement: formData.accrualSettings.entitlement,
+      //       frequency: formData.accrualSettings.frequency,
+      //       accrualRate: formData.accrualSettings.accrualRate,
+      //       minServiceMonths: formData.carryoverSettings.minServiceMonths,
+      //       maxCarryoverDays: formData.carryoverSettings.maxCarryoverDays,
+      //       carryoverExpiryDays: formData.carryoverSettings.carryoverExpiryDays,
+      //       rowVersion: firstAccrual.rowVersion,
+      //     });
 
-          // Update local accruals state
-          const updatedAccruals = accruals.map(accrual =>
-            accrual.id === firstAccrual.id ? updatedAccrual : accrual
-          );
-          setAccruals(updatedAccruals);
-          toast.success('Accrual settings updated successfully');
-        } catch (error: any) {
-          setError(error.message || 'Failed to update accrual settings');
-          throw error;
-        }
-      }
+      //     // Update local accruals state
+      //     // const updatedAccruals = accruals.map(accrual =>
+      //     //   accrual.id === firstAccrual.id ? updatedAccrual : accrual
+      //     // );
+      //     // setAccruals(updatedAccruals);
+      //     toast.success('Accrual settings updated successfully');
+      //   } catch (error: any) {
+      //     setError(error.message || 'Failed to update accrual settings');
+      //     throw error;
+      //   }
+      // }
 
       setIsEditing(false);
       setEditingSection(null);
@@ -290,25 +290,25 @@ function LeavePolicyAccrualPage() {
       const newAccrual = await leavePolicyAccrualService.createLeavePolicyAccrual(accrualAddDto);
 
       // Update the local state with the new accrual
-      const updatedAccruals = [...accruals, newAccrual];
-      setAccruals(updatedAccruals);
+      // const updatedAccruals = [...accruals, newAccrual];
+      setAccruals(newAccrual);
 
       // Update the form data with the new accrual (use the first accrual for display)
-      if (updatedAccruals.length === 1) {
-        setFormData(prev => ({
-          ...prev,
-          accrualSettings: {
-            entitlement: newAccrual.entitlement,
-            frequency: newAccrual.frequency,
-            accrualRate: newAccrual.accrualRate,
-          },
-          carryoverSettings: {
-            minServiceMonths: newAccrual.minServiceMonths,
-            maxCarryoverDays: newAccrual.maxCarryoverDays,
-            carryoverExpiryDays: newAccrual.carryoverExpiryDays,
-          }
-        }));
-      }
+      // if (updatedAccruals.length === 1) {
+      //   setFormData(prev => ({
+      //     ...prev,
+      //     accrualSettings: {
+      //       entitlement: newAccrual.entitlement,
+      //       frequency: newAccrual.frequency,
+      //       accrualRate: newAccrual.accrualRate,
+      //     },
+      //     carryoverSettings: {
+      //       minServiceMonths: newAccrual.minServiceMonths,
+      //       maxCarryoverDays: newAccrual.maxCarryoverDays,
+      //       carryoverExpiryDays: newAccrual.carryoverExpiryDays,
+      //     }
+      //   }));
+      // }
 
       toast.success('Accrual rule added successfully');
       setIsAddModalOpen(false);
@@ -376,42 +376,42 @@ function LeavePolicyAccrualPage() {
     setIsAddModalOpen(true);
   };
 
-  const handleDeleteAccrual = async (accrualId: UUID) => {
-    try {
-      if (!confirm('Are you sure you want to delete this accrual rule?')) {
-        return;
-      }
+  // const handleDeleteAccrual = async (accrualId: UUID) => {
+  //   try {
+  //     if (!confirm('Are you sure you want to delete this accrual rule?')) {
+  //       return;
+  //     }
 
-      setDeleteLoadingId(accrualId);
-      await leavePolicyAccrualService.deleteLeavePolicyAccrual(accrualId);
-      const updatedAccruals = accruals.filter(accrual => accrual.id !== accrualId);
-      setAccruals(updatedAccruals);
+  //     setDeleteLoadingId(accrualId);
+  //     await leavePolicyAccrualService.deleteLeavePolicyAccrual(accrualId);
+  //     const updatedAccruals = accruals.filter(accrual => accrual.id !== accrualId);
+  //     setAccruals(updatedAccruals);
 
-      // If we deleted the last accrual, reset the form data
-      if (updatedAccruals.length === 0) {
-        setFormData(prev => ({
-          ...prev,
-          accrualSettings: {
-            entitlement: 0,
-            frequency: '',
-            accrualRate: 0,
-          },
-          carryoverSettings: {
-            minServiceMonths: 0,
-            maxCarryoverDays: 0,
-            carryoverExpiryDays: 0,
-          }
-        }));
-      }
+  //     // If we deleted the last accrual, reset the form data
+  //     if (updatedAccruals.length === 0) {
+  //       setFormData(prev => ({
+  //         ...prev,
+  //         accrualSettings: {
+  //           entitlement: 0,
+  //           frequency: '',
+  //           accrualRate: 0,
+  //         },
+  //         carryoverSettings: {
+  //           minServiceMonths: 0,
+  //           maxCarryoverDays: 0,
+  //           carryoverExpiryDays: 0,
+  //         }
+  //       }));
+  //     }
 
-      toast.success('Accrual rule deleted successfully');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to delete accrual rule');
-      console.error('Error deleting accrual rule:', error);
-    } finally {
-      setDeleteLoadingId(null);
-    }
-  };
+  //     toast.success('Accrual rule deleted successfully');
+  //   } catch (error: any) {
+  //     toast.error(error.message || 'Failed to delete accrual rule');
+  //     console.error('Error deleting accrual rule:', error);
+  //   } finally {
+  //     setDeleteLoadingId(null);
+  //   }
+  // };
 
   // Loading State
   if (loading) {
@@ -619,7 +619,7 @@ function LeavePolicyAccrualPage() {
               <Calendar className="h-5 w-5 text-purple-600" />
               Accrual Settings
             </h2>
-            {accruals.length > 0 ? (
+            {accruals ? (
               <div className="flex gap-2">
                 <Button
                   variant="ghost"
@@ -630,9 +630,9 @@ function LeavePolicyAccrualPage() {
                 >
                   <Pen size={16} />
                 </Button>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                {/* <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                   {accruals.length} rule{accruals.length !== 1 ? 's' : ''}
-                </span>
+                </span> */}
               </div>
             ) : (
               <div className="text-sm text-gray-500 italic">
@@ -641,7 +641,7 @@ function LeavePolicyAccrualPage() {
             )}
           </div>
 
-          {accruals.length > 0 ? (
+          {accruals ? (
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Annual Entitlement</span>
@@ -660,11 +660,11 @@ function LeavePolicyAccrualPage() {
                 <span className="text-sm font-medium text-gray-600">Accrual Rate</span>
                 <div className="flex items-center gap-2">
                   {renderField('accrualSettings', 'accrualRate', 'Accrual Rate', formData.accrualSettings.accrualRate)}
-                  <span className="text-sm text-gray-500">days per period</span>
+                  <span className="text-sm text-gray-500">days</span>
                 </div>
               </div>
 
-              {/* Accrual Rules List */}
+              {/* Accrual Rules List
               <div className="mt-4">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Accrual Rules:</h3>
                 <div className="space-y-2">
@@ -681,7 +681,7 @@ function LeavePolicyAccrualPage() {
                         onClick={() => handleDeleteAccrual(accrual.id)}
                         disabled={deleteLoadingId === accrual.id || (isEditing && editingSection === 'accrualSettings')}
                       >
-                        {deleteLoadingId === accrual.id ? (
+                        // {deleteLoadingId === accrual.id ? (
                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-600"></div>
                         ) : (
                           'Delete'
@@ -690,7 +690,7 @@ function LeavePolicyAccrualPage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
             </div>
           ) : (
             <div className="py-4 text-center">
@@ -707,7 +707,7 @@ function LeavePolicyAccrualPage() {
               <Settings className="h-5 w-5 text-orange-600" />
               Carryover Settings
             </h2>
-            {accruals.length > 0 ? (
+            {accruals ? (
               <Button
                 variant="ghost"
                 size="sm"
@@ -724,7 +724,7 @@ function LeavePolicyAccrualPage() {
             )}
           </div>
 
-          {accruals.length > 0 ? (
+          {accruals ? (
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-600">Minimum Service Months</span>

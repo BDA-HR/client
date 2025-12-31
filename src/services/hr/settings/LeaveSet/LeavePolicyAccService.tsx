@@ -40,13 +40,13 @@ class LeavePolicyAccrualService {
   }
 
   // NEW METHOD: GET all accruals for a specific policy
-  async getLeavePolicyAccrualsByPolicyId(policyId: UUID): Promise<LeavePolicyAccrualListDto[]> {
+  async getLeavePolicyAccrualsByPolicyId(policyId: UUID): Promise<LeavePolicyAccrualListDto> {
     try {
-      const response = await api.get(`${this.baseUrl}/AllLeavePolicyAccByPolicy/${policyId}`);
+      const response = await api.get(`${this.baseUrl}/PolicyLeaveAcc/${policyId}`);
       return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
-      console.error('Error fetching leave policy accruals by policy ID:', errorMessage);
+      console.error('Error fetching leave policy accruals by policy Id:', errorMessage);
       throw new Error(errorMessage);
     }
   }
