@@ -11,13 +11,12 @@ const SignInPage: React.FC<SignInPageProps> = ({ onLogin }) => {
 
   const handleSignIn = async (code: string, password: string) => {
     console.log(`Attempting sign in with code: ${code}`);
-    
+
     try {
       // Call the parent's onLogin function with credentials
       if (onLogin) {
         await onLogin(code, password);
       }
-      
       // Navigate to /modules after successful login
       navigate('/modules');
     } catch (error) {
@@ -40,24 +39,24 @@ const SignInPage: React.FC<SignInPageProps> = ({ onLogin }) => {
         {/* Logo */}
         <div className="mb-8 flex items-center justify-center">
           <div className="bg-gray-300 border border-gray-400 rounded-full w-24 h-24 flex items-center justify-center shadow-lg">
-            <img 
-              src="/bda-logo-1.png" 
-              alt="RST Logo" 
+            <img
+              src="/bda-logo-1.png"
+              alt="RST Logo"
               className="w-16 h-16 rounded-full object-contain"
             />
           </div>
         </div>
-        
+
         {/* Main heading */}
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-800">
           Welcome back to RST ERP
         </h1>
-        
+
         {/* Subtext */}
         <p className="text-gray-700 text-center max-w-md text-lg">
           Streamline your business processes online with our intuitive platform
         </p>
-        
+
         {/* Decorative elements */}
         <div className="absolute bottom-10 left-0 right-0 flex justify-center">
           <div className="w-24 h-1 bg-gray-400 rounded-full"></div>

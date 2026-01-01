@@ -26,10 +26,10 @@ const CompList: React.FC<CompListProps> = ({
 }) => {
   const navigate = useNavigate();
 
- const handleViewBranches = (companyId: UUID) => {
+  const handleViewBranches = (companyId: UUID) => {
     onViewBranches(companyId as UUID);
     navigate(`/branches?companyId=${companyId}`);
- }
+  }
   return (
     <motion.div
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -77,7 +77,7 @@ const CompList: React.FC<CompListProps> = ({
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => onEditCompany(company)}
                     className='flex items-center gap-2'>
-                      <PenBox size={16}/>
+                    <PenBox size={16} />
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem

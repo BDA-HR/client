@@ -6,6 +6,7 @@ import {
 } from "../components/ui/field";
 import { Input } from "../components/ui/input";
 import React, { useState } from "react";
+import { authStore } from "../auth/auth.store";
 
 type LoginFormProps = {
     onSignIn: (code: string, password: string) => Promise<void> | void;
@@ -13,14 +14,15 @@ type LoginFormProps = {
 } & Omit<React.ComponentProps<"form">, "onSubmit">;
 
 export function LoginForm({
-                              onSignIn,
-                              className,
-                              ...props
-                          }: LoginFormProps) {
+    onSignIn,
+    className,
+    ...props
+}: LoginFormProps) {
     const [code, setCode] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    const login = authStore(state => state.login);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -32,6 +34,8 @@ export function LoginForm({
         setIsLoading(true);
         try {
             await onSignIn(code, password);
+
+            await login(code, password);
         } catch (error) {
             console.error("Login failed:", error);
             alert("Login failed. Please check your credentials and try again.");

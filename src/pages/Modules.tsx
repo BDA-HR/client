@@ -6,6 +6,8 @@ import { Bell } from "lucide-react";
 import Calendar from "../components/Calender";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
+import { authStore } from "../auth/auth.store";
+import { hasPermission } from "../auth/jwt.decode";
 
 interface Notification {
   id: number;
@@ -97,10 +99,14 @@ function Modules() {
     setSelectedModule(moduleName);
   }, []);
 
+  const token = authStore(state => state.accessToken);
+  if (token && hasPermission(token, "mod.hrm", "module")) {
+    console.log("User can access HR module");
+  }
 
   const toggleTaskCompletion = useCallback((taskId: number) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
         task.id === taskId ? { ...task, completed: !task.completed } : task
       )
     );
@@ -140,12 +146,12 @@ function Modules() {
           <div className="text-center ml-96">
             <h1 className="text-4xl font-bold text-gray-800 drop-shadow">
               Welcome to the  <i className="text-blue-500 relative">RST
-                                              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-          </i> <span className="text-blue-500"> {" "} ERP</span>
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+              </i> <span className="text-blue-500"> {" "} ERP</span>
             </h1>
 
           </div>
-          
+
           {/* Fixed Header Controls */}
           <div className="flex items-center gap-4">
             {/* Notification Icon with Badge */}
@@ -162,14 +168,14 @@ function Modules() {
 
             {/* Logout Button */}
             <DropdownMenu>
-            <DropdownMenuTrigger><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>CN</AvatarFallback> </Avatar></DropdownMenuTrigger>
-            <DropdownMenuContent>
-    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
-    <DropdownMenuItem onClick={() => navigate("/login")}>logout</DropdownMenuItem>
-  </DropdownMenuContent>
+              <DropdownMenuTrigger><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback> </Avatar></DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/login")}>logout</DropdownMenuItem>
+              </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
@@ -180,9 +186,9 @@ function Modules() {
         {/* Left Panel - Calendar with Scroll */}
         <div className="w-1/4 h-full pr-8">
           <div className="h-full overflow-y-auto"> {/* Scroll container */}
-            <Calendar 
-              tasks={tasks} 
-              onTaskToggle={toggleTaskCompletion} 
+            <Calendar
+              tasks={tasks}
+              onTaskToggle={toggleTaskCompletion}
             />
           </div>
         </div>
