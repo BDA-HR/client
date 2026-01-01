@@ -1,4 +1,4 @@
-import Honeycomb from "../components/Honeycomb";
+import ModulesSection from "../components/ModulesSection";
 import { AnimatedList } from "../components/magicui/animated-list";
 import { useNavigate } from "react-router";
 import { useState, useEffect, useCallback } from "react";
@@ -194,11 +194,11 @@ function Modules() {
         </div>
 
         {/* Center Panel - Honeycomb */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="relative w-full max-w-[75vmin] h-[75vmin]">
-            <Honeycomb onModuleSelect={handleModuleSelect} />
-          </div>
-        </div>
+<div className="flex-1 flex items-center justify-center">
+  <div className="relative w-full h-full min-h-[600px]">
+    <ModulesSection onModuleSelect={handleModuleSelect} />
+  </div>
+</div>
 
         {/* Right Panel - Notifications */}
         <div className="w-1/4 pl-8 h-full">
