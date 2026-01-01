@@ -17,7 +17,7 @@ import RecruitmentList from './pages/hr/recruitmentpage/RecruitmentList';
 import CRMDashboard from './pages/modules/CRM';
 import EmployeeManagementPage from './pages/hr/employeepage/EmployeeRecord';
 import LeaveEntitlementPage from './pages/hr/leavepage/LeaveEntitlementPage';
-import LeaveList from './pages/hr/leavepage/LeaveList';
+import LeaveList from './pages/hr/leavepage/myLeavePage';
 import LeaveRequestForm from './pages/hr/leavepage/LeaveRequestForm';
 import Training from './pages/hr/trainingpage/Training';
 import AttendanceList from './pages/hr/attendancepage/AttendanceList';

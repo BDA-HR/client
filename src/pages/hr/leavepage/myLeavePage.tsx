@@ -1,0 +1,367 @@
+import React, { useState, useEffect } from 'react';
+import AnnualLeaveSearchFilters from '../../../components/hr/annualLeave/AnnualLeaveSerchFilter';
+import LeaveTable from '../../../components/hr/annualLeave/LeaveTable';
+import AddLeaveRequestModal from '../../../components/hr/annualLeave/AddLeaveRequestModal';
+import EditLeaveReqModal from '../../../components/hr/annualLeave/EditLeaveReqModal';
+import DeleteLeaveReqModal from '../../../components/hr/annualLeave/DeleteLeaveReqModal';
+import { leaveService } from '../../../services/hr/leaveservice';
+import type { LeaveRequestListDto, LeaveRequestAddDto, LeaveRequestModDto } from '../../../types/hr/leaverequest';
+import type { UUID } from 'crypto';
+import useToast from '../../../hooks/useToast';
+
+interface LeaveType {
+  id: UUID;
+  name: string;
+}
+
+const LeaveList = () => {
+  const toast = useToast();
+  const [leaves, setLeaves] = useState<LeaveRequestListDto[]>([]);
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([
+    { id: 'lt-001' as UUID, name: 'Annual Leave' },
+    { id: 'lt-002' as UUID, name: 'Sick Leave' },
+    { id: 'lt-003' as UUID, name: 'Maternity Leave' },
+    { id: 'lt-004' as UUID, name: 'Paternity Leave' },
+    { id: 'lt-005' as UUID, name: 'Unpaid Leave' },
+    { id: 'lt-006' as UUID, name: 'Emergency Leave' },
+  ]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedLeave, setSelectedLeave] = useState<LeaveRequestListDto | null>(null);
+  const [leaveToDelete, setLeaveToDelete] = useState<LeaveRequestListDto | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Fetch leave requests on component mount and when refresh is triggered
+  useEffect(() => {
+    fetchLeaveRequests();
+  }, [refreshTrigger]);
+
+  // Fetch leave requests from API
+  const fetchLeaveRequests = async () => {
+    try {
+      setLoading(true);
+      const leaveRequests = await leaveService.getMyLeaveRequests();
+      setLeaves(leaveRequests);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to fetch leave requests');
+      console.error('Error fetching leave requests:', error);
+      setLeaves([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter leaves based on search term
+  const filteredLeaves = leaves.filter(leave => {
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (leave.leaveType && leave.leaveType.toLowerCase().includes(searchLower)) ||
+      (leave.comments && leave.comments.toLowerCase().includes(searchLower)) ||
+      (leave.statusStr && leave.statusStr.toLowerCase().includes(searchLower)) ||
+      (leave.id && leave.id.toLowerCase().includes(searchLower))
+    );
+  });
+
+  // Pagination logic
+  const itemsPerPage = 10;
+  const totalItems = filteredLeaves.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedLeaves = filteredLeaves.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleAddLeaveClick = () => {
+    setShowAddModal(true);
+  };
+
+  const handleLeaveEdit = (leave: LeaveRequestListDto) => {
+    setSelectedLeave(leave);
+    setShowEditModal(true);
+  };
+
+  const handleLeaveDelete = (leave: LeaveRequestListDto) => {
+    setLeaveToDelete(leave);
+    setShowDeleteModal(true);
+  };
+
+  // Handle adding new leave request via API
+  const handleAddLeave = async (leaveData: LeaveRequestAddDto): Promise<any> => {
+    setActionLoading(true);
+    try {
+      await leaveService.addLeaveRequest(leaveData);
+      
+      // Refresh the list
+      await fetchLeaveRequests();
+      
+      toast.success('Leave request submitted successfully!');
+      
+      return { message: 'Leave request submitted successfully!' };
+      
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to submit leave request');
+      throw error;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle editing leave request via API
+  const handleEditLeave = async (leaveData: LeaveRequestModDto): Promise<any> => {
+    setActionLoading(true);
+    try {
+      await leaveService.updateLeaveRequest(leaveData);
+      
+      // Refresh the list to get updated data
+      await fetchLeaveRequests();
+      
+      toast.success('Leave request updated successfully!');
+      
+      return { message: 'Leave request updated successfully!' };
+      
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update leave request');
+      throw error;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle deleting leave request via API
+  const handleConfirmDelete = async (leaveId: UUID): Promise<any> => {
+    setActionLoading(true);
+    try {
+      await leaveService.deleteLeaveRequest(leaveId);
+      
+      // Update local state immediately for better UX
+      setLeaves(prevLeaves => prevLeaves.filter(leave => leave.id !== leaveId));
+      
+      toast.success('Leave request deleted successfully!');
+      
+      return { message: 'Leave request deleted successfully!' };
+      
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete leave request');
+      throw error;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Refresh button handler
+  const handleRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+    
+    // Show success message (since useToast doesn't have info method)
+    toast.success('Leave requests refreshed!');
+  };
+
+  // Handle successful add modal close
+  const handleAddModalClose = () => {
+    setShowAddModal(false);
+  };
+
+  // Handle successful edit modal close
+  const handleEditModalClose = () => {
+    setShowEditModal(false);
+    setSelectedLeave(null);
+  };
+
+  // Handle successful delete modal close
+  const handleDeleteModalClose = () => {
+    setShowDeleteModal(false);
+    setLeaveToDelete(null);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Search filter component with refresh button */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex-1">
+          <AnnualLeaveSearchFilters
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onAddLeave={handleAddLeaveClick}
+          />
+        </div>
+        <button
+          onClick={handleRefresh}
+          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+          disabled={loading || actionLoading}
+        >
+          <svg 
+            className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+            />
+          </svg>
+          Refresh
+        </button>
+      </div>
+
+      {/* Statistics Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Requests</p>
+              <p className="text-2xl font-bold text-gray-900">{leaves.length}</p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-blue-600 font-semibold">TR</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pending</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {leaves.filter(l => l.statusStr === 'Pending').length}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+              <span className="text-yellow-600 font-semibold">P</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Approved</p>
+              <p className="text-2xl font-bold text-green-600">
+                {leaves.filter(l => l.statusStr === 'Approved').length}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+              <span className="text-green-600 font-semibold">A</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Rejected</p>
+              <p className="text-2xl font-bold text-red-600">
+                {leaves.filter(l => l.statusStr === 'Rejected').length}
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+              <span className="text-red-600 font-semibold">R</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Loading State */}
+      {loading && leaves.length === 0 ? (
+        <div className="bg-white rounded-lg p-8 flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            <p className="text-gray-600">Loading leave requests...</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Leave Table Component */}
+          <LeaveTable
+            leaves={paginatedLeaves}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            onPageChange={handlePageChange}
+            onLeaveEdit={handleLeaveEdit}
+            onLeaveDelete={handleLeaveDelete}
+            loading={loading || actionLoading}
+          />
+
+          {/* Summary Footer */}
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+              <div className="text-sm text-gray-600">
+                Showing <span className="font-semibold">{filteredLeaves.length}</span> leave requests
+                {searchTerm && ` matching "${searchTerm}"`}
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="text-sm text-gray-600">
+                  <span className="inline-flex items-center">
+                    <span className="h-3 w-3 rounded-full bg-yellow-400 mr-1"></span>
+                    Pending: {leaves.filter(l => l.statusStr === 'Pending').length}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <span className="inline-flex items-center">
+                    <span className="h-3 w-3 rounded-full bg-green-500 mr-1"></span>
+                    Approved: {leaves.filter(l => l.statusStr === 'Approved').length}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <span className="inline-flex items-center">
+                    <span className="h-3 w-3 rounded-full bg-red-500 mr-1"></span>
+                    Rejected: {leaves.filter(l => l.statusStr === 'Rejected').length}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Add Leave Request Modal */}
+      <AddLeaveRequestModal
+        onAddLeave={handleAddLeave}
+        leaveTypes={leaveTypes}
+        employeeId={'current-user-id' as UUID} // Replace with actual user ID from auth context
+        isOpen={showAddModal}
+        onClose={handleAddModalClose}
+        isLoading={actionLoading}
+      />
+
+      {/* Edit Leave Request Modal */}
+      {selectedLeave && (
+        <EditLeaveReqModal
+          leave={selectedLeave}
+          onEditLeave={handleEditLeave}
+          leaveTypes={leaveTypes}
+          isOpen={showEditModal}
+          onClose={handleEditModalClose}
+          isLoading={actionLoading}
+        />
+      )}
+
+      {/* Delete Leave Request Modal */}
+      {leaveToDelete && (
+        <DeleteLeaveReqModal
+          leave={leaveToDelete}
+          isOpen={showDeleteModal}
+          onClose={handleDeleteModalClose}
+          onConfirm={handleConfirmDelete}
+          isLoading={actionLoading}
+        />
+      )}
+    </div>
+  );
+};
+
+export default LeaveList;

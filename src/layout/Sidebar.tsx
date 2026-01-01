@@ -243,12 +243,12 @@ const Sidebar: React.FC = () => {
 
               <NavGroup
                 icon={<Building2 size={18} />}
-                label="Leave"
+                label="Annual Leave"
                 isOpen={openGroup === 'Leave'}
                 onToggle={() => toggleGroup('Leave')}
                 hoverBg={theme.hoverBg}
               >
-                <NavItem to="/hr/leave/list" icon={<Building2 size={18} />} label="Leave List" {...theme} isChild />
+                <NavItem to="/hr/leave/list" icon={<Building2 size={18} />} label="My Leave" {...theme} isChild />
                 <NavItem to="/hr/leave/form" icon={<Building2 size={18} />} label="Leave Request" {...theme} isChild />
                 <NavItem to="/hr/leave/Entitlement" icon={<Users size={18} />} label="Leave Entitlement" {...theme} isChild />
               </NavGroup>
