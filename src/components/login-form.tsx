@@ -6,7 +6,7 @@ import {
 } from "../components/ui/field";
 import { Input } from "../components/ui/input";
 import React, { useState } from "react";
-import { authStore } from "../auth/auth.store";
+import { authStore } from "../../src/stores/auth.store";
 
 type LoginFormProps = {
     onSignIn: (code: string, password: string) => Promise<void> | void;

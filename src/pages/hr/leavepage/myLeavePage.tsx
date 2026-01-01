@@ -34,9 +34,8 @@ const LeaveList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState<LeaveRequestListDto | null>(null);
   const [leaveToDelete, setLeaveToDelete] = useState<LeaveRequestListDto | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [refreshTrigger] = useState(0);
 
-  // Fetch leave requests on component mount and when refresh is triggered
   useEffect(() => {
     fetchLeaveRequests();
   }, [refreshTrigger]);
@@ -159,14 +158,6 @@ const LeaveList = () => {
     }
   };
 
-  // Refresh button handler
-  const handleRefresh = () => {
-    setRefreshTrigger(prev => prev + 1);
-    
-    // Show success message (since useToast doesn't have info method)
-    toast.success('Leave requests refreshed!');
-  };
-
   // Handle successful add modal close
   const handleAddModalClose = () => {
     setShowAddModal(false);
@@ -186,36 +177,12 @@ const LeaveList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Search filter component with refresh button */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1">
-          <AnnualLeaveSearchFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            onAddLeave={handleAddLeaveClick}
-          />
-        </div>
-        <button
-          onClick={handleRefresh}
-          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
-          disabled={loading || actionLoading}
-        >
-          <svg 
-            className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
-            />
-          </svg>
-          Refresh
-        </button>
-      </div>
+      {/* Search filter component without refresh button */}
+      <AnnualLeaveSearchFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onAddLeave={handleAddLeaveClick}
+      />
 
       {/* Statistics Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
