@@ -112,7 +112,7 @@ function LeavePolicyAccrualPage() {
           },
           accrualSettings: {
             entitlement: accrualsList?.entitlement || 0,
-            frequency: accrualsList?.frequency || '',
+            frequency: accrualsList?.frequencyStr || '',
             accrualRate: accrualsList?.accrualRate || 0,
           },
           carryoverSettings: {
@@ -164,7 +164,7 @@ function LeavePolicyAccrualPage() {
         },
         accrualSettings: {
           entitlement: firstAccrual.entitlement,
-          frequency: firstAccrual.frequency,
+          frequency: firstAccrual.frequencyStr,
           accrualRate: firstAccrual.accrualRate,
         },
         carryoverSettings: {
