@@ -6,8 +6,8 @@ import { Bell } from "lucide-react";
 import Calendar from "../components/Calender";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
-import { authStore } from "../auth/auth.store";
-import { hasPermission } from "../auth/jwt.decode";
+import { authStore } from "../../src/stores/auth.store";
+import { hasPermission } from "../../src/utils/jwt.utils";
 
 interface Notification {
   id: number;

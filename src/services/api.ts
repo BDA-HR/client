@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { isExpiringSoon } from '../auth/token.utils';
-import { authStore } from '../auth/auth.store';
+import { isExpiringSoon } from '../../src/utils/token.utils';
+import { authStore } from '../../src/stores/auth.store';
 
 // Create axios instance with default config
 export const api = axios.create({
