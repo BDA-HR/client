@@ -262,36 +262,7 @@ const LeaveList = () => {
             onLeaveDelete={handleLeaveDelete}
             loading={loading || actionLoading}
           />
-
-          {/* Summary Footer */}
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
-              <div className="text-sm text-gray-600">
-                Showing <span className="font-semibold">{filteredLeaves.length}</span> leave requests
-                {searchTerm && ` matching "${searchTerm}"`}
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="text-sm text-gray-600">
-                  <span className="inline-flex items-center">
-                    <span className="h-3 w-3 rounded-full bg-yellow-400 mr-1"></span>
-                    Pending: {leaves.filter(l => l.statusStr === 'Pending').length}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <span className="inline-flex items-center">
-                    <span className="h-3 w-3 rounded-full bg-green-500 mr-1"></span>
-                    Approved: {leaves.filter(l => l.statusStr === 'Approved').length}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <span className="inline-flex items-center">
-                    <span className="h-3 w-3 rounded-full bg-red-500 mr-1"></span>
-                    Rejected: {leaves.filter(l => l.statusStr === 'Rejected').length}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          
         </>
       )}
 
