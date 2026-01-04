@@ -17,28 +17,32 @@ interface LeaveType {
 const LeaveList = () => {
   const toast = useToast();
   const [leaves, setLeaves] = useState<LeaveRequestListDto[]>([]);
-  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([
-    { id: 'lt-001' as UUID, name: 'Annual Leave' },
-    { id: 'lt-002' as UUID, name: 'Sick Leave' },
-    { id: 'lt-003' as UUID, name: 'Maternity Leave' },
-    { id: 'lt-004' as UUID, name: 'Paternity Leave' },
-    { id: 'lt-005' as UUID, name: 'Unpaid Leave' },
-    { id: 'lt-006' as UUID, name: 'Emergency Leave' },
-  ]);
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [leaveTypesLoading, setLeaveTypesLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState<LeaveRequestListDto | null>(null);
   const [leaveToDelete, setLeaveToDelete] = useState<LeaveRequestListDto | null>(null);
-  const [refreshTrigger] = useState(0);
 
-  useEffect(() => {
-    fetchLeaveRequests();
-  }, [refreshTrigger]);
+  // Fetch leave types from backend API
+  const fetchLeaveTypes = async () => {
+    try {
+      setLeaveTypesLoading(true);
+      const types = await leaveService.getAllLeaveTypes();
+      setLeaveTypes(types);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to fetch leave types');
+      console.error('Error fetching leave types:', error);
+      setLeaveTypes([]);
+    } finally {
+      setLeaveTypesLoading(false);
+    }
+  };
 
   // Fetch leave requests from API
   const fetchLeaveRequests = async () => {
@@ -54,6 +58,24 @@ const LeaveList = () => {
       setLoading(false);
     }
   };
+
+  // Initial data fetching
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        fetchLeaveTypes(),
+        fetchLeaveRequests()
+      ]);
+    };
+    fetchData();
+  }, []);
+
+  // Refresh leave types when modal opens (optional - for real-time updates)
+  useEffect(() => {
+    if (showAddModal && leaveTypes.length === 0) {
+      fetchLeaveTypes();
+    }
+  }, [showAddModal]);
 
   // Filter leaves based on search term
   const filteredLeaves = leaves.filter(leave => {
@@ -99,14 +121,14 @@ const LeaveList = () => {
   const handleAddLeave = async (leaveData: LeaveRequestAddDto): Promise<any> => {
     setActionLoading(true);
     try {
-      await leaveService.addLeaveRequest(leaveData);
+      const result = await leaveService.addLeaveRequest(leaveData);
       
       // Refresh the list
       await fetchLeaveRequests();
       
       toast.success('Leave request submitted successfully!');
       
-      return { message: 'Leave request submitted successfully!' };
+      return { message: 'Leave request submitted successfully!', data: result };
       
     } catch (error: any) {
       toast.error(error.message || 'Failed to submit leave request');
@@ -120,14 +142,14 @@ const LeaveList = () => {
   const handleEditLeave = async (leaveData: LeaveRequestModDto): Promise<any> => {
     setActionLoading(true);
     try {
-      await leaveService.updateLeaveRequest(leaveData);
+      const result = await leaveService.updateLeaveRequest(leaveData);
       
       // Refresh the list to get updated data
       await fetchLeaveRequests();
       
       toast.success('Leave request updated successfully!');
       
-      return { message: 'Leave request updated successfully!' };
+      return { message: 'Leave request updated successfully!', data: result };
       
     } catch (error: any) {
       toast.error(error.message || 'Failed to update leave request');
@@ -270,6 +292,7 @@ const LeaveList = () => {
       <AddLeaveRequestModal
         onAddLeave={handleAddLeave}
         leaveTypes={leaveTypes}
+        leaveTypesLoading={leaveTypesLoading}
         employeeId={'current-user-id' as UUID} // Replace with actual user ID from auth context
         isOpen={showAddModal}
         onClose={handleAddModalClose}
@@ -282,6 +305,7 @@ const LeaveList = () => {
           leave={selectedLeave}
           onEditLeave={handleEditLeave}
           leaveTypes={leaveTypes}
+          leaveTypesLoading={leaveTypesLoading}
           isOpen={showEditModal}
           onClose={handleEditModalClose}
           isLoading={actionLoading}

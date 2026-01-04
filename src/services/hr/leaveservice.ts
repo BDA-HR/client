@@ -12,8 +12,14 @@ interface ApiResponse<T> {
   errors?: Record<string, string[]>;
 }
 
+interface LeaveTypeDto {
+  id: UUID;
+  name: string;
+}
+
 class LeaveService {
   private baseUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/LeaveRequest`;
+  private namesUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/Names`;
   
   private extractErrorMessage(error: any): string {
     if (error.response?.data?.message) {
@@ -28,6 +34,20 @@ class LeaveService {
       return error.message;
     }
     return 'An unexpected error occurred';
+  }
+
+  // GET: /api/hrm/leave/v1/Names/AllLeaveTypeName
+  async getAllLeaveTypes(): Promise<LeaveTypeDto[]> {
+    try {
+      const response = await api.get<ApiResponse<LeaveTypeDto[]>>(
+        `${this.namesUrl}/AllLeaveTypeName`
+      );
+      return response.data.data || [];
+    } catch (error) {
+      const errorMessage = this.extractErrorMessage(error);
+      console.error('Error fetching leave types:', errorMessage);
+      throw new Error(errorMessage);
+    }
   }
 
   // POST: /api/hrm/leave/v1/LeaveRequest/AddNewReq

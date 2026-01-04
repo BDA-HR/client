@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, BadgePlus, Calendar, MessageSquare } from 'lucide-react';
+import { X, BadgePlus, Calendar, MessageSquare, Loader2 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
@@ -20,20 +20,22 @@ import useToast from '../../../hooks/useToast';
 interface AddLeaveRequestModalProps {
   onAddLeave: (leave: LeaveRequestAddDto) => Promise<any>;
   leaveTypes: Array<{ id: UUID; name: string }>;
+  leaveTypesLoading: boolean;
   employeeId: UUID;
   isOpen: boolean;
   onClose: () => void;
+  isLoading: boolean;
 }
 
 const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({ 
   onAddLeave, 
   leaveTypes,
-  employeeId,
+  leaveTypesLoading,
   isOpen,
-  onClose
+  onClose,
+  isLoading
 }) => {
   const toast = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   
   const [newLeave, setNewLeave] = useState<LeaveRequestAddDto>({
     leaveTypeId: '' as UUID,
@@ -82,8 +84,6 @@ const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({
       return;
     }
     
-    setIsLoading(true);
-
     // Show loading toast
     const loadingToastId = toast.loading('Submitting leave request...');
 
@@ -124,13 +124,10 @@ const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({
       
       toast.error(errorMessage);
       console.error('Error submitting leave request:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleClose = () => {
-    // Reset form when closing
     setNewLeave({
       leaveTypeId: '' as UUID,
       startDate: '',
@@ -160,7 +157,7 @@ const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({
             <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
               <BadgePlus className="h-4 w-4 text-emerald-600" />
             </div>
-            <h2 className="text-lg font-bold text-green-800">Add New</h2>
+            <h2 className="text-lg font-bold text-green-800">Add New Leave Request</h2>
           </div>
           <button
             onClick={handleClose}
@@ -182,19 +179,37 @@ const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({
               <Select
                 value={newLeave.leaveTypeId}
                 onValueChange={(value) => setNewLeave({...newLeave, leaveTypeId: value as UUID})}
-                disabled={isLoading}
+                disabled={isLoading || leaveTypesLoading}
               >
                 <SelectTrigger id="leaveType" className="w-full">
-                  <SelectValue placeholder="Select leave type" />
+                  <SelectValue placeholder={
+                    leaveTypesLoading ? "Loading leave types..." : "Select leave type"
+                  } />
                 </SelectTrigger>
                 <SelectContent>
-                  {leaveTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
+                  {leaveTypesLoading ? (
+                    <div className="flex items-center justify-center p-4">
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Loading leave types...
+                    </div>
+                  ) : leaveTypes.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">
+                      No leave types available
+                    </div>
+                  ) : (
+                    leaveTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
+              {!leaveTypesLoading && leaveTypes.length === 0 && (
+                <p className="text-sm text-amber-600 mt-1">
+                  Unable to load leave types. Please contact administrator.
+                </p>
+              )}
             </div>
 
             {/* Date Range */}
@@ -235,6 +250,16 @@ const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* Days Calculation Display */}
+            {(newLeave.startDate && newLeave.endDate) && (
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm text-gray-600">
+                  Total days: <span className="font-semibold">{totalDays}</span>
+                  {totalDays > 0 && ` (${isSingleDay ? 'Single day' : 'Multiple days'})`}
+                </p>
+              </div>
+            )}
 
             {/* Half Day Option */}
             {isSingleDay && (
@@ -279,9 +304,14 @@ const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={isLoading || leaveTypesLoading || leaveTypes.length === 0}
             >
-              {isLoading ? 'Saving...' : 'Save'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : 'Save'}
             </Button>
             <Button
               variant="outline"
@@ -292,6 +322,11 @@ const AddLeaveRequestModal: React.FC<AddLeaveRequestModalProps> = ({
               Cancel
             </Button>
           </div>
+          {leaveTypes.length === 0 && !leaveTypesLoading && (
+            <p className="text-center text-sm text-red-600 mt-2">
+              Cannot submit leave request: Leave types not available
+            </p>
+          )}
         </div>
       </motion.div>
     </div>

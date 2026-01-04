@@ -27,6 +27,10 @@ export interface LeaveRequestListDto extends BaseDto {
   leaveType: string;
 }
 
+export interface LeaveTypeDto {
+  id: UUID;
+  name: string;
+}
 export interface LeaveRequestAddDto {
   leaveTypeId: UUID;
   startDate: string | Date; // Assuming this is DateTime
