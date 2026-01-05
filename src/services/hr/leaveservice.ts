@@ -1,10 +1,11 @@
 import { api } from '../api';
-import type { 
-  LeaveRequestListDto, 
+import type {
+  LeaveRequestListDto,
   LeaveRequestAddDto,
-  LeaveRequestModDto,  
-  UUID 
+  LeaveRequestModDto,
+  UUID
 } from '../../types/hr/leaverequest';
+import type { ListItem } from '../../types/List/list';
 
 interface ApiResponse<T> {
   data: T;
@@ -20,7 +21,7 @@ interface LeaveTypeDto {
 class LeaveService {
   private baseUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/LeaveRequest`;
   private namesUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/Names`;
-  
+
   private extractErrorMessage(error: any): string {
     if (error.response?.data?.message) {
       return error.response.data.message;
@@ -37,16 +38,13 @@ class LeaveService {
   }
 
   // GET: /api/hrm/leave/v1/Names/AllLeaveTypeName
-  async getAllLeaveTypes(): Promise<LeaveTypeDto[]> {
+  async getAllLeaveTypes(): Promise<ListItem[]> {
     try {
-      const response = await api.get<ApiResponse<LeaveTypeDto[]>>(
-        `${this.namesUrl}/AllLeaveTypeName`
-      );
-      return response.data.data || [];
+      const response = await api.get(`${this.namesUrl}/AllLeaveTypeName`);
+      return response.data;
     } catch (error) {
-      const errorMessage = this.extractErrorMessage(error);
-      console.error('Error fetching leave types:', errorMessage);
-      throw new Error(errorMessage);
+      console.error('Error fetching education levels:', error);
+      throw error;
     }
   }
 
@@ -54,7 +52,7 @@ class LeaveService {
   async addLeaveRequest(leaveData: LeaveRequestAddDto): Promise<LeaveRequestListDto> {
     try {
       const response = await api.post<ApiResponse<LeaveRequestListDto>>(
-        `${this.baseUrl}/AddNewReq`, 
+        `${this.baseUrl}/AddNewReq`,
         leaveData
       );
       console.info('Leave request created successfully:', response.data.data?.id);
@@ -98,7 +96,7 @@ class LeaveService {
   async updateLeaveRequest(updateData: LeaveRequestModDto): Promise<LeaveRequestListDto> {
     try {
       const response = await api.put<ApiResponse<LeaveRequestListDto>>(
-        `${this.baseUrl}/UpdateLeaveReq/${updateData.id}`, 
+        `${this.baseUrl}/UpdateLeaveReq/${updateData.id}`,
         updateData
       );
       console.info('Leave request updated successfully:', response.data.data?.id);
