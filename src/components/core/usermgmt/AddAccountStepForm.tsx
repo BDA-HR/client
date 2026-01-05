@@ -6,6 +6,9 @@ import { MainPermissionsStep } from './steps/MainPermissionsStep';
 import { ApiPermissionsStep } from './steps/ApiPermissionsStep';
 import { AddAccountStepHeader } from './AddAccountStepHeader';
 import type { EmpSearchRes } from '../../../types/core/EmpSearchRes';
+import type { RegStep1, RegStep2, RegStep3, UUID } from '../../../types/auth/registration';
+import { registrationService } from '../../../services/auth/registerservice';
+import toast from 'react-hot-toast';
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: Lock },
@@ -41,6 +44,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string>('');
 
   // Mock data for main permissions
   const MOCK_PERMISSIONS = Array.from({ length: 50 }, (_, i) => ({
@@ -142,14 +146,38 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       },
     });
     setCurrentStep(1);
+    setUserId('');
   };
 
-  // Handle Step 1 submission
+  // Handle Step 1 submission with API integration
   const handleStep1Submit = async (step1Data: any) => {
     setLoading(true);
     setError(null);
 
     try {
+      if (!employee?.id) {
+        throw new Error('Employee ID not found');
+      }
+
+      // Prepare registration step 1 data
+      const regStep1Data: RegStep1 = {
+        employeeId: employee.id as UUID,
+        password: step1Data.password,
+        roleId: step1Data.role,
+        perModules: step1Data.modules.map((id: string) => id as UUID)
+      };
+
+      console.log('Calling registration step 1:', regStep1Data);
+
+      // Call registration service step 1
+      const result = await registrationService.step1(regStep1Data);
+      
+      console.log('Registration step 1 completed:', result);
+
+      // Store user ID for next steps
+      setUserId(result.userId);
+
+      // Update form data
       const updatedFormData = {
         ...formData,
         step1: step1Data,
@@ -158,20 +186,35 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('accountFormData', JSON.stringify(updatedFormData));
 
+      // Show success message
+      toast.success('Account created successfully!');
+
       scrollToTop();
       setCurrentStep(prev => prev + 1);
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Failed to save basic info:', error);
-      setError('Failed to save basic information. Please try again.');
+      const errorMessage = error.message || 'Failed to create account. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle Step 2 submission
+  // Handle Step 2 submission with API integration
   const handleStep2Submit = async (step2Data: any) => {
     if (formData.step1.modules.length === 0) {
-      setError('Please select at least one module in Step 1 first.');
+      const errorMsg = 'Please select at least one module in Step 1 first.';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+
+    if (!userId) {
+      const errorMsg = 'Account not created. Please complete Step 1 first.';
+      setError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -179,6 +222,22 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     setError(null);
 
     try {
+      // Prepare registration step 2 data
+      const regStep2Data: Omit<RegStep2, 'userId'> = {
+        perMenus: step2Data.permissions.map((id: string) => id as UUID)
+      };
+
+      console.log('Calling registration step 2:', { userId, ...regStep2Data });
+
+      // Call registration service step 2
+      const result = await registrationService.step2({
+        userId,
+        ...regStep2Data
+      });
+      
+      console.log('Registration step 2 completed:', result);
+
+      // Update form data
       const updatedFormData = {
         ...formData,
         step2: step2Data,
@@ -187,20 +246,35 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       setFormData(updatedFormData);
       localStorage.setItem('accountFormData', JSON.stringify(updatedFormData));
 
+      // Show success message
+      toast.success('Menu permissions saved successfully!');
+
       scrollToTop();
       setCurrentStep(prev => prev + 1);
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Failed to save permissions:', error);
-      setError('Failed to save permissions. Please try again.');
+      const errorMessage = error.message || 'Failed to save menu permissions. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle Step 3 submission
-    const handleStep3Submit = async (step3Data: any) => {
+  // Handle Step 3 submission with API integration
+  const handleStep3Submit = async (step3Data: any) => {
     if (formData.step2.permissions.length === 0) {
-      setError('Please select at least one permission in Step 2 first.');
+      const errorMsg = 'Please select at least one permission in Step 2 first.';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+
+    if (!userId) {
+      const errorMsg = 'Account not found. Please complete previous steps first.';
+      setError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -208,35 +282,136 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     setError(null);
 
     try {
+      // Prepare registration step 3 data
+      const regStep3Data: Omit<RegStep3, 'userId'> = {
+        perAccess: step3Data.apiPermissions.map((id: string) => id as UUID)
+      };
+
+      console.log('Calling registration step 3:', { userId, ...regStep3Data });
+
+      // Call registration service step 3
+      const result = await registrationService.step3({
+        userId,
+        ...regStep3Data
+      });
+      
+      console.log('Registration step 3 completed:', result);
+
+      // Prepare final data for callback
       const finalData = {
+        userId: result.userId,
         employeeId: employee?.id || '',
         employeeCode: getEmployeeCode(),
         employeeName: getEmployeeDisplayName(),
         email: getEmployeeEmail(),
-        password: formData.step1.password,
         role: formData.step1.role,
         modules: formData.step1.modules,
         permissions: formData.step2.permissions,
         detailedPermissions: step3Data.apiPermissions,
       };
 
-      console.log('Submitting account data:', finalData);
+      console.log('Account creation completed:', finalData);
       
-      // Replace with actual API call
-      
-      const result = { 
-        success: true, 
-        message: 'Account created successfully',
-        accountId: `ACC-${Date.now()}`
-      };
+      // Show success message
+      toast.success('Account setup completed successfully!');
 
       clearTemporaryData();
 
-      onAccountAdded(result);
+      // Call the callback with result
+      onAccountAdded({
+        success: true,
+        message: 'Account created successfully',
+        accountId: result.userId,
+        ...finalData
+      });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create account:', error);
-      setError('Failed to create account. Please try again.');
+      const errorMessage = error.message || 'Failed to complete account setup. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Alternative: Handle complete registration in one go
+  const handleCompleteRegistration = async () => {
+    if (!employee?.id) {
+      toast.error('Employee ID not found');
+      return;
+    }
+
+    // Check if Step 1 data is complete
+    if (!formData.step1.password || !formData.step1.role || formData.step1.modules.length === 0) {
+      toast.error('Please complete Step 1 first');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Prepare all data
+      const regStep1Data: RegStep1 = {
+        employeeId: employee.id as UUID,
+        password: formData.step1.password,
+        roleId: formData.step1.role,
+        perModules: formData.step1.modules.map(id => id as UUID)
+      };
+
+      const regStep2Data: Omit<RegStep2, 'userId'> = {
+        perMenus: formData.step2.permissions.map(id => id as UUID)
+      };
+
+      const regStep3Data: Omit<RegStep3, 'userId'> = {
+        perAccess: formData.step3.apiPermissions.map(id => id as UUID)
+      };
+
+      console.log('Starting complete registration...', {
+        step1: regStep1Data,
+        step2: regStep2Data,
+        step3: regStep3Data
+      });
+
+      // Call complete registration
+      const result = await registrationService.completeRegistration(
+        regStep1Data,
+        regStep2Data,
+        regStep3Data
+      );
+      
+      console.log('Complete registration successful:', result);
+
+      // Prepare final data
+      const finalData = {
+        userId: result.userId,
+        employeeId: employee.id,
+        employeeCode: getEmployeeCode(),
+        employeeName: getEmployeeDisplayName(),
+        email: getEmployeeEmail(),
+        role: formData.step1.role,
+        modules: formData.step1.modules,
+        permissions: formData.step2.permissions,
+        detailedPermissions: formData.step3.apiPermissions,
+      };
+
+      toast.success('Account created successfully!');
+
+      clearTemporaryData();
+
+      onAccountAdded({
+        success: true,
+        message: 'Account created successfully',
+        accountId: result.userId,
+        ...finalData
+      });
+
+    } catch (error: any) {
+      console.error('Failed complete registration:', error);
+      const errorMessage = error.message || 'Failed to create account. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -280,6 +455,15 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
           }
         }}
       />
+
+      {/* Status Display */}
+      {userId && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-700">
+            Account created with User ID: <span className="font-semibold">{userId}</span>
+          </p>
+        </div>
+      )}
 
       {/* Error Display */}
       {error && (
@@ -332,6 +516,21 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Complete Registration Button (Optional) */}
+      {currentStep === 3 && (
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="flex justify-center">
+            <button
+              onClick={handleCompleteRegistration}
+              disabled={loading}
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors font-medium"
+            >
+              {loading ? 'Processing...' : 'Complete Registration'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
