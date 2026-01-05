@@ -1,11 +1,5 @@
 import { api } from '../api';
-import type {
-  LeaveRequestListDto,
-  LeaveRequestAddDto,
-  LeaveRequestModDto,
-  UUID
-} from '../../types/hr/leaverequest';
-import type { ListItem } from '../../types/List/list';
+import type { LeaveRequestListDto, LeaveRequestAddDto, LeaveRequestModDto, UUID } from '../../types/hr/leaverequest';
 
 interface ApiResponse<T> {
   data: T;
@@ -13,14 +7,8 @@ interface ApiResponse<T> {
   errors?: Record<string, string[]>;
 }
 
-interface LeaveTypeDto {
-  id: UUID;
-  name: string;
-}
-
 class LeaveService {
   private baseUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/LeaveRequest`;
-  private namesUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/Names`;
 
   private extractErrorMessage(error: any): string {
     if (error.response?.data?.message) {
@@ -37,24 +25,10 @@ class LeaveService {
     return 'An unexpected error occurred';
   }
 
-  // GET: /api/hrm/leave/v1/Names/AllLeaveTypeName
-  async getAllLeaveTypes(): Promise<ListItem[]> {
-    try {
-      const response = await api.get(`${this.namesUrl}/AllLeaveTypeName`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching education levels:', error);
-      throw error;
-    }
-  }
-
   // POST: /api/hrm/leave/v1/LeaveRequest/AddNewReq
   async addLeaveRequest(leaveData: LeaveRequestAddDto): Promise<LeaveRequestListDto> {
     try {
-      const response = await api.post<ApiResponse<LeaveRequestListDto>>(
-        `${this.baseUrl}/AddNewReq`,
-        leaveData
-      );
+      const response = await api.post(`${this.baseUrl}/AddNewReq`, leaveData);
       console.info('Leave request created successfully:', response.data.data?.id);
       return response.data.data;
     } catch (error) {
@@ -67,9 +41,7 @@ class LeaveService {
   // GET: /api/hrm/leave/v1/LeaveRequest/MyLeaveReq
   async getMyLeaveRequests(): Promise<LeaveRequestListDto[]> {
     try {
-      const response = await api.get<ApiResponse<LeaveRequestListDto[]>>(
-        `${this.baseUrl}/MyLeaveReq`
-      );
+      const response = await api.get(`${this.baseUrl}/MyLeaveReq`);
       return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
@@ -81,9 +53,7 @@ class LeaveService {
   // GET: /api/hrm/leave/v1/LeaveRequest/GetLeaveReq/{id}
   async getLeaveRequestById(id: UUID): Promise<LeaveRequestListDto> {
     try {
-      const response = await api.get<ApiResponse<LeaveRequestListDto>>(
-        `${this.baseUrl}/GetLeaveReq/${id}`
-      );
+      const response = await api.get(`${this.baseUrl}/GetLeaveReq/${id}`);
       return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
@@ -95,10 +65,7 @@ class LeaveService {
   // PUT: /api/hrm/leave/v1/LeaveRequest/UpdateLeaveReq/{id}
   async updateLeaveRequest(updateData: LeaveRequestModDto): Promise<LeaveRequestListDto> {
     try {
-      const response = await api.put<ApiResponse<LeaveRequestListDto>>(
-        `${this.baseUrl}/UpdateLeaveReq/${updateData.id}`,
-        updateData
-      );
+      const response = await api.put(`${this.baseUrl}/UpdateLeaveReq/${updateData.id}`, updateData);
       console.info('Leave request updated successfully:', response.data.data?.id);
       return response.data.data;
     } catch (error) {
@@ -111,9 +78,7 @@ class LeaveService {
   // DELETE: /api/hrm/leave/v1/LeaveRequest/DeleteLeaveReq/{id}
   async deleteLeaveRequest(id: UUID): Promise<void> {
     try {
-      const response = await api.delete<ApiResponse<void>>(
-        `${this.baseUrl}/DeleteLeaveReq/${id}`
-      );
+      const response = await api.delete(`${this.baseUrl}/DeleteLeaveReq/${id}`);
       console.info('Leave request deleted successfully:', response.data.message);
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
