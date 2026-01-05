@@ -8,7 +8,7 @@ import JobGradeSearchFilters from '../../../../components/settings/hrSettings/jo
 import AddJobGradeModal from '../../../../components/settings/hrSettings/jobgrade/AddJobGrade';
 import EditJobGradeModal from '../../../../components/settings/hrSettings/jobgrade/EditJobGradeModal';
 import DeleteJobGradeModal from '../../../../components/settings/hrSettings/jobgrade/DeleteJobGradeModal';
-import { jobGradeService } from '../../../../services/hr/settings/JobGradeServives';
+import { jobGradeService } from '../../../../services/core/settings/ModHrm/JobGradeServives';
 import type { JobGradeListDto, JobGradeAddDto, JobGradeModDto } from '../../../../types/hr/jobgrade';
 
 const ITEMS_PER_PAGE = 20;

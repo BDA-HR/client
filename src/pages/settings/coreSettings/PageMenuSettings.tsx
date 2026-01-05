@@ -5,7 +5,7 @@ import MenuPermissionSearchFilters from "../../../components/settings/coreSettin
 import MenuPermissionTable from "../../../components/settings/coreSettings/menuPermissions/MenuPermissionsTable";
 import EditMenuPermissionModal from "../../../components/settings/coreSettings/menuPermissions/EditMenuPermissionModal";
 import DeleteMenuPermissionModal from "../../../components/settings/coreSettings/menuPermissions/DeleteMenuPermissionModal";
-import { menuPermissionService } from "../../../services/core/settings/menu-permissionservice";
+import { menuPermissionService } from "../../../services/core/settings/ModCore/menu-permissionservice";
 import type { 
   PerMenuListDto, 
   PerMenuModDto,

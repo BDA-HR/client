@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { XCircleIcon } from 'lucide-react';
-import { leavePolicyService } from '../../../../../services/hr/settings/LeaveSet/LeavePolicyService';
-import { leaveTypeService } from '../../../../../services/hr/settings/LeaveSet/LeaveTypeService';
+import { leavePolicyService } from '../../../../../services/core/settings/ModHrm/LeavePolicyService';
+import { leaveTypeService } from '../../../../../services/core/settings/ModHrm/LeaveTypeService';
 import type { 
   LeavePolicyListDto, 
   LeavePolicyAddDto, 

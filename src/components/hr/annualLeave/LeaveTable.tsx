@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ChevronLeft,
@@ -19,9 +19,29 @@ interface LeaveTableProps {
   totalItems: number;
   onPageChange: (page: number) => void;
   onLeaveEdit: (leave: LeaveRequestListDto) => void;
-  onLeaveDelete: (leaveId: UUID) => void;
+  onLeaveDelete: (leave: LeaveRequestListDto) => void; // Changed from (leaveId: UUID)
   loading?: boolean;
 }
+
+// Helper function to convert isHalfDay display value to boolean
+const getIsHalfDayBoolean = (isHalfDayValue: any): boolean => {
+  if (typeof isHalfDayValue === 'boolean') {
+    return isHalfDayValue;
+  }
+  
+  if (typeof isHalfDayValue === 'string') {
+    const str = isHalfDayValue.toLowerCase();
+    return str === 'yes' || str === 'true' || str === 'half day' || str === '1';
+  }
+  
+  return false;
+};
+
+// Helper function to get display text for half day
+const getHalfDayDisplayText = (isHalfDayValue: any): string => {
+  const isHalfDay = getIsHalfDayBoolean(isHalfDayValue);
+  return isHalfDay ? 'Half Day' : 'Full Day';
+};
 
 const LeaveTable: React.FC<LeaveTableProps> = ({
   leaves,
@@ -47,13 +67,14 @@ const LeaveTable: React.FC<LeaveTableProps> = ({
   };
 
   const handleDelete = (leave: LeaveRequestListDto) => {
-    onLeaveDelete(leave.id);
+    onLeaveDelete(leave); // Pass the entire leave object
     setPopoverOpen(null);
   };
 
   const formatDate = (dateString: string | Date) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Date';
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -75,20 +96,83 @@ const LeaveTable: React.FC<LeaveTableProps> = ({
     );
   };
 
-  const getHalfDayBadge = (isHalfDayStr: string) => {
-    const isHalfDay = isHalfDayStr?.toLowerCase() === 'yes';
+  const getHalfDayBadge = (isHalfDayValue: any) => {
+    const isHalfDay = getIsHalfDayBoolean(isHalfDayValue);
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
         isHalfDay 
           ? 'bg-blue-100 text-blue-800 border border-blue-200'
           : 'bg-gray-100 text-gray-800 border border-gray-200'
       }`}>
-        {isHalfDay ? 'Half Day' : 'Full Day'}
+        {getHalfDayDisplayText(isHalfDayValue)}
       </span>
     );
   };
 
-  if (loading && leaves.length === 0) {
+  // Mock data flag for development
+  const USE_MOCK_DATA = false; // Set to false for production
+  
+  // Mock data for UI testing
+  const MOCK_LEAVES: LeaveRequestListDto[] = [
+    {
+      id: '1' as UUID,
+      employeeId: 'emp001' as UUID,
+      approvedById: undefined,
+      leaveTypeId: 'lt001' as UUID,
+      startDate: '2024-01-15',
+      endDate: '2024-01-17',
+      dateRequested: '2024-01-10',
+      dateApproved: '2024-01-11',
+      comments: 'Family vacation',
+      daysRequestedStr: '3 days',
+      isHalfDayStr: 'No',
+      statusStr: 'Approved',
+      startDateStr: 'January 15, 2024',
+      startDateStrAm: '',
+      endDateStr: 'January 17, 2024',
+      endDateStrAm: '',
+      dateApprovedStr: 'January 11, 2024',
+      dateApprovedStrAm: '',
+      dateRequestedStr: 'January 10, 2024',
+      dateRequestedStrAm: '',
+      approvedBy: 'Manager',
+      employee: 'John Doe',
+      leaveType: 'Annual Leave',
+      isHalfDay: false, // Boolean field
+      rowVersion: 'v1'
+    },
+    {
+      id: '2' as UUID,
+      employeeId: 'emp002' as UUID,
+      approvedById: undefined,
+      leaveTypeId: 'lt002' as UUID,
+      startDate: '2024-01-20',
+      endDate: '2024-01-20',
+      dateRequested: '2024-01-19',
+      dateApproved: null,
+      comments: 'Medical appointment',
+      daysRequestedStr: '1 day',
+      isHalfDayStr: 'Yes',
+      statusStr: 'Pending',
+      startDateStr: 'January 20, 2024',
+      startDateStrAm: '',
+      endDateStr: 'January 20, 2024',
+      endDateStrAm: '',
+      dateApprovedStr: '',
+      dateApprovedStrAm: '',
+      dateRequestedStr: 'January 19, 2024',
+      dateRequestedStrAm: '',
+      approvedBy: '',
+      employee: 'Jane Smith',
+      leaveType: 'Sick Leave',
+      isHalfDay: true, // Boolean field
+      rowVersion: 'v1'
+    },
+  ];
+
+  const dataToDisplay = USE_MOCK_DATA && leaves.length === 0 ? MOCK_LEAVES : leaves;
+
+  if (loading && dataToDisplay.length === 0) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-8 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
@@ -98,6 +182,9 @@ const LeaveTable: React.FC<LeaveTableProps> = ({
       </div>
     );
   }
+
+  // Show mock data indicator if using mock data
+  const isUsingMockData = USE_MOCK_DATA && leaves.length === 0;
 
   return (
     <motion.div
@@ -118,6 +205,17 @@ const LeaveTable: React.FC<LeaveTableProps> = ({
       }}
       className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm overflow-hidden"
     >
+      {/* Mock Data Indicator */}
+      {isUsingMockData && (
+        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2">
+          <div className="flex items-center justify-center">
+            <div className="text-sm text-yellow-800">
+              <span className="font-medium">Note:</span> Using mock data for UI preview
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-white">
@@ -206,7 +304,7 @@ const LeaveTable: React.FC<LeaveTableProps> = ({
                     <span>{leave.daysRequestedStr || "0 days"}</span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
-                    {getHalfDayBadge(leave.isHalfDayStr)}
+                    {getHalfDayBadge(leave.isHalfDay || leave.isHalfDayStr)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
@@ -276,6 +374,7 @@ const LeaveTable: React.FC<LeaveTableProps> = ({
               Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
               <span className="font-medium">{Math.min(currentPage * 10, totalItems)}</span> of{' '}
               <span className="font-medium">{totalItems}</span> requests
+              {isUsingMockData && ' (Mock Data)'}
             </p>
           </div>
           <div>

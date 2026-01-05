@@ -12,7 +12,7 @@ import type { Step4Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
 import { amharicRegex } from '../../../../../utils/amharic-regex';
 import List from '../../../../List/list';
-import { listService } from '../../../../../services/List/listservice';
+import { listService } from '../../../../../services/hr/listservice';
 import type { ListItem } from '../../../../../types/List/list';
 
 interface GuarantorStepProps {

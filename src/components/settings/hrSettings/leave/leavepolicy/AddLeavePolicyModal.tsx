@@ -12,7 +12,7 @@ import {
 } from '../../../../ui/dropdown-menu';
 import type { LeavePolicyAddDto, UUID } from '../../../../../types/hr/leavepolicy';
 import type { LeaveTypeListDto } from '../../../../../types/hr/leavetype';
-import { leaveTypeService } from '../../../../../services/hr/settings/LeaveSet/LeaveTypeService';
+import { leaveTypeService } from '../../../../../services/core/settings/ModHrm/LeaveTypeService';
 import toast from 'react-hot-toast';
 interface AddLeavePolicyModalProps {
   isOpen: boolean;

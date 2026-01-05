@@ -5,19 +5,16 @@ import AddLeaveRequestModal from '../../../components/hr/annualLeave/AddLeaveReq
 import EditLeaveReqModal from '../../../components/hr/annualLeave/EditLeaveReqModal';
 import DeleteLeaveReqModal from '../../../components/hr/annualLeave/DeleteLeaveReqModal';
 import { leaveService } from '../../../services/hr/leaveservice';
+import { hrmLeaveList } from '../../../services/List/HrmLeaveList'; 
 import type { LeaveRequestListDto, LeaveRequestAddDto, LeaveRequestModDto } from '../../../types/hr/leaverequest';
+import type { ListItem } from '../../../types/List/list'; 
 import type { UUID } from 'crypto';
 import useToast from '../../../hooks/useToast';
-
-interface LeaveType {
-  id: UUID;
-  name: string;
-}
 
 const LeaveList = () => {
   const toast = useToast();
   const [leaves, setLeaves] = useState<LeaveRequestListDto[]>([]);
-  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
+  const [leaveTypes, setLeaveTypes] = useState<ListItem[]>([]); 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -29,11 +26,11 @@ const LeaveList = () => {
   const [selectedLeave, setSelectedLeave] = useState<LeaveRequestListDto | null>(null);
   const [leaveToDelete, setLeaveToDelete] = useState<LeaveRequestListDto | null>(null);
 
-  // Fetch leave types from backend API
+  // Fetch leave types from hrmLeaveList service
   const fetchLeaveTypes = async () => {
     try {
       setLeaveTypesLoading(true);
-      const types = await leaveService.getAllLeaveTypes();
+      const types = await hrmLeaveList.getAllLeaveTypes();
       setLeaveTypes(types);
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch leave types');
@@ -44,7 +41,7 @@ const LeaveList = () => {
     }
   };
 
-  // Fetch leave requests from API
+  // Fetch leave requests from API using leaveService
   const fetchLeaveRequests = async () => {
     try {
       setLoading(true);
@@ -70,7 +67,6 @@ const LeaveList = () => {
     fetchData();
   }, []);
 
-  // Refresh leave types when modal opens (optional - for real-time updates)
   useEffect(() => {
     if (showAddModal && leaveTypes.length === 0) {
       fetchLeaveTypes();
@@ -117,11 +113,11 @@ const LeaveList = () => {
     setShowDeleteModal(true);
   };
 
-  // Handle adding new leave request via API
+  // Handle adding new leave request via API using leaveService
   const handleAddLeave = async (leaveData: LeaveRequestAddDto): Promise<any> => {
     setActionLoading(true);
     try {
-      const result = await leaveService.addLeaveRequest(leaveData);
+      const result = await leaveService.addLeaveRequest(leaveData); // Use leaveService
       
       // Refresh the list
       await fetchLeaveRequests();
@@ -138,13 +134,12 @@ const LeaveList = () => {
     }
   };
 
-  // Handle editing leave request via API
+  // Handle editing leave request via API using leaveService
   const handleEditLeave = async (leaveData: LeaveRequestModDto): Promise<any> => {
     setActionLoading(true);
     try {
-      const result = await leaveService.updateLeaveRequest(leaveData);
+      const result = await leaveService.updateLeaveRequest(leaveData); 
       
-      // Refresh the list to get updated data
       await fetchLeaveRequests();
       
       toast.success('Leave request updated successfully!');
@@ -159,11 +154,11 @@ const LeaveList = () => {
     }
   };
 
-  // Handle deleting leave request via API
+  // Handle deleting leave request via API using leaveService
   const handleConfirmDelete = async (leaveId: UUID): Promise<any> => {
     setActionLoading(true);
     try {
-      await leaveService.deleteLeaveRequest(leaveId);
+      await leaveService.deleteLeaveRequest(leaveId); // Use leaveService
       
       // Update local state immediately for better UX
       setLeaves(prevLeaves => prevLeaves.filter(leave => leave.id !== leaveId));
@@ -180,18 +175,15 @@ const LeaveList = () => {
     }
   };
 
-  // Handle successful add modal close
   const handleAddModalClose = () => {
     setShowAddModal(false);
   };
 
-  // Handle successful edit modal close
   const handleEditModalClose = () => {
     setShowEditModal(false);
     setSelectedLeave(null);
   };
 
-  // Handle successful delete modal close
   const handleDeleteModalClose = () => {
     setShowDeleteModal(false);
     setLeaveToDelete(null);

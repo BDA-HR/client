@@ -1,10 +1,10 @@
-import { api } from '../../api';
+import { api } from '../../../api';
 import type {
   EducationQualListDto,
   EducationQualAddDto,
   EducationQualModDto,
   UUID
-} from '../../../types/hr/educationalqual';
+} from '../../../../types/hr/educationalqual';
 
 class EducationQualService {
   private baseUrl = `${import.meta.env.VITE_CORE_MODULE_URL || 'core/hrmm/v1'}/EducationQual`;

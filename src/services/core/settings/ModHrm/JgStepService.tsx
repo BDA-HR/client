@@ -1,11 +1,11 @@
 // services/hr/JgStepService.ts
-import { api } from '../../api';
+import { api } from '../../../api';
 import type {
   JgStepListDto,
   JgStepAddDto,
   JgStepModDto,
   UUID
-} from '../../../types/hr/JgStep';
+} from '../../../../types/hr/JgStep';
 
 class JgStepService {
   private baseUrl = `${import.meta.env.VITE_CORE_HRMM_URL || 'core/hrmm/v1'}/JgStep`;

@@ -11,7 +11,7 @@ import type {
   UUID 
 } from '../../../../types/core/Settings/menu-permissions';
 import type { NameListItem } from '../../../../types/NameList/nameList';
-import { menuPermissionService } from '../../../../services/core/settings/menu-permissionservice';
+import { menuPermissionService } from '../../../../services/core/settings/ModCore/menu-permissionservice';
 import toast from 'react-hot-toast';
 
 interface EditMenuPermissionModalProps {

@@ -8,8 +8,8 @@ import type { LeavePolicyListDto, UUID } from '../../../../types/hr/leavepolicy'
 import type { LeavePolicyAccrualListDto, LeavePolicyAccrualAddDto } from '../../../../types/hr/leavepolicyaccrual';
 import AddLeavePolicyAccrualModal from '../../../../components/settings/hrSettings/leave/leavepolicyaccrual/AddLeavePolicyAccrualModal';
 import toast from 'react-hot-toast';
-import { leavePolicyAccrualService } from '../../../../services/hr/settings/LeaveSet/LeavePolicyAccService';
-import { leavePolicyService } from '../../../../services/hr/settings/LeaveSet/LeavePolicyService';
+import { leavePolicyAccrualService } from '../../../../services/core/settings/ModHrm/LeavePolicyAccService';
+import { leavePolicyService } from '../../../../services/core/settings/ModHrm/LeavePolicyService';
 
 function LeavePolicyAccrualPage() {
   const navigate = useNavigate();

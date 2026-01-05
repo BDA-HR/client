@@ -1,6 +1,5 @@
 import { api } from '../api';
 import type { ListItem } from '../../types/List/list';
-import type { NameListItem } from '../../types/NameList/nameList'; // Add this import
 
 class ListService {
   private baseUrl = `${import.meta.env.VITE_LUP_URL || '/lup/v1'}`;

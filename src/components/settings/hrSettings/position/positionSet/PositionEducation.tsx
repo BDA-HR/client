@@ -9,9 +9,9 @@ import type {
   UUID,
   EducationLevelDto,
 } from "../../../../../types/hr/position";
-import { positionService } from "../../../../../services/hr/settings/positionService";
+import { positionService } from "../../../../../services/core/settings/ModHrm/positionService";
 import DeletePositionEducationModal from "./DeletePositionEducationModal";
-import { listService } from "../../../../../services/List/listservice";
+import { listService } from "../../../../../services/hr/listservice";
 
 interface PositionEducationProps {
   positionId: UUID;

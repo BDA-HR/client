@@ -1,12 +1,6 @@
 import { api } from '../api';
 import type { LeaveRequestListDto, LeaveRequestAddDto, LeaveRequestModDto, UUID } from '../../types/hr/leaverequest';
 
-interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  errors?: Record<string, string[]>;
-}
-
 class LeaveService {
   private baseUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/LeaveRequest`;
 

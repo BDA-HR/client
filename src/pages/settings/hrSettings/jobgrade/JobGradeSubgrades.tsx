@@ -8,7 +8,7 @@ import AddJgStepModal from '../../../../components/settings/hrSettings/jobgrade/
 import EditJgStepModal from '../../../../components/settings/hrSettings/jobgrade/EditJgStepModal';
 import DeleteJgStepModal from '../../../../components/settings/hrSettings/jobgrade/DeleteJgStepModal';
 import StepCard from '../../../../components/settings/hrSettings/jobgrade/StepCard';
-import { jgStepService } from '../../../../services/hr/settings/JgStepService';
+import { jgStepService } from '../../../../services/core/settings/ModHrm/JgStepService';
 import type { JobGradeListDto } from '../../../../types/hr/jobgrade';
 import type { JgStepListDto, JgStepAddDto, JgStepModDto, UUID } from '../../../../types/hr/JgStep';
 

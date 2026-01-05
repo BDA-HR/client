@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { XCircleIcon } from 'lucide-react';
-import { leaveTypeService } from '../../../../../services/hr/settings/LeaveSet/LeaveTypeService';
+import { leaveTypeService } from '../../../../../services/core/settings/ModHrm/LeaveTypeService';
 import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto, UUID } from '../../../../../types/hr/leavetype';
 import LeaveSearchFilters from './LeaveSearchFilter';
 import LeaveTypeCard from "./LeaveTypeCard";

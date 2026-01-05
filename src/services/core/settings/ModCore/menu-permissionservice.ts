@@ -1,11 +1,11 @@
-import { api } from '../../api';
+import { api } from '../../../api';
 import type {
   ModPerMenuListDto,
   PerMenuListDto,
   PerMenuAddDto,
   PerMenuModDto
-} from '../../../types/core/Settings/menu-permissions';
-import type { NameListItem } from '../../../types/NameList/nameList';
+} from '../../../../types/core/Settings/menu-permissions';
+import type { NameListItem } from '../../../../types/NameList/nameList';
 
 class MenuPermissionService {
   private baseUrl = `/auth/v1/PerMenu`; 

@@ -11,7 +11,7 @@ import type {
   PerApiAddDto,
   UUID
 } from '../../../types/core/Settings/api-permission';
-import { apiPermissionService } from '../../../services/core/settings/api-permissionservice';
+import { apiPermissionService } from '../../../services/core/settings/ModCore/api-permissionservice';
 
 // Animation variants
 const containerVariants = {

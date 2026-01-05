@@ -5,7 +5,7 @@ import { Button } from '../../../../ui/button';
 import List from '../../../../List/list';
 import type { PositionEduAddDto, PositionEduModDto, PositionEduListDto, UUID, EducationLevelDto } from '../../../../../types/hr/position';
 import type { ListItem } from '../../../../../types/List/list';
-import { listService } from '../../../../../services/List/listservice';
+import { listService } from '../../../../../services/hr/listservice';
 import { nameListService } from '../../../../../services/List/HrmmNameListService'; 
 
 interface PositionEducationModalProps {

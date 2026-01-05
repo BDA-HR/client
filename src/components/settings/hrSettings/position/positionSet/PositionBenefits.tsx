@@ -8,7 +8,7 @@ import type {
   PositionBenefitAddDto,
   UUID,
 } from "../../../../../types/hr/position";
-import { positionService } from "../../../../../services/hr/settings/positionService";
+import { positionService } from "../../../../../services/core/settings/ModHrm/positionService";
 
 interface PositionBenefitsProps {
   positionId: UUID;

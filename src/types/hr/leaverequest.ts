@@ -3,25 +3,25 @@ import type { BaseDto } from './BaseDto';
 
 export type { UUID };
 export interface LeaveRequestListDto extends BaseDto {
-  employeeId: UUID; //HRM.Profile.Employee
-  approvedById?: UUID; //HRM.Profile.Employee
-  leaveTypeId: UUID; // LeaveType
-  startDate: string | Date; // Assuming this is DateTime from backend
-  endDate: string | Date; // Assuming this is DateTime from backend
-  dateRequested: string | Date; // Assuming this is DateTime from backend
-  dateApproved?: string | Date; // Assuming this is DateTime from backend
+  employeeId: UUID; 
+  approvedById?: UUID; 
+  leaveTypeId: UUID;
+  startDate: string | Date; 
+  endDate: string | Date; 
+  dateRequested: string | Date; 
+  dateApproved?: string | Date; 
   comments: string;
   daysRequestedStr: string;
   isHalfDayStr: string;
   statusStr: string;
-  startDateStr: string; // Format: "MMMM dd, yyyy"
-  startDateStrAm: string; // Ethiopian calendar format
-  endDateStr: string; // Format: "MMMM dd, yyyy"
-  endDateStrAm: string; // Ethiopian calendar format
-  dateApprovedStr: string; // Format: "MMMM dd, yyyy" or empty if not approved
-  dateApprovedStrAm: string; // Ethiopian calendar format or empty if not approved
-  dateRequestedStr: string; // Format: "MMMM dd, yyyy"
-  dateRequestedStrAm: string; // Ethiopian calendar format
+  startDateStr: string; 
+  startDateStrAm: string; 
+  endDateStr: string; 
+  endDateStrAm: string; 
+  dateApprovedStr: string; 
+  dateApprovedStrAm: string; 
+  dateRequestedStr: string; 
+  dateRequestedStrAm: string; 
   approvedBy: string;
   employee: string;
   leaveType: string;
@@ -33,8 +33,8 @@ export interface LeaveTypeDto {
 }
 export interface LeaveRequestAddDto {
   leaveTypeId: UUID;
-  startDate: string | Date; // Assuming this is DateTime
-  endDate: string | Date; // Assuming this is DateTime
+  startDate: string | Date; 
+  endDate: string | Date; 
   isHalfDay: boolean;
   comments: string;
 }

@@ -1,10 +1,10 @@
-import { api } from '../../api';
+import { api } from '../../../api';
 import type {
   MenuPerApiListDto,
   PerApiListDto,
   PerApiAddDto,
   PerApiModDto
-} from '../../../types/core/Settings/api-permission';
+} from '../../../../types/core/Settings/api-permission';
 
 class ApiPermissionService {
   private baseUrl = `${import.meta.env.VITE_AUTH_URL || 'auth/v1'}/PerApi`;
