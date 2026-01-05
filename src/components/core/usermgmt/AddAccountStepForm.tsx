@@ -7,7 +7,9 @@ import { ApiPermissionsStep } from './steps/ApiPermissionsStep';
 import { AddAccountStepHeader } from './AddAccountStepHeader';
 import type { EmpSearchRes } from '../../../types/core/EmpSearchRes';
 import type { RegStep1, RegStep2, RegStep3, UUID } from '../../../types/auth/registration';
+import type { ModPerMenuListDto, NameList } from '../../../types/auth/ModPerMenu';
 import { registrationService } from '../../../services/auth/registerservice';
+import { perMenuService } from '../../../services/auth/perMenuService';
 import toast from 'react-hot-toast';
 
 const steps = [
@@ -45,42 +47,18 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string>('');
+  const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
+  
+  // Real data state for permissions
+  const [permissionsData, setPermissionsData] = useState<ModPerMenuListDto[]>([]);
+  const [flattenedPermissions, setFlattenedPermissions] = useState<Array<NameList & { moduleId: UUID; moduleName: string }>>([]);
+  const [isLoadingPermissions, setIsLoadingPermissions] = useState(false);
+  const [permissionsError, setPermissionsError] = useState<string | null>(null);
 
-  // Mock data for main permissions
-  const MOCK_PERMISSIONS = Array.from({ length: 50 }, (_, i) => ({
-    id: `perm_${i + 1}`,
-    name: `Permission ${i + 1}`,
-    module: ['core', 'hr', 'crm', 'file', 'finance', 'procurement', 'inventory'][
-      Math.floor(Math.random() * 7)
-    ],
-    description: `Description for permission ${i + 1}`,
-  }));
-
-  // Mock data for detailed permissions
-  const MOCK_DETAILED_PERMISSIONS = Array.from({ length: 30 }, (_, i) => {
-    const actions = ['view', 'create', 'edit', 'delete', 'approve', 'export'];
-    const resources = ['accounts', 'users', 'inventory', 'finance', 'reports', 'files', 'settings'];
-    
-    const action = actions[Math.floor(Math.random() * actions.length)];
-    const resource = resources[Math.floor(Math.random() * resources.length)];
-    const permissionName = `${action.charAt(0).toUpperCase() + action.slice(1)} ${resource}`;
-    
-    return {
-      id: `detailed_perm_${i + 1}`,
-      name: permissionName,
-      mainPermissionId: `perm_${Math.floor(Math.random() * 50) + 1}`,
-      action: action,
-      resource: resource,
-      description: `Allows ${action} access to ${resource}`
-    };
-  });
-
-  // Mock data for main permissions list
-  const MOCK_MAIN_PERMISSIONS_LIST = Array.from({ length: 50 }, (_, i) => ({
-    id: `perm_${i + 1}`,
-    name: `Menu Permission ${i + 1}`,
-    description: `Description for menu permission ${i + 1}`
-  }));
+  // For Step 3 - we'll need real data here too
+  // For now, we'll use an empty array and you can replace with real API later
+  const [apiPermissionsData, setApiPermissionsData] = useState<any[]>([]);
+  const [mainPermissionsList, setMainPermissionsList] = useState<any[]>([]);
 
   const getEmployeeEmail = () => {
     if (!employee) return '';
@@ -105,18 +83,115 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     return employee.code || '';
   };
 
-  const getFilteredPermissions = () => {
-    if (formData.step1.modules.length === 0) return [];
-    return MOCK_PERMISSIONS.filter(permission =>
-      formData.step1.modules.includes(permission.module)
-    );
+  // Fetch real permissions data when modules are selected AND user ID is available
+  useEffect(() => {
+    const fetchPermissionsData = async () => {
+      if (currentStep === 2 && formData.step1.modules.length > 0 && userId) {
+        setIsLoadingPermissions(true);
+        setPermissionsError(null);
+        
+        try {
+          console.log('Fetching permission menus for user:', userId);
+          console.log('Selected modules:', formData.step1.modules);
+          
+          // Convert selected modules to UUID array
+          const selectedModuleIds = formData.step1.modules.map(id => id as UUID);
+          
+          // Fetch filtered permissions for the user based on selected modules
+          const filteredPermissions = await perMenuService.getFilteredPermissionsForUser(
+            userId as UUID,
+            selectedModuleIds
+          );
+          
+          console.log('Filtered permissions (grouped):', filteredPermissions);
+          setPermissionsData(filteredPermissions);
+          
+          // Flatten the permissions for easier display
+          const flattened = await perMenuService.getFlattenedPermissionsForUser(
+            userId as UUID,
+            selectedModuleIds
+          );
+          
+          console.log('Flattened permissions:', flattened);
+          setFlattenedPermissions(flattened);
+          
+          if (filteredPermissions.length === 0) {
+            toast.warning('No permissions found for the selected modules');
+          }
+          
+        } catch (error: any) {
+          console.error('Error fetching permissions data:', error);
+          const errorMessage = error.message || 'Failed to load permissions data from API';
+          setPermissionsError(errorMessage);
+          toast.error('Could not load permissions. Please try again.');
+          
+          // Clear data on error
+          setPermissionsData([]);
+          setFlattenedPermissions([]);
+        } finally {
+          setIsLoadingPermissions(false);
+        }
+      }
+    };
+    
+    fetchPermissionsData();
+  }, [currentStep, formData.step1.modules, userId]);
+
+  // Fetch API permissions data for Step 3 when we have user ID
+  useEffect(() => {
+    const fetchApiPermissionsData = async () => {
+      if (currentStep === 3 && userId && formData.step2.permissions.length > 0) {
+        // Here you would fetch real API permissions data
+        // For now, we'll just set empty arrays
+        // You can replace this with actual API calls when you have the endpoints
+        setApiPermissionsData([]);
+        setMainPermissionsList([]);
+      }
+    };
+    
+    fetchApiPermissionsData();
+  }, [currentStep, userId, formData.step2.permissions]);
+
+  // Transform API data to match MainPermissionsStep props format
+  const getPermissionsForStep2 = () => {
+    // If we have flattened permissions from API, use them
+    if (flattenedPermissions.length > 0) {
+      return flattenedPermissions.map(permission => ({
+        id: permission.id,
+        name: permission.name,
+        module: permission.moduleName,
+        description: `Permission for ${permission.moduleName} module`
+      }));
+    }
+    
+    // Otherwise, check if we have grouped data but not flattened yet
+    if (permissionsData.length > 0) {
+      const permissions: any[] = [];
+      for (const moduleGroup of permissionsData) {
+        for (const permission of moduleGroup.perMenuList) {
+          permissions.push({
+            id: permission.id,
+            name: permission.name,
+            module: moduleGroup.perModule,
+            description: `Permission for ${moduleGroup.perModule} module`
+          });
+        }
+      }
+      return permissions;
+    }
+    
+    // No data available
+    return [];
   };
 
   const getFilteredDetailedPermissions = () => {
-    if (formData.step2.permissions.length === 0) return [];
-    return MOCK_DETAILED_PERMISSIONS.filter(permission =>
-      formData.step2.permissions.includes(permission.mainPermissionId)
-    );
+    if (formData.step2.permissions.length === 0 || apiPermissionsData.length === 0) {
+      return [];
+    }
+    
+    // This would filter real API permissions data
+    // For now, return empty array
+    return [];
   };
 
   // Scroll to top when step changes
@@ -147,6 +222,12 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     });
     setCurrentStep(1);
     setUserId('');
+    setIsRegistrationComplete(false);
+    setPermissionsData([]);
+    setFlattenedPermissions([]);
+    setPermissionsError(null);
+    setApiPermissionsData([]);
+    setMainPermissionsList([]);
   };
 
   // Handle Step 1 submission with API integration
@@ -187,7 +268,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       localStorage.setItem('accountFormData', JSON.stringify(updatedFormData));
 
       // Show success message
-      toast.success('Account created successfully!');
+      toast.success('Account created successfully! Loading permissions...');
 
       scrollToTop();
       setCurrentStep(prev => prev + 1);
@@ -213,6 +294,13 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
 
     if (!userId) {
       const errorMsg = 'Account not created. Please complete Step 1 first.';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+
+    if (flattenedPermissions.length === 0 && !isLoadingPermissions) {
+      const errorMsg = 'No permissions available for the selected modules.';
       setError(errorMsg);
       toast.error(errorMsg);
       return;
@@ -247,7 +335,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       localStorage.setItem('accountFormData', JSON.stringify(updatedFormData));
 
       // Show success message
-      toast.success('Menu permissions saved successfully!');
+      toast.success('Menu permissions saved successfully! Moving to detailed permissions...');
 
       scrollToTop();
       setCurrentStep(prev => prev + 1);
@@ -297,6 +385,10 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       
       console.log('Registration step 3 completed:', result);
 
+      // Mark registration as complete
+      setIsRegistrationComplete(true);
+      setUserId(result.userId);
+
       // Prepare final data for callback
       const finalData = {
         userId: result.userId,
@@ -335,88 +427,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     }
   };
 
-  // Alternative: Handle complete registration in one go
-  const handleCompleteRegistration = async () => {
-    if (!employee?.id) {
-      toast.error('Employee ID not found');
-      return;
-    }
-
-    // Check if Step 1 data is complete
-    if (!formData.step1.password || !formData.step1.role || formData.step1.modules.length === 0) {
-      toast.error('Please complete Step 1 first');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Prepare all data
-      const regStep1Data: RegStep1 = {
-        employeeId: employee.id as UUID,
-        password: formData.step1.password,
-        roleId: formData.step1.role,
-        perModules: formData.step1.modules.map(id => id as UUID)
-      };
-
-      const regStep2Data: Omit<RegStep2, 'userId'> = {
-        perMenus: formData.step2.permissions.map(id => id as UUID)
-      };
-
-      const regStep3Data: Omit<RegStep3, 'userId'> = {
-        perAccess: formData.step3.apiPermissions.map(id => id as UUID)
-      };
-
-      console.log('Starting complete registration...', {
-        step1: regStep1Data,
-        step2: regStep2Data,
-        step3: regStep3Data
-      });
-
-      // Call complete registration
-      const result = await registrationService.completeRegistration(
-        regStep1Data,
-        regStep2Data,
-        regStep3Data
-      );
-      
-      console.log('Complete registration successful:', result);
-
-      // Prepare final data
-      const finalData = {
-        userId: result.userId,
-        employeeId: employee.id,
-        employeeCode: getEmployeeCode(),
-        employeeName: getEmployeeDisplayName(),
-        email: getEmployeeEmail(),
-        role: formData.step1.role,
-        modules: formData.step1.modules,
-        permissions: formData.step2.permissions,
-        detailedPermissions: formData.step3.apiPermissions,
-      };
-
-      toast.success('Account created successfully!');
-
-      clearTemporaryData();
-
-      onAccountAdded({
-        success: true,
-        message: 'Account created successfully',
-        accountId: result.userId,
-        ...finalData
-      });
-
-    } catch (error: any) {
-      console.error('Failed complete registration:', error);
-      const errorMessage = error.message || 'Failed to create account. Please try again.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleBack = () => {
     scrollToTop();
     if (currentStep > 1) {
@@ -442,6 +452,30 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     scrollToTop();
   }, []);
 
+  // Show success message when registration is complete
+  if (isRegistrationComplete && userId) {
+    return (
+      <div className="w-full max-w-6xl mx-auto p-6">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Account Created Successfully!</h2>
+          <p className="text-gray-600 mb-2">User ID: <span className="font-semibold text-green-600">{userId}</span></p>
+          <p className="text-gray-500 mb-6">The account has been created with all permissions configured.</p>
+          <button
+            onClick={onBackToAccounts}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+          >
+            Back to Accounts
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-6xl mx-auto p-6">
       {/* Header with steps */}
@@ -456,11 +490,39 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         }}
       />
 
-      {/* Status Display */}
-      {userId && (
+      {/* Module Selection Info */}
+      {currentStep === 2 && formData.step1.modules.length > 0 && (
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-700">
-            Account created with User ID: <span className="font-semibold">{userId}</span>
+            Showing permissions for <span className="font-semibold">{formData.step1.modules.length}</span> selected module(s)
+          </p>
+        </div>
+      )}
+
+      {/* Permissions API Error */}
+      {permissionsError && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-amber-700 text-sm">
+            {permissionsError}
+          </p>
+        </div>
+      )}
+
+      {/* Loading state for permissions */}
+      {currentStep === 2 && isLoadingPermissions && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center justify-center">
+            <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3" />
+            <span className="text-blue-700">Loading permissions for selected modules...</span>
+          </div>
+        </div>
+      )}
+
+      {/* No permissions warning */}
+      {currentStep === 2 && !isLoadingPermissions && flattenedPermissions.length === 0 && formData.step1.modules.length > 0 && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-yellow-700 text-sm">
+            No permissions found for the selected modules.
           </p>
         </div>
       )}
@@ -496,8 +558,8 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               initialData={formData.step2}
               onSubmit={handleStep2Submit}
               onBack={handleBack}
-              isLoading={loading}
-              permissions={getFilteredPermissions()}
+              isLoading={loading || isLoadingPermissions}
+              permissions={getPermissionsForStep2()}
               selectedModules={formData.step1.modules}
             />
           )}
@@ -511,26 +573,11 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               isLoading={loading}
               apiPermissions={getFilteredDetailedPermissions()}
               selectedPermissions={formData.step2.permissions}
-              mainPermissionsList={MOCK_MAIN_PERMISSIONS_LIST}
+              mainPermissionsList={mainPermissionsList}
             />
           )}
         </AnimatePresence>
       </div>
-
-      {/* Complete Registration Button (Optional) */}
-      {currentStep === 3 && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex justify-center">
-            <button
-              onClick={handleCompleteRegistration}
-              disabled={loading}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors font-medium"
-            >
-              {loading ? 'Processing...' : 'Complete Registration'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
