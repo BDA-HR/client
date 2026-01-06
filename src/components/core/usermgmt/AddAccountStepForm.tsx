@@ -8,8 +8,10 @@ import { AddAccountStepHeader } from './AddAccountStepHeader';
 import type { EmpSearchRes } from '../../../types/core/EmpSearchRes';
 import type { RegStep1, RegStep2, RegStep3, UUID } from '../../../types/auth/registration';
 import type { ModPerMenuListDto, NameList } from '../../../types/auth/ModPerMenu';
+import type { MenuPerApiListDto } from '../../../types/auth/MenuPerApi';
 import { registrationService } from '../../../services/auth/registerservice';
 import { perMenuService } from '../../../services/auth/perMenuService';
+import { menuPerApiService } from '../../../services/auth/MenuPerApiService';
 import toast from 'react-hot-toast';
 
 const steps = [
@@ -49,16 +51,17 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
   const [userId, setUserId] = useState<string>('');
   const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
   
-  // Real data state for permissions
+  // Real data state for permissions (Step 2)
   const [permissionsData, setPermissionsData] = useState<ModPerMenuListDto[]>([]);
   const [flattenedPermissions, setFlattenedPermissions] = useState<Array<NameList & { moduleId: UUID; moduleName: string }>>([]);
   const [isLoadingPermissions, setIsLoadingPermissions] = useState(false);
   const [permissionsError, setPermissionsError] = useState<string | null>(null);
 
-  // For Step 3 - we'll need real data here too
-  // For now, we'll use an empty array and you can replace with real API later
-  const [apiPermissionsData, setApiPermissionsData] = useState<any[]>([]);
-  const [mainPermissionsList, setMainPermissionsList] = useState<any[]>([]);
+  // Real data state for API permissions (Step 3)
+  const [apiPermissionsData, setApiPermissionsData] = useState<MenuPerApiListDto[]>([]);
+  const [flattenedApiPermissions, setFlattenedApiPermissions] = useState<Array<NameList & { menuId: UUID; menuName: string }>>([]);
+  const [isLoadingApiPermissions, setIsLoadingApiPermissions] = useState(false);
+  const [apiPermissionsError, setApiPermissionsError] = useState<string | null>(null);
 
   const getEmployeeEmail = () => {
     if (!employee) return '';
@@ -116,7 +119,13 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
           setFlattenedPermissions(flattened);
           
           if (filteredPermissions.length === 0) {
-            toast.warning('No permissions found for the selected modules');
+            toast('No permissions found for the selected modules', {
+              icon: '⚠️',
+              style: {
+                background: '#fef3c7',
+                color: '#92400e',
+              }
+            });
           }
           
         } catch (error: any) {
@@ -137,22 +146,66 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     fetchPermissionsData();
   }, [currentStep, formData.step1.modules, userId]);
 
-  // Fetch API permissions data for Step 3 when we have user ID
+  // Fetch API permissions data for Step 3 when we have user ID and selected menus
   useEffect(() => {
     const fetchApiPermissionsData = async () => {
       if (currentStep === 3 && userId && formData.step2.permissions.length > 0) {
-        // Here you would fetch real API permissions data
-        // For now, we'll just set empty arrays
-        // You can replace this with actual API calls when you have the endpoints
-        setApiPermissionsData([]);
-        setMainPermissionsList([]);
+        setIsLoadingApiPermissions(true);
+        setApiPermissionsError(null);
+        
+        try {
+          console.log('Fetching API permissions for user:', userId);
+          console.log('Selected menus:', formData.step2.permissions);
+          
+          // Convert selected menus to UUID array
+          const selectedMenuIds = formData.step2.permissions.map(id => id as UUID);
+          
+          // Fetch filtered API permissions for the user based on selected menus
+          const filteredApiPermissions = await menuPerApiService.getFilteredPerApisForUser(
+            userId as UUID,
+            selectedMenuIds
+          );
+          
+          console.log('Filtered API permissions (grouped):', filteredApiPermissions);
+          setApiPermissionsData(filteredApiPermissions);
+          
+          // Flatten the API permissions for easier display
+          const flattened = await menuPerApiService.getFlattenedPerApisForUser(
+            userId as UUID,
+            selectedMenuIds
+          );
+          
+          console.log('Flattened API permissions:', flattened);
+          setFlattenedApiPermissions(flattened);
+          
+          if (filteredApiPermissions.length === 0) {
+            toast('No API permissions found for the selected menus', {
+              icon: '⚠️',
+              style: {
+                background: '#fef3c7',
+                color: '#92400e',
+              }
+            });
+          }
+          
+        } catch (error: any) {
+          console.error('Error fetching API permissions data:', error);
+          const errorMessage = error.message || 'Failed to load API permissions data from API';
+          setApiPermissionsError(errorMessage);
+          toast.error('Could not load API permissions. Please try again.');
+          
+          setApiPermissionsData([]);
+          setFlattenedApiPermissions([]);
+        } finally {
+          setIsLoadingApiPermissions(false);
+        }
       }
     };
     
     fetchApiPermissionsData();
   }, [currentStep, userId, formData.step2.permissions]);
 
-  // Transform API data to match MainPermissionsStep props format
+  // Transform API data to match MainPermissionsStep props format (Step 2)
   const getPermissionsForStep2 = () => {
     // If we have flattened permissions from API, use them
     if (flattenedPermissions.length > 0) {
@@ -184,13 +237,33 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     return [];
   };
 
+  // Transform API data to match ApiPermissionsStep props format (Step 3)
   const getFilteredDetailedPermissions = () => {
-    if (formData.step2.permissions.length === 0 || apiPermissionsData.length === 0) {
+    if (formData.step2.permissions.length === 0 || flattenedApiPermissions.length === 0) {
       return [];
     }
     
-    // This would filter real API permissions data
-    // For now, return empty array
+    // Transform to match ApiPermissionsStep format
+    return flattenedApiPermissions.map(apiPermission => ({
+      id: apiPermission.id,
+      name: apiPermission.name,
+      mainPermissionId: apiPermission.menuId, // Use menuId as mainPermissionId
+      action: 'access', // You might want to extract this from the API response
+      resource: apiPermission.name.toLowerCase().replace(/\s+/g, '_'),
+      description: `API access for ${apiPermission.menuName}`
+    }));
+  };
+
+  // Get main permissions list for Step 3
+  const getMainPermissionsList = () => {
+    if (apiPermissionsData.length > 0) {
+      return apiPermissionsData.map(menuGroup => ({
+        id: menuGroup.perMenuId,
+        name: menuGroup.perMenu,
+        description: `Menu: ${menuGroup.perMenu}`
+      }));
+    }
+    
     return [];
   };
 
@@ -227,7 +300,8 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     setFlattenedPermissions([]);
     setPermissionsError(null);
     setApiPermissionsData([]);
-    setMainPermissionsList([]);
+    setFlattenedApiPermissions([]);
+    setApiPermissionsError(null);
   };
 
   // Handle Step 1 submission with API integration
@@ -366,6 +440,13 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       return;
     }
 
+    if (flattenedApiPermissions.length === 0 && !isLoadingApiPermissions) {
+      const errorMsg = 'No API permissions available for the selected menus.';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -409,7 +490,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
 
       clearTemporaryData();
 
-      // Call the callback with result
       onAccountAdded({
         success: true,
         message: 'Account created successfully',
@@ -463,7 +543,6 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Account Created Successfully!</h2>
-          <p className="text-gray-600 mb-2">User ID: <span className="font-semibold text-green-600">{userId}</span></p>
           <p className="text-gray-500 mb-6">The account has been created with all permissions configured.</p>
           <button
             onClick={onBackToAccounts}
@@ -499,6 +578,15 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         </div>
       )}
 
+      {/* Menu Selection Info */}
+      {currentStep === 3 && formData.step2.permissions.length > 0 && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-700">
+            Showing API permissions for <span className="font-semibold">{formData.step2.permissions.length}</span> selected menu(s)
+          </p>
+        </div>
+      )}
+
       {/* Permissions API Error */}
       {permissionsError && (
         <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
@@ -508,7 +596,16 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         </div>
       )}
 
-      {/* Loading state for permissions */}
+      {/* API Permissions Error */}
+      {apiPermissionsError && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-amber-700 text-sm">
+            {apiPermissionsError}
+          </p>
+        </div>
+      )}
+
+      {/* Loading state for permissions (Step 2) */}
       {currentStep === 2 && isLoadingPermissions && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center justify-center">
@@ -518,11 +615,30 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         </div>
       )}
 
-      {/* No permissions warning */}
+      {/* Loading state for API permissions (Step 3) */}
+      {currentStep === 3 && isLoadingApiPermissions && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center justify-center">
+            <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3" />
+            <span className="text-blue-700">Loading API permissions for selected menus...</span>
+          </div>
+        </div>
+      )}
+
+      {/* No permissions warning (Step 2) */}
       {currentStep === 2 && !isLoadingPermissions && flattenedPermissions.length === 0 && formData.step1.modules.length > 0 && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-yellow-700 text-sm">
             No permissions found for the selected modules.
+          </p>
+        </div>
+      )}
+
+      {/* No API permissions warning (Step 3) */}
+      {currentStep === 3 && !isLoadingApiPermissions && flattenedApiPermissions.length === 0 && formData.step2.permissions.length > 0 && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-yellow-700 text-sm">
+            No API permissions found for the selected menus.
           </p>
         </div>
       )}
@@ -570,10 +686,10 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               initialData={formData.step3}
               onSubmit={handleStep3Submit}
               onBack={handleBack}
-              isLoading={loading}
+              isLoading={loading || isLoadingApiPermissions}
               apiPermissions={getFilteredDetailedPermissions()}
               selectedPermissions={formData.step2.permissions}
-              mainPermissionsList={mainPermissionsList}
+              mainPermissionsList={getMainPermissionsList()}
             />
           )}
         </AnimatePresence>
