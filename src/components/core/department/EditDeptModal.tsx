@@ -1,17 +1,22 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, PenBox } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Label } from '../../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import List from '../../../components/List/list';
-import type { ListItem, UUID } from '../../../types/List/list';
-import type { EditDeptDto, DeptListDto } from '../../../types/core/dept';
-import { amharicRegex } from '../../../utils/amharic-regex';
-import { DeptStat } from '../../../types/core/enum';
-import type { BranchCompListDto } from '../../../types/core/branch';
-import { branchService } from '../../../services/core/branchservice';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { X, PenBox } from "lucide-react";
+import { Button } from "../../ui/button";
+import { Label } from "../../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../ui/select";
+import List from "../../../components/List/list";
+import type { ListItem, UUID } from "../../../types/List/list";
+import type { EditDeptDto, DeptListDto } from "../../../types/core/dept";
+import { amharicRegex } from "../../../utils/amharic-regex";
+import { DeptStat } from "../../../types/core/enum";
+import { useBranchCompanyList } from "../../../services/core/branch/branch.queries"
+import toast from "react-hot-toast";
 
 interface EditDeptModalProps {
   department: DeptListDto;
@@ -20,33 +25,34 @@ interface EditDeptModalProps {
   onClose: () => void;
 }
 
-const EditDeptModal: React.FC<EditDeptModalProps> = ({ 
-  department, 
-  onEditDepartment, 
+const EditDeptModal: React.FC<EditDeptModalProps> = ({
+  department,
+  onEditDepartment,
   isOpen,
-  onClose 
+  onClose,
 }) => {
-  const [branches, setBranches] = useState<BranchCompListDto[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<UUID | undefined>(department.branchId);
+  const [selectedBranch, setSelectedBranch] = useState<UUID | undefined>(
+    department.branchId
+  );
   const [editedDepartment, setEditedDepartment] = useState<EditDeptDto>({
     id: department.id,
     name: department.name,
     nameAm: department.nameAm,
     deptStat: department.deptStat,
     branchId: department.branchId,
-    rowVersion: department.rowVersion
+    rowVersion: department.rowVersion,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const deptStatusOptions = Object.entries(DeptStat);
+  // Use React Query to fetch branches
+  const {
+    data: branches = [],
+    isLoading: loadingBranches,
+    isError: branchesError,
+    refetch: refetchBranches,
+  } = useBranchCompanyList();
 
-  // Fetch branches when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      fetchBranches();
-    }
-  }, [isOpen]);
+  const deptStatusOptions = Object.entries(DeptStat);
 
   // Update form when department prop changes
   useEffect(() => {
@@ -56,40 +62,32 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
       nameAm: department.nameAm,
       deptStat: department.deptStat,
       branchId: department.branchId,
-      rowVersion: department.rowVersion
+      rowVersion: department.rowVersion,
     });
     setSelectedBranch(department.branchId);
   }, [department]);
 
-  const fetchBranches = async () => {
-    try {
-      setLoading(true);
-      const branchesData = await branchService.getBranchCompanyList();
-      setBranches(branchesData);
-    } catch (error) {
-      console.error('Error fetching branches:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const branchListItems: ListItem[] = branches.map(branch => ({
+  const branchListItems: ListItem[] = branches.map((branch) => ({
     id: branch.id,
-    name: branch.name
+    name: branch.name,
   }));
 
   // Find the selected branch name to display as placeholder
-  const selectedBranchItem = branches.find(branch => branch.id === selectedBranch);
-  const branchPlaceholder = selectedBranchItem ? selectedBranchItem.name : "Select a branch";
+  const selectedBranchItem = branches.find(
+    (branch) => branch.id === selectedBranch
+  );
+  const branchPlaceholder = selectedBranchItem
+    ? selectedBranchItem.name
+    : "Select a branch";
 
   const handleSelectBranch = (item: ListItem) => {
     setSelectedBranch(item.id);
-    setEditedDepartment(prev => ({ ...prev, branchId: item.id }));
+    setEditedDepartment((prev) => ({ ...prev, branchId: item.id }));
   };
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === '' || amharicRegex.test(value)) {
+    if (value === "" || amharicRegex.test(value)) {
       setEditedDepartment((prev) => ({ ...prev, nameAm: value }));
     }
   };
@@ -104,8 +102,12 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!editedDepartment.name || !editedDepartment.nameAm || !editedDepartment.branchId) {
-      toast.error('Please fill all required fields');
+    if (
+      !editedDepartment.name ||
+      !editedDepartment.nameAm ||
+      !editedDepartment.branchId
+    ) {
+      toast.error("Please fill all required fields");
       return;
     }
 
@@ -114,19 +116,19 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
     try {
       const response = await onEditDepartment(editedDepartment);
 
-      const successMessage = 
-        response?.data?.message || 
-        response?.message || 
-        '';
-      
+      const successMessage =
+        response?.data?.message ||
+        response?.message ||
+        "Department updated successfully!";
+
       toast.success(successMessage);
-      
+
       onClose();
-      
     } catch (error: any) {
-      const errorMessage = error.message || '';
+      const errorMessage =
+        error.message || "Failed to update department. Please try again.";
       toast.error(errorMessage);
-      console.error('Error updating department:', error);
+      console.error("Error updating department:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -172,12 +174,25 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
                 items={branchListItems}
                 selectedValue={selectedBranch}
                 onSelect={handleSelectBranch}
-                label= "Branch"
+                label="Branch"
                 placeholder={branchPlaceholder}
                 required
-                disabled={loading || isSubmitting}
+                disabled={loadingBranches || isSubmitting}
               />
-              {loading && <p className="text-sm text-gray-500">Loading branches...</p>}
+              {loadingBranches && (
+                <p className="text-sm text-gray-500">Loading branches...</p>
+              )}
+              {branchesError && (
+                <div className="text-sm text-red-600">
+                  Failed to load branches.{" "}
+                  <button
+                    onClick={() => refetchBranches()}
+                    className="text-emerald-600 hover:text-emerald-700 underline"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Department Names */}
@@ -240,9 +255,14 @@ const EditDeptModal: React.FC<EditDeptModalProps> = ({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6"
               onClick={handleSubmit}
-              disabled={!editedDepartment.name || !editedDepartment.nameAm || !editedDepartment.branchId || isSubmitting}
+              disabled={
+                !editedDepartment.name ||
+                !editedDepartment.nameAm ||
+                !editedDepartment.branchId ||
+                isSubmitting
+              }
             >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
             <Button
               variant="outline"
