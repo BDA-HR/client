@@ -1,16 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import BranchTable from "../../components/core/branch/BranchTable";
 import AddHeader from "../../components/core/branch/AddHeader";
-import {
-  useBranches,
-  useCompanyBranches,
-  useCreateBranch,
-  useUpdateBranch,
-  useDeleteBranch,
-} from "../../services/core/branch/branch.queries";
+import { branchService } from "../../services/core/branchservice";
 import type {
   BranchListDto,
   AddBranchDto,
@@ -27,26 +21,26 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   const [searchParams] = useSearchParams();
   const companyId = searchParams.get("companyId");
 
+  const [branches, setBranches] = useState<BranchListDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Use React Query hooks based on companyId
-  const {
-    data: branches = [],
-    isLoading: isLoadingBranches,
-    isError: branchesError,
-    error: branchesErrorData,
-    refetch: refetchBranches,
-  } = companyId ? useCompanyBranches(companyId as UUID) : useBranches();
-
-  const createBranchMutation = useCreateBranch();
-  const updateBranchMutation = useUpdateBranch();
-  const deleteBranchMutation = useDeleteBranch();
+  useEffect(() => {
+    if (companyId) {
+      loadCompanyBranches(companyId);
+    } else {
+      loadAllBranches();
+    }
+  }, [companyId]);
 
   // Helper functions for search
   const getStatusText = (status: string): string => {
+    // Handle both string numbers and actual numbers
     const statusNum = parseInt(status);
+
     switch (statusNum) {
       case 0:
         return "Active";
@@ -55,12 +49,15 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
       case 2:
         return "Under Construction";
       default:
+        // If it's not a number, return the original string
         return status || "Unknown";
     }
   };
 
   const getBranchTypeText = (branchType: string): string => {
+    // Handle both string numbers and actual numbers
     const typeNum = parseInt(branchType);
+
     switch (typeNum) {
       case 0:
         return "Head Office";
@@ -71,19 +68,23 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
       case 3:
         return "Virtual";
       default:
+        // If it's not a number, return the original string
         return branchType || "Unknown";
     }
   };
 
-  // Filter branches based on search term
+  // Filter branches based on search term - FIXED VERSION
   const filteredBranches = useMemo(() => {
+    console.log("Searching for:", searchTerm);
+    console.log("Total branches:", branches.length);
+
     if (!searchTerm.trim()) {
       return branches;
     }
 
     const lowercasedSearch = searchTerm.toLowerCase().trim();
 
-    return branches.filter((branch) => {
+    const filtered = branches.filter((branch) => {
       // Safely check basic fields with null checks
       const basicMatch =
         (branch.name && branch.name.toLowerCase().includes(lowercasedSearch)) ||
@@ -105,9 +106,47 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
         .toLowerCase()
         .includes(lowercasedSearch);
 
-      return basicMatch || statusMatch || branchTypeMatch;
+      const matches = basicMatch || statusMatch || branchTypeMatch;
+
+      if (matches) {
+        console.log("Match found:", branch.name, {
+          name: branch.name,
+          status: statusText,
+          type: branchTypeText,
+          searchTerm: lowercasedSearch,
+        });
+      }
+
+      return matches;
+    });
+
+    console.log("Filtered results:", filtered.length);
+    console.log("Sample of filtered:", filtered.slice(0, 3));
+    return filtered;
+  }, [branches, searchTerm]);
+
+  // Alternative simpler search approach - uncomment if the above doesn't work
+  /*
+  const filteredBranches = useMemo(() => {
+    if (!searchTerm.trim()) return branches;
+
+    const lowercasedSearch = searchTerm.toLowerCase().trim();
+    
+    return branches.filter((branch) => {
+      // Convert all searchable fields to lowercase strings and check
+      const searchableText = [
+        branch.name || '',
+        branch.nameAm || '',
+        branch.code || '',
+        branch.location || '',
+        getStatusText(branch.branchStat?.toString() || ''),
+        getBranchTypeText(branch.branchType?.toString() || '')
+      ].join(' ').toLowerCase();
+
+      return searchableText.includes(lowercasedSearch);
     });
   }, [branches, searchTerm]);
+  */
 
   // Paginate filtered branches
   const paginatedBranches = useMemo(() => {
@@ -117,7 +156,64 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
 
   const totalPages = Math.ceil(filteredBranches.length / itemsPerPage);
 
+  // Debug effect to see branch data
+  useEffect(() => {
+    if (branches.length > 0) {
+      console.log("Sample branch data:", branches[0]);
+      console.log(
+        "All branch names:",
+        branches.map((b) => b.name)
+      );
+      console.log(
+        "All branch statuses:",
+        branches.map((b) => ({
+          name: b.name,
+          status: b.branchStat,
+          statusText: getStatusText(b.branchStat?.toString() || ""),
+        }))
+      );
+    }
+  }, [branches]);
+
+  const loadAllBranches = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const allBranches = await branchService.getAllBranches();
+      console.log("Loaded all branches:", allBranches);
+      setBranches(allBranches);
+    } catch (err) {
+      const errorMessage = "Failed to load branches. Please try again later.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error loading branches:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCompanyBranches = async (compId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const companyBranches = await branchService.getCompanyBranches(
+        compId as UUID
+      );
+      console.log("Loaded company branches:", companyBranches);
+      setBranches(companyBranches);
+    } catch (err) {
+      const errorMessage =
+        "Failed to load company branches. Please try again later.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error loading company branches:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearchChange = (term: string) => {
+    console.log("Search term changed:", term);
     setSearchTerm(term);
     setCurrentPage(1); // Reset to first page when searching
   };
@@ -127,135 +223,101 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
   };
 
   const handleAddBranch = async (branchData: AddBranchDto) => {
-    await createBranchMutation.mutateAsync(branchData, {
-      onSuccess: () => {
-        toast.success("Branch added successfully!");
-      },
-      onError: (error: any) => {
-        const errorMessage =
-          error?.response?.data?.message ||
-          "Failed to add branch. Please try again.";
-        toast.error(errorMessage);
-        throw error;
-      },
-    });
+    try {
+      const newBranch = await branchService.createBranch(branchData);
+      setBranches([...branches, newBranch]);
+      setError(null);
+      toast.success("Branch added successfully!");
+    } catch (err) {
+      const errorMessage = "Failed to add branch. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error adding branch:", err);
+      throw err;
+    }
   };
 
   const handleBranchUpdate = async (updatedBranch: BranchListDto) => {
-    const updateData: EditBranchDto = {
-      id: updatedBranch.id as UUID,
-      name: updatedBranch.name,
-      nameAm: updatedBranch.nameAm,
-      code: updatedBranch.code,
-      location: updatedBranch.location,
-      dateOpened: new Date().toISOString(),
-      branchType: updatedBranch.branchType || BranchType["0"],
-      branchStat: updatedBranch.branchStat || BranchStat["0"],
-      compId: updatedBranch.compId as UUID,
-      rowVersion: updatedBranch.rowVersion,
-    };
+    try {
+      const updateData: EditBranchDto = {
+        id: updatedBranch.id as UUID,
+        name: updatedBranch.name,
+        nameAm: updatedBranch.nameAm,
+        code: updatedBranch.code,
+        location: updatedBranch.location,
+        dateOpened: new Date().toISOString(),
+        branchType: updatedBranch.branchType || BranchType["0"],
+        branchStat: updatedBranch.branchStat || BranchStat["0"],
+        compId: updatedBranch.compId as UUID,
+        rowVersion: updatedBranch.rowVersion,
+      };
 
-    await updateBranchMutation.mutateAsync(updateData, {
-      onSuccess: () => {
-        toast.success("Branch updated successfully!");
-      },
-      onError: (error: any) => {
-        const errorMessage =
-          error?.response?.data?.message ||
-          "Failed to update branch. Please try again.";
-        toast.error(errorMessage);
-        throw error;
-      },
-    });
+      const updated = await branchService.updateBranch(updateData);
+      setBranches(branches.map((b) => (b.id === updated.id ? updated : b)));
+      setError(null);
+      toast.success("Branch updated successfully!");
+    } catch (err) {
+      const errorMessage = "Failed to update branch. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error updating branch:", err);
+      throw err;
+    }
   };
 
   const handleBranchStatusChange = async (id: string, status: string) => {
-    const branch = branches.find((b) => b.id === id);
-    if (branch) {
-      const updateData: EditBranchDto = {
-        id: branch.id as UUID,
-        name: branch.name,
-        nameAm: branch.nameAm,
-        code: branch.code,
-        location: branch.location,
-        dateOpened: new Date().toISOString(),
-        branchType: branch.branchType || BranchType["0"],
-        branchStat: status as BranchStat,
-        compId: branch.compId as UUID,
-        rowVersion: branch.rowVersion,
-      };
+    try {
+      const branch = branches.find((b) => b.id === id);
+      if (branch) {
+        const updateData: EditBranchDto = {
+          id: branch.id as UUID,
+          name: branch.name,
+          nameAm: branch.nameAm,
+          code: branch.code,
+          location: branch.location,
+          dateOpened: new Date().toISOString(),
+          branchType: branch.branchType || BranchType["0"],
+          branchStat: status as BranchStat,
+          compId: branch.compId as UUID,
+          rowVersion: branch.rowVersion,
+        };
 
-      await updateBranchMutation.mutateAsync(updateData, {
-        onSuccess: () => {
-          toast.success(`Branch status updated to ${getStatusText(status)}`);
-        },
-        onError: (error: any) => {
-          const errorMessage =
-            error?.response?.data?.message ||
-            "Failed to update branch status. Please try again.";
-          toast.error(errorMessage);
-        },
-      });
+        const updated = await branchService.updateBranch(updateData);
+        setBranches(branches.map((b) => (b.id === updated.id ? updated : b)));
+        setError(null);
+        toast.success(`Branch status updated to ${getStatusText(status)}`);
+      }
+    } catch (err) {
+      const errorMessage = "Failed to update branch status. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error updating branch status:", err);
     }
   };
 
   const handleBranchDelete = async (id: string) => {
-    await deleteBranchMutation.mutateAsync(id as UUID, {
-      onSuccess: () => {
-        toast.success("Branch deleted successfully!");
-      },
-      onError: (error: any) => {
-        const errorMessage =
-          error?.response?.data?.message ||
-          "Failed to delete branch. Please try again.";
-        toast.error(errorMessage);
-      },
-    });
+    try {
+      await branchService.deleteBranch(id as UUID);
+      setBranches(branches.filter((b) => b.id !== id));
+      setError(null);
+      toast.success("Branch deleted successfully!");
+    } catch (err) {
+      const errorMessage = "Failed to delete branch. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error("Error deleting branch:", err);
+    }
   };
 
   const reloadBranches = () => {
-    refetchBranches();
+    if (companyId) {
+      loadCompanyBranches(companyId);
+    } else {
+      loadAllBranches();
+    }
   };
 
-  // Get error message from React Query error
-  const getErrorMessage = () => {
-    if (branchesError) {
-      const errorMessage =
-        (branchesErrorData as any)?.response?.data?.message ||
-        "Failed to load branches. Please try again later.";
-      return errorMessage;
-    }
-    return null;
-  };
-
-  const errorMessage = getErrorMessage();
-
-  // Get mutation error message
-  const getMutationErrorMessage = () => {
-    if (createBranchMutation.isError) {
-      return (
-        createBranchMutation.error?.message ||
-        "Failed to add branch. Please try again."
-      );
-    }
-    if (updateBranchMutation.isError) {
-      return (
-        updateBranchMutation.error?.message ||
-        "Failed to update branch. Please try again."
-      );
-    }
-    if (deleteBranchMutation.isError) {
-      return (
-        deleteBranchMutation.error?.message ||
-        "Failed to delete branch. Please try again."
-      );
-    }
-    return null;
-  };
-
-  const mutationErrorMessage = getMutationErrorMessage();
-
-  if (isLoadingBranches) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
@@ -289,8 +351,8 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
         defaultCompanyId={companyId as UUID}
       />
 
-      {/* Error Message for loading branches */}
-      {errorMessage && (
+      {/* Error Message */}
+      {error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -298,39 +360,31 @@ const BranchesPage: React.FC<BranchesPageProps> = () => {
         >
           <div className="flex justify-between items-center">
             <span className="font-medium">
-              Failed to load branches.{" "}
-              <button
-                onClick={reloadBranches}
-                className="underline hover:text-red-800 font-semibold focus:outline-none"
-              >
-                Try again
-              </button>
+              {error.includes("load") ? (
+                <>
+                  Failed to load branches.{" "}
+                  <button
+                    onClick={reloadBranches}
+                    className="underline hover:text-red-800 font-semibold focus:outline-none"
+                  >
+                    Try again
+                  </button>{" "}
+                  later.
+                </>
+              ) : error.includes("add") ? (
+                "Failed to add branch. Please try again."
+              ) : error.includes("update") ? (
+                "Failed to update branch. Please try again."
+              ) : error.includes("delete") ? (
+                "Failed to delete branch. Please try again."
+              ) : error.includes("status") ? (
+                "Failed to update branch status. Please try again."
+              ) : (
+                error
+              )}
             </span>
             <button
-              onClick={() => refetchBranches()}
-              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
-            >
-              ×
-            </button>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Error Message for mutations */}
-      {mutationErrorMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
-        >
-          <div className="flex justify-between items-center">
-            <span className="font-medium">{mutationErrorMessage}</span>
-            <button
-              onClick={() => {
-                createBranchMutation.reset();
-                updateBranchMutation.reset();
-                deleteBranchMutation.reset();
-              }}
+              onClick={() => setError(null)}
               className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
             >
               ×
