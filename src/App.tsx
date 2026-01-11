@@ -56,6 +56,17 @@ import PageApiSettings from './pages/settings/coreSettings/PageApiSettings';
 import PageMenuSettings from './pages/settings/coreSettings/PageMenuSettings';
 import FileDashboard from './pages/modules/File';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
@@ -68,6 +79,7 @@ function App() {
 
   return (
     <ModuleProvider>
+      <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
           {/* Root path redirects to login */}
@@ -159,6 +171,7 @@ function App() {
           <Route path="*" element={<Navigate to={isAuthenticated ? "/404" : "/login"} replace />} />
         </Routes>
       </BrowserRouter>
+      </QueryClientProvider>
     </ModuleProvider>
   );
 }
