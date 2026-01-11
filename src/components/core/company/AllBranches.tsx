@@ -1,85 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { branchService } from '../../../services/core/branchservice';
-import type { BranchListDto } from '../../../types/core/branch';
-import { Building, ChevronRight, ChevronLeft} from 'lucide-react';
+import { Building, ChevronRight, ChevronLeft } from 'lucide-react';
 import { BranchSearch } from '../branch/BranchsSearch'; 
+import { useBranches } from '../../../services/core/branch/branch.queries';
 
 const AllBranchs: React.FC = () => {
-  const [branches, setBranches] = useState<BranchListDto[]>([]);
-  const [filteredBranches, setFilteredBranches] = useState<BranchListDto[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 10;
 
-  const fetchBranches = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const allBranches = await branchService.getAllBranches();
-      
-      setBranches(allBranches);
-      setFilteredBranches(allBranches);
-      setTotalItems(allBranches.length);
-      setTotalPages(Math.ceil(allBranches.length / itemsPerPage));
-    } catch (err) {
-      setError('Failed to load branches. Please try again later.');
-      console.error('Error fetching branches:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBranches();
-  }, []);
-
-  // Filter branches based on search term
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredBranches(branches);
-    } else {
-      const lowercasedSearch = searchTerm.toLowerCase();
-      const filtered = branches.filter(branch =>
-        branch.name?.toLowerCase().includes(lowercasedSearch) ||
-        branch.location?.toLowerCase().includes(lowercasedSearch) ||
-        branch.code?.toLowerCase().includes(lowercasedSearch) ||
-        branch.comp?.toLowerCase().includes(lowercasedSearch)
-      );
-      setFilteredBranches(filtered);
-    }
-    setCurrentPage(1); // Reset to first page when search changes
-  }, [searchTerm, branches]);
-
-  // Update pagination when filtered branches change
-  useEffect(() => {
-    setTotalItems(filteredBranches.length);
-    setTotalPages(Math.ceil(filteredBranches.length / itemsPerPage));
-  }, [filteredBranches]);
-
-  const handleSearchChange = (term: string) => {
-    setSearchTerm(term);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const paginatedBranches = filteredBranches.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Use React Query hook
+  const { 
+    data: branches = [], 
+    isLoading, 
+    error: queryError,
+    refetch 
+  } = useBranches(); // Gets all branches
 
   // Helper functions moved inside component
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case '0': return 'bg-green-100 text-green-800 border border-green-200'; // Active - Green
-      case '1': return 'bg-red-100 text-red-800 border border-red-200';       // Inactive - Red
-      case '2': return 'bg-yellow-100 text-yellow-800 border border-yellow-200'; // Under Construction - Yellow
+      case '0': return 'bg-green-100 text-green-800 border border-green-200';
+      case '1': return 'bg-red-100 text-red-800 border border-red-200';
+      case '2': return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
       default: return 'bg-gray-100 text-gray-800 border border-gray-200';
     }
   };
@@ -103,6 +46,42 @@ const AllBranchs: React.FC = () => {
     }
   };
 
+  // Filter branches based on search term - using useMemo for performance
+  const filteredBranches = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return branches;
+    }
+    
+    const lowercasedSearch = searchTerm.toLowerCase();
+    return branches.filter(branch =>
+      branch.name?.toLowerCase().includes(lowercasedSearch) ||
+      branch.location?.toLowerCase().includes(lowercasedSearch) ||
+      branch.code?.toLowerCase().includes(lowercasedSearch) ||
+      branch.comp?.toLowerCase().includes(lowercasedSearch)
+    );
+  }, [branches, searchTerm]);
+
+  // Paginate filtered branches
+  const paginatedBranches = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredBranches.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredBranches, currentPage]);
+
+  const totalPages = Math.ceil(filteredBranches.length / itemsPerPage);
+  const totalItems = filteredBranches.length;
+
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when search changes
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Handle error message
+  const errorMessage = queryError?.message || null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -117,15 +96,15 @@ const AllBranchs: React.FC = () => {
         </div>
       </div>
 
-  <BranchSearch 
-    searchTerm={searchTerm}
-    onSearchChange={handleSearchChange}
-    onRefresh={fetchBranches}
-    loading={loading}
-  />
+      <BranchSearch 
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        onRefresh={() => refetch()}
+        loading={isLoading}
+      />
 
       {/* Error message for API errors */}
-      {error && (
+      {errorMessage && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -133,23 +112,23 @@ const AllBranchs: React.FC = () => {
         >
           <div className="flex justify-between items-center">
             <span className="font-medium">
-              {error.includes("load") ? (
+              {errorMessage.includes("load") ? (
                 <>
                   Failed to load branches.{" "}
                   <button
-                    onClick={fetchBranches}
+                    onClick={() => refetch()}
                     className="underline hover:text-red-800 font-semibold focus:outline-none"
+                    disabled={isLoading}
                   >
                     Try again
-                  </button>{" "}
-                  later.
+                  </button>
                 </>
               ) : (
-                error
+                errorMessage
               )}
             </span>
             <button
-              onClick={() => setError(null)}
+              onClick={() => {}}
               className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
             >
               ×
@@ -159,7 +138,7 @@ const AllBranchs: React.FC = () => {
       )}
 
       {/* Loading State */}
-      {loading && (
+      {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -170,7 +149,7 @@ const AllBranchs: React.FC = () => {
       )}
 
       {/* Branch Table - Only show when not loading and no error */}
-      {!loading && !error && (
+      {!isLoading && !errorMessage && (
         <motion.div 
           initial="hidden"
           animate="visible"
@@ -273,7 +252,9 @@ const AllBranchs: React.FC = () => {
                 ) : (
                   <tr>
                     <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                      No branches found matching your search criteria.
+                      {branches.length === 0 
+                        ? "No branches available." 
+                        : "No branches found matching your search criteria."}
                     </td>
                   </tr>
                 )}
@@ -288,14 +269,14 @@ const AllBranchs: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -313,7 +294,7 @@ const AllBranchs: React.FC = () => {
                     <button
                       onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="sr-only">Previous</span>
                       <ChevronLeft size={16} />
@@ -334,7 +315,7 @@ const AllBranchs: React.FC = () => {
                     <button
                       onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="sr-only">Next</span>
                       <ChevronRight size={16} />
