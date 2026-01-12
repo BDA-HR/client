@@ -1,59 +1,75 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import DepartmentManagementHeader from "../../components/core/department/DeptHeader";
 import DepartmentSearchFilters from "../../components/core/department/DeptSearchFilters";
 import DepartmentTable from "../../components/core/department/DeptTable";
 import EditDeptModal from "../../components/core/department/EditDeptModal";
+import {
+  useDepartments,
+  useCreateDepartment,
+  useUpdateDepartment,
+  useDeleteDepartment,
+  useDepartmentStatus,
+} from "../../services/core/department/dept.queries";
 import type {
   AddDeptDto,
   EditDeptDto,
   DeptListDto,
   UUID,
 } from "../../types/core/dept";
-import { departmentService } from "../../services/core/deptservice";
 
 const DepartmentOverview = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [editingDepartment, setEditingDepartment] = useState<DeptListDto | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [departments, setDepartments] = useState<DeptListDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const itemsPerPage = 8;
 
-  // Load departments on component mount
-  useEffect(() => {
-    loadDepartments();
-  }, []);
+  // React Query hooks
+  const {
+    data: departments = [],
+    isLoading,
+    error: queryError,
+    refetch,
+  } = useDepartments();
 
-  const loadDepartments = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await departmentService.getAllDepartments();
-      setDepartments(data);
-    } catch (err) {
-      console.error("Error loading departments:", err);
-      setError("Failed to load departments. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const createDepartmentMutation = useCreateDepartment({
+    onSuccess: () => {
+      setFormError(null);
+      setCurrentPage(1);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to create department. Please try again.');
+    },
+  });
+
+  const updateDepartmentMutation = useUpdateDepartment({
+    onSuccess: () => {
+      setFormError(null);
+      setIsEditModalOpen(false);
+      setEditingDepartment(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to update department. Please try again.');
+    },
+  });
+
+  const deleteDepartmentMutation = useDeleteDepartment({
+    onSuccess: () => {
+      setFormError(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to delete department. Please try again.');
+    },
+  });
+
+  const { getStatusText } = useDepartmentStatus();
 
   const handleAddDepartment = async (newDepartment: AddDeptDto) => {
-    try {
-      setError(null);
-      const createdDept = await departmentService.createDepartment(
-        newDepartment
-      );
-      setDepartments((prev) => [...prev, createdDept]);
-      setCurrentPage(1);
-    } catch (err) {
-      console.error("Error creating department:", err);
-      setError("Failed to create department. Please try again.");
-      throw err;
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await createDepartmentMutation.mutateAsync(newDepartment);
   };
 
   const handleEditClick = (department: EditDeptDto) => {
@@ -67,84 +83,90 @@ const DepartmentOverview = () => {
   };
 
   const handleUpdateDepartment = async (updatedDepartment: EditDeptDto) => {
-    try {
-      setError(null);
-      const updatedDept = await departmentService.updateDepartment(
-        updatedDepartment
-      );
-      setDepartments((prev) =>
-        prev.map((dept) => (dept.id === updatedDept.id ? updatedDept : dept))
-      );
-      setIsEditModalOpen(false);
-      setEditingDepartment(null);
-    } catch (err) {
-      console.error("Error updating department:", err);
-      setError("Failed to update department. Please try again.");
-      throw err;
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await updateDepartmentMutation.mutateAsync(updatedDepartment);
   };
 
   const handleDepartmentStatusChange = async (
-    departmentId: string,
+    departmentId: UUID,
     newStatus: "active" | "inactive"
   ) => {
-    try {
-      setError(null);
-      const department = departments.find((dept) => dept.id === departmentId);
-      if (department) {
-        const updatedDept = await departmentService.updateDepartment({
-          ...department,
-          deptStat: newStatus === "active" ? "Active" : "Inactive",
-          rowVersion: department.rowVersion,
-        });
-        setDepartments((prev) =>
-          prev.map((dept) => (dept.id === updatedDept.id ? updatedDept : dept))
-        );
-      }
-    } catch (err) {
-      console.error("Error updating department status:", err);
-      setError("Failed to update department status. Please try again.");
+    setFormError(null);
+    const department = departments.find((dept) => dept.id === departmentId);
+    if (department) {
+      // Create properly typed update object
+      const updateData: EditDeptDto = {
+        id: department.id,
+        name: department.name,
+        nameAm: department.nameAm,
+        deptStat: newStatus === "active" ? "0" : "1",
+        branchId: department.branchId,
+        rowVersion: department.rowVersion,
+      };
+      
+      // No try/catch needed - error is handled by mutation's onError
+      await updateDepartmentMutation.mutateAsync(updateData);
     }
   };
 
   const handleDepartmentDelete = async (departmentId: UUID) => {
-    try {
-      setError(null);
-      await departmentService.deleteDepartment(departmentId);
-      setDepartments((prev) => prev.filter((dept) => dept.id !== departmentId));
-    } catch (err) {
-      console.error("Error deleting department:", err);
-      setError("Failed to delete department. Please try again.");
-      throw err;
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await deleteDepartmentMutation.mutateAsync(departmentId);
   };
 
   // Enhanced filter function to include status search
-  const filteredDepartments = departments.filter((department) => {
+  const filteredDepartments = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return departments;
+    }
+    
     const searchLower = searchTerm.toLowerCase();
     
-    // Basic text search
-    const basicMatch = 
-      department.name.toLowerCase().includes(searchLower) ||
-      department.nameAm.toLowerCase().includes(searchLower) ||
-      department.branch.toLowerCase().includes(searchLower);
-    
-    const statusMatch = 
-      (searchLower.includes('active') && department.deptStat === "0") ||
-      (searchLower.includes('inactive') && department.deptStat === "1") ||
-      (searchLower.includes('0') && department.deptStat === "0") ||
-      (searchLower.includes('1') && department.deptStat === "1") ||
-      department.deptStatStr.toLowerCase().includes(searchLower);
-    
-    return basicMatch || statusMatch;
-  });
+    return departments.filter((department) => {
+      // Basic text search
+      const basicMatch = 
+        department.name.toLowerCase().includes(searchLower) ||
+        department.nameAm.toLowerCase().includes(searchLower) ||
+        (department.branch && department.branch.toLowerCase().includes(searchLower));
+      
+      // Status search
+      const statusText = getStatusText(department.deptStat).toLowerCase();
+      const statusMatch = statusText.includes(searchLower);
+      
+      // Numeric status search
+      const numericStatusMatch = 
+        (searchLower.includes('0') && department.deptStat === "0") ||
+        (searchLower.includes('1') && department.deptStat === "1");
+      
+      // deptStatStr search (if available)
+      const statStrMatch = department.deptStatStr 
+        ? department.deptStatStr.toLowerCase().includes(searchLower)
+        : false;
+      
+      return basicMatch || statusMatch || numericStatusMatch || statStrMatch;
+    });
+  }, [departments, searchTerm, getStatusText]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage);
-  const paginatedDepartments = filteredDepartments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedDepartments = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredDepartments.slice(startIndex, endIndex);
+  }, [filteredDepartments, currentPage, itemsPerPage]);
+
+  // Combine query error and form error
+  const displayError = queryError?.message || formError;
+
+  // Clear errors
+  const clearErrors = () => {
+    setFormError(null);
+    if (queryError) {
+      refetch();
+    }
+  };
 
   return (
     <>
@@ -164,7 +186,7 @@ const DepartmentOverview = () => {
         {/* Main content area with consistent padding */}
         <div className="flex-1 overflow-y-auto">
           {/* Loading State */}
-          {loading && (
+          {isLoading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -177,10 +199,10 @@ const DepartmentOverview = () => {
             </motion.div>
           )}
 
-          {!loading && (
+          {!isLoading && (
             <div className="space-y-6">
               {/* Error Message */}
-              {error && (
+              {displayError && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -188,29 +210,29 @@ const DepartmentOverview = () => {
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-medium">
-                      {error.includes("load") ? (
+                      {displayError.includes("load") ? (
                         <>
                           Failed to load departments.{" "}
                           <button
-                            onClick={loadDepartments}
+                            onClick={() => refetch()}
                             className="underline hover:text-red-800 font-semibold focus:outline-none"
+                            disabled={isLoading}
                           >
                             Try again
-                          </button>{" "}
-                          later.
+                          </button>
                         </>
-                      ) : error.includes("create") ? (
+                      ) : displayError.includes("create") ? (
                         "Failed to create department. Please try again."
-                      ) : error.includes("update") ? (
+                      ) : displayError.includes("update") ? (
                         "Failed to update department. Please try again."
-                      ) : error.includes("delete") ? (
+                      ) : displayError.includes("delete") ? (
                         "Failed to delete department. Please try again."
                       ) : (
-                        error
+                        displayError
                       )}
                     </span>
                     <button
-                      onClick={() => setError(null)}
+                      onClick={clearErrors}
                       className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
                     >
                       ×

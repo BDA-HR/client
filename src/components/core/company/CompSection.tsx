@@ -1,80 +1,77 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { XCircleIcon } from 'lucide-react';
-import { companyService } from '../../../services/core/compservice';
-import type { CompListDto, UUID } from '../../../types/core/comp';
 import AddCompModal from './AddCompModal';
 import EditCompModal from './EditCompModal';
 import DeleteCompDialog from './DeleteCompModal';
 import CompList from './CompList';
+import { 
+  useCompanies, 
+  useCreateCompany, 
+  useUpdateCompany, 
+  useDeleteCompany 
+} from '../../../services/core/company/company.queries';
+import type { CompListDto, UUID, AddCompDto } from '../../../types/core/comp';
 
 interface CompSectionProps {
   onClick?: (companyId: UUID) => void;
 }
 
 const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
-  const [companies, setCompanies] = useState<CompListDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [editCompany, setEditCompany] = useState<CompListDto | null>(null);
   const [deleteCompany, setDeleteCompany] = useState<CompListDto | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const fetchCompanies = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const companiesData = await companyService.getAllCompanies();
-      setCompanies(companiesData);
-    } catch (err) {
-      console.error('Failed to fetch companies:', err);
-      setError('Failed to load companies. Please try again later.');
-    } finally {
-      setLoading(false);
+  // React Query hooks
+  const { 
+    data: companies = [], 
+    isLoading, 
+    error: queryError,
+    refetch 
+  } = useCompanies();
+
+  const createCompanyMutation = useCreateCompany({
+    onError: (error) => {
+      setFormError(error.message || 'Failed to create company. Please try again.');
     }
-  };
+  });
 
-  // Fetch companies on component mount
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  const handleAddCompany = async (companyData: { name: string; nameAm: string }) => {
-    try {
-      const newCompany = await companyService.createCompany(companyData);
-      setCompanies((prev) => [...prev, newCompany]);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to create company:', err);
-      setError('Failed to create company. Please try again.');
-      throw err;
+  const updateCompanyMutation = useUpdateCompany({
+    onError: (error) => {
+      setFormError(error.message || 'Failed to update company. Please try again.');
     }
+  });
+
+  const deleteCompanyMutation = useDeleteCompany({
+    onError: (error) => {
+      setFormError(error.message || 'Failed to delete company. Please try again.');
+    }
+  });
+
+  const handleAddCompany = async (companyData: { name: string; nameAm: string; code?: string }) => {
+    setFormError(null);
+    
+    // Create proper AddCompDto object based on your actual AddCompDto type
+    const newCompanyData: AddCompDto = {
+      ...companyData,
+    };
+    
+    // No try/catch needed - error is handled by mutation's onError
+    await createCompanyMutation.mutateAsync(newCompanyData);
   };
 
   const handleEditCompany = async (updatedCompany: CompListDto) => {
-    try {
-      const result = await companyService.updateCompany(updatedCompany);
-      setCompanies((prev) =>
-        prev.map((comp) => (comp.id === result.id ? result : comp))
-      );
-      setEditCompany(null);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to update company:', err);
-      setError('Failed to update company. Please try again.');
-      throw err;
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await updateCompanyMutation.mutateAsync(updatedCompany);
+    setEditCompany(null);
   };
 
   const handleDeleteCompany = async (companyId: UUID) => {
-    try {
-      await companyService.deleteCompany(companyId);
-      setCompanies((prev) => prev.filter((c) => c.id !== companyId));
-      setDeleteCompany(null);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to delete company:', err);
-      setError('Failed to delete company. Please try again.');
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await deleteCompanyMutation.mutateAsync(companyId);
+    setDeleteCompany(null);
   };
 
   const handleViewBranches = (companyId: UUID) => {
@@ -83,10 +80,13 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
     }
   };
 
+  // Combine query error and form error for display
+  const displayError = queryError?.message || formError;
+
   return (
     <div className="space-y-6">
       {/* Header - Moved up with negative margin */}
-      <div className="flex justify-between items-center -mt-6"> {/* Added negative margin-top */}
+      <div className="flex justify-between items-center -mt-6">
         <motion.h1 
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -101,7 +101,7 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
       </div>
 
       {/* Error message for API errors */}
-      {error && (
+      {displayError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -109,29 +109,33 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
         >
           <div className="flex justify-between items-center">
             <span className="font-medium">
-              {error.includes("load") ? (
+              {displayError.includes("load") ? (
                 <>
                   Failed to load Companies.{" "}
                   <button
-                    onClick={fetchCompanies}
+                    onClick={() => refetch()}
                     className="underline hover:text-red-800 font-semibold focus:outline-none"
+                    disabled={isLoading}
                   >
                     Try again
-                  </button>{" "}
-                  later.
+                  </button>
                 </>
-              ) : error.includes("create") ? (
+              ) : displayError.includes("create") ? (
                 "Failed to create company. Please try again."
-              ) : error.includes("update") ? (
+              ) : displayError.includes("update") ? (
                 "Failed to update company. Please try again."
-              ) : error.includes("delete") ? (
+              ) : displayError.includes("delete") ? (
                 "Failed to delete company. Please try again."
               ) : (
-                error
+                displayError
               )}
             </span>
             <button
-              onClick={() => setError(null)}
+              onClick={() => {
+                setFormError(null);
+                // Clear query error by refetching
+                if (queryError) refetch();
+              }}
               className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
             >
               ×
@@ -141,14 +145,14 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
       )}
 
       {/* Loading state */}
-      {loading && (
+      {isLoading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
         </div>
       )}
 
       {/* No companies message - Show when not loading and companies array is empty */}
-      {!loading && companies.length === 0 && !error && (
+      {!isLoading && companies.length === 0 && !displayError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -165,7 +169,9 @@ const CompSection: React.FC<CompSectionProps> = ({ onClick }) => {
           </div>
         </motion.div>
       )}
-      {!loading && companies.length > 0 && (
+
+      {/* Companies list */}
+      {!isLoading && companies.length > 0 && (
         <CompList 
           companies={companies}
           onEditCompany={setEditCompany}

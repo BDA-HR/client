@@ -1,26 +1,58 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { FiscalYearTable } from '../../components/core/fiscalyear/FiscYearTable';
 import { FiscYearSearch } from '../../components/core/fiscalyear/FiscYearSearch';
 import { ViewFiscModal } from '../../components/core/fiscalyear/ViewFiscModal';
 import { EditFiscModal } from '../../components/core/fiscalyear/EditFiscModal';
 import { DeleteFiscModal } from '../../components/core/fiscalyear/DeleteFiscModal';
-import { fiscalYearService } from '../../services/core/fiscservice';
+import { 
+  useFiscalYears, 
+  useUpdateFiscalYear, 
+  useDeleteFiscalYear 
+} from '../../services/core/fiscalyear/fisc.queries';
 import type { FiscYearListDto, EditFiscYearDto, UUID } from '../../types/core/fisc';
 import { motion } from 'framer-motion';
 
 
 export default function FiscalYearHistory() {
-  const [years, setYears] = useState<FiscYearListDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<FiscYearListDto | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const itemsPerPage = 10;
+
+  // React Query hooks
+  const {
+    data: years = [],
+    isLoading,
+    error: queryError,
+    refetch,
+  } = useFiscalYears();
+
+  const updateFiscalYearMutation = useUpdateFiscalYear({
+    onSuccess: () => {
+      setFormError(null);
+      setEditModalOpen(false);
+      setSelectedYear(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to update fiscal year');
+    },
+  });
+
+  const deleteFiscalYearMutation = useDeleteFiscalYear({
+    onSuccess: () => {
+      setFormError(null);
+      setDeleteModalOpen(false);
+      setSelectedYear(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to delete fiscal year');
+    },
+  });
 
   // Filter years based on search term
   const filteredYears = useMemo(() => {
@@ -34,92 +66,57 @@ export default function FiscalYearHistory() {
       year.isActiveStr.toLowerCase().includes(term) ||
       (year.isActive === '0' && 'active'.includes(term)) ||
       (year.isActive === '1' && 'inactive'.includes(term)) ||
-      year.dateStartStrAm.toLowerCase().includes(term) ||
-      year.dateEndStrAm.toLowerCase().includes(term)
+      (year.dateStartStrAm && year.dateStartStrAm.toLowerCase().includes(term)) ||
+      (year.dateEndStrAm && year.dateEndStrAm.toLowerCase().includes(term))
     );
   }, [years, searchTerm]);
 
   const totalItems = filteredYears.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const paginatedYears = filteredYears.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  useEffect(() => {
-    loadFiscalYears();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  const loadFiscalYears = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const fiscalYears = await fiscalYearService.getAllFiscalYears();
-      setYears(fiscalYears);
-    } catch (err) {
-      setError('Failed to load fiscal years');
-      console.error('Error loading fiscal years:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const paginatedYears = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredYears.slice(startIndex, endIndex);
+  }, [filteredYears, currentPage, itemsPerPage]);
 
   const handleYearUpdate = async (updatedYear: EditFiscYearDto) => {
-    try {
-      // Validate dates
-      const startDate = new Date(updatedYear.dateStart);
-      const endDate = new Date(updatedYear.dateEnd);
-      
-      if (endDate <= startDate) {
-        setError('End date must be after start date');
-        return;
-      }
-
-      const result = await fiscalYearService.updateFiscalYear(updatedYear);
-      setYears(years.map(year => year.id === result.id ? result : year));
-      setEditModalOpen(false);
-      setError(null);
-    } catch (err) {
-      console.error('Error updating fiscal year:', err);
-      setError('Failed to update fiscal year');
+    setFormError(null);
+    
+    // Validate dates
+    const startDate = new Date(updatedYear.dateStart);
+    const endDate = new Date(updatedYear.dateEnd);
+    
+    if (endDate <= startDate) {
+      setFormError('End date must be after start date');
+      return;
     }
+
+    // No try/catch needed - error is handled by mutation's onError
+    await updateFiscalYearMutation.mutateAsync(updatedYear);
   };
 
-  // FIXED: Change parameter type from string to '0' | '1'
   const handleYearStatusChange = async (yearId: UUID, newStatus: '0' | '1') => {
-    try {
-      const year = years.find(y => y.id === yearId);
-      if (!year) return;
+    setFormError(null);
+    const year = years.find(y => y.id === yearId);
+    if (!year) return;
 
-      const editData: EditFiscYearDto = {
-        id: yearId,
-        name: year.name,
-        dateStart: year.dateStart,
-        dateEnd: year.dateEnd,
-        isActive: newStatus, // This is now the correct type
-        rowVersion: year.rowVersion || '1'
-      };
-      
-      const result = await fiscalYearService.updateFiscalYear(editData);
-      setYears(years.map(y => y.id === result.id ? result : y));
-      setError(null);
-    } catch (err) {
-      console.error('Error updating fiscal year status:', err);
-      setError('Failed to update status');
-    }
+    const editData: EditFiscYearDto = {
+      id: yearId,
+      name: year.name,
+      dateStart: year.dateStart,
+      dateEnd: year.dateEnd,
+      isActive: newStatus,
+      rowVersion: year.rowVersion || '1'
+    };
+    
+    // No try/catch needed - error is handled by mutation's onError
+    await updateFiscalYearMutation.mutateAsync(editData);
   };
 
   const handleYearDelete = async (yearId: UUID) => {
-    try {
-      await fiscalYearService.deleteFiscalYear(yearId);
-      setYears(years.filter(year => year.id !== yearId));
-      setDeleteModalOpen(false);
-      setError(null);
-    } catch (err) {
-      console.error('Error deleting fiscal year:', err);
-      setError('Failed to delete fiscal year');
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await deleteFiscalYearMutation.mutateAsync(yearId);
   };
 
   const handleViewDetails = (year: FiscYearListDto) => {
@@ -144,6 +141,25 @@ export default function FiscalYearHistory() {
 
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // Handle delete confirmation
+  const handleDeleteConfirmation = async () => {
+    if (selectedYear) {
+      await handleYearDelete(selectedYear.id);
+    }
+  };
+
+  // Combine query error and form error
+  const displayError = queryError?.message || formError;
+
+  // Clear errors
+  const clearErrors = () => {
+    setFormError(null);
+    if (queryError) {
+      refetch();
+    }
   };
 
   return (
@@ -160,7 +176,7 @@ export default function FiscalYearHistory() {
         </div>
 
         {/* Error Message */}
-        {error && (
+        {displayError && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -168,29 +184,31 @@ export default function FiscalYearHistory() {
           >
             <div className="flex justify-between items-center">
               <span className="font-medium">
-                {error.includes("load") ? (
+                {displayError.includes("load") ? (
                   <>
                     Failed to load fiscal years.{" "}
                     <button
-                      onClick={loadFiscalYears}
+                      onClick={() => refetch()}
                       className="underline hover:text-red-800 font-semibold focus:outline-none"
+                      disabled={isLoading}
                     >
                       Try again
-                    </button>{" "}
-                    later.
+                    </button>
                   </>
-                ) : error.includes("update") ? (
+                ) : displayError.includes("update") ? (
                   "Failed to update fiscal year. Please try again."
-                ) : error.includes("delete") ? (
+                ) : displayError.includes("delete") ? (
                   "Failed to delete fiscal year. Please try again."
-                ) : error.includes("status") ? (
+                ) : displayError.includes("status") ? (
                   "Failed to update status. Please try again."
+                ) : displayError.includes("End date") ? (
+                  displayError
                 ) : (
-                  error
+                  displayError
                 )}
               </span>
               <button
-                onClick={() => setError(null)}
+                onClick={clearErrors}
                 className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
               >
                 ×
@@ -200,14 +218,14 @@ export default function FiscalYearHistory() {
         )}
 
         {/* Loading State */}
-        {loading && (
+        {isLoading && (
           <div className="flex justify-center items-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
           </div>
         )}
 
         {/* Content */}
-        {!loading && !error && (
+        {!isLoading && !displayError && (
           <div className="space-y-6">
             {/* Search Component */}
             <FiscYearSearch 
@@ -248,7 +266,7 @@ export default function FiscalYearHistory() {
           fiscalYear={selectedYear}
           isOpen={deleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
-          onConfirm={handleYearDelete}
+          onConfirm={handleDeleteConfirmation}
         />
       </div>
     </div>

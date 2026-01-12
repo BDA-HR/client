@@ -1,21 +1,25 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PeriodTable } from '../../components/core/period/PeriodTable';
 import { ViewPeriodModal } from '../../components/core/period/ViewPeriodModal';
 import EditPeriodModal from '../../components/core/period/EditPeriodModal';
 import { DeletePeriodModal } from '../../components/core/period/DeletePeriodModal';
 import { AddPeriodModal } from '../../components/core/period/AddPeriodModal';
-import { periodService } from '../../services/core/periodservice';
-import type { PeriodListDto, EditPeriodDto, UUID, AddPeriodDto } from '../../types/core/period';
-import { motion } from 'framer-motion';
 import PeriodSearchFilters from '../../components/core/period/PeriodSearchFilters';
+import { 
+  usePeriods, 
+  useCreatePeriod, 
+  useUpdatePeriod, 
+  useDeletePeriod,
+  usePeriodValidation
+} from '../../services/core/period/period.queries';
+import type { PeriodListDto, EditPeriodDto, UUID, AddPeriodDto } from '../../types/core/period';
+import type { Quarter } from '../../types/core/enum';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 export default function PagePeriod() {
   const navigate = useNavigate();
-  const [periods, setPeriods] = useState<PeriodListDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,17 +27,86 @@ export default function PagePeriod() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodListDto | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
+  // Correct AddPeriodDto based on your types
   const [newPeriod, setNewPeriod] = useState<AddPeriodDto>({
     name: "",
     dateStart: new Date().toISOString().split('T')[0],
     dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    isActive: "0",
-    quarterId: "" as UUID,
+    quarter: "" as Quarter, // Changed from quarterId to quarter
     fiscalYearId: "" as UUID,
+    // No isActive field - it will be set to active by default on the server
   });
 
   const itemsPerPage = 10;
+
+  // React Query hooks
+  const {
+    data: periods = [],
+    isLoading,
+    error: queryError,
+    refetch,
+  } = usePeriods();
+
+  const createPeriodMutation = useCreatePeriod({
+    onSuccess: (newPeriodData) => {
+      setFormError(null);
+      setIsModalOpen(false);
+      // Reset to default values
+      setNewPeriod({
+        name: "",
+        dateStart: new Date().toISOString().split('T')[0],
+        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        quarter: "" as Quarter,
+        fiscalYearId: "" as UUID,
+      });
+      
+      // Check if the new period is active
+      if (newPeriodData.isActive === "0") {
+        toast.success("Active period added successfully!");
+      } else {
+        toast.success("Period added successfully!");
+      }
+    },
+    onError: (error) => {
+      setFormError(error.message || "Failed to add period");
+      toast.error("Failed to add period");
+    },
+  });
+
+  const updatePeriodMutation = useUpdatePeriod({
+    onSuccess: (updatedPeriod) => {
+      setFormError(null);
+      setEditModalOpen(false);
+      setSelectedPeriod(null);
+      
+      if (updatedPeriod.isActive === "0") {
+        toast.success("Period updated and set as active!");
+      } else {
+        toast.success("Period updated successfully!");
+      }
+    },
+    onError: (error) => {
+      setFormError(error.message || "Failed to update period");
+      toast.error("Failed to update period");
+    },
+  });
+
+  const deletePeriodMutation = useDeletePeriod({
+    onSuccess: () => {
+      setFormError(null);
+      setDeleteModalOpen(false);
+      setSelectedPeriod(null);
+      toast.success("Period deleted successfully!");
+    },
+    onError: (error) => {
+      setFormError(error.message || "Failed to delete period");
+      toast.error("Failed to delete period");
+    },
+  });
+
+  const { validateDates } = usePeriodValidation();
 
   // Filter periods based on search term - shows ALL periods (active and inactive)
   const filteredPeriods = useMemo(() => {
@@ -70,86 +143,49 @@ export default function PagePeriod() {
     });
   }, [periods, searchTerm]);
 
+  // Pagination calculations
   const totalItems = filteredPeriods.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const paginatedPeriods = filteredPeriods.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  useEffect(() => {
-    loadPeriods();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  const loadPeriods = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const periodsData = await periodService.getAllPeriods();
-      setPeriods(periodsData);
-    } catch (err) {
-      setError('Failed to load periods');
-      console.error('Error loading periods:', err);
-      setPeriods([]); // Ensure periods is empty array on error
-    } finally {
-      setLoading(false);
-    }
-  };
+  const paginatedPeriods = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredPeriods.slice(startIndex, endIndex);
+  }, [filteredPeriods, currentPage, itemsPerPage]);
 
   const handleAddPeriod = async () => {
-    try {
-      toast.loading("Adding period...");
-      setError(null);
-      
-      const createdPeriod = await periodService.createPeriod(newPeriod);
-      setPeriods((prev) => [createdPeriod, ...prev]);
-      setNewPeriod({
-        name: "",
-        dateStart: new Date().toISOString().split('T')[0],
-        dateEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        isActive: "0",
-        quarterId: "" as UUID,
-        fiscalYearId: "" as UUID,
-      });
-      setIsModalOpen(false);
-      toast.dismiss();
-      toast.success("Period added successfully!");
-    } catch (err) {
-      console.error("Error adding period:", err);
-      toast.dismiss();
-      setError("Failed to add period");
-      toast.error("Failed to add period");
-      throw err;
+    setFormError(null);
+    
+    // Validate dates
+    const dateError = validateDates(newPeriod.dateStart, newPeriod.dateEnd);
+    if (dateError) {
+      setFormError(dateError);
+      toast.error(dateError);
+      return;
     }
+
+    // No try/catch needed - error is handled by mutation's onError
+    await createPeriodMutation.mutateAsync(newPeriod);
   };
 
   const handleEditPeriod = async (periodData: EditPeriodDto) => {
-    try {
-      setError(null);
-      const updatedPeriod = await periodService.updatePeriod(periodData);
-      setPeriods((prev) =>
-        prev.map((p) => (p.id === updatedPeriod.id ? updatedPeriod : p))
-      );
-      setEditModalOpen(false);
-    } catch (err) {
-      console.error('Error updating period:', err);
-      setError('Failed to update period');
-      throw err;
+    setFormError(null);
+    
+    // Validate dates
+    const dateError = validateDates(periodData.dateStart, periodData.dateEnd);
+    if (dateError) {
+      setFormError(dateError);
+      toast.error(dateError);
+      return;
     }
+
+    // No try/catch needed - error is handled by mutation's onError
+    await updatePeriodMutation.mutateAsync(periodData);
   };
 
   const handleDeletePeriod = async (periodId: UUID) => {
-    try {
-      await periodService.deletePeriod(periodId);
-      setPeriods((prev) => prev.filter((p) => p.id !== periodId));
-      setDeleteModalOpen(false);
-      setError(null);
-    } catch (err) {
-      console.error('Error deleting period:', err);
-      setError('Failed to delete period');
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await deletePeriodMutation.mutateAsync(periodId);
   };
 
   const handleViewDetails = (period: PeriodListDto) => {
@@ -169,10 +205,12 @@ export default function PagePeriod() {
 
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   const handleClearFilters = () => {
     setSearchTerm('');
+    setCurrentPage(1);
   };
 
   const handleAddPeriodClick = () => {
@@ -181,6 +219,24 @@ export default function PagePeriod() {
 
   const handleViewHistory = () => {
     navigate('/core/fiscal-year/overview');
+  };
+
+  // Handle delete confirmation
+  const handleDeleteConfirmation = async () => {
+    if (selectedPeriod) {
+      await handleDeletePeriod(selectedPeriod.id);
+    }
+  };
+
+  // Combine query error and form error
+  const displayError = queryError?.message || formError;
+
+  // Clear errors
+  const clearErrors = () => {
+    setFormError(null);
+    if (queryError) {
+      refetch();
+    }
   };
 
   return (
@@ -196,7 +252,7 @@ export default function PagePeriod() {
         </div>
 
         {/* Error Message */}
-        {error && (
+        {displayError && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -204,27 +260,29 @@ export default function PagePeriod() {
           >
             <div className="flex justify-between items-center">
               <span className="font-medium">
-                {error.includes("load") ? (
+                {displayError.includes("load") ? (
                   <>
                     Failed to load periods.{" "}
                     <button
-                      onClick={loadPeriods}
+                      onClick={() => refetch()}
                       className="underline hover:text-red-800 font-semibold focus:outline-none"
+                      disabled={isLoading}
                     >
                       Try again
-                    </button>{" "}
-                    later.
+                    </button>
                   </>
-                ) : error.includes("update") ? (
+                ) : displayError.includes("update") ? (
                   "Failed to update period. Please try again."
-                ) : error.includes("delete") ? (
+                ) : displayError.includes("delete") ? (
                   "Failed to delete period. Please try again."
+                ) : displayError.includes("End date") ? (
+                  displayError
                 ) : (
-                  error
+                  displayError
                 )}
               </span>
               <button
-                onClick={() => setError(null)}
+                onClick={clearErrors}
                 className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
               >
                 ×
@@ -234,14 +292,14 @@ export default function PagePeriod() {
         )}
 
         {/* Loading State */}
-        {loading && (
+        {isLoading && (
           <div className="flex justify-center items-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
           </div>
         )}
 
         {/* Content */}
-        {!loading && (
+        {!isLoading && (
           <>
             {/* Search Filters */}
             <PeriodSearchFilters
@@ -267,7 +325,7 @@ export default function PagePeriod() {
                 onViewDetails={handleViewDetails}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                loading={loading}
+                loading={isLoading}
               />
             </div>
           </>
@@ -304,7 +362,7 @@ export default function PagePeriod() {
           period={selectedPeriod}
           isOpen={deleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
-          onConfirm={handleDeletePeriod}
+          onConfirm={handleDeleteConfirmation}
         />
       </div>
     </div>

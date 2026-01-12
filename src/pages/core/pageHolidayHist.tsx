@@ -1,107 +1,98 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Calendar, ChevronDown } from 'lucide-react';
 import { HolidayList } from '../../components/core/holiday/HolidayList';
 import { HolidaySearch } from '../../components/core/holiday/HolidaySearch';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { holidayService } from '../../services/core/holidayservice';
-import { fiscalYearService } from '../../services/core/fiscservice';
-import type { HolidayListDto } from '../../types/core/holiday';
-import type { FiscYearListDto } from '../../types/core/fisc';
+import { 
+  useHolidays,
+  useUpdateHoliday,
+  useDeleteHoliday 
+} from '../../services/core/holiday/holiday.queries';
+import { useFiscalYears } from '../../services/core/fiscalyear/fisc.queries';
+import type { HolidayListDto, EditHolidayDto } from '../../types/core/holiday';
 
 export const PageHolidayHist = () => {
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredHolidays, setFilteredHolidays] = useState<HolidayListDto[]>([]);
-  const [allHolidays, setAllHolidays] = useState<HolidayListDto[]>([]);
   const [currentYearHolidays, setCurrentYearHolidays] = useState<HolidayListDto[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [fiscalYears, setFiscalYears] = useState<FiscYearListDto[]>([]);
   const [searchMode, setSearchMode] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [selectedHoliday, setSelectedHoliday] = useState<HolidayListDto | null>(null);
 
-  // Load all data on component mount
-  useEffect(() => {
-    loadAllData();
-  }, []);
+  // React Query hooks
+  const {
+    data: allHolidays = [],
+    isLoading: holidaysLoading,
+    error: holidaysError,
+    refetch: refetchHolidays,
+  } = useHolidays();
 
-  // Filter holidays when search term or selected year changes
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredHolidays(currentYearHolidays);
-      setSearchMode(false);
-    } else {
-      const filtered = allHolidays.filter(holiday =>
-        holiday.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        holiday.dateStrAm?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        holiday.date.includes(searchTerm) ||
-        holiday.fiscYear.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (holiday.description && holiday.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        holiday.fiscalYearName?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredHolidays(filtered);
-      setSearchMode(true);
-    }
-  }, [searchTerm, currentYearHolidays, allHolidays]);
+  const {
+    data: fiscalYears = [],
+    isLoading: fiscalYearsLoading,
+    error: fiscalYearsError,
+  } = useFiscalYears();
+
+  const updateHolidayMutation = useUpdateHoliday({
+    onSuccess: () => {
+      setFormError(null);
+      setSelectedHoliday(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to update holiday');
+    },
+  });
+
+  const deleteHolidayMutation = useDeleteHoliday({
+    onSuccess: () => {
+      setFormError(null);
+      setSelectedHoliday(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to delete holiday');
+    },
+  });
 
   // Set default selected year when fiscal years are loaded
-  useEffect(() => {
+  useMemo(() => {
     if (fiscalYears.length > 0 && !selectedYear) {
       const currentYear = fiscalYears.find(fy => fy.isActive === '0') || fiscalYears[0];
       setSelectedYear(currentYear.name);
     }
   }, [fiscalYears, selectedYear]);
 
-  // Load holidays when selected year changes
-  useEffect(() => {
-    if (selectedYear) {
-      loadHolidaysForYear(selectedYear);
-    }
-  }, [selectedYear]);
-
-  const loadAllData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Load fiscal years and holidays in parallel
-      const [fiscalYearsData, holidaysData] = await Promise.all([
-        fiscalYearService.getAllFiscalYears(),
-        holidayService.getAllHolidays()
-      ]);
-      
-      setFiscalYears(fiscalYearsData);
-      setAllHolidays(holidaysData);
-      
-    } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load holiday data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadHolidaysForYear = async (yearName: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Filter holidays by fiscal year name
+  // Filter current year holidays when selected year or all holidays change
+  useMemo(() => {
+    if (selectedYear && allHolidays.length > 0) {
       const yearHolidays = allHolidays.filter(holiday => 
-        holiday.fiscYear === yearName || holiday.fiscalYearName === yearName
+        holiday.fiscYear === selectedYear || holiday.fiscalYearName === selectedYear
       );
-      
       setCurrentYearHolidays(yearHolidays);
       setFilteredHolidays(yearHolidays);
-      
-    } catch (err) {
-      console.error('Error loading holidays for year:', err);
-      setError('Failed to load holidays');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [selectedYear, allHolidays]);
+
+  // Filter holidays when search term changes
+  useMemo(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredHolidays(currentYearHolidays);
+      setSearchMode(false);
+    } else {
+      const filtered = allHolidays.filter(holiday =>
+        holiday.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (holiday.dateStrAm && holiday.dateStrAm.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        holiday.date.includes(searchTerm) ||
+        holiday.fiscYear.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (holiday.description && holiday.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (holiday.fiscalYearName && holiday.fiscalYearName.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredHolidays(filtered);
+      setSearchMode(true);
+    }
+  }, [searchTerm, currentYearHolidays, allHolidays]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -127,12 +118,23 @@ export const PageHolidayHist = () => {
 
   const handleEditHoliday = (holiday: HolidayListDto) => {
     console.log('Edit holiday:', holiday);
-    // Implement edit functionality - you can integrate modals here
+    // TODO: Implement edit modal functionality
+    setSelectedHoliday(holiday);
+    // You can open an edit modal here
   };
 
   const handleDeleteHoliday = (holiday: HolidayListDto) => {
     console.log('Delete holiday:', holiday);
-    // Implement delete functionality - you can integrate modals here
+    setSelectedHoliday(holiday);
+    // You can open a delete confirmation modal here
+  };
+
+  const handleDeleteConfirmation = async () => {
+    if (selectedHoliday) {
+      setFormError(null);
+      // No try/catch needed - error is handled by mutation's onError
+      await deleteHolidayMutation.mutateAsync(selectedHoliday.id);
+    }
   };
 
   const getTotalHolidays = (yearName: string) => {
@@ -157,9 +159,18 @@ export const PageHolidayHist = () => {
       .sort((a, b) => b.localeCompare(a)); // Sort descending (most recent first)
   }, [fiscalYears]);
 
-  // Retry loading data
-  const handleRetry = () => {
-    loadAllData();
+  // Combined loading state
+  const isLoading = holidaysLoading || fiscalYearsLoading;
+
+  // Combine errors from all sources
+  const displayError = holidaysError?.message || fiscalYearsError?.message || formError;
+
+  // Clear errors
+  const clearErrors = () => {
+    setFormError(null);
+    if (holidaysError || fiscalYearsError) {
+      refetchHolidays();
+    }
   };
 
   return (
@@ -181,7 +192,7 @@ export const PageHolidayHist = () => {
         </motion.div>
 
         {/* Error Message */}
-        {error && (
+        {displayError && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -189,18 +200,19 @@ export const PageHolidayHist = () => {
           >
             <div className="flex justify-between items-center">
               <span className="font-medium">
-                {error}
-                {error.includes('load') && (
+                {displayError}
+                {displayError.includes('load') && (
                   <button
-                    onClick={handleRetry}
+                    onClick={() => refetchHolidays()}
                     className="ml-2 underline hover:text-red-800 font-semibold"
+                    disabled={isLoading}
                   >
                     Try again
                   </button>
                 )}
               </span>
               <button
-                onClick={() => setError(null)}
+                onClick={clearErrors}
                 className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
               >
                 ×
@@ -210,14 +222,14 @@ export const PageHolidayHist = () => {
         )}
 
         {/* Loading State */}
-        {loading && allHolidays.length === 0 && (
+        {isLoading && allHolidays.length === 0 && (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
           </div>
         )}
 
         {/* Content */}
-        {!loading && fiscalYears.length > 0 && (
+        {!isLoading && fiscalYears.length > 0 && (
           <>
             {/* Search Component */}
             <motion.div
@@ -276,10 +288,12 @@ export const PageHolidayHist = () => {
             >
               <HolidayList
                 holidays={filteredHolidays}
-                loading={loading && allHolidays.length === 0}
+                loading={isLoading && allHolidays.length === 0}
                 onEdit={handleEditHoliday}
                 onDelete={handleDeleteHoliday}
                 currentFiscalYear={searchMode ? 'all' : selectedYear}
+                isUpdating={updateHolidayMutation.isPending}
+                isDeleting={deleteHolidayMutation.isPending}
               />
             </motion.div>
 
@@ -342,7 +356,7 @@ export const PageHolidayHist = () => {
         )}
 
         {/* Empty State */}
-        {!loading && fiscalYears.length === 0 && !error && (
+        {!isLoading && fiscalYears.length === 0 && !displayError && (
           <div className="text-center py-12">
             <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Fiscal Years Found</h3>
