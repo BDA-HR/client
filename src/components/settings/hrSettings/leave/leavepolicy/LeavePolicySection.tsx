@@ -3,13 +3,13 @@ import { motion } from 'framer-motion';
 import { XCircleIcon } from 'lucide-react';
 import { leavePolicyService } from '../../../../../services/core/settings/ModHrm/LeavePolicyService';
 import { leaveTypeService } from '../../../../../services/core/settings/ModHrm/LeaveTypeService';
-import type { 
-  LeavePolicyListDto, 
-  LeavePolicyAddDto, 
-  LeavePolicyModDto, 
+import type {
+  LeavePolicyListDto,
+  LeavePolicyAddDto,
+  LeavePolicyModDto,
   LeaveTypeOptionDto,
-  UUID 
-} from '../../../../../types/hr/leavepolicy';
+  UUID
+} from '../../../../../types/core/Settings/leavepolicy';
 import LeavePolicyHeader from './LeavePolicyHeader';
 import LeavePolicySearchFilters from './LeavePolicySearchFilter';
 import LeavePolicyCard from "./LeavePolicyCard";
@@ -137,13 +137,13 @@ const LeavePolicySection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Leave Policy Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <LeavePolicyHeader />
-        </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <LeavePolicyHeader />
+      </motion.div>
       {/* Error message for API errors */}
       {error && (
         <motion.div

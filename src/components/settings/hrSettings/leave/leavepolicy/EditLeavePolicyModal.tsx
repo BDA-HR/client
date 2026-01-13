@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Edit,  Clock } from 'lucide-react';
+import { X, Edit, Clock } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Label } from '../../../../ui/label';
 import { Input } from '../../../../ui/input';
@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../../../ui/dropdown-menu';
-import type { LeavePolicyListDto, LeavePolicyModDto, LeaveTypeOptionDto, UUID } from '../../../../../types/hr/leavepolicy';
+import type { LeavePolicyListDto, LeavePolicyModDto, LeaveTypeOptionDto, UUID } from '../../../../../types/core/Settings/leavepolicy';
 
 interface EditLeavePolicyModalProps {
   isOpen: boolean;
@@ -58,7 +58,7 @@ const EditLeavePolicyModal: React.FC<EditLeavePolicyModalProps> = ({
         leaveTypeId: policy.leaveTypeId,
         rowVersion: policy.rowVersion || ''
       });
-      
+
       // Set the selected leave type for display
       const currentLeaveType = leaveTypeOptions.find(lt => lt.id === policy.leaveTypeId);
       setSelectedLeaveType(currentLeaveType || null);
@@ -160,9 +160,8 @@ const EditLeavePolicyModal: React.FC<EditLeavePolicyModalProps> = ({
                         {selectedLeaveType ? selectedLeaveType.name : 'Select a leave type'}
                       </span>
                       <svg
-                        className={`h-4 w-4 opacity-50 transition-transform ${
-                          isLeaveTypeDropdownOpen ? 'rotate-180' : ''
-                        }`}
+                        className={`h-4 w-4 opacity-50 transition-transform ${isLeaveTypeDropdownOpen ? 'rotate-180' : ''
+                          }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -290,7 +289,7 @@ const EditLeavePolicyModal: React.FC<EditLeavePolicyModalProps> = ({
                   </div>
                 </div>
               </div>
-              
+
             </div>
           </div>
 

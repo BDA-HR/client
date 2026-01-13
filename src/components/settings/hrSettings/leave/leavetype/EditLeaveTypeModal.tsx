@@ -4,7 +4,7 @@ import { X, Edit, Calendar } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Label } from '../../../../ui/label';
 import { Input } from '../../../../ui/input';
-import type { LeaveTypeListDto, LeaveTypeModDto, UUID } from '../../../../../types/hr/leavetype';
+import type { LeaveTypeListDto, LeaveTypeModDto, UUID } from '../../../../../types/core/Settings/leavetype';
 
 interface EditLeaveTypeModalProps {
   isOpen: boolean;
@@ -124,15 +124,13 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, isPaid: true }))}
-                    className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
-                      formData.isPaid === true
+                    className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${formData.isPaid === true
                         ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
                         : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
-                    <div className={`p-2 rounded-full ${
-                      formData.isPaid === true ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
-                    }`}>
+                    <div className={`p-2 rounded-full ${formData.isPaid === true ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                      }`}>
                       <Calendar className="h-5 w-5" />
                     </div>
                     <span className="font-medium text-sm">Paid Leave</span>
@@ -143,15 +141,13 @@ const EditLeaveTypeModal: React.FC<EditLeaveTypeModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, isPaid: false }))}
-                    className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
-                      formData.isPaid === false
+                    className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${formData.isPaid === false
                         ? 'border-red-400 bg-red-50 text-red-400 shadow-sm'
                         : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
-                    <div className={`p-2 rounded-full ${
-                      formData.isPaid === false ? 'bg-red-100 text-red-400' : 'bg-gray-100 text-gray-400'
-                    }`}>
+                    <div className={`p-2 rounded-full ${formData.isPaid === false ? 'bg-red-100 text-red-400' : 'bg-gray-100 text-gray-400'
+                      }`}>
                       <Calendar className="h-5 w-5" />
                     </div>
                     <span className="font-medium text-sm">Unpaid Leave</span>

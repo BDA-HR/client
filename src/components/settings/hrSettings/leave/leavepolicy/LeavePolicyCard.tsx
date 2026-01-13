@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import {  MoreVertical, Edit, Trash2, ArrowRight } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { Button } from '../../../../ui/button';
-import type { LeavePolicyListDto } from '../../../../../types/hr/leavepolicy';
+import type { LeavePolicyListDto } from '../../../../../types/core/Settings/leavepolicy';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
@@ -28,11 +28,11 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isOutsideMenuButton = menuButtonRef.current && 
+      const isOutsideMenuButton = menuButtonRef.current &&
         !menuButtonRef.current.contains(event.target as Node);
-      const isOutsideMenu = menuRef.current && 
+      const isOutsideMenu = menuRef.current &&
         !menuRef.current.contains(event.target as Node);
-      
+
       if (isOutsideMenuButton && isOutsideMenu) {
         setShowMenu(false);
       }
@@ -62,7 +62,7 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
 
   const handleMenuClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (menuButtonRef.current) {
       const rect = menuButtonRef.current.getBoundingClientRect();
       setMenuPosition({
@@ -70,7 +70,7 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
         left: rect.right + window.scrollX - 160
       });
     }
-    
+
     setShowMenu(!showMenu);
   };
 
@@ -116,9 +116,8 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={handleCardClick}
-        className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer group ${
-          viewMode === 'grid' ? 'p-6' : 'p-5 flex items-start'
-        }`}
+        className={`bg-white border border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all relative cursor-pointer group ${viewMode === 'grid' ? 'p-6' : 'p-5 flex items-start'
+          }`}
       >
         {/* More Options Menu Button */}
         <div className="absolute top-3 right-3">
@@ -142,7 +141,7 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
           // Grid View
           <>
             <div className="flex items-center mb-4">
-              
+
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">
                   {leavePolicy.name}
@@ -159,13 +158,13 @@ const LeavePolicyCard: React.FC<LeavePolicyCardProps> = ({
             </div>
           </>
         ) : (
-          
+
           <>
-            
+
           </>
         )}
       </motion.div>
-      
+
       <DropdownMenu />
     </>
   );

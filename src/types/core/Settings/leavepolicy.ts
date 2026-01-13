@@ -1,5 +1,5 @@
 import type { UUID } from 'crypto';
-import type { BaseDto } from './BaseDto';
+import type { BaseDto } from '../../hr/BaseDto';
 
 export type { UUID };
 
@@ -52,11 +52,11 @@ export interface BooleanOptionDto {
 }
 
 // Combined types for UI
-export type LeavePolicyFilterType = 
-  | 'all' 
-  | 'withAttachment' 
-  | 'withoutAttachment' 
-  | 'holidaysAsLeave' 
+export type LeavePolicyFilterType =
+  | 'all'
+  | 'withAttachment'
+  | 'withoutAttachment'
+  | 'holidaysAsLeave'
   | 'byLeaveType';
 
 export interface LeavePolicyFilters {

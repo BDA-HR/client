@@ -31,10 +31,10 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<EmpSearchRes | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
-  
+
   // State for employee table
   const [employeesTableData, setEmployeesTableData] = useState<TableEmployee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<TableEmployee[]>([]);
@@ -60,13 +60,13 @@ const UserManagement: React.FC = () => {
 
   // Convert EmployeeListDto to TableEmployee format using actual employee data
   const convertToTableEmployee = (employee: EmployeeListDto): TableEmployee => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
-    const currentDay = String(new Date().getDate()).padStart(2, '0');
-    
+    // const currentYear = new Date().getFullYear();
+    // const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+    // const currentDay = String(new Date().getDate()).padStart(2, '0');
+
     const status = determineEmployeeStatus(employee);
-    const employmentDate = employee.employmentDate || `${currentYear}-${currentMonth}-${currentDay}`;
-    
+    // const employmentDate = employee.employmentDate || `${currentYear}-${currentMonth}-${currentDay}`;
+
     return {
       id: employee.id,
       code: employee.code,
@@ -81,7 +81,7 @@ const UserManagement: React.FC = () => {
       empNature: employee.empNature,
       photo: employee.photo || "",
       status: status,
-      employmentDate: employmentDate,
+      // employmentDate: employmentDate,
       createdAt: employee.createdAt,
       updatedAt: employee.modifiedAt,
     };
@@ -92,22 +92,22 @@ const UserManagement: React.FC = () => {
     return employees.filter(employee => {
       // Apply search term filter
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = !searchTerm || 
+      const matchesSearch = !searchTerm ||
         employee.empFullName.toLowerCase().includes(searchLower) ||
         employee.code.toLowerCase().includes(searchLower) ||
         (employee.department && employee.department.toLowerCase().includes(searchLower)) ||
         (employee.position && employee.position.toLowerCase().includes(searchLower));
 
       // Apply department filter
-      const matchesDepartment = !filters.department || 
+      const matchesDepartment = !filters.department ||
         employee.department === filters.department;
 
       // Apply status filter
-      const matchesStatus = !filters.status || 
+      const matchesStatus = !filters.status ||
         employee.status === filters.status;
 
       // Apply employment type filter
-      const matchesEmploymentType = !filters.employmentType || 
+      const matchesEmploymentType = !filters.employmentType ||
         employee.empType === filters.employmentType;
 
       return matchesSearch && matchesDepartment && matchesStatus && matchesEmploymentType;
@@ -118,42 +118,42 @@ const UserManagement: React.FC = () => {
   const fetchAllEmployees = async (page: number = 1) => {
     setTableLoading(true);
     setError(null);
-    
+
     try {
       // Fetch all employees from the API
       const apiEmployees = await usermgmtService.getAllEmployees();
       console.log("API Response:", apiEmployees);
-      
+
       // Check if response is in expected format
       if (!Array.isArray(apiEmployees)) {
         console.warn("API response is not an array:", apiEmployees);
         // Still proceed with empty array instead of throwing error
       }
-      
+
       // Convert API response to TableEmployee format
-      const convertedEmployees: TableEmployee[] = Array.isArray(apiEmployees) 
+      const convertedEmployees: TableEmployee[] = Array.isArray(apiEmployees)
         ? apiEmployees.map(convertToTableEmployee)
         : [];
-      
+
       setAllEmployees(convertedEmployees);
-      
+
       // Apply filters and search
       const filtered = applyFiltersAndSearch(convertedEmployees);
       setFilteredEmployees(filtered);
-      
+
       // Apply pagination
       const itemsPerPage = 10;
       const startIndex = (page - 1) * itemsPerPage;
       const paginatedEmployees = filtered.slice(startIndex, startIndex + itemsPerPage);
-      
+
       setEmployeesTableData(paginatedEmployees);
       setTotalPages(Math.ceil(filtered.length / itemsPerPage));
       setTotalItems(filtered.length);
-      
+
     } catch (err: any) {
       console.error("Failed to fetch employees:", err);
       setError(err.message || "Failed to load employee list");
-      
+
       // Set empty arrays instead of using mock data
       setAllEmployees([]);
       setFilteredEmployees([]);
@@ -175,11 +175,11 @@ const UserManagement: React.FC = () => {
     if (allEmployees.length > 0) {
       const filtered = applyFiltersAndSearch(allEmployees);
       setFilteredEmployees(filtered);
-      
+
       const itemsPerPage = 10;
       const startIndex = (currentPage - 1) * itemsPerPage;
       const paginatedEmployees = filtered.slice(startIndex, startIndex + itemsPerPage);
-      
+
       setEmployeesTableData(paginatedEmployees);
       setTotalPages(Math.ceil(filtered.length / itemsPerPage));
       setTotalItems(filtered.length);
@@ -203,7 +203,7 @@ const UserManagement: React.FC = () => {
       position: employeeData.position,
       photo: employeeData.photo || ""
     };
-    
+
     setSelectedEmployee(empSearchRes);
     setShowAccountForm(true);
   };
@@ -212,7 +212,7 @@ const UserManagement: React.FC = () => {
     console.log("Account created:", result);
     setShowAccountForm(false);
     setSelectedEmployee(null);
-    setError(null); 
+    setError(null);
     setHasSearched(false);
     // Refresh the employee list after account creation
     fetchAllEmployees(currentPage);
@@ -221,7 +221,7 @@ const UserManagement: React.FC = () => {
   const handleBackToAccounts = () => {
     setShowAccountForm(false);
     setSelectedEmployee(null);
-    setError(null); 
+    setError(null);
     setHasSearched(false);
   };
 
@@ -258,9 +258,9 @@ const UserManagement: React.FC = () => {
 
   // Check if we should show "no results" message
   const showNoResultsMessage = hasSearched && filteredEmployees.length === 0 && !tableLoading;
-  
+
   // Check if we should show the table (always show it, even if empty)
-  const showEmployeeTable = !showNoResultsMessage;
+  // const showEmployeeTable = !showNoResultsMessage;
 
   return (
     <>
@@ -283,12 +283,12 @@ const UserManagement: React.FC = () => {
               <div className="pb-6">
                 <h1 className="text-2xl font-bold">
                   <span className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent mr-2">
-                    User  
+                    User
                   </span>
                   Management
                 </h1>
               </div>
-              
+
               {/* Error Message Display */}
               {error && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -300,7 +300,7 @@ const UserManagement: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Loading State */}
               {loading && (
                 <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -310,22 +310,22 @@ const UserManagement: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Employee Search Filters */}
               <EmployeeSearchFilters
                 searchTerm={searchTerm}
                 setSearchTerm={handleEmployeeSearch}
                 filters={filters}
                 setFilters={handleFiltersChange}
-                employees={filteredEmployees}
+                // employees={filteredEmployees}
                 onRefresh={handleRefreshEmployees}
                 loading={tableLoading}
                 onAddEmployee={handleAddEmployee}
               />
-              
+
               {/* Show no results message */}
               {showNoResultsMessage && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="text-center py-12 bg-white rounded-lg border border-gray-200 shadow-sm"
@@ -337,7 +337,7 @@ const UserManagement: React.FC = () => {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">No employees found</h3>
                   <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                    {searchTerm 
+                    {searchTerm
                       ? `No employees found matching "${searchTerm}". Try adjusting your search terms or filters.`
                       : "No employees match the selected filters. Try adjusting your filter criteria."}
                   </p>
@@ -355,7 +355,7 @@ const UserManagement: React.FC = () => {
               )}
 
               {/* Employee Table Section - Always show even if empty */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -367,9 +367,9 @@ const UserManagement: React.FC = () => {
                   totalPages={totalPages}
                   totalItems={totalItems}
                   onPageChange={handlePageChange}
-                  onEmployeeUpdate={() => {}}
-                  onEmployeeStatusChange={() => {}}
-                  onEmployeeTerminate={() => {}}
+                  onEmployeeUpdate={() => { }}
+                  onEmployeeStatusChange={() => { }}
+                  onEmployeeTerminate={() => { }}
                   onEmployeeDelete={handleEmployeeDelete}
                   onAddAccount={handleAddAccount}
                   showAddAccountButton={true}

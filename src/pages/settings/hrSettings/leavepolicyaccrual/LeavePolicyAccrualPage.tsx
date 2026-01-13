@@ -4,8 +4,8 @@ import LeavePolicyAccrualHeader from '../../../../components/settings/hrSettings
 import { Button } from '../../../../components/ui/button'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Calendar, FileText, Clock, Settings, Pen } from 'lucide-react';
-import type { LeavePolicyListDto, UUID } from '../../../../types/hr/leavepolicy';
-import type { LeavePolicyAccrualListDto, LeavePolicyAccrualAddDto } from '../../../../types/hr/leavepolicyaccrual';
+import type { LeavePolicyListDto, UUID } from '../../../../types/core/Settings/leavepolicy';
+import type { LeavePolicyAccrualListDto, LeavePolicyAccrualAddDto } from '../../../../types/core/Settings/leavepolicyaccrual';
 import AddLeavePolicyAccrualModal from '../../../../components/settings/hrSettings/leave/leavepolicyaccrual/AddLeavePolicyAccrualModal';
 import toast from 'react-hot-toast';
 import { leavePolicyAccrualService } from '../../../../services/core/settings/ModHrm/LeavePolicyAccService';

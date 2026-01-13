@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { XCircleIcon } from 'lucide-react';
 import { leaveTypeService } from '../../../../../services/core/settings/ModHrm/LeaveTypeService';
-import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto, UUID } from '../../../../../types/hr/leavetype';
+import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto, UUID } from '../../../../../types/core/Settings/leavetype';
 import LeaveSearchFilters from './LeaveSearchFilter';
 import LeaveTypeCard from "./LeaveTypeCard";
 import AddLeaveTypeModal from "./AddLeaveTypeModal";
@@ -20,8 +20,7 @@ const LeaveTypeSection: React.FC = () => {
 
   // Filter leave types based on search term
   const filteredLeaveTypes = leaveTypes.filter(leaveType =>
-    leaveType.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (leaveType.isPaid ? 'paid' : 'unpaid').includes(searchTerm.toLowerCase()));
+    leaveType.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const fetchLeaveTypes = async () => {
     try {
@@ -36,7 +35,7 @@ const LeaveTypeSection: React.FC = () => {
       setLoading(false);
     }
   };
-useEffect(() => {
+  useEffect(() => {
     fetchLeaveTypes();
   }, []);
 
@@ -159,7 +158,7 @@ useEffect(() => {
           onAddClick={handleOpenAddModal}
         />
       </motion.div>
-            {/* Loading state */}
+      {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>

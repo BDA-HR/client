@@ -4,7 +4,7 @@ import type {
   LeaveTypeAddDto,
   LeaveTypeModDto,
   UUID
-} from '../../../../types/hr/leavetype';
+} from '../../../../types/core/Settings/leavetype';
 
 class LeaveTypeService {
   private baseUrl = `${import.meta.env.VITE_HRMM_LEAVE_URL || 'hrm/leave/v1'}/LeaveType`;

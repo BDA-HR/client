@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Calendar, Clock, Settings, BadgePlus } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import toast from 'react-hot-toast';
-import type { UUID } from '../../../../../types/hr/leavepolicy';
+import type { UUID } from '../../../../../types/core/Settings/leavepolicy';
 import List from '../../../../List/list';
 import type { ListItem } from '../../../../../types/List/list';
 
@@ -92,7 +92,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error("Please fix the form errors before submitting");
       return;
@@ -110,7 +110,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
         maxCarryoverDays: parseFloat(formData.maxCarryoverDays),
         carryoverExpiryDays: parseInt(formData.carryoverExpiryDays),
       });
-      
+
       toast.success("Accrual rule added successfully");
       onClose();
     } catch (error: any) {
@@ -127,7 +127,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error for this field when user starts typing
     if (formErrors[field]) {
       setFormErrors((prev) => ({ ...prev, [field]: "" }));
@@ -188,8 +188,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
                     min="0.5"
                     className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                       focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
-                      text-sm transition-colors ${
-                        formErrors.entitlement ? "border-red-500" : "border-gray-300"
+                      text-sm transition-colors ${formErrors.entitlement ? "border-red-500" : "border-gray-300"
                       }`}
                     placeholder="e.g., 20"
                     value={formData.entitlement}
@@ -238,8 +237,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
                       min="0.01"
                       className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                         focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
-                        text-sm transition-colors ${
-                          formErrors.accrualRate ? "border-red-500" : "border-gray-300"
+                        text-sm transition-colors ${formErrors.accrualRate ? "border-red-500" : "border-gray-300"
                         }`}
                       placeholder="e.g., 1.67"
                       value={formData.accrualRate}
@@ -269,8 +267,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
                       min="0"
                       className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                         focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
-                        text-sm transition-colors ${
-                          formErrors.minServiceMonths ? "border-red-500" : "border-gray-300"
+                        text-sm transition-colors ${formErrors.minServiceMonths ? "border-red-500" : "border-gray-300"
                         }`}
                       placeholder="e.g., 3"
                       value={formData.minServiceMonths}
@@ -298,8 +295,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
                       min="0"
                       className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                         focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
-                        text-sm transition-colors ${
-                          formErrors.maxCarryoverDays ? "border-red-500" : "border-gray-300"
+                        text-sm transition-colors ${formErrors.maxCarryoverDays ? "border-red-500" : "border-gray-300"
                         }`}
                       placeholder="e.g., 10"
                       value={formData.maxCarryoverDays}
@@ -326,8 +322,7 @@ const AddLeavePolicyAccrualModal: React.FC<AddLeavePolicyAccrualModalProps> = ({
                       min="0"
                       className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                         focus:outline-none focus:ring-emerald-500 focus:border-emerald-500
-                        text-sm transition-colors ${
-                          formErrors.carryoverExpiryDays ? "border-red-500" : "border-gray-300"
+                        text-sm transition-colors ${formErrors.carryoverExpiryDays ? "border-red-500" : "border-gray-300"
                         }`}
                       placeholder="e.g., 90"
                       value={formData.carryoverExpiryDays}

@@ -4,7 +4,7 @@ import type {
   LeavePolicyAddDto,
   LeavePolicyModDto,
   UUID
-} from '../../../../types/hr/leavepolicy';
+} from '../../../../types/core/Settings/leavepolicy';
 
 class LeavePolicyService {
   // private baseUrl = `${import.meta.env.VITE_HRMM_MODULE_URL}/LeavePolicy`;

@@ -4,7 +4,7 @@ import type {
   LeavePolicyAccrualAddDto,
   LeavePolicyAccrualModDto,
   UUID
-} from '../../../../types/hr/leavepolicyaccrual';
+} from '../../../../types/core/Settings/leavepolicyaccrual';
 
 class LeavePolicyAccrualService {
   // private baseUrl = `${import.meta.env.VITE_HRMM_MODULE_URL}/LeavePolicyAcc`;

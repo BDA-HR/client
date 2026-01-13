@@ -1,5 +1,5 @@
 import type { UUID } from 'crypto';
-import type { BaseDto } from './BaseDto';
+import type { BaseDto } from '../../hr/BaseDto';
 
 export type { UUID };
 export interface LeavePolicyAccrualListDto extends BaseDto {

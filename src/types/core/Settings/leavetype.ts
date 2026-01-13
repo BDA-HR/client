@@ -1,24 +1,39 @@
 import type { UUID } from 'crypto';
-import type { BaseDto } from './BaseDto';
+import type { BaseDto } from '../../hr/BaseDto';
+import type { LeaveCategory } from '../enum';
 
 export type { UUID };
 
 // Leave Type Types
 export interface LeaveTypeListDto extends BaseDto {
   name: string;
-  isPaid: boolean;
-  isPaidStr: string;
+  requiresApproval: boolean;
+  allowHalfDay: boolean;
+  holidaysAsLeave: boolean;
+  isActive: boolean;
+  leaveCategory: string;
+  leaveCategoryStr: string;
+  requiresApprovalStr: string;
+  allowHalfDayStr: string;
+  isActiveStr: string;
+  holidaysAsLeaveStr: string;
 }
 
 export interface LeaveTypeAddDto {
   name: string;
-  isPaid: boolean;
+  leaveCategory: LeaveCategory;
+  requiresApproval: boolean;
+  allowHalfDay: boolean;
+  holidaysAsLeave: boolean;
 }
 
 export interface LeaveTypeModDto {
   id: UUID;
   name: string;
-  isPaid: boolean;
+  leaveCategory: LeaveCategory;
+  requiresApproval: boolean;
+  allowHalfDay: boolean;
+  holidaysAsLeave: boolean;
   rowVersion: string;
 }
 
@@ -30,9 +45,9 @@ export interface PaidStatusDto {
 }
 
 // Combined types for UI
-export type LeaveTypeFilterType = 
-  | 'all' 
-  | 'paid' 
+export type LeaveTypeFilterType =
+  | 'all'
+  | 'paid'
   | 'unpaid';
 
 export interface LeaveTypeFilters {

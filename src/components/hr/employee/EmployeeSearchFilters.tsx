@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BadgePlus, Search, X } from 'lucide-react';
 import { Button } from '../../ui/button';
-import type { EmployeeListDto } from '../../../types/hr/employee';
+// import type { EmployeeListDto } from '../../../types/hr/employee';
 
 interface EmployeeSearchFiltersProps {
   searchTerm: string;
@@ -14,7 +14,7 @@ interface EmployeeSearchFiltersProps {
     employmentType: string;
   };
   setFilters: (filters: any) => void;
-  employees: EmployeeListDto[];
+  // employees: EmployeeListDto[];
   onRefresh?: () => void;
   loading?: boolean;
   onAddEmployee?: () => void;

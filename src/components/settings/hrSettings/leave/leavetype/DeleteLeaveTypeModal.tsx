@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { LeaveTypeListDto, UUID } from "../../../../../types/hr/leavetype";
+import type { LeaveTypeListDto, UUID } from "../../../../../types/core/Settings/leavetype";
 import { Button } from "../../../../ui/button";
 
 interface DeleteLeaveTypeModalProps {

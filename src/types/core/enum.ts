@@ -45,3 +45,17 @@ export const PeriodStat = {
   "1": 'Inactive'
 } as const;
 export type PeriodStat = typeof PeriodStat[keyof typeof PeriodStat];
+
+export const LeaveCategory = {
+  "0": 'Paid',
+  "1": 'Unpaid',
+  "2": 'Special'
+} as const;
+export type LeaveCategory = typeof LeaveCategory[keyof typeof LeaveCategory];
+
+export const PolicyGender = {
+  "0": 'Male',
+  "1": 'Female',
+  "2": 'Male & Female'
+} as const;
+export type PolicyGender = typeof PolicyGender[keyof typeof PolicyGender];

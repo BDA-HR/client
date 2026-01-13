@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../../ui/button';
-import type { LeaveTypeListDto } from '../../../../../types/hr/leavetype';
+import type { LeaveTypeListDto } from '../../../../../types/core/Settings/leavetype';
 import { createPortal } from 'react-dom';
 
 interface LeaveTypeCardProps {
@@ -24,11 +24,11 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
   // Close menu when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isOutsideMenuButton = menuButtonRef.current && 
+      const isOutsideMenuButton = menuButtonRef.current &&
         !menuButtonRef.current.contains(event.target as Node);
-      const isOutsideMenu = menuRef.current && 
+      const isOutsideMenu = menuRef.current &&
         !menuRef.current.contains(event.target as Node);
-      
+
       if (isOutsideMenuButton && isOutsideMenu) {
         setShowMenu(false);
       }
@@ -52,7 +52,7 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
 
   const handleMenuClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (menuButtonRef.current) {
       const rect = menuButtonRef.current.getBoundingClientRect();
       setMenuPosition({
@@ -60,7 +60,7 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
         left: rect.right + window.scrollX - 160
       });
     }
-    
+
     setShowMenu(!showMenu);
   };
 
@@ -122,15 +122,13 @@ const LeaveTypeCard: React.FC<LeaveTypeCardProps> = ({
 
         {/* Grid View  */}
         <div className="flex items-center mb-4">
-        
+
           <div className="flex-1">
             <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
               {leaveType.name}
             </h3>
-            <p className={`text-sm font-medium ${
-              leaveType.isPaid ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {leaveType.isPaid ? 'Paid' : 'Unpaid'}
+            <p className={`text-sm font-medium`}>
+              {leaveType.allowHalfDayStr ? 'Paid' : 'Unpaid'}
             </p>
           </div>
         </div>

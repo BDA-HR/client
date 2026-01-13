@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { LeavePolicyListDto, UUID } from "../../../../../types/hr/leavepolicy";
+import type { LeavePolicyListDto, UUID } from "../../../../../types/core/Settings/leavepolicy";
 import { Button } from "../../../../ui/button";
 
 interface DeleteLeavePolicyModalProps {
