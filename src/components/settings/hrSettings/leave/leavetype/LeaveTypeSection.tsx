@@ -4,7 +4,7 @@ import { XCircleIcon } from 'lucide-react';
 import { leaveTypeService } from '../../../../../services/core/settings/ModHrm/LeaveTypeService';
 import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto, UUID } from '../../../../../types/core/Settings/leavetype';
 import LeaveSearchFilters from './LeaveSearchFilter';
-import LeaveTypeCard from "./LeaveTypeCard";
+import LeaveTypeTable from "./LeaveTypeTable";
 import AddLeaveTypeModal from "./AddLeaveTypeModal";
 import EditLeaveTypeModal from "./EditLeaveTypeModal";
 import DeleteLeaveTypeModal from "./DeleteLeaveTypeModal";
@@ -35,6 +35,7 @@ const LeaveTypeSection: React.FC = () => {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     fetchLeaveTypes();
   }, []);
@@ -76,6 +77,23 @@ const LeaveTypeSection: React.FC = () => {
     } catch (err) {
       console.error('Failed to delete leave type:', err);
       setError('Failed to delete leave type. Please try again.');
+    }
+  };
+
+  const handleToggleStatus = async (leaveType: LeaveTypeListDto) => {
+    try {
+      const updatedLeaveType = {
+        ...leaveType,
+        isActive: !leaveType.isActive,
+      };
+      const result = await leaveTypeService.updateLeaveType(updatedLeaveType as LeaveTypeModDto);
+      setLeaveTypes((prev) =>
+        prev.map((lt) => (lt.id === result.id ? result : lt))
+      );
+      setError(null);
+    } catch (err) {
+      console.error('Failed to toggle leave type status:', err);
+      setError('Failed to update leave type status. Please try again.');
     }
   };
 
@@ -184,7 +202,7 @@ const LeaveTypeSection: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Leave Types Content - Grid View */}
+      {/* Leave Types Table */}
       {!loading && leaveTypes.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -192,27 +210,12 @@ const LeaveTypeSection: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="pt-0 pb-0 -mt-2"
         >
-          {filteredLeaveTypes.length === 0 ? (
-            <div className="text-center py-6">
-              <div className="text-gray-500 text-lg">
-                No leave types found matching your search.
-              </div>
-              <p className="text-gray-400 mt-2">
-                Try adjusting your search terms or add a new leave type.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {filteredLeaveTypes.map((leaveType) => (
-                <LeaveTypeCard
-                  key={leaveType.id}
-                  leaveType={leaveType}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          )}
+          <LeaveTypeTable
+            leaveTypes={filteredLeaveTypes}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleStatus={handleToggleStatus}
+          />
         </motion.div>
       )}
 

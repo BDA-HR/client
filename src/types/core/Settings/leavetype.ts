@@ -1,17 +1,16 @@
 import type { UUID } from 'crypto';
 import type { BaseDto } from '../../hr/BaseDto';
-import type { LeaveCategory } from '../enum';
 
 export type { UUID };
 
 // Leave Type Types
 export interface LeaveTypeListDto extends BaseDto {
   name: string;
+  leaveCategory: string;
   requiresApproval: boolean;
   allowHalfDay: boolean;
   holidaysAsLeave: boolean;
   isActive: boolean;
-  leaveCategory: string;
   leaveCategoryStr: string;
   requiresApprovalStr: string;
   allowHalfDayStr: string;
@@ -21,7 +20,7 @@ export interface LeaveTypeListDto extends BaseDto {
 
 export interface LeaveTypeAddDto {
   name: string;
-  leaveCategory: LeaveCategory;
+  leaveCategory: string;
   requiresApproval: boolean;
   allowHalfDay: boolean;
   holidaysAsLeave: boolean;
@@ -30,12 +29,14 @@ export interface LeaveTypeAddDto {
 export interface LeaveTypeModDto {
   id: UUID;
   name: string;
-  leaveCategory: LeaveCategory;
+  leaveCategory: string;
   requiresApproval: boolean;
   allowHalfDay: boolean;
   holidaysAsLeave: boolean;
+  isActive: boolean;
   rowVersion: string;
 }
+export type LeaveCategory = string;
 
 // Service response types (if needed for dropdowns/selects)
 export interface PaidStatusDto {
@@ -65,7 +66,10 @@ export interface LeaveTypeTableData {
 // Form data types
 export interface LeaveTypeFormData {
   name: string;
-  isPaid: boolean;
+  leaveCategory: string;
+  requiresApproval: boolean;
+  allowHalfDay: boolean;
+  holidaysAsLeave: boolean;
 }
 
 // Validation types
@@ -73,7 +77,11 @@ export interface LeaveTypeValidationResult {
   isValid: boolean;
   errors: {
     name?: string;
-    isPaid?: string;
+    leaveCategory?: string;
+    requiresApproval?: string;
+    allowHalfDay?: string;
+    holidaysAsLeave?: string;
+    isActive?: string;
   };
 }
 
