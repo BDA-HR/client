@@ -1,7 +1,7 @@
-import type { AuthTokens, LoginRequest } from "../types/auth/auth.types";
+import type { AuthTokens, LoginRequest } from "../types/types/auth/auth.types";
 import { api } from './api';
 
-const AUTH_URL = `${import.meta.env.VITE_AUTH_URL || 'auth/v1'}`;
+const AUTH_URL = `${import.meta.env.VITE_AUTH_URL || '/api/auth/v1'}`;
 
 export const loginApi = async (payload: LoginRequest): Promise<AuthTokens> => {
     const res = await api.post(`${AUTH_URL}/Login`, payload);

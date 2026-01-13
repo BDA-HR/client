@@ -6,8 +6,9 @@ import { Bell } from "lucide-react";
 import Calendar from "../components/Calender";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
-import { authStore } from "../../src/stores/auth.store";
+import { getAccessToken } from "../utils/auth.utils";
 import { hasPermission } from "../../src/utils/jwt.utils";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Notification {
   id: number;
@@ -99,7 +100,7 @@ function Modules() {
     setSelectedModule(moduleName);
   }, []);
 
-  const token = authStore(state => state.accessToken);
+  const token = getAccessToken();
   if (token && hasPermission(token, "mod.hrm", "module")) {
     console.log("User can access HR module");
   }
