@@ -14,6 +14,14 @@ import type {
 
 } from '../../../../types/core/Settings/menu-permissions';
 
+// Helper function to safely display field values
+const safeDisplayValue = (value: any, defaultValue: string = '-'): string => {
+  if (value === null || value === undefined || value === 'null' || value === '') {
+    return defaultValue;
+  }
+  return String(value);
+};
+
 
 interface MenuPermissionTableProps {
   permissions: PerMenuListDto[];
@@ -81,8 +89,20 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Menu Name
               </th>
+              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                Path
+              </th>
+              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                Icon
+              </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                 Module
+              </th>
+              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                Type
+              </th>
+              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                Order
               </th>
               <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -92,7 +112,7 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {permissions.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-6 py-4 text-center text-sm text-gray-500">
                   No menu permissions found
                 </td>
               </tr>
@@ -126,13 +146,50 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     <div className="flex items-center">
-                      <span>{permission.name}</span>
+                      <span>{safeDisplayValue(permission.label || permission.name)}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                    <div className="flex items-center">
+                      <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                        {safeDisplayValue(permission.path)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                    <div className="flex items-center">
+                      <span className="font-mono text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
+                        {safeDisplayValue(permission.icon)}
+                      </span>
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <div className="flex items-center">
                       <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium">
                         {permission.module}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                    <div className="flex items-center">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        permission.isChild 
+                          ? 'bg-orange-50 text-orange-700' 
+                          : 'bg-blue-50 text-blue-700'
+                      }`}>
+                        {permission.isChild ? 'Child' : 'Parent'}
+                      </span>
+                      {permission.isChild && safeDisplayValue(permission.parentKey, '') !== '-' && (
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({safeDisplayValue(permission.parentKey, '')})
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                    <div className="flex items-center">
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                        {safeDisplayValue(permission.order, '0')}
                       </span>
                     </div>
                   </td>

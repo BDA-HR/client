@@ -4,6 +4,7 @@ import { X, PenBox } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Label } from '../../../ui/label';
 import { Input } from '../../../ui/input';
+import { Checkbox } from '../../../ui/checkbox';
 import List from '../../../List/list';
 import type { 
   PerMenuModDto, 
@@ -13,6 +14,14 @@ import type {
 import type { NameListItem } from '../../../../types/NameList/nameList';
 import { menuPermissionService } from '../../../../services/core/settings/ModCore/menu-permissionservice';
 import toast from 'react-hot-toast';
+
+// Helper function to safely handle null/undefined values
+const safeValue = (value: any, defaultValue: any = ''): any => {
+  if (value === null || value === undefined || value === 'null') {
+    return defaultValue;
+  }
+  return value;
+};
 
 interface EditMenuPermissionModalProps {
   permission: PerMenuListDto | null;
@@ -30,9 +39,22 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
     id: '' as UUID,
     perModuleId: '' as UUID,
     key: '',
-    desc: ''
+    label: '', // Use label directly (matches API)
+    path: '', // New path field
+    icon: '', // New icon field
+    isChild: false, // New isChild field
+    parentKey: '', // New parentKey field
+    order: 0 // New order field
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Add errors state for field-specific validation
+  const [errors, setErrors] = useState<{
+    label?: string;
+    path?: string;
+    icon?: string;
+    parentKey?: string;
+  }>({});
   
   // State for module names
   const [moduleNames, setModuleNames] = useState<NameListItem[]>([]);
@@ -72,7 +94,12 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
         id: permission.id,
         perModuleId: permission.perModuleId,
         key: permission.key,
-        desc: permission.name
+        label: safeValue(permission.label || permission.name, ''), // Map existing name to label
+        path: safeValue(permission.path, ''), // New field
+        icon: safeValue(permission.icon, ''), // New field
+        isChild: safeValue(permission.isChild, false), // New field
+        parentKey: safeValue(permission.parentKey, ''), // New field
+        order: safeValue(permission.order, 0) // New field
       });
       setIsOpen(true);
     } else {
@@ -94,14 +121,37 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
       name: module.name
     }));
 
-  const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setEditedPermission((prev) => ({ ...prev, key: value }));
+    setEditedPermission((prev) => ({ ...prev, label: value }));
+    // Clear label error when user starts typing
+    if (errors.label) setErrors(prev => ({ ...prev, label: undefined }));
   };
 
-  const handleDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePathChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setEditedPermission((prev) => ({ ...prev, desc: value }));
+    setEditedPermission((prev) => ({ ...prev, path: value }));
+    // Clear path error when user starts typing
+    if (errors.path) setErrors(prev => ({ ...prev, path: undefined }));
+  };
+
+  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEditedPermission((prev) => ({ ...prev, icon: value }));
+    // Clear icon error when user starts typing
+    if (errors.icon) setErrors(prev => ({ ...prev, icon: undefined }));
+  };
+
+  const handleOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
+    setEditedPermission((prev) => ({ ...prev, order: value }));
+  };
+
+  const handleParentKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEditedPermission((prev) => ({ ...prev, parentKey: value }));
+    // Clear parentKey error when user starts typing
+    if (errors.parentKey) setErrors(prev => ({ ...prev, parentKey: undefined }));
   };
 
   const handleModuleSelect = (item: { id: UUID; name: string }) => {
@@ -109,7 +159,11 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!editedPermission.key.trim() || !editedPermission.desc.trim() || !editedPermission.perModuleId) {
+    if (!editedPermission.label.trim() || 
+        !editedPermission.path.trim() || 
+        !editedPermission.icon.trim() || 
+        !editedPermission.perModuleId ||
+        (editedPermission.isChild && !editedPermission.parentKey.trim())) {
       toast.error('Please fill all required fields');
       return;
     }
@@ -117,11 +171,22 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const response = await onEditPermission({
-        ...editedPermission,
+      // Map to the exact API structure expected by backend
+      const dataToSend = {
+        id: editedPermission.id,
+        perModuleId: editedPermission.perModuleId,
         key: editedPermission.key.trim(),
-        desc: editedPermission.desc.trim(),
-      });
+        label: editedPermission.label.trim(), // Backend expects 'label', not 'desc'
+        path: editedPermission.path.trim(),
+        icon: editedPermission.icon.trim(),
+        isChild: editedPermission.isChild,
+        parentKey: editedPermission.parentKey.trim(),
+        order: editedPermission.order
+      };
+      
+      console.log('Sending edit data to API:', dataToSend);
+      
+      const response = await onEditPermission(dataToSend);
 
       console.log('Menu Permission updated successfully!', response);
       
@@ -135,7 +200,10 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
       
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to update permission';
+      
+      // Show the general error message
       toast.error(errorMessage);
+      
       console.error('Error updating menu permission:', error);
     } finally {
       setIsSubmitting(false);
@@ -148,8 +216,14 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
         id: '' as UUID,
         perModuleId: '' as UUID,
         key: '',
-        desc: ''
+        label: '',
+        path: '',
+        icon: '',
+        isChild: false,
+        parentKey: '',
+        order: 0
       });
+      setErrors({}); // Clear errors
       setModuleError(null);
       setIsOpen(false);
       if (onClose) onClose();
@@ -169,7 +243,7 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isSubmitting) {
@@ -181,8 +255,8 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full md:w-1/2 lg:w-1/3 max-h-[90vh] overflow-y-auto"
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         onKeyDown={handleKeyDown}
       >
         {/* Header */}
@@ -190,7 +264,9 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
           <div className="flex items-center gap-3">
             <PenBox size={20} className="text-emerald-600" />
             <div>
-              <h2 className="text-lg font-bold text-gray-800">Edit Menu Permission</h2>
+              <h2 className="text-lg font-bold text-gray-800">
+                Edit Menu Permission
+              </h2>
             </div>
           </div>
           <button
@@ -204,72 +280,186 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-6">
-          {/* Module Selection using List Component */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-gray-700">
-              Select Module <span className="text-red-500">*</span>
-            </Label>
-            
-            {isFetchingModules ? (
-              <div className="flex items-center justify-center p-4 border rounded-lg bg-gray-50">
-                <div className="h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
-                <span className="text-sm text-gray-600">Loading modules...</span>
-              </div>
-            ) : moduleError ? (
-              <div className="p-3 border border-red-200 bg-red-50 rounded-lg">
-                <p className="text-sm text-red-600">{moduleError}</p>
-              </div>
-            ) : (
-              <>
-                <List
-                  items={moduleListItems}
-                  selectedValue={editedPermission.perModuleId}
-                  onSelect={handleModuleSelect}
-                  label=""
-                  placeholder="Select a module"
-                  required
-                  disabled={isSubmitting}
-                />
-                {moduleListItems.length === 0 && !moduleError && (
-                  <p className="text-sm text-amber-600 mt-1">
-                    No modules available
-                  </p>
+        <div className="p-6">
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column */}
+            <div className="space-y-6">
+              {/* Module Selection */}
+              <div className="space-y-3 min-h-[76px]">
+                <Label className="text-sm font-medium text-gray-700">
+                  Select Module <span className="text-red-500">*</span>
+                </Label>
+
+                {isFetchingModules ? (
+                  <div className="flex items-center justify-center p-4 border rounded-lg bg-gray-50">
+                    <div className="h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
+                    <span className="text-sm text-gray-600">
+                      Loading modules...
+                    </span>
+                  </div>
+                ) : moduleError ? (
+                  <div className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                    <p className="text-sm text-red-600">{moduleError}</p>
+                  </div>
+                ) : (
+                  <>
+                    <List
+                      items={moduleListItems}
+                      selectedValue={editedPermission.perModuleId}
+                      onSelect={handleModuleSelect}
+                      label=""
+                      placeholder="Select a module"
+                      required
+                      disabled={isSubmitting}
+                    />
+                    {moduleListItems.length === 0 && !moduleError && (
+                      <p className="text-sm text-amber-600 mt-1">
+                        No modules available
+                      </p>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </div>
+              </div>
+              {/* Menu Name/Label */}
+              <div className="space-y-3 min-h-[76px]">
+                <Label
+                  htmlFor="edit-label"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Label <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-label"
+                  value={editedPermission.label}
+                  onChange={handleLabelChange}
+                  placeholder="Enter menu name/label"
+                  className="w-full"
+                  disabled={isSubmitting || isFetchingModules}
+                  aria-invalid={!editedPermission.label.trim()}
+                />
+              </div>
 
-          {/* Menu Key */}
-          <div className="space-y-3">
-            <Label htmlFor="edit-key" className="text-sm font-medium text-gray-700">
-              Menu Key <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="edit-key"
-              value={editedPermission.key}
-              onChange={handleKeyChange}
-              placeholder="menu.module.feature (e.g., menu.hr.dashboard)"
-              className="w-full"
-              disabled={isSubmitting || isFetchingModules}
-              aria-invalid={!editedPermission.key.trim()}
-            />
-          </div>
+              {/* Path */}
+              <div className="space-y-3 min-h-[76px]">
+                <Label
+                  htmlFor="edit-path"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Path <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-path"
+                  value={editedPermission.path}
+                  onChange={handlePathChange}
+                  placeholder="Enter menu path (e.g., /dashboard)"
+                  className="w-full"
+                  disabled={isSubmitting || isFetchingModules}
+                  aria-invalid={!editedPermission.path.trim()}
+                />
+              </div>
+            </div>
 
-          {/* Menu Name */}
-          <div className="space-y-3">
-            <Label htmlFor="edit-desc" className="text-sm font-medium text-gray-700">
-              Menu Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="edit-desc"
-              value={editedPermission.desc}
-              onChange={handleDescChange}
-              placeholder="Enter menu name"
-              className="w-full"
-              disabled={isSubmitting || isFetchingModules}
-              aria-invalid={!editedPermission.desc.trim()}
-            />
+            {/* Right Column */}
+            <div className="space-y-6">
+              {/* Order */}
+              <div className="space-y-3 min-h-[76px]">
+                <Label
+                  htmlFor="edit-order"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Order <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-order"
+                  type="number"
+                  min="0"
+                  value={
+                    editedPermission.order === 0 ? "" : editedPermission.order
+                  }
+                  onChange={handleOrderChange}
+                  placeholder="Enter display order (e.g., 1, 2, 3...)"
+                  className="w-full"
+                  disabled={isSubmitting || isFetchingModules}
+                  aria-invalid={editedPermission.order < 0}
+                />
+              </div>
+              {/* Icon */}
+              <div className="space-y-3 min-h-[76px]">
+                <Label
+                  htmlFor="edit-icon"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Icon <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-icon"
+                  value={editedPermission.icon}
+                  onChange={handleIconChange}
+                  placeholder="Enter icon name (e.g., dashboard, users)"
+                  className="w-full"
+                  disabled={isSubmitting || isFetchingModules}
+                  aria-invalid={!editedPermission.icon.trim()}
+                />
+              </div>
+
+              {/* Menu Type - Is Child Checkbox */}
+              <div className="space-y-3 min-h-[76px]">
+                <Label className="text-sm font-medium text-gray-700">
+                  Menu Type
+                </Label>
+                <div className="flex items-center space-x-2 h-10">
+                  <Checkbox
+                    id="edit-isChild"
+                    checked={editedPermission.isChild}
+                    onCheckedChange={(checked) => {
+                      setEditedPermission((prev) => ({
+                        ...prev,
+                        isChild: checked as boolean,
+                        parentKey: checked ? prev.parentKey : "", // Clear parent key if not child
+                      }));
+                    }}
+                    disabled={isSubmitting || isFetchingModules}
+                  />
+                  <Label
+                    htmlFor="edit-isChild"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Is Child Menu
+                  </Label>
+                </div>
+              </div>
+
+              {/* Parent Key - Always reserve space but conditionally show content */}
+              <div className="space-y-3 min-h-[76px]">
+                {editedPermission.isChild ? (
+                  <>
+                    <Label
+                      htmlFor="edit-parentKey"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Parent Key <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-parentKey"
+                      value={editedPermission.parentKey}
+                      onChange={handleParentKeyChange}
+                      placeholder="Enter parent menu key"
+                      className="w-full"
+                      disabled={isSubmitting || isFetchingModules}
+                      aria-invalid={!editedPermission.parentKey.trim()}
+                    />
+                  </>
+                ) : (
+                  <div className="opacity-0 pointer-events-none">
+                    <Label className="text-sm font-medium text-gray-700">
+                      -
+                    </Label>
+                    <div className="h-10 w-full"></div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -288,13 +478,17 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6 min-w-[100px] shadow-sm hover:shadow transition-shadow duration-200"
               onClick={handleSubmit}
-              disabled={isSubmitting || 
-                       isFetchingModules || 
-                       moduleError !== null || 
-                       moduleListItems.length === 0 ||
-                       !editedPermission.key.trim() || 
-                       !editedPermission.desc.trim() || 
-                       !editedPermission.perModuleId}
+              disabled={
+                isSubmitting ||
+                isFetchingModules ||
+                moduleError !== null ||
+                moduleListItems.length === 0 ||
+                !editedPermission.label.trim() ||
+                !editedPermission.path.trim() ||
+                !editedPermission.icon.trim() ||
+                !editedPermission.perModuleId ||
+                (editedPermission.isChild && !editedPermission.parentKey.trim())
+              }
               type="button"
             >
               {isSubmitting ? (
@@ -303,7 +497,7 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
                   Saving...
                 </div>
               ) : (
-                'Save Changes'
+                "Save Changes"
               )}
             </Button>
           </div>
