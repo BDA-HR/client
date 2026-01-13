@@ -35,28 +35,37 @@ import UserOverview from "./pages/core/usermanagement/pageUserManagement";
 import DepartmentOverview from "./pages/core/pageDepartments";
 import CompanyBranchesPage from "./pages/core/pageCompanies";
 // import CompanyDetailsPage from './components/core/company/CompDetails';
-import BranchesPage from "./pages/core/pageBranches";
-import FiscalYearHistory from "./pages/core/pageFiscYearHist";
-import PagePeriod from "./pages/core/pagePeriod";
-import PageSettings from "./pages/settings/pageSettings";
-import JobGradeSubgrades from "./pages/settings/hrSettings/jobgrade/JobGradeSubgrades";
-import PageBenefitSet from "./pages/settings/hrSettings/pageBenefitSet";
-import PageEducationalQual from "./pages/settings/hrSettings/pageEducationalQual";
-import PagePosition from "./pages/settings/hrSettings/position/pagePosition";
-import PositionDetails from "./pages/settings/hrSettings/position/PositionDetails";
-import AddEmployeePage from "./pages/hr/employeepage/AddEmployeePage";
-import PageAnnualLeave from "./pages/settings/hrSettings/pageAnnualLeave";
-import LeavePolicyAccrualPage from "./pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage";
-import { PageHolidayHist } from "./pages/core/pageHolidayHist";
-import ProfilePage from "./pages/profile";
-import PageAddUser from "./pages/core/usermanagement/pageAddUser";
-import PageHrSettings from "./pages/settings/hrSettings/PageHrSettings";
-import PageCoreSettings from "./pages/settings/coreSettings/PageCoreSettings";
-import PageApiSettings from "./pages/settings/coreSettings/PageApiSettings";
-import PageMenuSettings from "./pages/settings/coreSettings/PageMenuSettings";
-import FileDashboard from "./pages/modules/File";
-import { AuthProvider } from "../src/contexts/AuthContext"; 
+import BranchesPage from './pages/core/pageBranches';
+import FiscalYearHistory from './pages/core/pageFiscYearHist';
+import PagePeriod from './pages/core/pagePeriod';
+import PageSettings from './pages/settings/pageSettings';
+import JobGradeSubgrades from './pages/settings/hrSettings/jobgrade/JobGradeSubgrades';
+import PageBenefitSet from './pages/settings/hrSettings/pageBenefitSet';
+import PageEducationalQual from './pages/settings/hrSettings/pageEducationalQual';
+import PagePosition from './pages/settings/hrSettings/position/pagePosition';
+import PositionDetails from './pages/settings/hrSettings/position/PositionDetails';
+import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
+import PageAnnualLeave from './pages/settings/hrSettings/pageAnnualLeave';
+import LeavePolicyAccrualPage  from './pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage';
+import { PageHolidayHist } from './pages/core/pageHolidayHist';
+import ProfilePage from './pages/profile';
+import PageAddUser from './pages/core/usermanagement/pageAddUser';
+import PageHrSettings from './pages/settings/hrSettings/PageHrSettings';
+import PageCoreSettings from './pages/settings/coreSettings/PageCoreSettings';
+import PageApiSettings from './pages/settings/coreSettings/PageApiSettings';
+import PageMenuSettings from './pages/settings/coreSettings/PageMenuSettings';
+import FileDashboard from './pages/modules/File';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -71,7 +80,8 @@ function App() {
   return (
     <AuthProvider>
       <ModuleProvider>
-        <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
           <Routes>
             {/* Root path redirects to login */}
             <Route path="/" element={<Navigate to="/login" replace />} />
@@ -235,7 +245,8 @@ function App() {
             />
           </Routes>
         </BrowserRouter>
-      </ModuleProvider>
+        </QueryClientProvider>
+    </ModuleProvider>
     </AuthProvider>
   );
 }

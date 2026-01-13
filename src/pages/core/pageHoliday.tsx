@@ -5,11 +5,16 @@ import { AddHolidayModal } from '../../components/core/holiday/AddHolidayModal';
 import { EditHolidayModal } from '../../components/core/holiday/EditHolidayModal';
 import { DeleteHolidayModal } from '../../components/core/holiday/DeleteHolidayModal';
 import { HolidayList } from '../../components/core/holiday/HolidayList';
-import { holidayService } from '../../services/core/holidayservice';
-import { fiscalYearService } from '../../services/core/fiscservice';
+import { 
+  useHolidays, 
+  useCreateHoliday, 
+  useUpdateHoliday, 
+  useDeleteHoliday 
+} from '../../services/core/holiday/holiday.queries';
+import { useFiscalYears } from '../../services/core/fiscalyear/fisc.queries';
 import type { AddHolidayDto, HolidayListDto, EditHolidayDto, UUID } from '../../types/core/holiday';
-import {motion} from 'framer-motion';
 import type { FiscYearListDto } from '../../types/core/fisc';
+import { motion } from 'framer-motion';
 
 const getDefaultHoliday = (fiscalYears: FiscYearListDto[]): AddHolidayDto => ({
   name: '',
@@ -29,15 +34,64 @@ export default function PageHoliday() {
     fiscalYearId: '' as UUID,
   });
   const [selectedHoliday, setSelectedHoliday] = useState<HolidayListDto | null>(null);
-  const [holidays, setHolidays] = useState<HolidayListDto[]>([]);
-  const [fiscalYears, setFiscalYears] = useState<FiscYearListDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  // Load holidays and fiscal years on component mount
+  // React Query hooks
+  const {
+    data: holidays = [],
+    isLoading: holidaysLoading,
+    error: holidaysError,
+    refetch: refetchHolidays,
+  } = useHolidays();
+
+  const {
+    data: fiscalYears = [],
+    isLoading: fiscalYearsLoading,
+    error: fiscalYearsError,
+  } = useFiscalYears();
+
+  const createHolidayMutation = useCreateHoliday({
+    onSuccess: () => {
+      setFormError(null);
+      setAddModalOpen(false);
+      setNewHoliday(getDefaultHoliday(fiscalYears));
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to create holiday');
+    },
+  });
+
+  const updateHolidayMutation = useUpdateHoliday({
+    onSuccess: () => {
+      setFormError(null);
+      setEditModalOpen(false);
+      setSelectedHoliday(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to update holiday');
+    },
+  });
+
+  const deleteHolidayMutation = useDeleteHoliday({
+    onSuccess: () => {
+      setFormError(null);
+      setDeleteModalOpen(false);
+      setSelectedHoliday(null);
+    },
+    onError: (error) => {
+      setFormError(error.message || 'Failed to delete holiday');
+    },
+  });
+
+  // Set default fiscal year for new holidays when fiscal years are loaded
   useEffect(() => {
-    loadData();
-  }, []);
+    if (fiscalYears.length > 0 && !newHoliday.fiscalYearId) {
+      setNewHoliday(prev => ({
+        ...prev,
+        fiscalYearId: fiscalYears[0].id
+      }));
+    }
+  }, [fiscalYears, newHoliday.fiscalYearId]);
 
   // Reset newHoliday when add modal opens with current fiscal years
   useEffect(() => {
@@ -46,77 +100,22 @@ export default function PageHoliday() {
     }
   }, [addModalOpen, fiscalYears]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Load holidays and fiscal years in parallel
-      const [holidaysData, fiscalYearsData] = await Promise.all([
-        holidayService.getAllHolidays(),
-        fiscalYearService.getAllFiscalYears()
-      ]);
-      
-      setHolidays(holidaysData);
-      setFiscalYears(fiscalYearsData);
-      
-      // Set default fiscal year for new holidays
-      if (fiscalYearsData.length > 0) {
-        setNewHoliday(prev => ({
-          ...prev,
-          fiscalYearId: fiscalYearsData[0].id
-        }));
-      }
-    } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load holidays data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleAddHoliday = async (): Promise<void> => {
-    try {
-      setError(null);
-      const createdHoliday = await holidayService.createHoliday(newHoliday);
-      setHolidays(prev => [createdHoliday, ...prev]);
-      setAddModalOpen(false);
-      setNewHoliday(getDefaultHoliday(fiscalYears));
-    } catch (error) {
-      console.error('Error adding holiday:', error);
-      setError('Failed to create holiday');
-      throw error;
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await createHolidayMutation.mutateAsync(newHoliday);
   };
 
   const handleEditHoliday = async (holidayData: EditHolidayDto): Promise<void> => {
-    try {
-      setError(null);
-      const updatedHoliday = await holidayService.updateHoliday(holidayData);
-      setHolidays(prev => prev.map(h => 
-        h.id === updatedHoliday.id ? updatedHoliday : h
-      ));
-      setEditModalOpen(false);
-      setSelectedHoliday(null);
-    } catch (error) {
-      console.error('Error updating holiday:', error);
-      setError('Failed to update holiday');
-      throw error;
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await updateHolidayMutation.mutateAsync(holidayData);
   };
 
   const handleDeleteHoliday = async (holidayId: UUID): Promise<void> => {
-    try {
-      setError(null);
-      await holidayService.deleteHoliday(holidayId);
-      setHolidays(prev => prev.filter(h => h.id !== holidayId));
-      setDeleteModalOpen(false);
-      setSelectedHoliday(null);
-    } catch (error) {
-      console.error('Error deleting holiday:', error);
-      setError('Failed to delete holiday');
-      throw error;
-    }
+    setFormError(null);
+    // No try/catch needed - error is handled by mutation's onError
+    await deleteHolidayMutation.mutateAsync(holidayId);
   };
 
   const handleAddModalOpenChange = (open: boolean) => {
@@ -138,6 +137,13 @@ export default function PageHoliday() {
     setDeleteModalOpen(true);
   };
 
+  // Handle delete confirmation
+  const handleDeleteConfirmation = async () => {
+    if (selectedHoliday) {
+      await handleDeleteHoliday(selectedHoliday.id);
+    }
+  };
+
   const handleEditModalClose = () => {
     setEditModalOpen(false);
     setSelectedHoliday(null);
@@ -146,6 +152,20 @@ export default function PageHoliday() {
   const handleDeleteModalClose = () => {
     setDeleteModalOpen(false);
     setSelectedHoliday(null);
+  };
+
+  // Combine errors from both queries
+  const displayError = holidaysError?.message || fiscalYearsError?.message || formError;
+
+  // Combined loading state
+  const isLoading = holidaysLoading || fiscalYearsLoading;
+
+  // Clear errors
+  const clearErrors = () => {
+    setFormError(null);
+    if (holidaysError || fiscalYearsError) {
+      refetchHolidays();
+    }
   };
 
   // Get current fiscal year for display
@@ -160,50 +180,50 @@ export default function PageHoliday() {
         />
         
         {/* Error Message */}
-        {error && (
+        {displayError && (
           <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6"
+          >
+            <div className="flex justify-between items-center">
+              <span className="font-medium">
+                {displayError.includes("load") ? (
+                  <>
+                    Failed to load holidays.{" "}
+                    <button
+                      onClick={() => refetchHolidays()}
+                      className="underline hover:text-red-800 font-semibold focus:outline-none"
+                      disabled={isLoading}
+                    >
+                      Try again
+                    </button>
+                  </>
+                ) : displayError.includes("create") ? (
+                  "Failed to create holiday. Please try again."
+                ) : displayError.includes("update") ? (
+                  "Failed to update holiday. Please try again."
+                ) : displayError.includes("delete") ? (
+                  "Failed to delete holiday. Please try again."
+                ) : (
+                  displayError
+                )}
+              </span>
+              <button
+                onClick={clearErrors}
+                className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
               >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">
-                    {error.includes("load") ? (
-                      <>
-                        Failed to load holidays.{" "}
-                        <button
-                          onClick={loadData}
-                          className="underline hover:text-red-800 font-semibold focus:outline-none"
-                        >
-                          Try again
-                        </button>{" "}
-                        later.
-                      </>
-                    ) : error.includes("create") ? (
-                      "Failed to create fiscal year. Please try again."
-                    ) : error.includes("update") ? (
-                      "Failed to update fiscal year. Please try again."
-                    ) : error.includes("delete") ? (
-                      "Failed to delete fiscal year. Please try again."
-                    ) : (
-                      error
-                    )}
-                  </span>
-                  <button
-                    onClick={() => setError(null)}
-                    className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
-                  >
-                    ×
-                  </button>
-                </div>
-              </motion.div>
+                ×
+              </button>
+            </div>
+          </motion.div>
         )}
         
         {/* Main Content */}
         <div className="w-full mx-auto px-4 py-6">
           <HolidayList
             holidays={holidays}
-            loading={loading}
+            loading={isLoading}
             onEdit={handleEdit}
             onDelete={handleDelete}
             currentFiscalYear={currentFiscalYear}
@@ -221,20 +241,20 @@ export default function PageHoliday() {
       </Dialog>
 
       {/* Edit Modal */}
-<EditHolidayModal
-  isOpen={editModalOpen}
-  onClose={handleEditModalClose}
-  onSave={handleEditHoliday}
-  holiday={selectedHoliday}
-  fiscalYears={fiscalYears}
-/>
+      <EditHolidayModal
+        isOpen={editModalOpen}
+        onClose={handleEditModalClose}
+        onSave={handleEditHoliday}
+        holiday={selectedHoliday}
+        fiscalYears={fiscalYears}
+      />
 
-<DeleteHolidayModal
-  isOpen={deleteModalOpen}
-  onClose={handleDeleteModalClose}
-  onConfirm={handleDeleteHoliday}
-  holiday={selectedHoliday}
-/>
+      <DeleteHolidayModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteModalClose}
+        onConfirm={handleDeleteConfirmation}
+        holiday={selectedHoliday}
+      />
     </div>
   );
 }

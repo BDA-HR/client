@@ -11,7 +11,7 @@ import type { ModPerMenuListDto, NameList } from '../../../types/auth/ModPerMenu
 import type { MenuPerApiListDto } from '../../../types/auth/MenuPerApi';
 import { registrationService } from '../../../services/auth/registerservice';
 import { perMenuService } from '../../../services/auth/perMenuService';
-import { menuPerApiService } from '../../../services/auth/MenuPerApiService';
+import * as MenuPerApiService from '../../../services/auth/menuPerApiService';
 import toast from 'react-hot-toast';
 
 const steps = [
@@ -50,7 +50,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string>('');
   const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
-  
+
   // Real data state for permissions (Step 2)
   const [permissionsData, setPermissionsData] = useState<ModPerMenuListDto[]>([]);
   const [flattenedPermissions, setFlattenedPermissions] = useState<Array<NameList & { moduleId: UUID; moduleName: string }>>([]);
@@ -65,14 +65,14 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
 
   const getEmployeeEmail = () => {
     if (!employee) return '';
-    
+
     if (employee.code) {
       if (employee.code.includes('@')) {
         return employee.code;
       }
       return `${employee.code.toLowerCase()}@company.com`;
     }
-    
+
     return '';
   };
 
@@ -92,32 +92,32 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       if (currentStep === 2 && formData.step1.modules.length > 0 && userId) {
         setIsLoadingPermissions(true);
         setPermissionsError(null);
-        
+
         try {
           console.log('Fetching permission menus for user:', userId);
           console.log('Selected modules:', formData.step1.modules);
-          
+
           // Convert selected modules to UUID array
           const selectedModuleIds = formData.step1.modules.map(id => id as UUID);
-          
+
           // Fetch filtered permissions for the user based on selected modules
           const filteredPermissions = await perMenuService.getFilteredPermissionsForUser(
             userId as UUID,
             selectedModuleIds
           );
-          
+
           console.log('Filtered permissions (grouped):', filteredPermissions);
           setPermissionsData(filteredPermissions);
-          
+
           // Flatten the permissions for easier display
           const flattened = await perMenuService.getFlattenedPermissionsForUser(
             userId as UUID,
             selectedModuleIds
           );
-          
+
           console.log('Flattened permissions:', flattened);
           setFlattenedPermissions(flattened);
-          
+
           if (filteredPermissions.length === 0) {
             toast('No permissions found for the selected modules', {
               icon: '⚠️',
@@ -127,13 +127,13 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               }
             });
           }
-          
+
         } catch (error: any) {
           console.error('Error fetching permissions data:', error);
           const errorMessage = error.message || 'Failed to load permissions data from API';
           setPermissionsError(errorMessage);
           toast.error('Could not load permissions. Please try again.');
-          
+
           // Clear data on error
           setPermissionsData([]);
           setFlattenedPermissions([]);
@@ -142,7 +142,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         }
       }
     };
-    
+
     fetchPermissionsData();
   }, [currentStep, formData.step1.modules, userId]);
 
@@ -152,32 +152,32 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       if (currentStep === 3 && userId && formData.step2.permissions.length > 0) {
         setIsLoadingApiPermissions(true);
         setApiPermissionsError(null);
-        
+
         try {
           console.log('Fetching API permissions for user:', userId);
           console.log('Selected menus:', formData.step2.permissions);
-          
+
           // Convert selected menus to UUID array
           const selectedMenuIds = formData.step2.permissions.map(id => id as UUID);
-          
+
           // Fetch filtered API permissions for the user based on selected menus
-          const filteredApiPermissions = await menuPerApiService.getFilteredPerApisForUser(
+          const filteredApiPermissions = await MenuPerApiService.menuPerApiService.getFilteredPerApisForUser(
             userId as UUID,
             selectedMenuIds
           );
-          
+
           console.log('Filtered API permissions (grouped):', filteredApiPermissions);
           setApiPermissionsData(filteredApiPermissions);
-          
+
           // Flatten the API permissions for easier display
-          const flattened = await menuPerApiService.getFlattenedPerApisForUser(
+          const flattened = await MenuPerApiService.menuPerApiService.getFlattenedPerApisForUser(
             userId as UUID,
             selectedMenuIds
           );
-          
+
           console.log('Flattened API permissions:', flattened);
           setFlattenedApiPermissions(flattened);
-          
+
           if (filteredApiPermissions.length === 0) {
             toast('No API permissions found for the selected menus', {
               icon: '⚠️',
@@ -187,13 +187,13 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               }
             });
           }
-          
+
         } catch (error: any) {
           console.error('Error fetching API permissions data:', error);
           const errorMessage = error.message || 'Failed to load API permissions data from API';
           setApiPermissionsError(errorMessage);
           toast.error('Could not load API permissions. Please try again.');
-          
+
           setApiPermissionsData([]);
           setFlattenedApiPermissions([]);
         } finally {
@@ -201,7 +201,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         }
       }
     };
-    
+
     fetchApiPermissionsData();
   }, [currentStep, userId, formData.step2.permissions]);
 
@@ -216,7 +216,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         description: `Permission for ${permission.moduleName} module`
       }));
     }
-    
+
     // Otherwise, check if we have grouped data but not flattened yet
     if (permissionsData.length > 0) {
       const permissions: any[] = [];
@@ -232,7 +232,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       }
       return permissions;
     }
-    
+
     // No data available
     return [];
   };
@@ -242,7 +242,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
     if (formData.step2.permissions.length === 0 || flattenedApiPermissions.length === 0) {
       return [];
     }
-    
+
     // Transform to match ApiPermissionsStep format
     return flattenedApiPermissions.map(apiPermission => ({
       id: apiPermission.id,
@@ -263,7 +263,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         description: `Menu: ${menuGroup.perMenu}`
       }));
     }
-    
+
     return [];
   };
 
@@ -326,7 +326,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
 
       // Call registration service step 1
       const result = await registrationService.step1(regStep1Data);
-      
+
       console.log('Registration step 1 completed:', result);
 
       // Store user ID for next steps
@@ -396,7 +396,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         userId,
         ...regStep2Data
       });
-      
+
       console.log('Registration step 2 completed:', result);
 
       // Update form data
@@ -463,7 +463,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         userId,
         ...regStep3Data
       });
-      
+
       console.log('Registration step 3 completed:', result);
 
       // Mark registration as complete
@@ -484,7 +484,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
       };
 
       console.log('Account creation completed:', finalData);
-      
+
       // Show success message
       toast.success('Account setup completed successfully!');
 
@@ -496,7 +496,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
         accountId: result.userId,
         ...finalData
       });
-      
+
     } catch (error: any) {
       console.error('Failed to create account:', error);
       const errorMessage = error.message || 'Failed to complete account setup. Please try again.';
@@ -667,7 +667,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               }}
             />
           )}
-          
+
           {currentStep === 2 && (
             <MainPermissionsStep
               key="step2"
@@ -679,7 +679,7 @@ export const AddAccountStepForm: React.FC<AddAccountStepFormProps> = ({
               selectedModules={formData.step1.modules}
             />
           )}
-          
+
           {currentStep === 3 && (
             <ApiPermissionsStep
               key="step3"

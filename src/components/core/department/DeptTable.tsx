@@ -20,7 +20,7 @@ interface DepartmentTableProps {
   totalItems: number;
   onPageChange: (page: number) => void;
   onEditDepartment: (department: EditDeptDto) => void;
-  onDepartmentStatusChange: (id: string, status: "active" | "inactive") => void;
+  onDepartmentStatusChange: (id: UUID, status: "active" | "inactive") => void;
   onDepartmentDelete: (id: UUID) => void;
 }
 
