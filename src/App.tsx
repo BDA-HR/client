@@ -57,6 +57,7 @@ import PageMenuSettings from './pages/settings/coreSettings/PageMenuSettings';
 import FileDashboard from './pages/modules/File';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
