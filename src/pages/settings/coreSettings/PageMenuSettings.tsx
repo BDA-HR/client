@@ -188,7 +188,11 @@ function PageMenuSettings() {
     return permissions.filter(permission => 
       permission.key.toLowerCase().includes(searchLower) ||
       permission.name.toLowerCase().includes(searchLower) ||
-      permission.module.toLowerCase().includes(searchLower)
+      permission.module.toLowerCase().includes(searchLower) ||
+      (permission.label && permission.label.toLowerCase().includes(searchLower)) ||
+      (permission.path && permission.path.toLowerCase().includes(searchLower)) ||
+      (permission.icon && permission.icon.toLowerCase().includes(searchLower)) ||
+      (permission.parentKey && permission.parentKey.toLowerCase().includes(searchLower))
     );
   };
 

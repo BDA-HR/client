@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChevronRight, Mail, MousePointer, BarChart2 } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const marketingData = [
   { name: 'Jan', opens: 4000, clicks: 2400, conversions: 1800 },
@@ -21,6 +22,8 @@ const campaigns = [
 ];
 
 export default function MarketingOverview() {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
       className="bg-white rounded-lg border p-6 shadow-sm"
@@ -33,7 +36,7 @@ export default function MarketingOverview() {
           <Mail className="mr-2 text-purple-600" size={20} />
           Marketing Automation
         </h2>
-        <Button variant="ghost" size="sm" className="text-purple-600">
+        <Button variant="ghost" size="sm" className="text-purple-600" onClick={() => navigate('/crm/marketing')}>
           View All <ChevronRight size={16} />
         </Button>
       </div>

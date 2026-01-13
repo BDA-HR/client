@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { isExpiringSoon } from '../../src/utils/token.utils';
-import { authStore } from '../../src/stores/auth.store';
+import { getAccessToken, getExpiresAt, refresh } from "../utils/auth.utils";
 
 // Create axios instance with default config
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_GATEWAY_URL || 'http://localhost:1212/',
+  baseURL: import.meta.env.VITE_GATEWAY_URL || 'https://localhost:1213/api/',
   timeout: 10000,
   withCredentials: true,
   headers: {
@@ -13,22 +13,16 @@ export const api = axios.create({
 });
 
 /* 🔐 Preemptive refresh */
-api.interceptors.request.use(async config => {
-  const state = authStore.getState();
-
-  if (
-    state.accessToken &&
-    state.expiresAt &&
-    isExpiringSoon(state.expiresAt)
-  ) {
-    await authStore.getState().refresh();
+api.interceptors.request.use(async (config) => {
+  let token = getAccessToken();
+  const expiresAt = getExpiresAt();
+  if (token && expiresAt && isExpiringSoon(expiresAt)) {
+    await refresh();
+    token = getAccessToken(); // Refresh updates cookie
   }
-
-  const token = authStore.getState().accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 

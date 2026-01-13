@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChevronRight, UserPlus } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface LeadData {
   name: string;
@@ -34,6 +35,8 @@ const leadStatus: LeadStatus[] = [
 ];
 
 export default function LeadOverview() {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
       className="bg-white rounded-xl border border-orange-100 p-6 shadow-sm hover:shadow-orange-100 transition-shadow"
@@ -46,7 +49,7 @@ export default function LeadOverview() {
           <UserPlus className="mr-2 text-orange-600" size={20} />
           Lead Management
         </h2>
-        <Button variant="ghost" size="sm" className="hover:text-orange-600  text-black hover:bg-orange-50">
+        <Button variant="ghost" size="sm" className="hover:text-orange-600  text-black hover:bg-orange-50" onClick={() => navigate('/crm/leads')}>
           View All <ChevronRight size={16} />
         </Button>
       </div>

@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, BadgePlus } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Label } from '../../ui/label';
-import List from '../../../components/List/list';
-import type { ListItem, UUID } from '../../../types/List/list';
-import type { AddDeptDto } from '../../../types/core/dept';
-import type { BranchCompListDto } from '../../../types/core/branch';
-import { amharicRegex } from '../../../utils/amharic-regex';
-import { branchService } from '../../../services/core/branchservice';
-import useToast from '../../../hooks/useToast';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { X, BadgePlus } from "lucide-react";
+import { Button } from "../../ui/button";
+import { Label } from "../../ui/label";
+import List from "../../../components/List/list";
+import type { ListItem, UUID } from "../../../types/List/list";
+import type { AddDeptDto } from "../../../types/core/dept";
+import type { BranchCompListDto } from "../../../types/core/branch";
+import { amharicRegex } from "../../../utils/amharic-regex";
+import { useBranchCompanyList } from "../../../services/core/branch/branch.queries";
+import useToast from "../../../hooks/useToast";
 
 interface AddDeptModalProps {
   onAddDepartment: (department: AddDeptDto) => Promise<any>;
@@ -18,94 +18,89 @@ interface AddDeptModalProps {
 const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [branches, setBranches] = useState<BranchCompListDto[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<UUID | undefined>(undefined);
+  const [selectedBranch, setSelectedBranch] = useState<UUID | undefined>(
+    undefined
+  );
   const [newDepartment, setNewDepartment] = useState({
-    name: '',
-    nameAm: '',
-    branchId: '' as UUID
+    name: "",
+    nameAm: "",
+    branchId: "" as UUID,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchBranches();
-    }
-  }, [isOpen]);
+  // Use React Query to fetch branches
+  const {
+    data: branches = [],
+    isLoading: loadingBranches,
+    isError: branchesError,
+    error: branchesErrorData,
+    refetch: refetchBranches,
+  } = useBranchCompanyList();
 
-  const fetchBranches = async () => {
-    try {
-      setLoading(true);
-      const branchesData = await branchService.getBranchCompanyList();
-      setBranches(branchesData);
-    } catch (error) {
-      console.error('Error fetching branches:', error);
-      toast.error('Failed to load branches. Please refresh the page.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const branchListItems: ListItem[] = branches.map(branch => ({
+  const branchListItems: ListItem[] = branches.map((branch) => ({
     id: branch.id,
-    name: branch.name
+    name: branch.name,
   }));
 
   const handleSelectBranch = (item: ListItem) => {
     setSelectedBranch(item.id);
-    setNewDepartment(prev => ({ ...prev, branchId: item.id }));
+    setNewDepartment((prev) => ({ ...prev, branchId: item.id }));
   };
 
   const handleAmharicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === '' || amharicRegex.test(value)) {
+    if (value === "" || amharicRegex.test(value)) {
       setNewDepartment((prev) => ({ ...prev, nameAm: value }));
     }
   };
 
   const handleSubmit = async () => {
-    if (!newDepartment.name || !newDepartment.nameAm || !newDepartment.branchId) {
-      toast.error('Please fill all required fields');
+    if (
+      !newDepartment.name ||
+      !newDepartment.nameAm ||
+      !newDepartment.branchId
+    ) {
+      toast.error("Please fill all required fields");
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToastId = toast.loading('Adding department...');
+    const loadingToastId = toast.loading("Adding department...");
 
     try {
       const response = await onAddDepartment({
         name: newDepartment.name.trim(),
         nameAm: newDepartment.nameAm.trim(),
         branchId: newDepartment.branchId,
-      });      toast.dismiss(loadingToastId);
+      });
+
+      toast.dismiss(loadingToastId);
 
       const successMessage =
         response?.data?.message ||
         response?.message ||
-        '';
+        "Department added successfully!";
 
       toast.success(successMessage);
 
       // Reset form
       setNewDepartment({
-        name: '',
-        nameAm: '',
-        branchId: '' as UUID
+        name: "",
+        nameAm: "",
+        branchId: "" as UUID,
       });
       setSelectedBranch(undefined);
       setIsOpen(false);
-
     } catch (error: any) {
       toast.dismiss(loadingToastId);
-      
-      const errorMessage = 
+
+      const errorMessage =
         error.response?.data?.message ||
         error.message ||
-        'Failed to add department. Please try again.';
-      
+        "Failed to add department. Please try again.";
+
       toast.error(errorMessage);
-      console.error('Error adding department:', error);
+      console.error("Error adding department:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -117,7 +112,16 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
     }
   };
 
-  const isFormValid = newDepartment.name && newDepartment.nameAm && newDepartment.branchId;
+  const isFormValid =
+    newDepartment.name && newDepartment.nameAm && newDepartment.branchId;
+
+  // Show error if branches fail to load
+  if (branchesError && isOpen) {
+    const errorMessage =
+      (branchesErrorData as any)?.response?.data?.message ||
+      "Failed to load branches. Please try again.";
+    toast.error(errorMessage);
+  }
 
   return (
     <>
@@ -166,9 +170,22 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
                     label="Select Branch"
                     placeholder="Select a branch"
                     required
-                    disabled={loading || isSubmitting}
+                    disabled={loadingBranches || isSubmitting}
                   />
-                  {loading && <p className="text-sm text-gray-500">Loading branches...</p>}
+                  {loadingBranches && (
+                    <p className="text-sm text-gray-500">Loading branches...</p>
+                  )}
+                  {branchesError && (
+                    <div className="text-sm text-red-600">
+                      Failed to load branches.{" "}
+                      <button
+                        onClick={() => refetchBranches()}
+                        className="text-emerald-600 hover:text-emerald-700 underline"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Department Names */}
@@ -194,7 +211,10 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
                     id="name"
                     value={newDepartment.name}
                     onChange={(e) =>
-                      setNewDepartment((prev) => ({ ...prev, name: e.target.value }))
+                      setNewDepartment((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
                     }
                     placeholder="Finance"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
@@ -212,7 +232,7 @@ const AddDeptModal: React.FC<AddDeptModalProps> = ({ onAddDepartment }) => {
                   onClick={handleSubmit}
                   disabled={!isFormValid || isSubmitting}
                 >
-                  {isSubmitting ? 'Saving...' : 'Save'}
+                  {isSubmitting ? "Saving..." : "Save"}
                 </Button>
                 <Button
                   variant="outline"

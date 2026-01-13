@@ -5,9 +5,16 @@ import { useState, useEffect, useCallback } from "react";
 import { Bell } from "lucide-react";
 import Calendar from "../components/Calender";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
-import { authStore } from "../../src/stores/auth.store";
-import { hasPermission } from "../../src/utils/jwt.utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
+import { getAccessToken } from "../utils/auth.utils";
+import { hasRole } from "../utils/jwt.utils";
 
 interface Notification {
   id: number;
@@ -76,37 +83,47 @@ const initialNotifications: Notification[] = [
   },
 ];
 const mockTasks: Task[] = [
-  { id: 1, title: 'Team Meeting', time: '10:00 AM', completed: false },
-  { id: 2, title: 'Client Presentation', time: '2:30 PM', completed: true },
-  { id: 3, title: 'Project Deadline', time: '4:00 PM', completed: false },
-  { id: 4, title: 'Review Reports', time: '5:30 PM', completed: false },
+  { id: 1, title: "Team Meeting", time: "10:00 AM", completed: false },
+  { id: 2, title: "Client Presentation", time: "2:30 PM", completed: true },
+  { id: 3, title: "Project Deadline", time: "4:00 PM", completed: false },
+  { id: 4, title: "Review Reports", time: "5:30 PM", completed: false },
 ];
-
-
 
 function Modules() {
   const navigate = useNavigate();
-  const [visibleNotifications, setVisibleNotifications] = useState<Notification[]>([]);
-  const [allNotifications, setAllNotifications] = useState<Notification[]>(initialNotifications);
-  const [shownNotificationCount, setShownNotificationCount] = useState<number>(0); // NEW
+  const [visibleNotifications, setVisibleNotifications] = useState<
+    Notification[]
+  >([]);
+  const [allNotifications, setAllNotifications] =
+    useState<Notification[]>(initialNotifications);
+  const [shownNotificationCount, setShownNotificationCount] =
+    useState<number>(0);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
+
+  // Get token and check roles
+  const token = getAccessToken();
+  const isAdmin = token ? hasRole(token, "admin") : false;
+  const isCEO = token ? hasRole(token, "ceo") : false;
+  const isViceCEO = token
+    ? hasRole(token, "vice.ceo") || hasRole(token, "vice_ceo")
+    : false;
+  const isAuditor = token ? hasRole(token, "auditor") : false;
+
+  // Hide sidebars for admin, CEO, vice CEO, and auditor roles
+  const hideSidebars = isAdmin || isCEO || isViceCEO || isAuditor;
+
   useEffect(() => {
-    document.title = selectedModule ? `RST | ${selectedModule}` : 'RST';
+    document.title = selectedModule ? `RST | ${selectedModule}` : "RST";
   }, [selectedModule]);
 
   const handleModuleSelect = useCallback((moduleName: string) => {
     setSelectedModule(moduleName);
   }, []);
 
-  const token = authStore(state => state.accessToken);
-  if (token && hasPermission(token, "mod.hrm", "module")) {
-    console.log("User can access HR module");
-  }
-
   const toggleTaskCompletion = useCallback((taskId: number) => {
-    setTasks(prevTasks =>
-      prevTasks.map(task =>
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
         task.id === taskId ? { ...task, completed: !task.completed } : task
       )
     );
@@ -116,9 +133,9 @@ function Modules() {
     const showTimer = setInterval(() => {
       if (allNotifications.length > 0) {
         const nextNotification = allNotifications[0];
-        setVisibleNotifications(prev => [nextNotification, ...prev]);
-        setAllNotifications(prev => prev.slice(1));
-        setShownNotificationCount(prev => prev + 1); // INCREMENT only when shown
+        setVisibleNotifications((prev) => [nextNotification, ...prev]);
+        setAllNotifications((prev) => prev.slice(1));
+        setShownNotificationCount((prev) => prev + 1);
       } else {
         clearInterval(showTimer);
       }
@@ -130,7 +147,7 @@ function Modules() {
   useEffect(() => {
     if (visibleNotifications.length > 0) {
       const removeTimer = setInterval(() => {
-        setVisibleNotifications(prev => prev.slice(0, -1));
+        setVisibleNotifications((prev) => prev.slice(0, -1));
       }, 20000);
 
       return () => clearInterval(removeTimer);
@@ -143,18 +160,20 @@ function Modules() {
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-white/90 to-transparent backdrop-blur-sm py-4">
         <div className="container mx-auto flex justify-between items-center">
           {/* Split header text */}
-          <div className="text-center ml-96">
+          <div className={`text-center ${hideSidebars ? "mx-auto" : "ml-96"}`}>
             <h1 className="text-4xl font-bold text-gray-800 drop-shadow">
-              Welcome to the  <i className="text-blue-500 relative">RST
+              Welcome to the{" "}
+              <i className="text-blue-500 relative">
+                RST
                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
-              </i> <span className="text-blue-500"> {" "} ERP</span>
+              </i>{" "}
+              <span className="text-blue-500"> ERP</span>
             </h1>
-
           </div>
 
           {/* Fixed Header Controls */}
           <div className="flex items-center gap-4">
-            {/* Notification Icon with Badge */}
+            {/* Notification Icon with Badge - Show for all users */}
             <div className="relative">
               <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
                 <Bell className="h-6 w-6 text-gray-700" />
@@ -168,13 +187,21 @@ function Modules() {
 
             {/* Logout Button */}
             <DropdownMenu>
-              <DropdownMenuTrigger><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback> </Avatar></DropdownMenuTrigger>
+              <DropdownMenuTrigger>
+                <Avatar>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/login")}>logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/login")}>
+                  logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -182,53 +209,65 @@ function Modules() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto h-full flex items-center pt-24"> {/* Added top/bottom padding */}
-        {/* Left Panel - Calendar with Scroll */}
-        <div className="w-1/4 h-full pr-8">
-          <div className="h-full overflow-y-auto"> {/* Scroll container */}
-            <Calendar
-              tasks={tasks}
-              onTaskToggle={toggleTaskCompletion}
-            />
+      <div className="container mx-auto h-full flex items-center pt-24">
+        {/* Left Panel - Calendar (Hidden for admin/executive roles) */}
+        {!hideSidebars && (
+          <div className="w-1/4 h-full pr-8">
+            <div className="h-full overflow-y-auto">
+              <Calendar tasks={tasks} onTaskToggle={toggleTaskCompletion} />
+            </div>
+          </div>
+        )}
+
+        {/* Center Panel - Modules Section */}
+        <div
+          className={`flex items-center justify-center ${
+            hideSidebars ? "w-full max-w-7xl mx-auto" : "flex-1"
+          }`}
+        >
+          <div className="relative w-full h-full min-h-[600px]">
+            <ModulesSection onModuleSelect={handleModuleSelect} />
           </div>
         </div>
 
-        {/* Center Panel - Honeycomb */}
-<div className="flex-1 flex items-center justify-center">
-  <div className="relative w-full h-full min-h-[600px]">
-    <ModulesSection onModuleSelect={handleModuleSelect} />
-  </div>
-</div>
-
-        {/* Right Panel - Notifications */}
-        <div className="w-1/4 pl-8 h-full">
-          <div className="h-full flex flex-col">
-            {/* Notification List with Scroll */}
-            <div className="flex-1 overflow-y-auto"> {/* Scroll container */}
-              <div className="bg-transparent rounded-2xl p-6 relative">
-                <div className="relative">
-                  <AnimatedList>
-                    {visibleNotifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-white/70 hover:bg-white transition-all duration-200 cursor-pointer mb-3 animate-in slide-in-from-right-96 fade-in duration-300"
-                      >
-                        <div className="text-2xl">{notification.icon}</div>
-                        <div className="flex flex-col">
-                          <h3 className="font-medium text-gray-800">{notification.name}</h3>
-                          <p className="text-sm text-gray-600">{notification.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+        {/* Right Panel - Notifications (Hidden for admin/executive roles) */}
+        {!hideSidebars && (
+          <div className="w-1/4 pl-8 h-full">
+            <div className="h-full flex flex-col">
+              {/* Notification List with Scroll */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="bg-transparent rounded-2xl p-6 relative">
+                  <div className="relative">
+                    <AnimatedList>
+                      {visibleNotifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className="flex items-center gap-3 p-3 rounded-xl bg-white/70 hover:bg-white transition-all duration-200 cursor-pointer mb-3 animate-in slide-in-from-right-96 fade-in duration-300"
+                        >
+                          <div className="text-2xl">{notification.icon}</div>
+                          <div className="flex flex-col">
+                            <h3 className="font-medium text-gray-800">
+                              {notification.name}
+                            </h3>
+                            <p className="text-sm text-gray-600">
+                              {notification.description}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {notification.time}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </AnimatedList>
+                      ))}
+                    </AnimatedList>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
 }
+
 export default Modules;

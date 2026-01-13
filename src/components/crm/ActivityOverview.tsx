@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ChevronRight, Calendar, User } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 type ActivityType = 'Meeting' | 'Call' | 'Email' | 'Task';
 type ActivityStatus = 'upcoming' | 'completed' | 'pending' | 'overdue';
@@ -36,6 +37,8 @@ const statusColors: StatusColors = {
 };
 
 export default function ActivityOverview() {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
       className="bg-white rounded-lg border p-6 shadow-sm"
@@ -48,7 +51,7 @@ export default function ActivityOverview() {
           <Calendar className="mr-2 text-amber-600" size={20} />
           Activity Management
         </h2>
-        <Button variant="ghost" size="sm" className="text-amber-600">
+        <Button variant="ghost" size="sm" className="text-amber-600" onClick={() => navigate('/crm/activities')}>
           View All <ChevronRight size={16} />
         </Button>
       </div>

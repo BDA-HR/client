@@ -1,24 +1,32 @@
-import type { AuthTokens, LoginRequest } from "../types/auth/auth.types";
-import { api } from './api';
+// src/services/auth.api.ts
 
-const AUTH_URL = `${import.meta.env.VITE_AUTH_URL || 'auth/v1'}`;
+import type { AuthTokens, LoginRequest } from "../types/auth/auth.types";
+import { api } from "./api";
+import axios from "axios"; // add this import
+
+// Temporary direct axios instance for login only
+const directAuthApi = axios.create({
+  baseURL: "https://localhost:1213",
+  timeout: 10000,
+  headers: { "Content-Type": "application/json" },
+});
 
 export const loginApi = async (payload: LoginRequest): Promise<AuthTokens> => {
-    const res = await api.post(`${AUTH_URL}/Login`, payload);
+  // Bypass gateway — call auth service directly (proven to work)
+  const res = await directAuthApi.post("/api/auth/v1/Login", payload);
 
-    if (!res.data.success) {
-        throw new Error(res.data.message);
-    }
+  if (!res.data.success) {
+    throw new Error(res.data.message || "Login failed");
+  }
 
-    return res.data.data;
+  return res.data.data;
 };
 
+// Keep normal refresh through gateway (or direct if needed)
 export const refreshTokenApi = async (): Promise<AuthTokens> => {
-    const res = await api.post(`${AUTH_URL}/RefreshToken`);
-
-    if (!res.data.success) {
-        throw new Error("Refresh token expired");
-    }
-
-    return res.data.data;
+  const res = await api.post("/api/auth/v1/RefreshToken");
+  if (!res.data.success) {
+    throw new Error(res.data.message || "Refresh failed");
+  }
+  return res.data.data;
 };

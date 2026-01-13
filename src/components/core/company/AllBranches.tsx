@@ -29,20 +29,29 @@ const AllBranchs: React.FC = () => {
 
   const getStatusText = (status: string): string => {
     switch (status) {
-      case '0': return 'Active';
-      case '1': return 'Inactive';
-      case '2': return 'Under Construction';
-      default: return status;
+      case "0":
+        return "Active";
+      case "1":
+        return "Inactive";
+      case "2":
+        return "Under Construction";
+      default:
+        return status;
     }
   };
 
   const getBranchTypeText = (branchType: string): string => {
     switch (branchType) {
-      case '0': return 'Head Office';
-      case '1': return 'Regional';
-      case '2': return 'Local';
-      case '3': return 'Virtual';
-      default: return branchType;
+      case "0":
+        return "Head Office";
+      case "1":
+        return "Regional";
+      case "2":
+        return "Local";
+      case "3":
+        return "Virtual";
+      default:
+        return branchType;
     }
   };
 
@@ -92,7 +101,9 @@ const AllBranchs: React.FC = () => {
       {/* Header - Always visible */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 -mt-2">
         <div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white">All Branches</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white">
+            All Branches
+          </h2>
         </div>
       </div>
 
@@ -156,42 +167,60 @@ const AllBranchs: React.FC = () => {
           variants={{
             hidden: { y: 20, opacity: 0 },
             visible: {
-              y: 0, 
+              y: 0,
               opacity: 1,
               transition: {
-                type: 'spring',
+                type: "spring",
                 stiffness: 100,
                 damping: 15,
-                duration: 0.5
-              }
-            }
+                duration: 0.5,
+              },
+            },
           }}
           className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md overflow-hidden"
         >
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-white">
-                <motion.tr 
+                <motion.tr
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  >
                     Branch
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                  >
                     Type
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                  >
                     Status
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
+                  >
                     Location
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell"
+                  >
                     Company
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell"
+                  >
                     Opened
                   </th>
                 </motion.tr>
@@ -199,7 +228,7 @@ const AllBranchs: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedBranches.length > 0 ? (
                   paginatedBranches.map((branch, index) => (
-                    <motion.tr 
+                    <motion.tr
                       key={branch.id}
                       custom={index}
                       initial="hidden"
@@ -208,7 +237,7 @@ const AllBranchs: React.FC = () => {
                     >
                       <td className="px-4 py-1 whitespace-nowrap">
                         <div className="flex items-center">
-                          <motion.div 
+                          <motion.div
                             whileHover={{ rotate: 10 }}
                             className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
                           >
@@ -225,21 +254,29 @@ const AllBranchs: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                          {getBranchTypeText(branch.branchType)}
+                        {getBranchTypeText(branch.branchType)}
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                            branch.branchStat
+                          )}`}
+                        >
                           {getStatusText(branch.branchStatStr)}
                         </span>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
                         <div className="flex items-center">
-                          <span className="truncate max-w-[120px]">{branch.location}</span>
+                          <span className="truncate max-w-[120px]">
+                            {branch.location}
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                         <div className="flex items-center">
-                          <span className="truncate max-w-[120px]">{branch.comp}</span>
+                          <span className="truncate max-w-[120px]">
+                            {branch.comp}
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
@@ -274,7 +311,9 @@ const AllBranchs: React.FC = () => {
                   Previous
                 </button>
                 <button
-                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  onClick={() =>
+                    handlePageChange(Math.min(totalPages, currentPage + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -284,36 +323,52 @@ const AllBranchs: React.FC = () => {
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
-                    <span className="font-medium">{Math.min(currentPage * 10, totalItems)}</span> of{' '}
-                    <span className="font-medium">{totalItems}</span> branches
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(currentPage - 1) * 10 + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium">
+                      {Math.min(currentPage * 10, totalItems)}
+                    </span>{" "}
+                    of <span className="font-medium">{totalItems}</span>{" "}
+                    branches
                   </p>
                 </div>
                 <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
                     <button
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      onClick={() =>
+                        handlePageChange(Math.max(1, currentPage - 1))
+                      }
                       disabled={currentPage === 1}
                       className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="sr-only">Previous</span>
                       <ChevronLeft size={16} />
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          currentPage === page
-                            ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === page
+                              ? "z-10 bg-emerald-50 border-emerald-500 text-emerald-600"
+                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      )
+                    )}
                     <button
-                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      onClick={() =>
+                        handlePageChange(Math.min(totalPages, currentPage + 1))
+                      }
                       disabled={currentPage === totalPages}
                       className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >

@@ -28,3 +28,15 @@ export function hasPermission(
             return payload.perApi.includes(permission);
     }
 }
+
+export function hasRole(token: string, expectedRole: string): boolean {
+  if (!token) return false;
+
+  try {
+    const decoded: any = jwtDecode(token);
+    return decoded.role === expectedRole;
+  } catch (e) {
+    console.error("Invalid token", e);
+    return false;
+  }
+}

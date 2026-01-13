@@ -4,6 +4,7 @@ import { X, BadgePlus } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Label } from '../../../ui/label';
 import { Input } from '../../../ui/input';
+import { Checkbox } from '../../../ui/checkbox';
 import List from '../../../List/list';
 import type { ListItem } from '../../../../types/List/list';
 import type { PerMenuAddDto, UUID } from '../../../../types/core/Settings/menu-permissions';
@@ -19,18 +20,44 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
   const [isOpen, setIsOpen] = useState(false);
   const [newPermission, setNewPermission] = useState<PerMenuAddDto>({
     perModuleId: '' as UUID,
-    key: '',
-    desc: ''
+    key: '', 
+    label: '', 
+    path: '', 
+    icon: '', 
+    isChild: false,
+    parentKey: '', 
+    order: 0 
   });
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModule, setSelectedModule] = useState<UUID | undefined>(undefined);
   const [errors, setErrors] = useState<{
     perModuleId?: string;
     key?: string;
-    desc?: string;
+    label?: string;
+    path?: string;
+    icon?: string;
+    order?: string;
+    parentKey?: string;
   }>({});
   
-  // New state for module names
+  // Add real-time key validation
+  const [existingKeys, setExistingKeys] = useState<string[]>([]);
+  
+  // Fetch existing keys when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const fetchExistingKeys = async () => {
+        try {
+          const permissions = await menuPermissionService.getAllMenuPermissions();
+          const keys = permissions.map(p => p.key);
+          setExistingKeys(keys);
+        } catch (error) {
+          console.error('Error fetching existing keys:', error);
+        }
+      };
+      fetchExistingKeys();
+    }
+  }, [isOpen]);
   const [moduleNames, setModuleNames] = useState<NameListItem[]>([]);
   const [isFetchingModules, setIsFetchingModules] = useState(false);
   const [moduleError, setModuleError] = useState<string | null>(null);
@@ -86,20 +113,35 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
   const validateForm = () => {
     const newErrors: {
       perModuleId?: string;
-      key?: string;
-      desc?: string;
+      label?: string;
+      path?: string;
+      icon?: string;
+      order?: string;
+      parentKey?: string;
     } = {};
 
     if (!newPermission.perModuleId) {
       newErrors.perModuleId = 'Please select a module';
     }
 
-    if (!newPermission.key.trim()) {
-      newErrors.key = 'Menu key is required';
+    if (!newPermission.label.trim()) {
+      newErrors.label = 'Label is required';
     }
 
-    if (!newPermission.desc.trim()) {
-      newErrors.desc = 'Description is required';
+    if (!newPermission.path.trim()) {
+      newErrors.path = 'Path is required';
+    }
+
+    if (!newPermission.icon.trim()) {
+      newErrors.icon = 'Icon is required';
+    }
+
+    if (newPermission.order < 0) {
+      newErrors.order = 'Order must be a positive number';
+    }
+
+    if (newPermission.isChild && !newPermission.parentKey.trim()) {
+      newErrors.parentKey = 'Parent key is required when Is Child is true';
     }
 
     setErrors(newErrors);
@@ -115,11 +157,25 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     setIsLoading(true);
 
     try {
-      const response = await onAddPermission({
-        ...newPermission,
-        key: newPermission.key.trim(),
-        desc: newPermission.desc.trim(),
-      });
+      // Generate key from selected module and label
+      const selectedModuleName = moduleListItems.find(m => m.id === newPermission.perModuleId)?.name || 'module';
+      const generatedKey = `${selectedModuleName.toLowerCase().replace(/\s+/g, '.')}.${newPermission.label.toLowerCase().replace(/\s+/g, '.')}`;
+      
+      // Map to the exact API structure expected by backend
+      const dataToSend = {
+        perModuleId: newPermission.perModuleId,
+        key: generatedKey, // Auto-generated key
+        label: newPermission.label.trim(),
+        path: newPermission.path.trim(),
+        icon: newPermission.icon.trim(),
+        isChild: newPermission.isChild,
+        parentKey: newPermission.parentKey.trim(),
+        order: newPermission.order
+      };
+      
+      console.log('Sending data to API:', dataToSend);
+      
+      const response = await onAddPermission(dataToSend);
 
       const successMessage =
         response?.data?.message ||
@@ -129,14 +185,26 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
       toast.success(successMessage);
 
       // Reset form and close modal
-      setNewPermission({ perModuleId: '' as UUID, key: '', desc: '' });
+      setNewPermission({ 
+        perModuleId: '' as UUID, 
+        key: '', // Will be auto-generated
+        label: '', 
+        path: '', 
+        icon: '', 
+        isChild: false, 
+        parentKey: '', 
+        order: 0 
+      });
       setSelectedModule(undefined);
       setErrors({});
       setIsOpen(false);
 
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to add menu permission';
+      
+      // Show the general error message
       toast.error(errorMessage);
+      
       console.error('Error adding menu permission:', error);
     } finally {
       setIsLoading(false);
@@ -146,7 +214,16 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
   const handleClose = () => {
     if (!isLoading) {
       // Reset form when closing
-      setNewPermission({ perModuleId: '' as UUID, key: '', desc: '' });
+      setNewPermission({ 
+        perModuleId: '' as UUID, 
+        key: '', // Will be auto-generated
+        label: '', 
+        path: '', 
+        icon: '', 
+        isChild: false, 
+        parentKey: '', 
+        order: 0 
+      });
       setSelectedModule(undefined);
       setErrors({});
       setModuleError(null);
@@ -164,7 +241,16 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     }
   };
 
-  const isFormValid = newPermission.perModuleId && newPermission.key.trim() && newPermission.desc.trim();
+  const isFormValid = newPermission.perModuleId && 
+                    newPermission.label.trim() && 
+                    newPermission.path.trim() && 
+                    newPermission.icon.trim() && 
+                    newPermission.order >= 0 &&
+                    (!newPermission.isChild || newPermission.parentKey.trim()) &&
+                    !errors.label &&
+                    !errors.path &&
+                    !errors.icon &&
+                    !errors.parentKey;
 
   return (
     <>
@@ -194,8 +280,8 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="bg-white rounded-xl shadow-xl max-w-2xl w-full md:w-1/2 lg:w-1/3 max-h-[90vh] overflow-y-auto"
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             onKeyDown={handleKeyDown}
           >
             {/* Header */}
@@ -203,7 +289,9 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
               <div className="flex items-center gap-3">
                 <BadgePlus size={20} className="text-emerald-600" />
                 <div>
-                  <h2 className="text-lg font-bold text-gray-800">Add Menu Permission</h2>
+                  <h2 className="text-lg font-bold text-gray-800">
+                    Add Menu Permission
+                  </h2>
                 </div>
               </div>
               <button
@@ -217,89 +305,289 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-6">
-              {/* Module Selection using List Component */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-700">
-                  Select Module <span className="text-red-500">*</span>
-                </Label>
-                
-                {isFetchingModules ? (
-                  <div className="flex items-center justify-center p-4 border rounded-lg bg-gray-50">
-                    <div className="h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
-                    <span className="text-sm text-gray-600">Loading modules...</span>
-                  </div>
-                ) : moduleError ? (
-                  <div className="p-3 border border-red-200 bg-red-50 rounded-lg">
-                    <p className="text-sm text-red-600">{moduleError}</p>
-                  </div>
-                ) : (
-                  <>
-                    <List
-                      items={moduleListItems}
-                      selectedValue={selectedModule}
-                      onSelect={handleSelectModule}
-                      label=""
-                      placeholder="Select a module"
-                      required
-                      disabled={isLoading}
-                    />
-                    {errors.perModuleId && (
-                      <p className="text-sm text-red-500 mt-1">{errors.perModuleId}</p>
+            <div className="p-6">
+              {/* Two Column Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left Column */}
+                <div className="space-y-6">
+                  {/* Module Selection - Full Width */}
+                  <div className="space-y-3 min-h-[76px]">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Select Module <span className="text-red-500">*</span>
+                    </Label>
+
+                    {isFetchingModules ? (
+                      <div className="flex items-center justify-center p-4 border rounded-lg bg-gray-50">
+                        <div className="h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
+                        <span className="text-sm text-gray-600">
+                          Loading modules...
+                        </span>
+                      </div>
+                    ) : moduleError ? (
+                      <div className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                        <p className="text-sm text-red-600">{moduleError}</p>
+                      </div>
+                    ) : (
+                      <>
+                        <List
+                          items={moduleListItems}
+                          selectedValue={selectedModule}
+                          onSelect={handleSelectModule}
+                          label=""
+                          placeholder="Select a module"
+                          required
+                          disabled={isLoading}
+                        />
+                        {errors.perModuleId && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {errors.perModuleId}
+                          </p>
+                        )}
+                        {moduleListItems.length === 0 && !moduleError && (
+                          <p className="text-sm text-amber-600 mt-1">
+                            No modules available
+                          </p>
+                        )}
+                      </>
                     )}
-                    {moduleListItems.length === 0 && !moduleError && (
-                      <p className="text-sm text-amber-600 mt-1">
-                        No modules available
+                  </div>
+                  {/* Menu Name/Label */}
+                  <div className="space-y-3 min-h-[76px]">
+                    <Label
+                      htmlFor="label"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Label <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="label"
+                      value={newPermission.label}
+                      onChange={(e) => {
+                        setNewPermission((prev) => ({
+                          ...prev,
+                          label: e.target.value,
+                        }));
+                        if (errors.label)
+                          setErrors((prev) => ({ ...prev, label: undefined }));
+                      }}
+                      placeholder="Enter menu name/label"
+                      className={`w-full ${
+                        errors.label
+                          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                          : ""
+                      }`}
+                      disabled={isLoading || isFetchingModules}
+                      aria-invalid={!!errors.label}
+                      aria-describedby={
+                        errors.label ? "label-error" : undefined
+                      }
+                    />
+                    {errors.label && (
+                      <p id="label-error" className="text-sm text-red-500">
+                        {errors.label}
                       </p>
                     )}
-                  </>
-                )}
-              </div>
+                  </div>
 
-              {/* Menu Key */}
-              <div className="space-y-3">
-                <Label htmlFor="key" className="text-sm font-medium text-gray-700">
-                  Key <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="key"
-                  value={newPermission.key}
-                  onChange={(e) => {
-                    setNewPermission(prev => ({ ...prev, key: e.target.value }));
-                    if (errors.key) setErrors(prev => ({ ...prev, key: undefined }));
-                  }}
-                  placeholder="menu.module.feature (e.g., menu.hr.dashboard)"
-                  className={`w-full ${errors.key ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}`}
-                  disabled={isLoading || isFetchingModules}
-                  aria-invalid={!!errors.key}
-                  aria-describedby={errors.key ? "key-error" : undefined}
-                />
-                {errors.key && (
-                  <p id="key-error" className="text-sm text-red-500">{errors.key}</p>
-                )}
-              </div>
+                  {/* Path */}
+                  <div className="space-y-3 min-h-[76px]">
+                    <Label
+                      htmlFor="path"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Path <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="path"
+                      value={newPermission.path}
+                      onChange={(e) => {
+                        setNewPermission((prev) => ({
+                          ...prev,
+                          path: e.target.value,
+                        }));
+                        if (errors.path)
+                          setErrors((prev) => ({ ...prev, path: undefined }));
+                      }}
+                      placeholder="Enter menu path (e.g., /dashboard)"
+                      className={`w-full ${
+                        errors.path
+                          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                          : ""
+                      }`}
+                      disabled={isLoading || isFetchingModules}
+                      aria-invalid={!!errors.path}
+                      aria-describedby={errors.path ? "path-error" : undefined}
+                    />
+                    {errors.path && (
+                      <p id="path-error" className="text-sm text-red-500">
+                        {errors.path}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-              {/* Description */}
-              <div className="space-y-3">
-                <Label htmlFor="desc" className="text-sm font-medium text-gray-700">
-                  Description <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="desc"
-                  value={newPermission.desc}
-                  onChange={(e) => {
-                    setNewPermission(prev => ({ ...prev, desc: e.target.value }));
-                    if (errors.desc) setErrors(prev => ({ ...prev, desc: undefined }));
-                  }}
-                  placeholder="Enter permission description"
-                  className={`w-full ${errors.desc ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''}`}
-                  disabled={isLoading || isFetchingModules}
-                  aria-invalid={!!errors.desc}
-                  aria-describedby={errors.desc ? "desc-error" : undefined}
-                />
-                {errors.desc && (
-                  <p id="desc-error" className="text-sm text-red-500">{errors.desc}</p>
-                )}
+                {/* Right Column */}
+                <div className="space-y-6">
+                  {/* Order */}
+                  <div className="space-y-3 min-h-[76px]">
+                    <Label
+                      htmlFor="order"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Order <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="order"
+                      type="number"
+                      min="0"
+                      value={
+                        newPermission.order === 0 ? "" : newPermission.order
+                      }
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === ""
+                            ? 0
+                            : parseInt(e.target.value) || 0;
+                        setNewPermission((prev) => ({ ...prev, order: value }));
+                        if (errors.order)
+                          setErrors((prev) => ({ ...prev, order: undefined }));
+                      }}
+                      placeholder="Enter display order (e.g., 1, 2, 3...)"
+                      className={`w-full ${
+                        errors.order
+                          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                          : ""
+                      }`}
+                      disabled={isLoading || isFetchingModules}
+                      aria-invalid={!!errors.order}
+                      aria-describedby={
+                        errors.order ? "order-error" : undefined
+                      }
+                    />
+                    {errors.order && (
+                      <p id="order-error" className="text-sm text-red-500">
+                        {errors.order}
+                      </p>
+                    )}
+                  </div>
+                  {/* Icon */}
+                  <div className="space-y-3 min-h-[76px]">
+                    <Label
+                      htmlFor="icon"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Icon <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="icon"
+                      value={newPermission.icon}
+                      onChange={(e) => {
+                        setNewPermission((prev) => ({
+                          ...prev,
+                          icon: e.target.value,
+                        }));
+                        if (errors.icon)
+                          setErrors((prev) => ({ ...prev, icon: undefined }));
+                      }}
+                      placeholder="Enter icon name (e.g., dashboard, users)"
+                      className={`w-full ${
+                        errors.icon
+                          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                          : ""
+                      }`}
+                      disabled={isLoading || isFetchingModules}
+                      aria-invalid={!!errors.icon}
+                      aria-describedby={errors.icon ? "icon-error" : undefined}
+                    />
+                    {errors.icon && (
+                      <p id="icon-error" className="text-sm text-red-500">
+                        {errors.icon}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Menu Type - Is Child Checkbox */}
+                  <div className="space-y-3 min-h-[76px]">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Menu Type
+                    </Label>
+                    <div className="flex items-center space-x-2 h-10">
+                      <Checkbox
+                        id="isChild"
+                        checked={newPermission.isChild}
+                        onCheckedChange={(checked) => {
+                          setNewPermission((prev) => ({
+                            ...prev,
+                            isChild: checked as boolean,
+                            parentKey: checked ? prev.parentKey : "",
+                          }));
+                        }}
+                        disabled={isLoading || isFetchingModules}
+                      />
+                      <Label
+                        htmlFor="isChild"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Is Child Menu
+                      </Label>
+                    </div>
+                  </div>
+
+                  {/* Parent Key - Always reserve space but conditionally show content */}
+                  <div className="space-y-3 min-h-[76px]">
+                    {newPermission.isChild ? (
+                      <>
+                        <Label
+                          htmlFor="parentKey"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          Parent Key <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="parentKey"
+                          value={newPermission.parentKey}
+                          onChange={(e) => {
+                            setNewPermission((prev) => ({
+                              ...prev,
+                              parentKey: e.target.value,
+                            }));
+                            if (errors.parentKey)
+                              setErrors((prev) => ({
+                                ...prev,
+                                parentKey: undefined,
+                              }));
+                          }}
+                          placeholder="Enter parent menu key"
+                          className={`w-full ${
+                            errors.parentKey
+                              ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                              : ""
+                          }`}
+                          disabled={isLoading || isFetchingModules}
+                          aria-invalid={!!errors.parentKey}
+                          aria-describedby={
+                            errors.parentKey ? "parentKey-error" : undefined
+                          }
+                        />
+                        {errors.parentKey && (
+                          <p
+                            id="parentKey-error"
+                            className="text-sm text-red-500"
+                          >
+                            {errors.parentKey}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <div className="opacity-0 pointer-events-none">
+                        <Label className="text-sm font-medium text-gray-700">
+                          -
+                        </Label>
+                        <div className="h-10 w-full"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -318,7 +606,13 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                 <Button
                   className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6 min-w-[100px] shadow-sm hover:shadow transition-shadow duration-200"
                   onClick={handleSubmit}
-                  disabled={!isFormValid || isLoading || isFetchingModules || moduleError !== null || moduleListItems.length === 0}
+                  disabled={
+                    !isFormValid ||
+                    isLoading ||
+                    isFetchingModules ||
+                    moduleError !== null ||
+                    moduleListItems.length === 0
+                  }
                   type="button"
                 >
                   {isLoading ? (
@@ -327,7 +621,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                       Saving...
                     </div>
                   ) : (
-                    'Add Permission'
+                    "Add Permission"
                   )}
                 </Button>
               </div>

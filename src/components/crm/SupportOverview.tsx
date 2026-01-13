@@ -3,6 +3,7 @@ import { ChevronRight, Headphones } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { useNavigate } from 'react-router-dom';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -70,6 +71,8 @@ const chartOptions = {
 };
 
 export default function SupportOverview() {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
       className="bg-white rounded-lg border p-6 shadow-sm"
@@ -82,7 +85,7 @@ export default function SupportOverview() {
           <Headphones className="mr-2 text-indigo-600" size={20} />
           Customer Support
         </h2>
-        <Button variant="ghost" size="sm" className="text-indigo-600">
+        <Button variant="ghost" size="sm" className="text-indigo-600" onClick={() => navigate('/crm/support')}>
           View All <ChevronRight size={16} />
         </Button>
       </div>

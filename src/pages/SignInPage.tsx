@@ -2,28 +2,13 @@ import { LoginForm } from "../components/login-form";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
-type SignInPageProps = {
-  onLogin: (code: string, password: string) => Promise<void> | void;
-};
-
-const SignInPage: React.FC<SignInPageProps> = ({ onLogin }) => {
+const SignInPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSignIn = async (code: string, password: string) => {
-    console.log(`Attempting sign in with code: ${code}`);
-
-    try {
-      // Call the parent's onLogin function with credentials
-      if (onLogin) {
-        await onLogin(code, password);
-      }
-      // Navigate to /modules after successful login
-      navigate('/modules');
-    } catch (error) {
-      console.error("Login failed:", error);
-      // You might want to show an error message to the user here
-      throw error; // Re-throw so LoginForm can handle it
-    }
+  const handleSignInSuccess = () => {
+    // This is called after successful login (cookies are already set)
+    // Just navigate to the main app
+    navigate("/modules"); // or "/dashboard", whichever you prefer
   };
 
   return (
@@ -31,10 +16,12 @@ const SignInPage: React.FC<SignInPageProps> = ({ onLogin }) => {
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm onSignIn={handleSignIn} />
+            {/* No props needed anymore! Login handled inside LoginForm */}
+            <LoginForm />
           </div>
         </div>
       </div>
+
       <div className="bg-gradient-to-br from-gray-100 to-gray-200 relative hidden lg:flex flex-col items-center justify-center p-10">
         {/* Logo */}
         <div className="mb-8 flex items-center justify-center">
