@@ -2,7 +2,8 @@ import { cn } from "../lib/utils";
 import { Button } from "../components/ui/button";
 import { Field, FieldLabel } from "../components/ui/field";
 import { Input } from "../components/ui/input";
-import React, { useState } from "react";
+import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -15,38 +16,45 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
   const { login, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Auto-clear alert after 6 seconds
+  useEffect(() => {
+    if (alertMessage) {
+      const timer = setTimeout(() => {
+        setAlertMessage(null);
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertMessage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!code || !password) {
-      alert("Please enter both your employee code and password.");
+      setAlertMessage("Please enter both your employee code and password.");
       return;
     }
 
     setIsLoading(true);
+    setAlertMessage(null);
 
     try {
-      // This calls your loginApi, gets tokens, and sets them in cookies
       await login(code, password);
-
-      // Update the context so ProtectedRoute knows user is authenticated
       setIsAuthenticated(true);
-
-      // Redirect to the main app
-      navigate("/modules", { replace: true }); // replace: true avoids back-button to login
+      navigate("/modules", { replace: true });
     } catch (error: any) {
       console.error("Login failed:", error);
 
-      // More user-friendly error message if possible
       const message =
         error?.response?.data?.message ||
         error?.message ||
         "Invalid credentials. Please check your employee code and password.";
 
-      alert(`Login failed: ${message}`);
+      setAlertMessage(message);
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +63,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
   return (
     <form
       className={cn(
-        "flex flex-col gap-6 p-8 bg-white rounded-2xl shadow-xl max-w-2xl mx-auto",
+        "flex flex-col gap-5 p-8 bg-white rounded-2xl shadow-xl max-w-2xl mx-auto",
         className
       )}
       onSubmit={handleSubmit}
@@ -67,6 +75,17 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       <p className="text-center text-sm text-gray-500 mb-6">
         Enter your credentials to access your dashboard
       </p>
+
+      {/* Alert placed ABOVE the inputs, below the description */}
+      {alertMessage && (
+        <Alert
+          variant="destructive"
+          className="mb-2 animate-in fade-in slide-in-from-top-5 duration-300"
+        >
+          <AlertTitle>Login Error</AlertTitle>
+          <AlertDescription>{alertMessage}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Employee Code Input */}
       <Field>

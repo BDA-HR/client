@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AuthProvider } from './contexts/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 type ModuleContextType = {
   activeModule: string;
@@ -8,6 +10,16 @@ type ModuleContextType = {
 const ModuleContext = createContext<ModuleContextType>({
   activeModule: 'Core',
   setActiveModule: () => {},
+});
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 
 export const ModuleProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
@@ -28,9 +40,13 @@ export const ModuleProvider: React.FC<{children: React.ReactNode}> = ({ children
   }, [activeModule]);
 
   return (
-    <ModuleContext.Provider value={{ activeModule, setActiveModule }}>
-      {children}
-    </ModuleContext.Provider>
+    <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <ModuleContext.Provider value={{ activeModule, setActiveModule }}>
+        {children}
+      </ModuleContext.Provider>
+    </AuthProvider>
+    </QueryClientProvider>
   );
 };
 

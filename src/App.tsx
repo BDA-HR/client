@@ -1,69 +1,70 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import SignInPage from './pages/SignInPage';
-import Layout from './layout/layout';
-import Dashboard from './pages/modules/HR';
-import Modules from './pages/Modules';
-import { ModuleProvider } from './ModuleContext';
-import InventoryDashboard from './pages/modules/Inventory';
-import CoreDashboard from './pages/modules/Core';
-import Finance from './pages/modules/Finance';
-import Procurement from './pages/modules/Procurement';
-import JobGrade from './pages/settings/hrSettings/jobgrade/JobGrade';
-import Termination from './pages/hr/employeepage/Termination';
-import CandidatePipeline from './pages/hr/recruitmentpage/CandidatePipeline';
-import OnBoarding from './pages/hr/recruitmentpage/OnBoarding';
-import RecruitmentList from './pages/hr/recruitmentpage/RecruitmentList';
-import CRMDashboard from './pages/modules/CRM';
-import EmployeeManagementPage from './pages/hr/employeepage/EmployeeRecord';
-import LeaveEntitlementPage from './pages/hr/leavepage/LeaveEntitlementPage';
-import LeaveList from './pages/hr/leavepage/myLeavePage';
-import LeaveRequestForm from './pages/hr/leavepage/LeaveRequestForm';
-import Training from './pages/hr/trainingpage/Training';
-import AttendanceList from './pages/hr/attendancepage/AttendanceList';
-import ShiftScheduler from './pages/hr/attendancepage/ShiftScheduler';
-import TimeClock from './pages/hr/attendancepage/TimeClock';
-import TimeClockFormContainer from './pages/hr/attendancepage/TimeClockFormContainer';
-import EmployeeDetailsPage from './components/hr/employee/EmployeeDetailsPage';
-import BudgetList from './pages/finance/budgetpage/BudgetList';
-import BudgetCreate from './pages/finance/budgetpage/BudgetCreate';
-import GlPage from './pages/finance/generalledgerpage/GlPage';
+import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import SignInPage from "./pages/SignInPage";
+import Layout from "./layout/layout";
+import Dashboard from "./pages/modules/HR";
+import Modules from "./pages/Modules";
+import { ModuleProvider } from "./ModuleContext";
+import InventoryDashboard from "./pages/modules/Inventory";
+import CoreDashboard from "./pages/modules/Core";
+import Finance from "./pages/modules/Finance";
+import Procurement from "./pages/modules/Procurement";
+import JobGrade from "./pages/settings/hrSettings/jobgrade/JobGrade";
+import Termination from "./pages/hr/employeepage/Termination";
+import CandidatePipeline from "./pages/hr/recruitmentpage/CandidatePipeline";
+import OnBoarding from "./pages/hr/recruitmentpage/OnBoarding";
+import RecruitmentList from "./pages/hr/recruitmentpage/RecruitmentList";
+import CRMDashboard from "./pages/modules/CRM";
+import EmployeeManagementPage from "./pages/hr/employeepage/EmployeeRecord";
+import LeaveEntitlementPage from "./pages/hr/leavepage/LeaveEntitlementPage";
+import LeaveList from "./pages/hr/leavepage/myLeavePage";
+import LeaveRequestForm from "./pages/hr/leavepage/LeaveRequestForm";
+import Training from "./pages/hr/trainingpage/Training";
+import AttendanceList from "./pages/hr/attendancepage/AttendanceList";
+import ShiftScheduler from "./pages/hr/attendancepage/ShiftScheduler";
+import TimeClock from "./pages/hr/attendancepage/TimeClock";
+import TimeClockFormContainer from "./pages/hr/attendancepage/TimeClockFormContainer";
+import EmployeeDetailsPage from "./components/hr/employee/EmployeeDetailsPage";
+import BudgetList from "./pages/finance/budgetpage/BudgetList";
+import BudgetCreate from "./pages/finance/budgetpage/BudgetCreate";
+import GlPage from "./pages/finance/generalledgerpage/GlPage";
 // import BranchOverview from './pages/core/branchpage/BranchOverview';
-import FiscalYearOverview from './pages/core/pageFiscYear';
+import FiscalYearOverview from "./pages/core/pageFiscYear";
 // import HierarchyOverview from './pages/core/hierarchypage/HierarchyOverview';
-import UserOverview from './pages/core/usermanagement/pageUserManagement';
-import DepartmentOverview from './pages/core/pageDepartments';
-import CompanyBranchesPage from './pages/core/pageCompanies';
+import UserOverview from "./pages/core/usermanagement/pageUserManagement";
+import DepartmentOverview from "./pages/core/pageDepartments";
+import CompanyBranchesPage from "./pages/core/pageCompanies";
 // import CompanyDetailsPage from './components/core/company/CompDetails';
-import BranchesPage from './pages/core/pageBranches';
-import FiscalYearHistory from './pages/core/pageFiscYearHist';
-import PagePeriod from './pages/core/pagePeriod';
-import PageSettings from './pages/settings/pageSettings';
-import JobGradeSubgrades from './pages/settings/hrSettings/jobgrade/JobGradeSubgrades';
-import PageBenefitSet from './pages/settings/hrSettings/pageBenefitSet';
-import PageEducationalQual from './pages/settings/hrSettings/pageEducationalQual';
-import PagePosition from './pages/settings/hrSettings/position/pagePosition';
-import PositionDetails from './pages/settings/hrSettings/position/PositionDetails';
-import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
-import PageAnnualLeave from './pages/settings/hrSettings/pageAnnualLeave';
-import LeavePolicyAccrualPage  from './pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage';
-import { PageHolidayHist } from './pages/core/pageHolidayHist';
-import ProfilePage from './pages/profile';
-import PageAddUser from './pages/core/usermanagement/pageAddUser';
-import PageHrSettings from './pages/settings/hrSettings/PageHrSettings';
-import PageCoreSettings from './pages/settings/coreSettings/PageCoreSettings';
-import PageApiSettings from './pages/settings/coreSettings/PageApiSettings';
-import PageMenuSettings from './pages/settings/coreSettings/PageMenuSettings';
-import FileDashboard from './pages/modules/File';
-import { AuthProvider } from '../src/contexts/AuthContext'; // Adjust path
+import BranchesPage from "./pages/core/pageBranches";
+import FiscalYearHistory from "./pages/core/pageFiscYearHist";
+import PagePeriod from "./pages/core/pagePeriod";
+import PageSettings from "./pages/settings/pageSettings";
+import JobGradeSubgrades from "./pages/settings/hrSettings/jobgrade/JobGradeSubgrades";
+import PageBenefitSet from "./pages/settings/hrSettings/pageBenefitSet";
+import PageEducationalQual from "./pages/settings/hrSettings/pageEducationalQual";
+import PagePosition from "./pages/settings/hrSettings/position/pagePosition";
+import PositionDetails from "./pages/settings/hrSettings/position/PositionDetails";
+import AddEmployeePage from "./pages/hr/employeepage/AddEmployeePage";
+import PageAnnualLeave from "./pages/settings/hrSettings/pageAnnualLeave";
+import LeavePolicyAccrualPage from "./pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage";
+import { PageHolidayHist } from "./pages/core/pageHolidayHist";
+import ProfilePage from "./pages/profile";
+import PageAddUser from "./pages/core/usermanagement/pageAddUser";
+import PageHrSettings from "./pages/settings/hrSettings/PageHrSettings";
+import PageCoreSettings from "./pages/settings/coreSettings/PageCoreSettings";
+import PageApiSettings from "./pages/settings/coreSettings/PageApiSettings";
+import PageMenuSettings from "./pages/settings/coreSettings/PageMenuSettings";
+import FileDashboard from "./pages/modules/File";
+import { AuthProvider } from "../src/contexts/AuthContext"; 
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return localStorage.getItem("isAuthenticated") === "true";
   });
 
   const handleLogin = () => {
-    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem("isAuthenticated", "true");
     setIsAuthenticated(true);
   };
 
@@ -93,6 +94,9 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/file" element={<FileDashboard />} />
               {/* End MENU ROUTES */}
+              {/* START CRM ROUTES */}
+              
+              {/* END CRM ROUTES */}
               {/* START HR ROUTES */}
               <Route
                 path="/hr/employees/record"

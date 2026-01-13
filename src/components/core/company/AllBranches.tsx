@@ -1,107 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { branchService } from '../../../services/core/branchservice';
-import type { BranchListDto } from '../../../types/core/branch';
-import { Building, ChevronRight, ChevronLeft} from 'lucide-react';
-import { BranchSearch } from '../branch/BranchsSearch'; 
+import React, { useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { Building, ChevronRight, ChevronLeft } from "lucide-react";
+import { BranchSearch } from "../branch/BranchsSearch";
+import { useBranches } from "../../../services/core/branch/branch.queries";
+import type { BranchListDto } from "../../../types/core/branch";
 
 const AllBranchs: React.FC = () => {
-  const [branches, setBranches] = useState<BranchListDto[]>([]);
-  const [filteredBranches, setFilteredBranches] = useState<BranchListDto[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 10;
 
-  const fetchBranches = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const allBranches = await branchService.getAllBranches();
-      
-      setBranches(allBranches);
-      setFilteredBranches(allBranches);
-      setTotalItems(allBranches.length);
-      setTotalPages(Math.ceil(allBranches.length / itemsPerPage));
-    } catch (err) {
-      setError('Failed to load branches. Please try again later.');
-      console.error('Error fetching branches:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBranches();
-  }, []);
+  // Use React Query to fetch branches
+  const {
+    data: branches = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useBranches();
 
   // Filter branches based on search term
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredBranches(branches);
-    } else {
-      const lowercasedSearch = searchTerm.toLowerCase();
-      const filtered = branches.filter(branch =>
+  const filteredBranches = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return branches;
+    }
+
+    const lowercasedSearch = searchTerm.toLowerCase().trim();
+
+    return branches.filter(
+      (branch) =>
         branch.name?.toLowerCase().includes(lowercasedSearch) ||
         branch.location?.toLowerCase().includes(lowercasedSearch) ||
         branch.code?.toLowerCase().includes(lowercasedSearch) ||
         branch.comp?.toLowerCase().includes(lowercasedSearch)
-      );
-      setFilteredBranches(filtered);
-    }
-    setCurrentPage(1); // Reset to first page when search changes
-  }, [searchTerm, branches]);
+    );
+  }, [branches, searchTerm]);
 
-  // Update pagination when filtered branches change
-  useEffect(() => {
-    setTotalItems(filteredBranches.length);
-    setTotalPages(Math.ceil(filteredBranches.length / itemsPerPage));
-  }, [filteredBranches]);
+  // Paginate filtered branches
+  const paginatedBranches = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredBranches.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredBranches, currentPage]);
+
+  const totalPages = Math.ceil(filteredBranches.length / itemsPerPage);
+  const totalItems = filteredBranches.length;
 
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when search changes
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const paginatedBranches = filteredBranches.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   // Helper functions moved inside component
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case '0': return 'bg-green-100 text-green-800 border border-green-200'; // Active - Green
-      case '1': return 'bg-red-100 text-red-800 border border-red-200';       // Inactive - Red
-      case '2': return 'bg-yellow-100 text-yellow-800 border border-yellow-200'; // Under Construction - Yellow
-      default: return 'bg-gray-100 text-gray-800 border border-gray-200';
+      case "0":
+        return "bg-green-100 text-green-800 border border-green-200"; // Active - Green
+      case "1":
+        return "bg-red-100 text-red-800 border border-red-200"; // Inactive - Red
+      case "2":
+        return "bg-yellow-100 text-yellow-800 border border-yellow-200"; // Under Construction - Yellow
+      default:
+        return "bg-gray-100 text-gray-800 border border-gray-200";
     }
   };
 
   const getStatusText = (status: string): string => {
     switch (status) {
-      case '0': return 'Active';
-      case '1': return 'Inactive';
-      case '2': return 'Under Construction';
-      default: return status;
+      case "0":
+        return "Active";
+      case "1":
+        return "Inactive";
+      case "2":
+        return "Under Construction";
+      default:
+        return status;
     }
   };
 
   const getBranchTypeText = (branchType: string): string => {
     switch (branchType) {
-      case '0': return 'Head Office';
-      case '1': return 'Regional';
-      case '2': return 'Local';
-      case '3': return 'Virtual';
-      default: return branchType;
+      case "0":
+        return "Head Office";
+      case "1":
+        return "Regional";
+      case "2":
+        return "Local";
+      case "3":
+        return "Virtual";
+      default:
+        return branchType;
     }
   };
+
+  // Get error message from React Query error
+  const getErrorMessage = () => {
+    if (isError) {
+      const errorMessage =
+        (error as any)?.response?.data?.message ||
+        "Failed to load branches. Please try again later.";
+      return errorMessage;
+    }
+    return null;
+  };
+
+  const errorMessage = getErrorMessage();
 
   return (
     <motion.div
@@ -113,19 +119,21 @@ const AllBranchs: React.FC = () => {
       {/* Header - Always visible */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 -mt-2">
         <div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white">All Branches</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent dark:text-white">
+            All Branches
+          </h2>
         </div>
       </div>
 
-  <BranchSearch 
-    searchTerm={searchTerm}
-    onSearchChange={handleSearchChange}
-    onRefresh={fetchBranches}
-    loading={loading}
-  />
+      <BranchSearch
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        onRefresh={refetch}
+        loading={isLoading}
+      />
 
       {/* Error message for API errors */}
-      {error && (
+      {errorMessage && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -133,23 +141,16 @@ const AllBranchs: React.FC = () => {
         >
           <div className="flex justify-between items-center">
             <span className="font-medium">
-              {error.includes("load") ? (
-                <>
-                  Failed to load branches.{" "}
-                  <button
-                    onClick={fetchBranches}
-                    className="underline hover:text-red-800 font-semibold focus:outline-none"
-                  >
-                    Try again
-                  </button>{" "}
-                  later.
-                </>
-              ) : (
-                error
-              )}
+              Failed to load branches.{" "}
+              <button
+                onClick={() => refetch()}
+                className="underline hover:text-red-800 font-semibold focus:outline-none"
+              >
+                Try again
+              </button>
             </span>
             <button
-              onClick={() => setError(null)}
+              onClick={() => refetch()}
               className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
             >
               ×
@@ -159,7 +160,7 @@ const AllBranchs: React.FC = () => {
       )}
 
       {/* Loading State */}
-      {loading && (
+      {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -170,49 +171,67 @@ const AllBranchs: React.FC = () => {
       )}
 
       {/* Branch Table - Only show when not loading and no error */}
-      {!loading && !error && (
-        <motion.div 
+      {!isLoading && !errorMessage && (
+        <motion.div
           initial="hidden"
           animate="visible"
           variants={{
             hidden: { y: 20, opacity: 0 },
             visible: {
-              y: 0, 
+              y: 0,
               opacity: 1,
               transition: {
-                type: 'spring',
+                type: "spring",
                 stiffness: 100,
                 damping: 15,
-                duration: 0.5
-              }
-            }
+                duration: 0.5,
+              },
+            },
           }}
           className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md overflow-hidden"
         >
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-white">
-                <motion.tr 
+                <motion.tr
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  >
                     Branch
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                  >
                     Type
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                  >
                     Status
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
+                  >
                     Location
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell"
+                  >
                     Company
                   </th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell"
+                  >
                     Opened
                   </th>
                 </motion.tr>
@@ -220,7 +239,7 @@ const AllBranchs: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedBranches.length > 0 ? (
                   paginatedBranches.map((branch, index) => (
-                    <motion.tr 
+                    <motion.tr
                       key={branch.id}
                       custom={index}
                       initial="hidden"
@@ -229,7 +248,7 @@ const AllBranchs: React.FC = () => {
                     >
                       <td className="px-4 py-1 whitespace-nowrap">
                         <div className="flex items-center">
-                          <motion.div 
+                          <motion.div
                             whileHover={{ rotate: 10 }}
                             className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
                           >
@@ -246,21 +265,29 @@ const AllBranchs: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                          {getBranchTypeText(branch.branchType)}
+                        {getBranchTypeText(branch.branchType)}
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(branch.branchStat)}`}>
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                            branch.branchStat
+                          )}`}
+                        >
                           {getStatusText(branch.branchStatStr)}
                         </span>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm font-medium hidden md:table-cell text-gray-600">
                         <div className="flex items-center">
-                          <span className="truncate max-w-[120px]">{branch.location}</span>
+                          <span className="truncate max-w-[120px]">
+                            {branch.location}
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                         <div className="flex items-center">
-                          <span className="truncate max-w-[120px]">{branch.comp}</span>
+                          <span className="truncate max-w-[120px]">
+                            {branch.comp}
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-1 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
@@ -272,8 +299,13 @@ const AllBranchs: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                      No branches found matching your search criteria.
+                    <td
+                      colSpan={6}
+                      className="px-4 py-8 text-center text-gray-500"
+                    >
+                      {searchTerm.trim()
+                        ? "No branches found matching your search criteria."
+                        : "No branches available."}
                     </td>
                   </tr>
                 )}
@@ -293,7 +325,9 @@ const AllBranchs: React.FC = () => {
                   Previous
                 </button>
                 <button
-                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  onClick={() =>
+                    handlePageChange(Math.min(totalPages, currentPage + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
@@ -303,36 +337,52 @@ const AllBranchs: React.FC = () => {
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
-                    <span className="font-medium">{Math.min(currentPage * 10, totalItems)}</span> of{' '}
-                    <span className="font-medium">{totalItems}</span> branches
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(currentPage - 1) * 10 + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium">
+                      {Math.min(currentPage * 10, totalItems)}
+                    </span>{" "}
+                    of <span className="font-medium">{totalItems}</span>{" "}
+                    branches
                   </p>
                 </div>
                 <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
                     <button
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      onClick={() =>
+                        handlePageChange(Math.max(1, currentPage - 1))
+                      }
                       disabled={currentPage === 1}
                       className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                     >
                       <span className="sr-only">Previous</span>
                       <ChevronLeft size={16} />
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          currentPage === page
-                            ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === page
+                              ? "z-10 bg-emerald-50 border-emerald-500 text-emerald-600"
+                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      )
+                    )}
                     <button
-                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      onClick={() =>
+                        handlePageChange(Math.min(totalPages, currentPage + 1))
+                      }
                       disabled={currentPage === totalPages}
                       className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                     >

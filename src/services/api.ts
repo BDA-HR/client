@@ -4,7 +4,7 @@ import { getAccessToken, getExpiresAt, refresh } from "../utils/auth.utils";
 
 // Create axios instance with default config
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_GATEWAY_URL || 'http://localhost:1212/',
+  baseURL: import.meta.env.VITE_GATEWAY_URL || 'https://localhost:1213/api/',
   timeout: 10000,
   withCredentials: true,
   headers: {
