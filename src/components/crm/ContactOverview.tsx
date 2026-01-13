@@ -3,6 +3,7 @@ import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { ChevronRight, Users, Briefcase, MapPin } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -33,6 +34,8 @@ const recentContacts: RecentContact[] = [
 ];
 
 export default function ContactOverview() {
+  const navigate = useNavigate();
+
   const data = {
     labels: contactData.map(d => d.name),
     datasets: [
@@ -82,7 +85,7 @@ export default function ContactOverview() {
           <Users className="mr-2 text-orange-600" size={20} />
           Contact Management
         </h2>
-        <Button variant="ghost" size="sm" className="hover:text-orange-600 hover:bg-orange-50 text-black">
+        <Button variant="ghost" size="sm" className="hover:text-orange-600 hover:bg-orange-50 text-black" onClick={() => navigate('/crm/contacts')}>
           View All <ChevronRight size={16} />
         </Button>
       </div>

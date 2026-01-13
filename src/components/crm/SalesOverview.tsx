@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChevronRight, TrendingUp, DollarSign } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const salesData = [
   { name: 'Jan', revenue: 4000, quota: 3800 },
@@ -21,6 +22,8 @@ const deals = [
 ];
 
 export default function SalesOverview() {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
       className="bg-white rounded-lg border p-6 shadow-sm"
@@ -33,7 +36,7 @@ export default function SalesOverview() {
           <TrendingUp className="mr-2 text-green-600" size={20} />
           Sales Management
         </h2>
-        <Button variant="ghost" size="sm" className="text-green-600">
+        <Button variant="ghost" size="sm" className="text-green-600" onClick={() => navigate('/crm/sales')}>
           View All <ChevronRight size={16} />
         </Button>
       </div>

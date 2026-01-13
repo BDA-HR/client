@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ChevronRight, BarChart2, TrendingUp, Users, Mail, DollarSign } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const performanceData = [
   { name: 'Jan', leads: 120, conversions: 45, revenue: 4000 },
@@ -21,6 +22,8 @@ const kpiData = [
 ];
 
 export default function AnalyticsOverview() {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
       className="bg-white rounded-lg border p-6 shadow-sm"
@@ -33,7 +36,7 @@ export default function AnalyticsOverview() {
           <BarChart2 className="mr-2 text-cyan-600" size={20} />
           Analytics & Reporting
         </h2>
-        <Button variant="ghost" size="sm" className="text-cyan-600">
+        <Button variant="ghost" size="sm" className="text-cyan-600" onClick={() => navigate('/crm/analytics')}>
           View All Reports <ChevronRight size={16} />
         </Button>
       </div>
