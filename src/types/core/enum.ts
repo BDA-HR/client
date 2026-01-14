@@ -59,3 +59,23 @@ export const PolicyGender = {
   "2": 'Male & Female'
 } as const;
 export type PolicyGender = typeof PolicyGender[keyof typeof PolicyGender];
+
+export const LeaveCondition = {
+  "0": "With Half Salary",
+  "1": "With Full Salary",
+  "2": "With No Salary",
+} as const;
+export type LeaveCondition = (typeof LeaveCondition)[keyof typeof LeaveCondition];
+
+export const ApprovalRole = {
+  "0": "Manager",
+  "1": "HR",
+  "2": "Director",
+} as const;
+export type ApprovalRole = (typeof ApprovalRole)[keyof typeof ApprovalRole];
+
+export const PolicyStatus = {
+  "0": "",
+  "1": "Inactive",
+} as const;
+export type PolicyStatus = (typeof PolicyStatus)[keyof typeof PolicyStatus];
