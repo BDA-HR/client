@@ -28,7 +28,6 @@ const LeaveSearchFilters: React.FC<LeaveSearchFiltersProps> = ({
       className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
     >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        
         <div className="w-full lg:flex-1">
           <div className="relative w-full max-w-md">
             <label htmlFor="leave-search" className="sr-only">
@@ -45,7 +44,7 @@ const LeaveSearchFilters: React.FC<LeaveSearchFiltersProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            
+
             {hasSearchTerm && (
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <button
@@ -60,6 +59,15 @@ const LeaveSearchFilters: React.FC<LeaveSearchFiltersProps> = ({
             )}
           </div>
         </div>
+
+        <Button
+          onClick={onAddClick}
+          variant="outline"
+          className="flex items-center gap-2 cursor-pointer border-emerald-200 hover:bg-gray-50"
+        >
+          <BadgePlus className="h-4 w-4" />
+          Leave Policy
+        </Button>
 
         <Button
           onClick={onAddClick}
