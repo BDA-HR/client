@@ -6,10 +6,10 @@ import { Label } from '../../../ui/label';
 import { Input } from '../../../ui/input';
 import { Checkbox } from '../../../ui/checkbox';
 import List from '../../../List/list';
-import type { 
-  PerMenuModDto, 
+import type {
+  PerMenuModDto,
   PerMenuListDto,
-  UUID 
+  UUID
 } from '../../../../types/core/Settings/menu-permissions';
 import type { NameListItem } from '../../../../types/NameList/nameList';
 import { menuPermissionService } from '../../../../services/core/settings/ModCore/menu-permissionservice';
@@ -29,10 +29,10 @@ interface EditMenuPermissionModalProps {
   onClose?: () => void;
 }
 
-const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({ 
-  permission, 
-  onEditPermission, 
-  onClose 
+const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
+  permission,
+  onEditPermission,
+  onClose
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editedPermission, setEditedPermission] = useState<PerMenuModDto>({
@@ -47,7 +47,7 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
     order: 0 // New order field
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Add errors state for field-specific validation
   const [errors, setErrors] = useState<{
     label?: string;
@@ -55,7 +55,7 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
     icon?: string;
     parentKey?: string;
   }>({});
-  
+
   // State for module names
   const [moduleNames, setModuleNames] = useState<NameListItem[]>([]);
   const [isFetchingModules, setIsFetchingModules] = useState(false);
@@ -68,7 +68,7 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
       setModuleError(null);
       try {
         const modules = await menuPermissionService.getAllModuleNames();
-        
+
         if (Array.isArray(modules)) {
           setModuleNames(modules);
         } else {
@@ -94,7 +94,7 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
         id: permission.id,
         perModuleId: permission.perModuleId,
         key: permission.key,
-        label: safeValue(permission.label || permission.name, ''), // Map existing name to label
+        label: safeValue(permission.label), // Map existing name to label
         path: safeValue(permission.path, ''), // New field
         icon: safeValue(permission.icon, ''), // New field
         isChild: safeValue(permission.isChild, false), // New field
@@ -159,11 +159,11 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!editedPermission.label.trim() || 
-        !editedPermission.path.trim() || 
-        !editedPermission.icon.trim() || 
-        !editedPermission.perModuleId ||
-        (editedPermission.isChild && !editedPermission.parentKey.trim())) {
+    if (!editedPermission.label.trim() ||
+      !editedPermission.path.trim() ||
+      !editedPermission.icon.trim() ||
+      !editedPermission.perModuleId ||
+      (editedPermission.isChild && !editedPermission.parentKey.trim())) {
       toast.error('Please fill all required fields');
       return;
     }
@@ -183,27 +183,27 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
         parentKey: editedPermission.parentKey.trim(),
         order: editedPermission.order
       };
-      
+
       console.log('Sending edit data to API:', dataToSend);
-      
+
       const response = await onEditPermission(dataToSend);
 
       console.log('Menu Permission updated successfully!', response);
-      
+
       // Show success message
-      const successMessage = response?.data?.message || 
-                            response?.message || 
-                            'Menu permission updated successfully!';
+      const successMessage = response?.data?.message ||
+        response?.message ||
+        'Menu permission updated successfully!';
       toast.success(successMessage);
-      
+
       handleClose();
-      
+
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to update permission';
-      
+
       // Show the general error message
       toast.error(errorMessage);
-      
+
       console.error('Error updating menu permission:', error);
     } finally {
       setIsSubmitting(false);
