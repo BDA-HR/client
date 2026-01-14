@@ -191,7 +191,6 @@ const LeavePolicySection: React.FC = () => {
         </div>
       )}
 
-
       {/* Search and Filters Section for Leave Policies */}
       {!loading && (
         <motion.div
@@ -216,9 +215,12 @@ const LeavePolicySection: React.FC = () => {
           <div className="flex items-center">
             <XCircleIcon className="h-5 w-5 text-yellow-400 mr-3" />
             <div>
-              <h3 className="text-yellow-800 font-medium">No Leave Policies Found</h3>
+              <h3 className="text-yellow-800 font-medium">
+                No Leave Policies Found
+              </h3>
               <p className="text-yellow-700 text-sm mt-1">
-                There are currently no leave policies in the system. Please add a leave policy to get started.
+                There are currently no leave policies in the system. Please add
+                a leave policy to get started.
               </p>
             </div>
           </div>

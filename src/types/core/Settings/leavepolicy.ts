@@ -8,32 +8,30 @@ export interface LeavePolicyListDto extends BaseDto {
   leaveTypeId: UUID;
   code: string;
   name: string;
-  allowEncashment: ;
+  allowEncashment: boolean;
   requiresAttachment: boolean;
-  holidaysAsLeave: boolean;
+  status: string;
   leaveType: string;
+  statusStr: string;
+  allowEncashmentStr: string;
   requiresAttachmentStr: string;
-  minDurPerReqStr: string;
-  maxDurPerReqStr: string;
-  holidaysAsLeaveStr: string;
 }
-
 export interface LeavePolicyAddDto {
   name: string;
+  code: string;
+  allowEncashment: boolean;
   requiresAttachment: boolean;
-  minDurPerReq: number;
-  holidaysAsLeave: boolean;
-  status: number;
+  status: string;
   leaveTypeId: UUID;
 }
 
 export interface LeavePolicyModDto {
   id: UUID;
+  code: string;
   name: string;
+  allowEncashment: boolean;
   requiresAttachment: boolean;
-  minDurPerReq: number;
-  maxDurPerReq: number;
-  holidaysAsLeave: boolean;
+  status: string;
   leaveTypeId: UUID;
   rowVersion: string;
 }

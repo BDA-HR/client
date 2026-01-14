@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Search, BadgePlus, X } from "lucide-react";
 import { Button } from "../../../../ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface LeaveSearchFiltersProps {
   searchTerm: string;
@@ -20,8 +21,10 @@ const LeaveSearchFilters: React.FC<LeaveSearchFiltersProps> = ({
 
   const hasSearchTerm = searchTerm !== "";
 
+   const navigate = useNavigate();
+
    const onClick = () => {
-     navigate(`/settings/hr/leavePolicy`);
+     navigate(`/settings/hr/leave/leavePolicy`);
    };
   
 
@@ -66,7 +69,7 @@ const LeaveSearchFilters: React.FC<LeaveSearchFiltersProps> = ({
         </div>
 
         <Button
-          onClick={onAddClick}
+          onClick={onClick}
           variant="outline"
           className="flex items-center gap-2 cursor-pointer border-emerald-200 hover:bg-gray-50"
         >

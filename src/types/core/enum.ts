@@ -75,7 +75,20 @@ export const ApprovalRole = {
 export type ApprovalRole = (typeof ApprovalRole)[keyof typeof ApprovalRole];
 
 export const PolicyStatus = {
-  "0": "",
-  "1": "Inactive",
+  "0": "Draft",
+  "1": "Active",
+  "2": "Inactive",
 } as const;
 export type PolicyStatus = (typeof PolicyStatus)[keyof typeof PolicyStatus];
+
+export const ConditionOperator = {
+  "0": "=",
+  "1": "!=",
+  "2": "In",
+  "3": ">",
+  "4": "<",
+  "5": ">=",
+  "6": "<=",
+} as const;
+export type ConditionOperator =
+  (typeof ConditionOperator)[keyof typeof ConditionOperator];

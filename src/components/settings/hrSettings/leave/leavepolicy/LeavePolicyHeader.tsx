@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { FileText } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../../../../ui/button";
 
 // Define variants with proper TypeScript types
 const itemVariants = {
@@ -16,12 +18,26 @@ const itemVariants = {
 };
 
 const LeavePolicyHeader = () => {
+   const navigate = useNavigate();
+
+   const handleBack = () => {
+     navigate(-1);
+   };
   return (
     <motion.div
       variants={itemVariants}
       className="mb-4 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
     >
       <div className="flex items-center gap-3">
+         <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+                  aria-label="Go back"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="text-sm font-medium">Back</span>
+                </Button>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
