@@ -109,101 +109,113 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
           </button>
         </div>
 
-        {/* Body */}
-        <div className="px-6 py-4 space-y-4">
-          {/* Name */}
-          <div className="space-y-1">
-            <Label>
-              Leave Type Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isLoading}
-              placeholder="e.g. Annual Leave"
-            />
+
+        <form onSubmit={handleSubmit}>
+          {/* Body */}
+          <div className="px-6 py-4 space-y-4">
+            {/* Name */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="minDurPerReq" className="text-sm text-gray-700 font-medium">
+                  Leave Type Name <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    disabled={isLoading}
+                    placeholder="e.g. Annual Leave"
+                  />
+                </div>
+              </div>
+
+              {/* Leave Category */}
+              <div className="space-y-2">
+                <Label htmlFor="fiscalYear" className="block text-sm font-medium text-gray-700">
+                  Leave Category <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={leaveCategory}
+                  onValueChange={(v) =>
+                    setLeaveCategory(v as LeaveCategoryType)
+                  }
+                  disabled={isLoading}
+                >
+                  <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                    <SelectValue placeholder="Select Leave Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {leaveCategoryOptions.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Boolean Options Inline */}
+            <div className="rounded-lg border p-4 space-y-3">
+              <Label className="text-sm text-gray-500">Leave Rules</Label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={requiresApproval}
+                  onChange={(e) => setRequiresApproval(e.target.checked)}
+                  disabled={isLoading}
+                  className="h-4 w-4 accent-emerald-600"
+                />
+                <span className="text-sm text-gray-700">Requires approval</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={allowHalfDay}
+                  onChange={(e) => setAllowHalfDay(e.target.checked)}
+                  disabled={isLoading}
+                  className="h-4 w-4 accent-emerald-600"
+                />
+                <span className="text-sm text-gray-700">Allow half-day leave</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={holidaysAsLeave}
+                  onChange={(e) => setHolidaysAsLeave(e.target.checked)}
+                  disabled={isLoading}
+                  className="h-4 w-4 accent-emerald-600"
+                />
+                <span className="text-sm text-gray-700">Count holidays as leave</span>
+              </label>
+            </div>
           </div>
 
-          {/* Category */}
-          <div className="space-y-1">
-            <Label>
-              Leave Category <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={leaveCategory}
-              onValueChange={(v) =>
-                setLeaveCategory(v as LeaveCategoryType)
-              }
-              disabled={isLoading}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {leaveCategoryOptions.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Footer */}
+          <div className="border-t px-6 py-4 rounded-b-xl">
+            <div className="flex flex-row-reverse justify-center items-center gap-3">
+              <Button
+                variant="outline"
+                className="cursor-pointer px-6 border-gray-300 hover:bg-gray-100"
+                onClick={handleClose}
+                type="button"
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
+                type="submit"
+                disabled={isLoading || !name.trim()}
+              >
+                {isLoading ? "Saving..." : "Save"}
+              </Button>
+            </div>
           </div>
-
-          {/* Boolean Options Inline */}
-          <div className="rounded-lg border p-4 space-y-3">
-            <Label className="text-sm text-gray-500">Leave Rules</Label>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={requiresApproval}
-                onChange={(e) => setRequiresApproval(e.target.checked)}
-                disabled={isLoading}
-                className="h-4 w-4 accent-emerald-600"
-              />
-              <span className="text-sm text-gray-700">Requires approval</span>
-            </label>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={allowHalfDay}
-                onChange={(e) => setAllowHalfDay(e.target.checked)}
-                disabled={isLoading}
-                className="h-4 w-4 accent-emerald-600"
-              />
-              <span className="text-sm text-gray-700">Allow half-day leave</span>
-            </label>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={holidaysAsLeave}
-                onChange={(e) => setHolidaysAsLeave(e.target.checked)}
-                disabled={isLoading}
-                className="h-4 w-4 accent-emerald-600"
-              />
-              <span className="text-sm text-gray-700">Count holidays as leave</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-2 border-t px-6 py-3">
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={isLoading || !name.trim()}
-          >
-            {isLoading ? "Saving..." : "Save"}
-          </Button>
-        </div>
+        </form>
       </motion.div>
     </div>
   );
