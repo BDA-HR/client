@@ -20,6 +20,11 @@ const LeaveSearchFilters: React.FC<LeaveSearchFiltersProps> = ({
 
   const hasSearchTerm = searchTerm !== "";
 
+   const onClick = () => {
+     navigate(`/settings/hr/leavePolicy`);
+   };
+  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}

@@ -82,172 +82,194 @@ function App() {
     <AuthProvider>
       <ModuleProvider>
         <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-          <Routes>
-            {/* Root path redirects to login */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+          <BrowserRouter>
+            <Routes>
+              {/* Root path redirects to login */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
 
-            {/* Public route */}
-            <Route path="/login" element={<SignInPage />} />
+              {/* Public route */}
+              <Route path="/login" element={<SignInPage />} />
 
-            {/* Protected layout routes */}
-            <Route
-              path="/"
-              element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
-            >
-              {/* START MENU ROUTES */}
-              <Route path="/hr" element={<Dashboard />} />
-              <Route path="/inventory" element={<InventoryDashboard />} />
-              <Route path="/core" element={<CoreDashboard />} />
-              <Route path="/crm" element={<CRMDashboard />} />
-              <Route path="/finance" element={<Finance />} />
-              <Route path="/procurement" element={<Procurement />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/file" element={<FileDashboard />} />
-              {/* End MENU ROUTES */}
-              {/* START CRM ROUTES */}
-              
-              {/* END CRM ROUTES */}
-              {/* START HR ROUTES */}
+              {/* Protected layout routes */}
               <Route
-                path="/hr/employees/record"
-                element={<EmployeeManagementPage />}
-              />
-              <Route
-                path="/hr/employees/record/Add"
-                element={<AddEmployeePage />}
-              />
-              <Route
-                path="/hr/employees/:id"
-                element={<EmployeeDetailsPage />}
-              />
-              <Route path="/settings/hr/jobgrade" element={<JobGrade />} />
-              <Route
-                path="/settings/hr/jobgrade/:gradeId/steps"
-                element={<JobGradeSubgrades />}
-              />
-              <Route
-                path="/hr/employees/termination"
-                element={<Termination />}
-              />
-              <Route
-                path="/hr/recruitment/pipeline"
-                element={<CandidatePipeline />}
-              />
-              <Route
-                path="/hr/recruitment/candidates/:candidateId"
-                element={<CandidatePipeline />}
-              />
-              <Route
-                path="/hr/recruitment/onboarding"
-                element={<OnBoarding />}
-              />
-              <Route
-                path="/hr/recruitment/list"
-                element={<RecruitmentList />}
-              />
-              <Route path="/hr/leave/list" element={<LeaveList />} />
-              <Route path="/hr/leave/form" element={<LeaveRequestForm />} />
-              <Route
-                path="/hr/leave/entitlement"
-                element={<LeaveEntitlementPage />}
-              />
-              <Route path="/hr/attendance/list" element={<AttendanceList />} />
-              <Route path="/hr/shift-scheduler" element={<ShiftScheduler />} />
-              <Route path="/hr/time-clock" element={<TimeClock />} />
-              <Route
-                path="/hr/attendance/form"
-                element={<TimeClockFormContainer />}
-              />
-              <Route path="/settings" element={<PageSettings />} />
-              <Route
-                path="/settings/hr/benefitset"
-                element={<PageBenefitSet />}
-              />
-              <Route
-                path="/settings/hr/educationqual"
-                element={<PageEducationalQual />}
-              />
-              <Route path="/settings/hr/position" element={<PagePosition />} />
-              <Route
-                path="/settings/hr/position/:id"
-                element={<PositionDetails />}
-              />
-              <Route
-                path="/settings/hr/annualleave"
-                element={<PageAnnualLeave />}
-              />
-              <Route
-                path="/settings/hr/annualleave/:id/policy"
-                element={<LeavePolicyAccrualPage />}
-              />
-              <Route path="/settings/hr" element={<PageHrSettings />} />
-              <Route path="/hr/training" element={<Training />} />
-              {/* END HR ROUTES */}
-              {/* START FINANCE ROUTES */}
-              <Route path="/finance/gl" element={<GlPage />} />
-              <Route path="/finance/budget-list" element={<BudgetList />} />
-              <Route path="/finance/budget-create" element={<BudgetCreate />} />
-              {/* End FINANCE ROUTES */}
-              {/*sTART CORE ROUTES */}
-              <Route
-                path="/core/company/:companyId/branches"
-                element={<CompanyBranchesPage />}
-              />
-              <Route path="/branches" element={<BranchesPage />} />{" "}
-              <Route path="/core/company" element={<CompanyBranchesPage />} />
-              {/* <Route path='/core/branch' element={<BranchOverview />} /> */}
-              <Route
-                path="/core/fiscal-year"
-                element={<FiscalYearOverview />}
-              />
-              <Route
-                path="/core/fiscal-year/history"
-                element={<FiscalYearHistory />}
-              />
-              <Route
-                path="/core/fiscal-year/period-history"
-                element={<PagePeriod />}
-              />
-              {/* <Route path='/core/hierarchy' element={<HierarchyOverview />} /> */}
-              <Route path="/core/users" element={<UserOverview />} />
-              <Route path="/core/Add-Employee" element={<PageAddUser />} />
-              <Route path="/core/department" element={<DepartmentOverview />} />
-              {/* <Route path="/core/company/:id" element={<CompanyDetailsPage />} /> */}
-              <Route
-                path="/core/fiscal-year/holiday-history"
-                element={<PageHolidayHist />}
-              />
-              <Route path="/settings/core" element={<PageCoreSettings />} />
-              <Route
-                path="/settings/core/api-permissions"
-                element={<PageApiSettings />}
-              />
-              <Route
-                path="/settings/core/menu-permissions"
-                element={<PageMenuSettings />}
-              />
-            </Route>
-            {/* END CORE ROUTES */}
-            {/*START CORE ROUTES */}
+                path="/"
+                element={
+                  isAuthenticated ? <Layout /> : <Navigate to="/login" />
+                }
+              >
+                {/* START MENU ROUTES */}
+                <Route path="/hr" element={<Dashboard />} />
+                <Route path="/inventory" element={<InventoryDashboard />} />
+                <Route path="/core" element={<CoreDashboard />} />
+                <Route path="/crm" element={<CRMDashboard />} />
+                <Route path="/finance" element={<Finance />} />
+                <Route path="/procurement" element={<Procurement />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/file" element={<FileDashboard />} />
+                {/* End MENU ROUTES */}
+                {/* START CRM ROUTES */}
+                {/* END CRM ROUTES */}
+                {/* START HR ROUTES */}
+                <Route
+                  path="/hr/employees/record"
+                  element={<EmployeeManagementPage />}
+                />
+                <Route
+                  path="/hr/employees/record/Add"
+                  element={<AddEmployeePage />}
+                />
+                <Route
+                  path="/hr/employees/:id"
+                  element={<EmployeeDetailsPage />}
+                />
+                <Route path="/settings/hr/jobgrade" element={<JobGrade />} />
+                <Route
+                  path="/settings/hr/jobgrade/:gradeId/steps"
+                  element={<JobGradeSubgrades />}
+                />
+                <Route
+                  path="/hr/employees/termination"
+                  element={<Termination />}
+                />
+                <Route
+                  path="/hr/recruitment/pipeline"
+                  element={<CandidatePipeline />}
+                />
+                <Route
+                  path="/hr/recruitment/candidates/:candidateId"
+                  element={<CandidatePipeline />}
+                />
+                <Route
+                  path="/hr/recruitment/onboarding"
+                  element={<OnBoarding />}
+                />
+                <Route
+                  path="/hr/recruitment/list"
+                  element={<RecruitmentList />}
+                />
+                <Route path="/hr/leave/list" element={<LeaveList />} />
+                <Route path="/hr/leave/form" element={<LeaveRequestForm />} />
+                <Route
+                  path="/hr/leave/entitlement"
+                  element={<LeaveEntitlementPage />}
+                />
+                <Route
+                  path="/hr/attendance/list"
+                  element={<AttendanceList />}
+                />
+                <Route
+                  path="/hr/shift-scheduler"
+                  element={<ShiftScheduler />}
+                />
+                <Route path="/hr/time-clock" element={<TimeClock />} />
+                <Route
+                  path="/hr/attendance/form"
+                  element={<TimeClockFormContainer />}
+                />
+                <Route path="/settings" element={<PageSettings />} />
+                <Route
+                  path="/settings/hr/benefitset"
+                  element={<PageBenefitSet />}
+                />
+                <Route
+                  path="/settings/hr/educationqual"
+                  element={<PageEducationalQual />}
+                />
+                <Route
+                  path="/settings/hr/position"
+                  element={<PagePosition />}
+                />
+                <Route
+                  path="/settings/hr/position/:id"
+                  element={<PositionDetails />}
+                />
+                <Route
+                  path="/settings/hr/annualleave"
+                  element={<PageAnnualLeave />}
+                />
+                <Route
+                  path="/settings/hr/annualleave/leavePolicy"
+                  element={<LeavePolicy />}
+                />
+                <Route
+                  path="/settings/hr/annualleave/:id/policy"
+                  element={<LeavePolicyAccrualPage />}
+                />
+                <Route path="/settings/hr" element={<PageHrSettings />} />
+                <Route path="/hr/training" element={<Training />} />
+                {/* END HR ROUTES */}
+                {/* START FINANCE ROUTES */}
+                <Route path="/finance/gl" element={<GlPage />} />
+                <Route path="/finance/budget-list" element={<BudgetList />} />
+                <Route
+                  path="/finance/budget-create"
+                  element={<BudgetCreate />}
+                />
+                {/* End FINANCE ROUTES */}
+                {/*sTART CORE ROUTES */}
+                <Route
+                  path="/core/company/:companyId/branches"
+                  element={<CompanyBranchesPage />}
+                />
+                <Route path="/branches" element={<BranchesPage />} />{" "}
+                <Route path="/core/company" element={<CompanyBranchesPage />} />
+                {/* <Route path='/core/branch' element={<BranchOverview />} /> */}
+                <Route
+                  path="/core/fiscal-year"
+                  element={<FiscalYearOverview />}
+                />
+                <Route
+                  path="/core/fiscal-year/history"
+                  element={<FiscalYearHistory />}
+                />
+                <Route
+                  path="/core/fiscal-year/period-history"
+                  element={<PagePeriod />}
+                />
+                {/* <Route path='/core/hierarchy' element={<HierarchyOverview />} /> */}
+                <Route path="/core/users" element={<UserOverview />} />
+                <Route path="/core/Add-Employee" element={<PageAddUser />} />
+                <Route
+                  path="/core/department"
+                  element={<DepartmentOverview />}
+                />
+                {/* <Route path="/core/company/:id" element={<CompanyDetailsPage />} /> */}
+                <Route
+                  path="/core/fiscal-year/holiday-history"
+                  element={<PageHolidayHist />}
+                />
+                <Route path="/settings/core" element={<PageCoreSettings />} />
+                <Route
+                  path="/settings/core/api-permissions"
+                  element={<PageApiSettings />}
+                />
+                <Route
+                  path="/settings/core/menu-permissions"
+                  element={<PageMenuSettings />}
+                />
+              </Route>
+              {/* END CORE ROUTES */}
+              {/*START CORE ROUTES */}
 
-            {/* Modules route at /menu */}
-            <Route
-              path="/modules"
-              element={isAuthenticated ? <Modules /> : <Navigate to="/login" />}
-            />
+              {/* Modules route at /menu */}
+              <Route
+                path="/modules"
+                element={
+                  isAuthenticated ? <Modules /> : <Navigate to="/login" />
+                }
+              />
 
-            {/* Catch-all route */}
-            <Route
-              path="*"
-              element={
-                <Navigate to={isAuthenticated ? "/404" : "/login"} replace />
-              }
-            />
-          </Routes>
-        </BrowserRouter>
+              {/* Catch-all route */}
+              <Route
+                path="*"
+                element={
+                  <Navigate to={isAuthenticated ? "/404" : "/login"} replace />
+                }
+              />
+            </Routes>
+          </BrowserRouter>
         </QueryClientProvider>
-    </ModuleProvider>
+      </ModuleProvider>
     </AuthProvider>
   );
 }

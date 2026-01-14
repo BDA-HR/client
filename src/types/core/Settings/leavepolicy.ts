@@ -6,10 +6,10 @@ export type { UUID };
 // Leave Policy Types
 export interface LeavePolicyListDto extends BaseDto {
   leaveTypeId: UUID;
+  code: string;
   name: string;
+  allowEncashment: ;
   requiresAttachment: boolean;
-  minDurPerReq: number;
-  maxDurPerReq: number;
   holidaysAsLeave: boolean;
   leaveType: string;
   requiresAttachmentStr: string;
@@ -22,8 +22,8 @@ export interface LeavePolicyAddDto {
   name: string;
   requiresAttachment: boolean;
   minDurPerReq: number;
-  maxDurPerReq: number;
   holidaysAsLeave: boolean;
+  status: number;
   leaveTypeId: UUID;
 }
 

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import LeaveHeader from '../../../components/settings/hrSettings/leave/leavetype/LeaveHeader';
 import LeaveTypeSection from '../../../components/settings/hrSettings/leave/leavetype/LeaveTypeSection';
-import LeavePolicySection from '../../../components/settings/hrSettings/leave/leavepolicy/LeavePolicySection';
+// import LeavePolicySection from '../../../components/settings/hrSettings/leave/leavepolicy/LeavePolicySection';
 import type { LeaveTypeListDto, LeaveTypeAddDto, LeaveTypeModDto } from '../../../types/core/Settings/leavetype';
 import type { LeavePolicyListDto, LeavePolicyAddDto, LeavePolicyModDto, LeaveTypeOptionDto } from '../../../types/core/Settings/leavepolicy';
 
@@ -309,7 +309,7 @@ const PageAnnualLeave = () => {
       />
 
       {/* Leave Policy Section */}
-      <LeavePolicySection
+      {/* <LeavePolicySection
         searchTerm={policySearchTerm}
         setSearchTerm={setPolicySearchTerm}
         viewMode={policyViewMode}
@@ -323,7 +323,7 @@ const PageAnnualLeave = () => {
         isAddPolicyModalOpen={isAddPolicyModalOpen}
         onCloseAddPolicyModal={handleCloseAddPolicyModal}
         onOpenAddPolicyModal={handleOpenAddPolicyModal}
-      />
+      /> */}
     </motion.section>
   );
 };
