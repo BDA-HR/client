@@ -9,7 +9,7 @@ import {
   Menu,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../../ui/popover';
-import type { 
+import type {
   PerMenuListDto,
 
 } from '../../../../types/core/Settings/menu-permissions';
@@ -29,7 +29,7 @@ interface MenuPermissionTableProps {
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  onEditPermission: (permission: PerMenuListDto) => void; 
+  onEditPermission: (permission: PerMenuListDto) => void;
   onDeletePermission: (permission: PerMenuListDto) => void;
 }
 
@@ -45,7 +45,7 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
   const handleEdit = (permission: PerMenuListDto) => {
-    onEditPermission(permission); 
+    onEditPermission(permission);
     setPopoverOpen(null);
   };
 
@@ -73,7 +73,7 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -87,22 +87,19 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
                 Menu Key
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Menu Name
+                Label
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                Path
-              </th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                Icon
+                Order
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                 Module
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                Type
+                Is Child
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                Order
+                Parent
               </th>
               <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -118,7 +115,7 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
               </tr>
             ) : (
               permissions.map((permission, index) => (
-                <motion.tr 
+                <motion.tr
                   key={permission.id}
                   custom={index}
                   initial="hidden"
@@ -128,7 +125,7 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
                 >
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center">
-                      <motion.div 
+                      <motion.div
                         whileHover={{ rotate: 10 }}
                         className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
                       >
@@ -138,65 +135,44 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
                         <div className="text-sm font-medium text-gray-900">
                           {permission.key}
                         </div>
-                        <div className="text-xs text-gray-500">
-                          
-                        </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     <div className="flex items-center">
-                      <span>{safeDisplayValue(permission.label || permission.name)}</span>
+                      <span>{safeDisplayValue(permission.label)}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
                       <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                        {safeDisplayValue(permission.path)}
+                        {safeDisplayValue(permission.order)}
                       </span>
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
                     <div className="flex items-center">
                       <span className="font-mono text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                        {safeDisplayValue(permission.icon)}
+                        {safeDisplayValue(permission.module)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+                    <div className="flex items-center">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${permission.isChild ? 'bg-orange-50 text-orange-700' : 'bg-blue-50 text-blue-700'}`}>
+                        {permission.isChildStr}
                       </span>
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                     <div className="flex items-center">
-                      <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium">
-                        {permission.module}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                    <div className="flex items-center">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        permission.isChild 
-                          ? 'bg-orange-50 text-orange-700' 
-                          : 'bg-blue-50 text-blue-700'
-                      }`}>
-                        {permission.isChild ? 'Child' : 'Parent'}
-                      </span>
-                      {permission.isChild && safeDisplayValue(permission.parentKey, '') !== '-' && (
-                        <span className="ml-2 text-xs text-gray-500">
-                          ({safeDisplayValue(permission.parentKey, '')})
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                    <div className="flex items-center">
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                        {safeDisplayValue(permission.order, '0')}
-                      </span>
+                      {permission.parent}
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                     <Popover open={popoverOpen === permission.id} onOpenChange={(open) => setPopoverOpen(open ? permission.id : null)}>
                       <PopoverTrigger asChild>
-                        <motion.button 
+                        <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100 cursor-pointer"
@@ -206,14 +182,14 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
                       </PopoverTrigger>
                       <PopoverContent className="w-48 p-0" align="end">
                         <div className="py-1">
-                          <button 
+                          <button
                             onClick={() => handleEdit(permission)}
                             className="w-full cursor-pointer text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                           >
                             <PenBox size={16} />
                             Edit
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(permission)}
                             className="w-full cursor-pointer text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                           >
@@ -271,11 +247,10 @@ const MenuPermissionTable: React.FC<MenuPermissionTableProps> = ({
                 <button
                   key={page}
                   onClick={() => onPageChange(page)}
-                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                    currentPage === page
-                      ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
-                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                  }`}
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
+                    ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
+                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    }`}
                 >
                   {page}
                 </button>

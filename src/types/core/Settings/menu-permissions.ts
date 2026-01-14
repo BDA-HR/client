@@ -1,4 +1,5 @@
 import type { UUID } from "crypto";
+import type { BaseDto } from "../BaseDto";
 
 export type { UUID };
 
@@ -14,39 +15,39 @@ export interface ModPerMenuListDto {
   perMenuList: NameList[];
 }
 
-export interface PerMenuListDto {
-  id: UUID;
+export interface PerMenuListDto extends BaseDto {
   perModuleId: UUID; // PerModule
+  order: number;
+  isChild: boolean;
   key: string;
-  name: string;
+  label: string;
+  isChildStr: string;
+  parent: string;
   module: string; // PerModule
-  label?: string; // New label field (optional for backward compatibility)
-  path?: string; // New path field (optional for backward compatibility)
-  icon?: string; // New icon field (optional for backward compatibility)
-  isChild?: boolean; // New isChild field (optional for backward compatibility)
-  parentKey?: string; // New parentKey field (optional for backward compatibility)
-  order?: number; // New order field (optional for backward compatibility)
+  path: string; // PerModule
+  icon: string; // PerModule
+  parentKey: string; // PerModule
 }
 
 export interface PerMenuAddDto {
-  perModuleId: UUID; 
+  perModuleId: UUID;
   key: string;
   label: string;
-  path: string; 
-  icon: string; 
-  isChild: boolean; 
-  parentKey: string; 
-  order: number; 
+  path: string;
+  icon: string;
+  isChild: boolean;
+  parentKey: string;
+  order: number;
 }
 
 export interface PerMenuModDto {
-  perModuleId: UUID; 
+  perModuleId: UUID;
   id: UUID;
   key: string;
-  label: string; 
-  path: string; 
-  icon: string; 
-  isChild: boolean; 
-  parentKey: string; 
-  order: number; 
+  label: string;
+  path: string;
+  icon: string;
+  isChild: boolean;
+  parentKey: string;
+  order: number;
 }
