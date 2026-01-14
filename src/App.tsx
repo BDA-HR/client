@@ -46,7 +46,7 @@ import PagePosition from './pages/settings/hrSettings/position/pagePosition';
 import PositionDetails from './pages/settings/hrSettings/position/PositionDetails';
 import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
 import PageAnnualLeave from './pages/settings/hrSettings/pageAnnualLeave';
-import LeavePolicyAccrualPage  from './pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage';
+import LeavePolicyAccrualPage from './pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage';
 import { PageHolidayHist } from './pages/core/pageHolidayHist';
 import ProfilePage from './pages/profile';
 import PageAddUser from './pages/core/usermanagement/pageAddUser';
@@ -187,10 +187,10 @@ function App() {
                   path="/settings/hr/annualleave"
                   element={<PageAnnualLeave />}
                 />
-                <Route
+                {/* <Route
                   path="/settings/hr/annualleave/leavePolicy"
                   element={<LeavePolicy />}
-                />
+                /> */}
                 <Route
                   path="/settings/hr/annualleave/:id/policy"
                   element={<LeavePolicyAccrualPage />}

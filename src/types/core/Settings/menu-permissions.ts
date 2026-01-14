@@ -24,9 +24,9 @@ export interface PerMenuListDto extends BaseDto {
   isChildStr: string;
   parent: string;
   module: string; // PerModule
-  path: string; // PerModule
-  icon: string; // PerModule
-  parentKey: string; // PerModule
+  path: string;
+  icon: string;
+  parentKey: string;
 }
 
 export interface PerMenuAddDto {
