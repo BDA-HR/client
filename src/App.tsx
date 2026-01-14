@@ -191,7 +191,7 @@ function App() {
                 <Route
                   path="/settings/hr/leave/leavePolicy"
                   element={<LeavePolicy />}
-                /> */}
+                /> 
                 <Route
                   path="/settings/hr/annualleave/:id/policy"
                   element={<LeavePolicyAccrualPage />}
