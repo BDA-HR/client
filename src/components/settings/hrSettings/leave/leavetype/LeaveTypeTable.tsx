@@ -70,7 +70,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
   };
 
   const getBooleanIcon = (value: boolean) => {
-    return value ? (<CheckCircle className="h-5 w-5 text-green-500" />) : (<XCircle className="h-5 w-5 text-red-500" />);
+    return value ? (<CheckCircle className="h-4 w-4 text-green-500" />) : (<XCircle className="h-4 w-4 text-red-500" />);
   };
 
   // Animation variants for table rows
@@ -172,7 +172,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center">
-                        {getBooleanIcon(leaveType.requiresApproval)}
+                        {getBooleanIcon(leaveType.requiresApproval)} {leaveType.requiresApprovalStr}
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
