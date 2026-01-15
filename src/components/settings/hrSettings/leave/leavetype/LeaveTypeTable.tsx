@@ -65,13 +65,31 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
     return colors[category] || 'bg-gray-100 text-gray-800 border border-gray-200';
   };
 
+  const getBooleanColor = (booleanColor: string): string => {
+    const colors: Record<string, string> = {
+      True: "bg-green-500 text-white border border-green-200",
+      False: "bg-red-500 text-white border border-red-200",
+    };
+    return (
+      colors[booleanColor] || "bg-green-100 text-gray-800 border border-green-200"
+    );
+  };
+
   const getStatusColor = (isActive: boolean): string => {
     return isActive ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200";
   };
 
   const getBooleanIcon = (value: boolean) => {
-    return value ? (<CheckCircle className="h-4 w-4 text-green-500" />) : (<XCircle className="h-4 w-4 text-red-500" />);
+    return value ? (<CheckCircle className="h-4 w-4 text-white" />) : (<XCircle className="h-4 w-4 text-white" />);
   };
+
+ const getBooleanSmallIcon = (value: boolean) => {
+   return value ? (
+     <CheckCircle className="h-2.5 w-2.5 text-white" />
+   ) : (
+     <XCircle className="h-2.5 w-2.5 text-white" />
+   );
+ };
 
   // Animation variants for table rows
   const rowVariants = {
@@ -98,22 +116,40 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-white">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                >
                   Leave Type
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Category
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Requires Approval?
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Allow Half Day?
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Holidays as Leave?
                 </th>
-                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Actions
                 </th>
               </tr>
@@ -121,7 +157,10 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
             <tbody className="bg-white divide-y divide-gray-200">
               {leaveTypes.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td
+                    colSpan={6}
+                    className="px-6 py-8 text-center text-sm text-gray-500"
+                  >
                     <div className="flex flex-col items-center justify-center">
                       <div className="text-gray-400 text-lg mb-2">
                         No leave types found
@@ -158,31 +197,64 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                           </div>
                           <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                             <span>Is Active?: </span>
-                            {getBooleanIcon(leaveType.isActive)}
+                            <span
+                              className={`px-2 py-1 inline-flex text-[10px] leading-2 font-semibold rounded-full gap-0.5 ${getBooleanColor(
+                                leaveType.isActiveStr
+                              )}`}
+                            >
+                              {getBooleanSmallIcon(leaveType.isActive)}{" "}
+                              {leaveType.isActiveStr}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getCategoryColor(leaveType.leaveCategory)}`}>
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getCategoryColor(
+                            leaveType.leaveCategory
+                          )}`}
+                        >
                           {leaveType.leaveCategoryStr}
                         </span>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {getBooleanIcon(leaveType.requiresApproval)} {leaveType.requiresApprovalStr}
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-2 rounded-full ${getBooleanColor(
+                            leaveType.requiresApprovalStr
+                          )}`}
+                        >
+                          {getBooleanIcon(leaveType.requiresApproval)}{" "}
+                          {leaveType.requiresApprovalStr}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        {getBooleanIcon(leaveType.allowHalfDay)}
+                        <span
+                          className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-2 rounded-full ${getBooleanColor(
+                            leaveType.allowHalfDayStr
+                          )}`}
+                        >
+                          {getBooleanIcon(leaveType.allowHalfDay)}{" "}
+                          {leaveType.allowHalfDayStr}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         {getBooleanIcon(leaveType.holidaysAsLeave)}
+                        <span
+                          className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-2 rounded-full ${getBooleanColor(
+                            leaveType.holidaysAsLeaveStr
+                          )}`}
+                        >
+                          {getBooleanIcon(leaveType.holidaysAsLeave)}{" "}
+                          {leaveType.holidaysAsLeaveStr}
+                        </span>
                       </div>
                     </td>
                     {/* <td className="px-4 py-3 whitespace-nowrap">
@@ -194,7 +266,12 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                       </button>
                     </td> */}
                     <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <Popover open={popoverOpen === leaveType.id} onOpenChange={(open) => setPopoverOpen(open ? leaveType.id : null)}>
+                      <Popover
+                        open={popoverOpen === leaveType.id}
+                        onOpenChange={(open) =>
+                          setPopoverOpen(open ? leaveType.id : null)
+                        }
+                      >
                         <PopoverTrigger asChild>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
@@ -223,8 +300,11 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                             {onToggleStatus && (
                               <button
                                 onClick={() => handleToggleStatus(leaveType)}
-                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${leaveType.isActive ? 'text-amber-600 hover:bg-amber-50' : 'text-green-600 hover:bg-green-50'
-                                  }`}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${
+                                  leaveType.isActive
+                                    ? "text-amber-600 hover:bg-amber-50"
+                                    : "text-green-600 hover:bg-green-50"
+                                }`}
                               >
                                 {leaveType.isActive ? (
                                   <>
@@ -259,7 +339,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
       </motion.div>
 
       {/* View Details Modal - Keep only this one since delete has its own component now */}
-      {activeModal === 'view' && selectedLeaveType && (
+      {activeModal === "view" && selectedLeaveType && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -274,7 +354,9 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                   </span>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{selectedLeaveType.name}</h2>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    {selectedLeaveType.name}
+                  </h2>
                   <p className="text-sm text-gray-500">Leave Type Details</p>
                 </div>
               </div>
@@ -289,57 +371,86 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500 block mb-1">Category</label>
+                  <label className="text-sm font-medium text-gray-500 block mb-1">
+                    Category
+                  </label>
                   <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 inline-flex text-sm font-semibold rounded-full ${getCategoryColor(selectedLeaveType.leaveCategory)}`}>
+                    <span
+                      className={`px-3 py-1 inline-flex text-sm font-semibold rounded-full ${getCategoryColor(
+                        selectedLeaveType.leaveCategory
+                      )}`}
+                    >
                       {selectedLeaveType.leaveCategoryStr}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 block mb-1">Status</label>
-                  <span className={`px-3 py-1 inline-flex text-sm font-semibold rounded-full ${getStatusColor(selectedLeaveType.isActive)}`}>
+                  <label className="text-sm font-medium text-gray-500 block mb-1">
+                    Status
+                  </label>
+                  <span
+                    className={`px-3 py-1 inline-flex text-sm font-semibold rounded-full ${getStatusColor(
+                      selectedLeaveType.isActive
+                    )}`}
+                  >
                     {selectedLeaveType.isActiveStr}
                   </span>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 block mb-1">Approval Required</label>
+                  <label className="text-sm font-medium text-gray-500 block mb-1">
+                    Approval Required
+                  </label>
                   <div className="flex items-center gap-2">
                     {getBooleanIcon(selectedLeaveType.requiresApproval)}
-                    <span className="text-gray-900">{selectedLeaveType.requiresApprovalStr}</span>
+                    <span className="text-gray-900">
+                      {selectedLeaveType.requiresApprovalStr}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500 block mb-1">Half Day Allowed</label>
+                  <label className="text-sm font-medium text-gray-500 block mb-1">
+                    Half Day Allowed
+                  </label>
                   <div className="flex items-center gap-2">
                     {getBooleanIcon(selectedLeaveType.allowHalfDay)}
-                    <span className="text-gray-900">{selectedLeaveType.allowHalfDayStr}</span>
+                    <span className="text-gray-900">
+                      {selectedLeaveType.allowHalfDayStr}
+                    </span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 block mb-1">Holidays Count as Leave</label>
+                  <label className="text-sm font-medium text-gray-500 block mb-1">
+                    Holidays Count as Leave
+                  </label>
                   <div className="flex items-center gap-2">
                     {getBooleanIcon(selectedLeaveType.holidaysAsLeave)}
-                    <span className="text-gray-900">{selectedLeaveType.holidaysAsLeaveStr}</span>
+                    <span className="text-gray-900">
+                      {selectedLeaveType.holidaysAsLeaveStr}
+                    </span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 block mb-1">Created Date</label>
+                  <label className="text-sm font-medium text-gray-500 block mb-1">
+                    Created Date
+                  </label>
                   <p className="text-gray-900">
-                    {new Date(selectedLeaveType.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                    {new Date(selectedLeaveType.createdAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
                   </p>
                 </div>
               </div>
