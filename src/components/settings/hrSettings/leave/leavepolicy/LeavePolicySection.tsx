@@ -1,85 +1,75 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { XCircleIcon } from 'lucide-react';
-import { leavePolicyService } from '../../../../../services/core/settings/ModHrm/LeavePolicyService';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { XCircleIcon } from "lucide-react";
 import type {
   LeavePolicyListDto,
   LeavePolicyAddDto,
   LeavePolicyModDto,
   LeaveTypeOptionDto,
-  UUID
-} from '../../../../../types/core/Settings/leavepolicy';
-import LeavePolicyHeader from './LeavePolicyHeader';
-import LeavePolicySearchFilters from './LeavePolicySearchFilter';
-import LeavePolicyCard from "./LeavePolicyCard";
+  UUID,
+} from "../../../../../types/core/Settings/leavepolicy";
+import LeavePolicyHeader from "./LeavePolicyHeader";
+import LeavePolicySearchFilters from "./LeavePolicySearchFilter";
 import AddLeavePolicyModal from "./AddLeavePolicyModal";
 import EditLeavePolicyModal from "./EditLeavePolicyModal";
 import DeleteLeavePolicyModal from "./DeleteLeavePolicyModal";
-import { hrmLeaveList } from '../../../../../services/List/HrmLeaveList';
+import LeavePolicyTable from "./LeavePolicyTable";
+import { leavePolicyService } from "../../../../../services/core/settings/ModHrm/LeavePolicyService";
+import { hrmLeaveList } from "../../../../../services/List/HrmLeaveList";
 
 const LeavePolicySection: React.FC = () => {
   const [leavePolicies, setLeavePolicies] = useState<LeavePolicyListDto[]>([]);
-  const [leaveTypeOptions, setLeaveTypeOptions] = useState<LeaveTypeOptionDto[]>([]);
+  const [leaveTypeOptions, setLeaveTypeOptions] = useState<
+    LeaveTypeOptionDto[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
-  const [editingPolicy, setEditingPolicy] = useState<LeavePolicyListDto | null>(null);
-  const [deletingPolicy, setDeletingPolicy] = useState<LeavePolicyListDto | null>(null);
-
-  // Filter leave policies based on search term
-  const filteredLeavePolicies = leavePolicies.filter(policy =>
-    policy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    policy.leaveType.toLowerCase().includes(searchTerm.toLowerCase())
+  const [editingPolicy, setEditingPolicy] = useState<LeavePolicyListDto | null>(
+    null
   );
+  const [deletingPolicy, setDeletingPolicy] =
+    useState<LeavePolicyListDto | null>(null);
 
-  const fetchLeavePolicies = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const policiesData = await leavePolicyService.getAllLeavePolicies();
-      setLeavePolicies(policiesData);
-    } catch (err) {
-      console.error('Failed to fetch leave policies:', err);
-      setError('Failed to load leave policies. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchLeaveTypeOptions = async () => {
-    try {
-      const leaveTypes = await hrmLeaveList.getAllLeaveTypes();
-      const options: LeaveTypeOptionDto[] = leaveTypes.map(lt => ({
-        id: lt.id,
-        name: lt.name,
-      }));
-      setLeaveTypeOptions(options);
-    } catch (err) {
-      console.error('Failed to fetch leave type options:', err);
-    }
-  };
-
+  // Fetch policies and leave types
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([
-        fetchLeavePolicies(),
-        fetchLeaveTypeOptions()
-      ]);
+      try {
+        setLoading(true);
+        const [policies, leaveTypes] = await Promise.all([
+          leavePolicyService.getAllLeavePolicies(),
+          hrmLeaveList.getAllLeaveTypes(),
+        ]);
+        setLeavePolicies(policies);
+        setLeaveTypeOptions(
+          leaveTypes.map((lt) => ({ id: lt.id, name: lt.name }))
+        );
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load leave policies. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);
 
+  const filteredLeavePolicies = leavePolicies.filter(
+    (policy) =>
+      policy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      policy.leaveType.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // CRUD handlers
   const handleAddLeavePolicy = async (policyData: LeavePolicyAddDto) => {
     try {
       const newPolicy = await leavePolicyService.createLeavePolicy(policyData);
       setLeavePolicies((prev) => [...prev, newPolicy]);
       setIsAddPolicyModalOpen(false);
-      setError(null);
     } catch (err) {
-      console.error('Failed to create leave policy:', err);
-      setError('Failed to create leave policy. Please try again.');
-      throw err;
+      console.error(err);
+      setError("Failed to create leave policy. Please try again.");
     }
   };
 
@@ -87,56 +77,29 @@ const LeavePolicySection: React.FC = () => {
     try {
       const result = await leavePolicyService.updateLeavePolicy(updatedPolicy);
       setLeavePolicies((prev) =>
-        prev.map((policy) => (policy.id === result.id ? result : policy))
+        prev.map((p) => (p.id === result.id ? result : p))
       );
       setEditingPolicy(null);
-      setError(null);
     } catch (err) {
-      console.error('Failed to update leave policy:', err);
-      setError('Failed to update leave policy. Please try again.');
-      throw err;
+      console.error(err);
+      setError("Failed to update leave policy. Please try again.");
     }
   };
 
   const handleDeleteLeavePolicy = async (policyId: UUID) => {
     try {
       await leavePolicyService.deleteLeavePolicy(policyId);
-      setLeavePolicies((prev) => prev.filter((policy) => policy.id !== policyId));
+      setLeavePolicies((prev) => prev.filter((p) => p.id !== policyId));
       setDeletingPolicy(null);
-      setError(null);
     } catch (err) {
-      console.error('Failed to delete leave policy:', err);
-      setError('Failed to delete leave policy. Please try again.');
+      console.error(err);
+      setError("Failed to delete leave policy. Please try again.");
     }
-  };
-
-  const handleOpenAddModal = () => {
-    setIsAddPolicyModalOpen(true);
-  };
-
-  const handleCloseAddModal = () => {
-    setIsAddPolicyModalOpen(false);
-  };
-
-  const handleEdit = (policy: LeavePolicyListDto) => {
-    setEditingPolicy(policy);
-  };
-
-  const handleDelete = (policy: LeavePolicyListDto) => {
-    setDeletingPolicy(policy);
-  };
-
-  const handleCloseEditModal = () => {
-    setEditingPolicy(null);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setDeletingPolicy(null);
   };
 
   return (
     <div className="space-y-6">
-      {/* Leave Policy Header Section */}
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -144,7 +107,8 @@ const LeavePolicySection: React.FC = () => {
       >
         <LeavePolicyHeader />
       </motion.div>
-      {/* Error message for API errors */}
+
+      {/* Error Banner */}
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -152,28 +116,7 @@ const LeavePolicySection: React.FC = () => {
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
         >
           <div className="flex justify-between items-center">
-            <span className="font-medium">
-              {error.includes("load") ? (
-                <>
-                  Failed to load leave policies.{" "}
-                  <button
-                    onClick={fetchLeavePolicies}
-                    className="underline hover:text-red-800 font-semibold focus:outline-none"
-                  >
-                    Try again
-                  </button>{" "}
-                  later.
-                </>
-              ) : error.includes("create") ? (
-                "Failed to create leave policy. Please try again."
-              ) : error.includes("update") ? (
-                "Failed to update leave policy. Please try again."
-              ) : error.includes("delete") ? (
-                "Failed to delete leave policy. Please try again."
-              ) : (
-                error
-              )}
-            </span>
+            <span className="font-medium">{error}</span>
             <button
               onClick={() => setError(null)}
               className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
@@ -184,14 +127,14 @@ const LeavePolicySection: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Loading state */}
+      {/* Loading */}
       {loading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
         </div>
       )}
 
-      {/* Search and Filters Section for Leave Policies */}
+      {/* Search Filters */}
       {!loading && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -202,87 +145,48 @@ const LeavePolicySection: React.FC = () => {
           <LeavePolicySearchFilters
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
-            onAddClick={handleOpenAddModal}
+            onAddClick={() => setIsAddPolicyModalOpen(true)}
           />
         </motion.div>
       )}
-      {!loading && leavePolicies.length === 0 && !error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-6 mb-6"
-        >
-          <div className="flex items-center">
-            <XCircleIcon className="h-5 w-5 text-yellow-400 mr-3" />
-            <div>
-              <h3 className="text-yellow-800 font-medium">
-                No Leave Policies Found
-              </h3>
-              <p className="text-yellow-700 text-sm mt-1">
-                There are currently no leave policies in the system. Please add
-                a leave policy to get started.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
 
-      {/* Leave Policies Content - Grid View Only */}
-      {!loading && leavePolicies.length > 0 && (
+      {/* LeavePolicyTable always visible */}
+      {!loading && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           className="pt-0 pb-0"
         >
-          {filteredLeavePolicies.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-500 text-lg">
-                No leave policies found matching your search.
-              </div>
-              <p className="text-gray-400 mt-2">
-                Try adjusting your search terms or add a new leave policy.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredLeavePolicies.map((policy) => (
-                <LeavePolicyCard
-                  key={policy.id}
-                  leavePolicy={policy}
-                  viewMode="grid"
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          )}
+          <LeavePolicyTable
+            leavePolicies={filteredLeavePolicies} // empty array is fine
+            onEdit={setEditingPolicy as any}
+            onDelete={setDeletingPolicy as any}
+          />
         </motion.div>
       )}
 
-      {/* Add Leave Policy Modal */}
+      {/* Modals */}
       <AddLeavePolicyModal
         isOpen={isAddPolicyModalOpen}
-        onClose={handleCloseAddModal}
+        onClose={() => setIsAddPolicyModalOpen(false)}
         onAddLeavePolicy={handleAddLeavePolicy}
         leaveTypeOptions={leaveTypeOptions}
       />
-
-      {/* Edit Leave Policy Modal */}
       <EditLeavePolicyModal
         isOpen={!!editingPolicy}
-        onClose={handleCloseEditModal}
+        onClose={() => setEditingPolicy(null)}
         onSave={handleEditLeavePolicy}
         policy={editingPolicy}
         leaveTypeOptions={leaveTypeOptions}
       />
-
-      {/* Delete Leave Policy Modal */}
       <DeleteLeavePolicyModal
-        policy={deletingPolicy}
         isOpen={!!deletingPolicy}
-        onClose={handleCloseDeleteModal}
-        onConfirm={handleDeleteLeavePolicy}
+        onClose={() => setDeletingPolicy(null)}
+        onConfirm={() =>
+          deletingPolicy && handleDeleteLeavePolicy(deletingPolicy.id)
+        }
+        policy={deletingPolicy}
       />
     </div>
   );
