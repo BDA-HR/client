@@ -307,23 +307,6 @@ const PageAnnualLeave = () => {
         onCloseAddModal={handleCloseAddModal}
         onOpenAddModal={handleOpenAddModal}
       />
-
-      {/* Leave Policy Section */}
-      {/* <LeavePolicySection
-        searchTerm={policySearchTerm}
-        setSearchTerm={setPolicySearchTerm}
-        viewMode={policyViewMode}
-        setViewMode={setPolicyViewMode}
-        leavePolicies={filteredLeavePolicies}
-        onEdit={handlePolicyEdit}
-        onDelete={handlePolicyDelete}
-        onAddClick={handlePolicyAddClick}
-        leaveTypeOptions={leaveTypeOptions}
-        onAddLeavePolicy={handleAddLeavePolicy}
-        isAddPolicyModalOpen={isAddPolicyModalOpen}
-        onCloseAddPolicyModal={handleCloseAddPolicyModal}
-        onOpenAddPolicyModal={handleOpenAddPolicyModal}
-      /> */}
     </motion.section>
   );
 };

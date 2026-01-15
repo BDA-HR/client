@@ -10,7 +10,6 @@ import type {
 } from "../../../../types/core/Settings/leavepolicy";
 import { PolicyStatus, YesNo } from "../../../../types/core/enum";
 import LeavePolicySection from "../../../../components/settings/hrSettings/leave/leavepolicy/LeavePolicySection";
-import LeavePolicyHeader from "../../../../components/settings/hrSettings/leave/leavepolicy/LeavePolicyHeader";
 
 /* -------------------------------- helpers -------------------------------- */
 
