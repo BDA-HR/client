@@ -1,0 +1,50 @@
+import type { UUID } from 'crypto';
+import type { BaseDto } from '../../hr/BaseDto';
+
+export type { UUID };
+
+export interface LeavePolicyConfigListDto extends BaseDto {
+  annualEntitlement: number;
+  accrualFrequency: string;
+  accrualRate: number;
+  maxDaysPerReq: number;
+  maxCarryOverDays: number;
+  minServiceMonths: number;
+  isActive: boolean;
+  annualEntitlementStr: string;
+  accrualFrequencyStr: string;
+  accrualRateStr: string;
+  maxDaysPerReqStr: string;
+  maxCarryOverDaysStr: string;
+  minServiceMonthsStr: string;
+  isActiveStr: string;
+  leavePolicy: string;
+  fiscalYear: string;
+}
+
+export interface LeavePolicyConfigAddDto {
+  annualEntitlement: number;
+  accrualFrequency: string;
+  accrualRate: number;
+  maxDaysPerReq: number;
+  maxCarryOverDays: number;
+  minServiceMonths: number;
+  fiscalYearId: UUID;
+  leavePolicyId: UUID;
+  leaveAppChainId: UUID;
+}
+
+export interface LeavePolicyConfigModDto {
+  id: UUID;
+  annualEntitlement: number;
+  accrualFrequency: string;
+  accrualRate: number;
+  maxDaysPerReq: number;
+  maxCarryOverDays: number;
+  minServiceMonths: number;
+  isActive: boolean;
+  fiscalYearId: UUID;
+  leavePolicyId: UUID;
+  leaveAppChainId: UUID;
+  rowVersion: string;
+}
