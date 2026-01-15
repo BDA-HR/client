@@ -34,8 +34,8 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
   const [formData, setFormData] = useState<LeavePolicyAddDto>({
     code: "",
     name: "",
-    allowEncashment: true,
-    requiresAttachment: true,
+    allowEncashment: false,
+    requiresAttachment: false,
     status: "Active",
     leaveTypeId: "" as UUID,
   });
@@ -59,8 +59,8 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
     setFormData({
       code: "",
       name: "",
-      allowEncashment: true,
-      requiresAttachment: true,
+      allowEncashment: false,
+      requiresAttachment: false,
       status: "Active",
       leaveTypeId: "" as UUID,
     });
@@ -129,10 +129,10 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
+        <div className="flex justify-between items-center border-b px-6 py-3 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <BadgePlus size={20} />
             <h2 className="text-lg font-bold text-gray-800">
@@ -151,26 +151,6 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
         {/* Body */}
         <form onSubmit={handleSubmit}>
           <div className="px-6 py-4 space-y-4">
-            {/* Code */}
-            <div className="space-y-2">
-              <Label className="text-sm text-gray-700 font-medium">
-                Code <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                name="code"
-                value={formData.code}
-                onChange={handleChange}
-                placeholder="Eg. POL24"
-                className={`w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                  formErrors.code ? "border-red-500" : ""
-                }`}
-                disabled={loading}
-              />
-              {formErrors.code && (
-                <p className="text-red-500 text-sm mt-1">{formErrors.code}</p>
-              )}
-            </div>
-
             {/* Name */}
             <div className="space-y-2">
               <Label className="text-sm text-gray-700 font-medium">
@@ -190,50 +170,72 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                 <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
               )}
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Code */}
+              <div className="space-y-2">
+                <Label className="text-sm text-gray-700 font-medium">
+                  Code <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  name="code"
+                  value={formData.code}
+                  onChange={handleChange}
+                  placeholder="Eg. POL24"
+                  className={`w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    formErrors.code ? "border-red-500" : ""
+                  }`}
+                  disabled={loading}
+                />
+                {formErrors.code && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.code}</p>
+                )}
+              </div>
 
-            {/* Leave Type */}
-            <div className="space-y-2">
-              <Label className="text-sm text-gray-700 font-medium">
-                Leave Type <span className="text-red-500">*</span>
-              </Label>
-              <DropdownMenu
-                open={isLeaveTypeDropdownOpen}
-                onOpenChange={setIsLeaveTypeDropdownOpen}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`w-full justify-between ${
-                      formErrors.leaveTypeId
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    } ${
-                      loadingLeaveTypes ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    {selectedLeaveType?.name ||
-                      (loadingLeaveTypes ? "Loading..." : "Select leave type")}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full max-h-60 overflow-y-auto">
-                  {leaveTypeOptions.map((lt) => (
-                    <DropdownMenuItem
-                      key={lt.id}
-                      onClick={() => handleLeaveTypeSelect(lt)}
-                      className="text-sm cursor-pointer"
+              {/* Leave Type */}
+              <div className="space-y-2">
+                <Label className="text-sm text-gray-700 font-medium">
+                  Leave Type <span className="text-red-500">*</span>
+                </Label>
+                <DropdownMenu
+                  open={isLeaveTypeDropdownOpen}
+                  onOpenChange={setIsLeaveTypeDropdownOpen}
+                >
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`w-full justify-between ${
+                        formErrors.leaveTypeId
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } ${
+                        loadingLeaveTypes ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     >
-                      {lt.name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {formErrors.leaveTypeId && (
-                <p className="text-red-500 text-sm mt-1">
-                  {formErrors.leaveTypeId}
-                </p>
-              )}
+                      {selectedLeaveType?.name ||
+                        (loadingLeaveTypes
+                          ? "Loading..."
+                          : "Select leave type")}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) max-h-60 overflow-y-auto">
+                    {leaveTypeOptions.map((lt) => (
+                      <DropdownMenuItem
+                        key={lt.id}
+                        onClick={() => handleLeaveTypeSelect(lt)}
+                        className="text-sm cursor-pointer"
+                      >
+                        {lt.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {formErrors.leaveTypeId && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.leaveTypeId}
+                  </p>
+                )}
+              </div>
             </div>
-
             {/* Boolean checkboxes */}
             <div className="grid grid-cols-2 gap-4">
               <label className="flex items-center gap-2">
@@ -246,6 +248,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                       allowEncashment: e.target.checked,
                     })
                   }
+                  className="h-4 w-4 accent-emerald-600"
                 />
                 <span className="text-sm text-gray-700">Allow Encashment</span>
               </label>
@@ -260,6 +263,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
                       requiresAttachment: e.target.checked,
                     })
                   }
+                  className="h-4 w-4 accent-emerald-600"
                 />
                 <span className="text-sm text-gray-700">
                   Requires Attachment

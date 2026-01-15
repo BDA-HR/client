@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { XCircleIcon } from 'lucide-react';
 import { leavePolicyService } from '../../../../../services/core/settings/ModHrm/LeavePolicyService';
-import { leaveTypeService } from '../../../../../services/core/settings/ModHrm/LeaveTypeService';
 import type {
   LeavePolicyListDto,
   LeavePolicyAddDto,
@@ -16,6 +15,7 @@ import LeavePolicyCard from "./LeavePolicyCard";
 import AddLeavePolicyModal from "./AddLeavePolicyModal";
 import EditLeavePolicyModal from "./EditLeavePolicyModal";
 import DeleteLeavePolicyModal from "./DeleteLeavePolicyModal";
+import { hrmLeaveList } from '../../../../../services/List/HrmLeaveList';
 
 const LeavePolicySection: React.FC = () => {
   const [leavePolicies, setLeavePolicies] = useState<LeavePolicyListDto[]>([]);
@@ -49,7 +49,7 @@ const LeavePolicySection: React.FC = () => {
 
   const fetchLeaveTypeOptions = async () => {
     try {
-      const leaveTypes = await leaveTypeService.getAllLeaveTypes();
+      const leaveTypes = await hrmLeaveList.getAllLeaveTypes();
       const options: LeaveTypeOptionDto[] = leaveTypes.map(lt => ({
         id: lt.id,
         name: lt.name,
