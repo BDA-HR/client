@@ -94,7 +94,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     }
   }, [isOpen]);
 
-  // Prepare list items for the List component with safety check
+
   const moduleListItems: ListItem[] = Array.isArray(moduleNames) 
     ? moduleNames
         .filter(module => module && module.id && module.name) 
@@ -113,6 +113,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
   const validateForm = () => {
     const newErrors: {
       perModuleId?: string;
+      key?: string;
       label?: string;
       path?: string;
       icon?: string;
@@ -123,6 +124,11 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     if (!newPermission.perModuleId) {
       newErrors.perModuleId = 'Please select a module';
     }
+
+    if (!newPermission.key.trim()) {
+      newErrors.key = "Key is required";
+    }
+
 
     if (!newPermission.label.trim()) {
       newErrors.label = 'Label is required';
@@ -157,20 +163,15 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     setIsLoading(true);
 
     try {
-      // Generate key from selected module and label
-      const selectedModuleName = moduleListItems.find(m => m.id === newPermission.perModuleId)?.name || 'module';
-      const generatedKey = `${selectedModuleName.toLowerCase().replace(/\s+/g, '.')}.${newPermission.label.toLowerCase().replace(/\s+/g, '.')}`;
-      
-      // Map to the exact API structure expected by backend
       const dataToSend = {
         perModuleId: newPermission.perModuleId,
-        key: generatedKey, // Auto-generated key
+        key: newPermission.key.trim(), 
         label: newPermission.label.trim(),
         path: newPermission.path.trim(),
         icon: newPermission.icon.trim(),
         isChild: newPermission.isChild,
         parentKey: newPermission.parentKey.trim(),
-        order: newPermission.order
+        order: newPermission.order,
       };
       
       console.log('Sending data to API:', dataToSend);
@@ -241,16 +242,19 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
     }
   };
 
-  const isFormValid = newPermission.perModuleId && 
-                    newPermission.label.trim() && 
-                    newPermission.path.trim() && 
-                    newPermission.icon.trim() && 
-                    newPermission.order >= 0 &&
-                    (!newPermission.isChild || newPermission.parentKey.trim()) &&
-                    !errors.label &&
-                    !errors.path &&
-                    !errors.icon &&
-                    !errors.parentKey;
+  const isFormValid =
+    newPermission.perModuleId &&
+    newPermission.key.trim() &&
+    newPermission.label.trim() &&
+    newPermission.path.trim() &&
+    newPermission.icon.trim() &&
+    newPermission.order >= 0 &&
+    (!newPermission.isChild || newPermission.parentKey.trim()) &&
+    !errors.key &&
+    !errors.label &&
+    !errors.path &&
+    !errors.icon &&
+    !errors.parentKey;
 
   return (
     <>
@@ -281,7 +285,7 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto"
             onKeyDown={handleKeyDown}
           >
             {/* Header */}
@@ -305,13 +309,13 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
             </div>
 
             {/* Body */}
-            <div className="p-6">
+            <div className="p-4">
               {/* Two Column Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Left Column */}
-                <div className="space-y-6">
+                <div className="space-y-2">
                   {/* Module Selection - Full Width */}
-                  <div className="space-y-3 min-h-[76px]">
+                  <div className="space-y-2 min-h-[76px]">
                     <Label className="text-sm font-medium text-gray-700">
                       Select Module <span className="text-red-500">*</span>
                     </Label>
@@ -351,46 +355,55 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                       </>
                     )}
                   </div>
-                  {/* Menu Name/Label */}
-                  <div className="space-y-3 min-h-[76px]">
+                  {/* Menu key */}
+                  <div className="space-y-2 min-h-[76px]">
                     <Label
-                      htmlFor="label"
+                      htmlFor="key"
                       className="text-sm font-medium text-gray-700"
                     >
-                      Label <span className="text-red-500">*</span>
+                      Key{" "}
                     </Label>
                     <Input
-                      id="label"
-                      value={newPermission.label}
+                      id="key"
+                      value={newPermission.key}
                       onChange={(e) => {
                         setNewPermission((prev) => ({
                           ...prev,
-                          label: e.target.value,
+                          key: e.target.value,
                         }));
-                        if (errors.label)
-                          setErrors((prev) => ({ ...prev, label: undefined }));
+                        if (errors.key)
+                          setErrors((prev) => ({ ...prev, key: undefined }));
                       }}
-                      placeholder="Enter menu name/label"
+                      onBlur={() => {
+                        const value = newPermission.key.trim();
+
+                        if (value && existingKeys.includes(value)) {
+                          toast.error("This menu key already exists");
+                          setErrors((prev) => ({
+                            ...prev,
+                            key: "This key already exists",
+                          }));
+                        }
+                      }}
+                      placeholder="Enter menu key"
                       className={`w-full ${
-                        errors.label
+                        errors.key
                           ? "border-red-300 focus:ring-red-500 focus:border-red-500"
                           : ""
                       }`}
                       disabled={isLoading || isFetchingModules}
-                      aria-invalid={!!errors.label}
-                      aria-describedby={
-                        errors.label ? "label-error" : undefined
-                      }
+                      aria-invalid={!!errors.key}
+                      aria-describedby={errors.key ? "key-error" : undefined}
                     />
-                    {errors.label && (
-                      <p id="label-error" className="text-sm text-red-500">
-                        {errors.label}
+                    {errors.key && (
+                      <p id="key-error" className="text-sm text-red-500">
+                        {errors.key}
                       </p>
                     )}
                   </div>
 
                   {/* Path */}
-                  <div className="space-y-3 min-h-[76px]">
+                  <div className="space-y-2 min-h-[76px]">
                     <Label
                       htmlFor="path"
                       className="text-sm font-medium text-gray-700"
@@ -424,12 +437,38 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                       </p>
                     )}
                   </div>
+                  {/* Menu Type - Is Child Checkbox */}
+                  <div className="space-y-2 min-h-[76px]">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Menu Type
+                    </Label>
+                    <div className="flex items-center space-x-2 h-10">
+                      <Checkbox
+                        id="isChild"
+                        checked={newPermission.isChild}
+                        onCheckedChange={(checked) => {
+                          setNewPermission((prev) => ({
+                            ...prev,
+                            isChild: checked as boolean,
+                            parentKey: checked ? prev.parentKey : "",
+                          }));
+                        }}
+                        disabled={isLoading || isFetchingModules}
+                      />
+                      <Label
+                        htmlFor="isChild"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Is Child Menu
+                      </Label>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-6">
+                <div className="space-y-2">
                   {/* Order */}
-                  <div className="space-y-3 min-h-[76px]">
+                  <div className="space-y-2 min-h-[76px]">
                     <Label
                       htmlFor="order"
                       className="text-sm font-medium text-gray-700"
@@ -470,8 +509,47 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                       </p>
                     )}
                   </div>
+
+                  {/* Menu Name/Label */}
+                  <div className="space-y-2 min-h-[76px]">
+                    <Label
+                      htmlFor="label"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Label <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="label"
+                      value={newPermission.label}
+                      onChange={(e) => {
+                        setNewPermission((prev) => ({
+                          ...prev,
+                          label: e.target.value,
+                        }));
+                        if (errors.label)
+                          setErrors((prev) => ({ ...prev, label: undefined }));
+                      }}
+                      placeholder="Enter menu name/label"
+                      className={`w-full ${
+                        errors.label
+                          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                          : ""
+                      }`}
+                      disabled={isLoading || isFetchingModules}
+                      aria-invalid={!!errors.label}
+                      aria-describedby={
+                        errors.label ? "label-error" : undefined
+                      }
+                    />
+                    {errors.label && (
+                      <p id="label-error" className="text-sm text-red-500">
+                        {errors.label}
+                      </p>
+                    )}
+                  </div>
+
                   {/* Icon */}
-                  <div className="space-y-3 min-h-[76px]">
+                  <div className="space-y-2 min-h-[76px]">
                     <Label
                       htmlFor="icon"
                       className="text-sm font-medium text-gray-700"
@@ -506,35 +584,8 @@ const AddMenuPermissionModal: React.FC<AddMenuPermissionModalProps> = ({ onAddPe
                     )}
                   </div>
 
-                  {/* Menu Type - Is Child Checkbox */}
-                  <div className="space-y-3 min-h-[76px]">
-                    <Label className="text-sm font-medium text-gray-700">
-                      Menu Type
-                    </Label>
-                    <div className="flex items-center space-x-2 h-10">
-                      <Checkbox
-                        id="isChild"
-                        checked={newPermission.isChild}
-                        onCheckedChange={(checked) => {
-                          setNewPermission((prev) => ({
-                            ...prev,
-                            isChild: checked as boolean,
-                            parentKey: checked ? prev.parentKey : "",
-                          }));
-                        }}
-                        disabled={isLoading || isFetchingModules}
-                      />
-                      <Label
-                        htmlFor="isChild"
-                        className="text-sm font-medium text-gray-700"
-                      >
-                        Is Child Menu
-                      </Label>
-                    </div>
-                  </div>
-
                   {/* Parent Key - Always reserve space but conditionally show content */}
-                  <div className="space-y-3 min-h-[76px]">
+                  <div className="space-y-2 min-h-[76px]">
                     {newPermission.isChild ? (
                       <>
                         <Label
