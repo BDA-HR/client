@@ -67,8 +67,8 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
 
   const getBooleanColor = (booleanColor: string): string => {
     const colors: Record<string, string> = {
-      True: "bg-green-500 text-white border border-green-200",
-      False: "bg-red-500 text-white border border-red-200",
+      YES: "bg-green-500 text-white border border-green-200",
+      NO: "bg-red-500 text-white border border-red-200",
     };
     return (
       colors[booleanColor] || "bg-green-100 text-gray-800 border border-green-200"
@@ -83,13 +83,13 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
     return value ? (<CheckCircle className="h-4 w-4 text-white" />) : (<XCircle className="h-4 w-4 text-white" />);
   };
 
- const getBooleanSmallIcon = (value: boolean) => {
-   return value ? (
-     <CheckCircle className="h-2.5 w-2.5 text-white" />
-   ) : (
-     <XCircle className="h-2.5 w-2.5 text-white" />
-   );
- };
+  const getBooleanSmallIcon = (value: boolean) => {
+    return value ? (
+      <CheckCircle className="h-2.5 w-2.5 text-white" />
+    ) : (
+      <XCircle className="h-2.5 w-2.5 text-white" />
+    );
+  };
 
   // Animation variants for table rows
   const rowVariants = {
@@ -212,7 +212,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getCategoryColor(
+                          className={`px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full ${getCategoryColor(
                             leaveType.leaveCategory
                           )}`}
                         >
@@ -223,7 +223,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-1">
                         <span
-                          className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-2 rounded-full ${getBooleanColor(
+                          className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
                             leaveType.requiresApprovalStr
                           )}`}
                         >
@@ -235,7 +235,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-2 rounded-full ${getBooleanColor(
+                          className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
                             leaveType.allowHalfDayStr
                           )}`}
                         >
@@ -246,25 +246,15 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        {getBooleanIcon(leaveType.holidaysAsLeave)}
+                        {/* {getBooleanIcon(leaveType.holidaysAsLeave)} */}
                         <span
-                          className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-2 rounded-full ${getBooleanColor(
-                            leaveType.holidaysAsLeaveStr
-                          )}`}
+                          className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(leaveType.holidaysAsLeaveStr)}`}
                         >
                           {getBooleanIcon(leaveType.holidaysAsLeave)}{" "}
                           {leaveType.holidaysAsLeaveStr}
                         </span>
                       </div>
                     </td>
-                    {/* <td className="px-4 py-3 whitespace-nowrap">
-                      <button
-                        onClick={() => onToggleStatus && onToggleStatus(leaveType)}
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer transition-colors ${getStatusColor(leaveType.isActive)} hover:opacity-80`}
-                      >
-                        {leaveType.isActiveStr}
-                      </button>
-                    </td> */}
                     <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                       <Popover
                         open={popoverOpen === leaveType.id}
@@ -300,11 +290,10 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                             {onToggleStatus && (
                               <button
                                 onClick={() => handleToggleStatus(leaveType)}
-                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${
-                                  leaveType.isActive
-                                    ? "text-amber-600 hover:bg-amber-50"
-                                    : "text-green-600 hover:bg-green-50"
-                                }`}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${leaveType.isActive
+                                  ? "text-amber-600 hover:bg-amber-50"
+                                  : "text-green-600 hover:bg-green-50"
+                                  }`}
                               >
                                 {leaveType.isActive ? (
                                   <>
