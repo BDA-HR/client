@@ -106,6 +106,7 @@ const AddLeavePolicyModal: React.FC<AddLeavePolicyModalProps> = ({
     try {
       await onAddLeavePolicy(formData);
       toast.success("Leave policy added successfully");
+      resetForm();  
       onClose();
     } catch (error: any) {
       toast.error(error?.message || "Failed to add leave policy");

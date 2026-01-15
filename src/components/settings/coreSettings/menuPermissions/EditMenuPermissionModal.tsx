@@ -50,6 +50,7 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
 
   // Add errors state for field-specific validation
   const [errors, setErrors] = useState<{
+    key?: string;
     label?: string;
     path?: string;
     icon?: string;
@@ -93,13 +94,13 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
       setEditedPermission({
         id: permission.id,
         perModuleId: permission.perModuleId,
-        key: permission.key,
+        key: safeValue(permission.key),
         label: safeValue(permission.label), // Map existing name to label
-        path: safeValue(permission.path, ''), // New field
-        icon: safeValue(permission.icon, ''), // New field
+        path: safeValue(permission.path, ""), // New field
+        icon: safeValue(permission.icon, ""), // New field
         isChild: safeValue(permission.isChild, false), // New field
-        parentKey: safeValue(permission.parentKey, ''), // New field
-        order: safeValue(permission.order, 0) // New field
+        parentKey: safeValue(permission.parentKey, ""), // New field
+        order: safeValue(permission.order, 0), // New field
       });
       setIsOpen(true);
     } else {
@@ -127,6 +128,13 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
     // Clear label error when user starts typing
     if (errors.label) setErrors(prev => ({ ...prev, label: undefined }));
   };
+
+   const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+     const value = e.target.value;
+     setEditedPermission((prev) => ({ ...prev, key: value }));
+     // Clear key error when user starts typing
+     if (errors.key) setErrors((prev) => ({ ...prev, key: undefined }));
+   };
 
   const handlePathChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -284,9 +292,9 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
           {/* Two Column Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column */}
-            <div className="space-y-6">
+            <div className="space-y-2">
               {/* Module Selection */}
-              <div className="space-y-3 min-h-[76px]">
+              <div className="space-y-2 min-h-[76px]">
                 <Label className="text-sm font-medium text-gray-700">
                   Select Module <span className="text-red-500">*</span>
                 </Label>
@@ -321,27 +329,27 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
                   </>
                 )}
               </div>
-              {/* Menu Name/Label */}
-              <div className="space-y-3 min-h-[76px]">
+              {/* Menu key */}
+              <div className="space-y-2 min-h-[76px]">
                 <Label
-                  htmlFor="edit-label"
+                  htmlFor="edit-key"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Label <span className="text-red-500">*</span>
+                  Key <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="edit-label"
-                  value={editedPermission.label}
-                  onChange={handleLabelChange}
-                  placeholder="Enter menu name/label"
+                  id="edit-key"
+                  value={editedPermission.key}
+                  onChange={handleKeyChange}
+                  placeholder="Enter menu key"
                   className="w-full"
                   disabled={isSubmitting || isFetchingModules}
-                  aria-invalid={!editedPermission.label.trim()}
+                  aria-invalid={!editedPermission.key.trim()}
                 />
               </div>
 
               {/* Path */}
-              <div className="space-y-3 min-h-[76px]">
+              <div className="space-y-2 min-h-[76px]">
                 <Label
                   htmlFor="edit-path"
                   className="text-sm font-medium text-gray-700"
@@ -358,53 +366,8 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
                   aria-invalid={!editedPermission.path.trim()}
                 />
               </div>
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-6">
-              {/* Order */}
-              <div className="space-y-3 min-h-[76px]">
-                <Label
-                  htmlFor="edit-order"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Order <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="edit-order"
-                  type="number"
-                  min="0"
-                  value={
-                    editedPermission.order === 0 ? "" : editedPermission.order
-                  }
-                  onChange={handleOrderChange}
-                  placeholder="Enter display order (e.g., 1, 2, 3...)"
-                  className="w-full"
-                  disabled={isSubmitting || isFetchingModules}
-                  aria-invalid={editedPermission.order < 0}
-                />
-              </div>
-              {/* Icon */}
-              <div className="space-y-3 min-h-[76px]">
-                <Label
-                  htmlFor="edit-icon"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Icon <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="edit-icon"
-                  value={editedPermission.icon}
-                  onChange={handleIconChange}
-                  placeholder="Enter icon name (e.g., dashboard, users)"
-                  className="w-full"
-                  disabled={isSubmitting || isFetchingModules}
-                  aria-invalid={!editedPermission.icon.trim()}
-                />
-              </div>
-
               {/* Menu Type - Is Child Checkbox */}
-              <div className="space-y-3 min-h-[76px]">
+              <div className="space-y-2 min-h-[76px]">
                 <Label className="text-sm font-medium text-gray-700">
                   Menu Type
                 </Label>
@@ -429,9 +392,71 @@ const EditMenuPermissionModal: React.FC<EditMenuPermissionModalProps> = ({
                   </Label>
                 </div>
               </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-2">
+              {/* Order */}
+              <div className="space-y-2 min-h-[76px]">
+                <Label
+                  htmlFor="edit-order"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Order <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-order"
+                  type="number"
+                  min="0"
+                  value={
+                    editedPermission.order === 0 ? "" : editedPermission.order
+                  }
+                  onChange={handleOrderChange}
+                  placeholder="Enter display order (e.g., 1, 2, 3...)"
+                  className="w-full"
+                  disabled={isSubmitting || isFetchingModules}
+                  aria-invalid={editedPermission.order < 0}
+                />
+              </div>
+              {/* Menu Name/Label */}
+              <div className="space-y-2 min-h-[76px]">
+                <Label
+                  htmlFor="edit-label"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Label <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-label"
+                  value={editedPermission.label}
+                  onChange={handleLabelChange}
+                  placeholder="Enter menu name/label"
+                  className="w-full"
+                  disabled={isSubmitting || isFetchingModules}
+                  aria-invalid={!editedPermission.label.trim()}
+                />
+              </div>
+              {/* Icon */}
+              <div className="space-y-2 min-h-[76px]">
+                <Label
+                  htmlFor="edit-icon"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Icon <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-icon"
+                  value={editedPermission.icon}
+                  onChange={handleIconChange}
+                  placeholder="Enter icon name (e.g., dashboard, users)"
+                  className="w-full"
+                  disabled={isSubmitting || isFetchingModules}
+                  aria-invalid={!editedPermission.icon.trim()}
+                />
+              </div>
 
               {/* Parent Key - Always reserve space but conditionally show content */}
-              <div className="space-y-3 min-h-[76px]">
+              <div className="space-y-2 min-h-[76px]">
                 {editedPermission.isChild ? (
                   <>
                     <Label
