@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Search, BadgePlus, X } from "lucide-react";
+import { Search, BadgePlus, X, FileText } from "lucide-react";
 import { Button } from "../../../../ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -73,7 +73,7 @@ const LeaveSearchFilters: React.FC<LeaveSearchFiltersProps> = ({
           variant="outline"
           className="flex items-center gap-2 cursor-pointer border-emerald-200 hover:bg-gray-50"
         >
-          <BadgePlus className="h-4 w-4" />
+          <FileText className="h-4 w-4" />
           Leave Policy
         </Button>
 
