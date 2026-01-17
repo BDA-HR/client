@@ -41,6 +41,7 @@ const EditLeavePolicyModal: React.FC<EditLeavePolicyModalProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isActiveDropdownOpen, setIsActiveDropdownOpen] = useState(false);
 
   // Initialize form when modal opens or policy changes
   useEffect(() => {
@@ -61,8 +62,13 @@ const EditLeavePolicyModal: React.FC<EditLeavePolicyModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-    if (formData) setFormData({ ...formData, [name]: newValue });
+    if (name === "status") {
+      const newValue = checked ? "0" : "1";
+      if (formData) setFormData({ ...formData, [name]: newValue });
+    } else {
+      const newValue = type === "checkbox" ? checked : value;
+      if (formData) setFormData({ ...formData, [name]: newValue });
+    }
     if (formErrors[name]) setFormErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
@@ -78,6 +84,7 @@ const EditLeavePolicyModal: React.FC<EditLeavePolicyModalProps> = ({
     const errors: Record<string, string> = {};
     if (!formData?.name.trim()) errors.name = "Policy Name is required";
     if (!formData?.code.trim()) errors.code = "Code is required";
+    if (!formData?.status) errors.status = "Status is required";
     if (!formData?.leaveTypeId) errors.leaveTypeId = "Leave Type is required";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -231,30 +238,104 @@ const EditLeavePolicyModal: React.FC<EditLeavePolicyModalProps> = ({
                 )}
               </div>
             </div>
+            {/* Status Dropdown */}
+            <div className="space-y-2">
+              <Label className="text-sm text-gray-700 font-medium">
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <DropdownMenu
+                open={isActiveDropdownOpen}
+                onOpenChange={setIsActiveDropdownOpen}
+              >
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between border-gray-300"
+                  >
+                    {formData.status === "0" ? "Active" : "Inactive"}
+                    <svg
+                      className={`h-4 w-4 opacity-50 transition-transform ${
+                        isActiveDropdownOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (formData) setFormData({ ...formData, status: "0" });
+                      setIsActiveDropdownOpen(false);
+                      if (formErrors.status)
+                        setFormErrors((prev) => ({ ...prev, status: "" }));
+                    }}
+                    className="flex items-center justify-between"
+                  >
+                    <span>Active</span>
+                    {formData.status === "0" && (
+                      <Check className="h-4 w-4 text-gray-600" />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (formData) setFormData({ ...formData, status: "1" });
+                      setIsActiveDropdownOpen(false);
+                      if (formErrors.status)
+                        setFormErrors((prev) => ({ ...prev, status: "" }));
+                    }}
+                    className="flex items-center justify-between"
+                  >
+                    <span>Inactive</span>
+                    {formData.status === "1" && (
+                      <Check className="h-4 w-4 text-gray-600" />
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {formErrors.status && (
+                <p className="text-red-500 text-sm">{formErrors.status}</p>
+              )}
+            </div>
             {/* Boolean checkboxes */}
             <div className="grid grid-cols-2 gap-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="allowEncashment"
-                  checked={formData.allowEncashment}
-                  onChange={handleChange}
-                  className="h-4 w-4 accent-emerald-600"
-                />
-                <span className="text-sm text-gray-700">Allow Encashment</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="requiresAttachment"
-                  checked={formData.requiresAttachment}
-                  onChange={handleChange}
-                  className="h-4 w-4 accent-emerald-600"
-                />
-                <span className="text-sm text-gray-700">
-                  Requires Attachment
-                </span>
-              </label>
+              <div>
+                {" "}
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="allowEncashment"
+                    checked={formData.allowEncashment}
+                    onChange={handleChange}
+                    className="h-4 w-4 accent-emerald-600"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Allow Encashment
+                  </span>
+                </label>
+              </div>
+              <div>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="requiresAttachment"
+                    checked={formData.requiresAttachment}
+                    onChange={handleChange}
+                    className="h-4 w-4 accent-emerald-600"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Requires Attachment
+                  </span>
+                </label>
+              </div>
             </div>
           </div>
 

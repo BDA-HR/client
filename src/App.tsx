@@ -59,6 +59,7 @@ import FileDashboard from './pages/modules/File';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from "./contexts/AuthContext";
 import LeavePolicy from "./pages/settings/hrSettings/Leave/leavePolicy";
+import LeavePolicyConfig from "./pages/settings/hrSettings/Leave/leavePolicyConfig";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -191,7 +192,11 @@ function App() {
                 <Route
                   path="/settings/hr/leave/leavePolicy"
                   element={<LeavePolicy />}
-                /> 
+                />
+                <Route
+                  path="/settings/hr/leave/leavePolicyConfig/:leavePolicyId"
+                  element={<LeavePolicyConfig />}
+                />
                 <Route
                   path="/settings/hr/annualleave/:id/policy"
                   element={<LeavePolicyAccrualPage />}

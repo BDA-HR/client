@@ -31,7 +31,6 @@ export interface LeavePolicyConfigAddDto {
   minServiceMonths: number;
   fiscalYearId: UUID;
   leavePolicyId: UUID;
-  leaveAppChainId: UUID;
 }
 
 export interface LeavePolicyConfigModDto {

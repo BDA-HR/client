@@ -7,6 +7,7 @@ import {
   CheckCircle,
   XCircle,
   Trash2,
+  Cog,
 } from "lucide-react";
 import {
   Popover,
@@ -14,6 +15,7 @@ import {
   PopoverContent,
 } from "../../../../ui/popover";
 import type { LeavePolicyListDto } from "../../../../../types/core/Settings/leavepolicy";
+import { useNavigate } from "react-router-dom";
 
 interface LeavePolicyTableProps {
   leavePolicies: LeavePolicyListDto[];
@@ -21,6 +23,7 @@ interface LeavePolicyTableProps {
   onDelete: (leaveType: LeavePolicyListDto) => void;
   onToggleStatus?: (leaveType: LeavePolicyListDto) => void;
 }
+
 
 const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
   leavePolicies,
@@ -41,11 +44,19 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
     ) : (
       <XCircle className="h-3 w-3 text-white" />
     );
+ const getStatusColor = (status: string): string => {
+   const colors: Record<string, string> = {
+     0: "bg-green-100 text-green-800 border border-green-200",
+     1: "bg-red-100 text-red-800 border border-red-200",
+   };
+   console.log("status", status);
+   return (
+     colors[status] || "bg-gray-100 text-gray-800 border border-gray-200"
 
-  const getStatusColor = (isActive: boolean) =>
-    isActive
-      ? "bg-green-100 text-green-800 border border-green-200"
-      : "bg-red-100 text-red-800 border border-red-200";
+   );
+ };
+
+     const navigate = useNavigate();
 
   return (
     <motion.div
@@ -54,26 +65,29 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
       className="rounded-xl shadow-sm overflow-hidden bg-white"
     >
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-gray-200 align-middle">
           <thead className="bg-white">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider ">
                 Leave Policy Name
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Code
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Allow Encashment
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Requires Attachment
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Leave Type
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Policy Configure
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -101,7 +115,7 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
                   className="transition-colors hover:bg-gray-50"
                 >
                   {/* Name */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 align-middle text-center">
                     <div className="flex items-center">
                       <div className="shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
                         <span className="text-emerald-600 font-medium">
@@ -117,14 +131,14 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
                   </td>
 
                   {/* Code */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 align-middle text-center">
                     {leavePolicy.code}
                   </td>
 
                   {/* Allow Encashment */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 align-middle text-center">
                     <span
-                      className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-1 rounded-full ${getBooleanColor(
+                      className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getBooleanColor(
                         leavePolicy.allowEncashment
                       )}`}
                     >
@@ -134,9 +148,9 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
                   </td>
 
                   {/* Requires Attachment */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 align-middle text-center">
                     <span
-                      className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-1 rounded-full ${getBooleanColor(
+                      className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getBooleanColor(
                         leavePolicy.requiresAttachment
                       )}`}
                     >
@@ -146,21 +160,41 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
                   </td>
 
                   {/* Status */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 align-middle text-center">
                     <span
-                      className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full `}
+                      className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${getStatusColor(
+                        leavePolicy.status
+                      )}`}
                     >
-                      {leavePolicy.status ? "Active" : "Inactive"}
+                      {leavePolicy.status === "0" ? "Active" : "Inactive"}
                     </span>
                   </td>
 
                   {/* Leave Type */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 align-middle text-center">
                     {leavePolicy.leaveType}
                   </td>
 
+                  {/* Leave Config */}
+                  <td className="px-4 py-3 align-middle text-center">
+                    <div className="flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/settings/hr/leave/leavePolicyConfig/${leavePolicy.id}`
+                          )
+                        }
+                        className="flex items-center gap-2 p-1 rounded hover:bg-muted transition"
+                        title="Configure Leave Policy"
+                      >
+                        <Cog className="w-6 h-6 cursor-pointer text-emerald-500" />
+                      </button>
+                    </div>
+                  </td>
+
                   {/* Actions */}
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-3 align-middle text-right  text-sm font-medium">
                     <Popover
                       open={popoverOpen === leavePolicy.id}
                       onOpenChange={(open) =>
