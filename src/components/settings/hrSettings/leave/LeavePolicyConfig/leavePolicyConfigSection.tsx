@@ -7,6 +7,7 @@ import LeavePolicyConfigCard from "./LeavePolicyConfig/LeavePolicyConfigCard";
 import AddLeavePolicyConfig from "./LeavePolicyConfig/AddLeavePolicyConfig";
 import DeleteLeavePolicyConfig from "./LeavePolicyConfig/DeleteLeavePolicyConfig";
 import LeaveAppChainSection from "../LeaveAppChain/LeaveAppChainSection";
+import LeavePolicyConfigTable from "./LeavePolicyConfig/LeavePolicyConfigTable";
 
 interface LeavePolicyConfigSectionProps {
   leavePolicyId: UUID;
@@ -14,7 +15,7 @@ interface LeavePolicyConfigSectionProps {
 
 //    const [loading, setLoading] = useState(true);
 //    const [error, setError] = useState<string | null>(null);
-const mockActiveConfig: LeavePolicyConfigListDto = {
+const mockActiveConfig: LeavePolicyConfigListDto[] = [{
   id: "bf250852-ed18-4dfa-931e-c726f191e38a",
   annualEntitlement: 30,
   accrualFrequency: "MONTHLY",
@@ -40,7 +41,7 @@ const mockActiveConfig: LeavePolicyConfigListDto = {
   createdAtAm: "2025-10-01T10:00:00Z",
   modifiedAtAm: "2025-10-01T10:00:00Z",
   modifiedAt: "2025-10-01T10:00:00Z",
-};
+}];
 
 const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
   leavePolicyId,
@@ -103,11 +104,16 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         transition={{ delay: 0.1 }}
         className="pb-2"
       >
-        <LeavePolicyConfigCard
+        {/* <LeavePolicyConfigCard
           activeConfig={mockActiveConfig}
           loading={false}
           error={null}
           onViewDetails={() => {}}
+        /> */}
+        <LeavePolicyConfigTable
+          leavePolicyConfig={mockActiveConfig} // empty array is fine
+          onEdit={setEditingPolicy as any}
+          onDelete={setDeletingPolicy as any}
         />
       </motion.div>
 
