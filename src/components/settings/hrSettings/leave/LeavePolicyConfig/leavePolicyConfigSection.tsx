@@ -39,7 +39,7 @@ const mockActiveConfig: LeavePolicyConfigListDto = {
   createdAt: "2025-10-01T10:00:00Z",
   createdAtAm: "2025-10-01T10:00:00Z",
   modifiedAtAm: "2025-10-01T10:00:00Z",
-  // lastModDate: "2026-01-05T14:30:00Z",
+  modifiedAt: "2025-10-01T10:00:00Z",
 };
 
 const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
@@ -60,7 +60,6 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         transition={{ delay: 0.3 }}
       >
         <LeaveAppChainSection leavePolicyId={leavePolicyId} />
-        <LeavePolicyConfigPageHeader />
       </motion.div>
       {/* Error Banner */}
       {/* {error && (

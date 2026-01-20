@@ -188,7 +188,7 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
                         className="flex items-center gap-2 p-1 rounded hover:bg-muted transition"
                         title="Configure Leave Policy"
                       >
-                        <Cog className="w-6 h-6 cursor-pointer text-emerald-500" />
+                        <Cog className="w-6 h-6 cursor-pointer text-gray-500" />
                       </button>
                     </div>
                   </td>
