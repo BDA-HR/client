@@ -4,12 +4,13 @@ import type { BaseDto } from "../../hr/BaseDto";
 export type { UUID };
 
 export interface LeaveAppChainListDto extends BaseDto {
-  effectiveFrom: Date; 
-  effectiveTo: Date | null; 
+  effectiveFrom: Date;
+  effectiveTo: Date | null;
   isActive: boolean;
   effectiveFromStr: string;
   effectiveToStr: string;
   isActiveStr: string;
+  addedSteps: number;
   leavePolicy: string;
 }
 

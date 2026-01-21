@@ -17,7 +17,12 @@ const itemVariants = {
   },
 };
 
-const LeavePolicyHeader = () => {
+interface LeaveAppChainHeaderProps {
+  leavePolicyName: string;
+}
+
+
+const LeavePolicyHeader: React.FC<LeaveAppChainHeaderProps> = ({ leavePolicyName }) => {
    const navigate = useNavigate();
 
    const handleBack = () => {
@@ -29,34 +34,24 @@ const LeavePolicyHeader = () => {
       className="mb-4 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
     >
       <div className="flex items-center gap-3">
-         <Button
-                  variant="outline"
-                  onClick={handleBack}
-                  className="flex items-center gap-2 px-3 py-2 cursor-pointer"
-                  aria-label="Go back"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="text-sm font-medium">Back</span>
-                </Button>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center gap-2"
-        >
-          <FileText className="w-6 h-6 text-green-600" />
-          <h1 className="text-2xl font-bold text-black">
-            <motion.span
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="inline-block"
+        <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+              aria-label="Go back"
             >
-              <span className="bg-gradient-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
-                Leave 
-              </span>{" "}Approval Chain
-             
-            </motion.span>
-          </h1>
-        </motion.div>
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm font-medium">Back</span>
+            </Button>
+            <div className="h-8 w-px bg-green-300"></div>
+            <div>
+              <h1 className="text-2xl font-bold text-black tracking-tight">
+                {leavePolicyName}
+              </h1>
+              {/* <p className="text-lg text-gray-600 mt-1">{position.nameAm}</p> */}
+            </div>
+        </div>
       </div>
     </motion.div>
   );

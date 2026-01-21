@@ -20,6 +20,7 @@ interface ApprovalStepCardProps {
   effectiveFrom?: string;
   effectiveTo?: string;
   onViewDetails?: () => void;
+  onAddStepClick: () => void;
 }
 
 const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
@@ -27,6 +28,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
   effectiveFrom,
   effectiveTo,
   onViewDetails,
+  onAddStepClick,
 }) => {
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -82,16 +84,16 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
             <div className="flex items-center gap-3">
               <div className=" flex text-right gap-3">
                 <div className="text-sm font-medium text-gray-900 dark:text-white pt-1">
-               
                   Total step{steps.length !== 1 ? "s " : " "}
                   {steps.length}
                 </div>
                 <Button
+                  onClick={onAddStepClick}
                   size="sm"
                   className="flex cursor-pointer items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
                 >
                   <BadgePlus className="h-4 w-4" />
-                  Add New
+                  Add Approval Step
                 </Button>
               </div>
 
@@ -129,7 +131,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                   return (
                     <div key={step.id} className="relative flex items-center">
                       {/* Step Card */}
-                      <div className="relative z-10 flex flex-col items-center w-36">
+                      <div className="relative z-10 flex flex-col items-center w-48">
                         {/* Step Info */}
                         <div className="text-center w-full px-1">
                           <div className="flex flex-col items-center gap-1.5 mb-2">
@@ -172,7 +174,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
 
                       {/* Connector Line */}
                       {!isLast && (
-                        <div className="absolute left-full top-5 w-64 h-0.5">
+                        <div className="absolute left-full top-6 w-64 h-0.5">
                           <div className="w-full h-full bg-gradient-to-r from-gray-300 via-gray-300 to-gray-400 dark:from-gray-600 dark:via-gray-600 dark:to-gray-700 relative">
                             {/* Arrow head */}
                             <div className="absolute right-0 top-1/2 transform -translate-y-1/2">

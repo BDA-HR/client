@@ -8,6 +8,7 @@ import AddLeavePolicyConfig from "./LeavePolicyConfig/AddLeavePolicyConfig";
 import DeleteLeavePolicyConfig from "./LeavePolicyConfig/DeleteLeavePolicyConfig";
 import LeaveAppChainSection from "../LeaveAppChain/LeaveAppChainSection";
 import LeavePolicyConfigTable from "./LeavePolicyConfig/LeavePolicyConfigTable";
+import PolicyAssignmentRuleSection from "../PolicyAssignmentRule/PolicyAssignmenRuleSection";
 
 interface LeavePolicyConfigSectionProps {
   leavePolicyId: UUID;
@@ -125,6 +126,7 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         // onAddLeavePolicy={handleAddLeavePolicy}
         // leaveTypeOptions={leaveTypeOptions}
       />
+      <PolicyAssignmentRuleSection leavePolicyId={leavePolicyId} />
     </div>
   );
 };

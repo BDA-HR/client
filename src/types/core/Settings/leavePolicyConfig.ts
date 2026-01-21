@@ -43,7 +43,5 @@ export interface LeavePolicyConfigModDto {
   minServiceMonths: number;
   isActive: boolean;
   fiscalYearId: UUID;
-  leavePolicyId: UUID;
-  leaveAppChainId: UUID;
   rowVersion: string;
 }

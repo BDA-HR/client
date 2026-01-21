@@ -6,16 +6,13 @@ import type {
   LeaveAppChainModDto,
   UUID,
 } from "../../../../../types/core/Settings/leaveAppChain";
-import LeaveAppChainHeader from "./LeaveAppChainHeader";
-import LeaveAppChainSearchFilters from "./LeaveAppChainSearchFilter";
-import AddLeaveAppChainModal from "./AddLeaveAppChainModal";
 // import EditLeaveAppChainModal from "./EditLeaveAppChainModal";
 // import DeleteLeaveAppChainModal from "./DeleteLeaveAppChainModal";
 import { leaveAppChainServices } from "../../../../../services/core/settings/ModHrm/leaveAppChainServices";
-import LeaveAppStepCard from "./LeaveAppStep/leaveAppStepCard";
-import { useNavigate } from "react-router-dom";
-import AddLeaveAppStepModal from "./LeaveAppStep/AddLeaveAppStepModal";
-import { leavePolicyService } from "../../../../../services/core/settings/ModHrm/LeavePolicyService";
+import PolicyAssignmentRuleTable from "./PolicyAssignmentRuleTable";
+import type {  PolicyAssignmentRuleListDto } from "../../../../../types/core/Settings/policyAssignmentRule";
+import PolicyAssignmentRuleHeader from "./policyAssignmentRuleHeader";
+import AddPolicyAssignmentRuleModal from "./AddPolicyAssignmentRule";
 
 // Add props interface to receive leavePolicyId
 interface LeaveAppChainSectionProps {
@@ -54,7 +51,7 @@ const sampleApprovalSteps = [
   },
 ];
 
-const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
+const PolicyAssignmentRuleSection: React.FC<LeaveAppChainSectionProps> = ({
   leavePolicyId,
 }) => {
   const [leavePolicies, setLeavePolicies] = useState<LeaveAppChainListDto[]>(
@@ -62,60 +59,47 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAddAppChainModalOpen, setIsAddAppChainModalOpen] = useState(false);
-    const [isAddStepModalOpen, setIsAddStepModalOpen] = useState(false);
-     const [leavePolicyName, setLeavePolicyName] =
-       useState<string>("Leave Policy"); // ADD THIS
-     const [policyLoading, setPolicyLoading] = useState<boolean>(true);
-  // const [editingAppChain, setEditingAppChain] =
-  //   useState<LeaveAppChainListDto | null>(null);
-  // const [deletingAppChain, setDeletingAppChain] =
-  //   useState<LeaveAppChainListDto | null>(null);
-
-  // Initialize the service with leavePolicyId
+  const [isAddPolicyAssignmentRuleModalOpen, setIsAddPolicyAssignmentRuleModalOpen] = useState(false);
+  
   const { listByPolicy, create, update, remove } =
     leaveAppChainServices(leavePolicyId);
 
+  // Fetch policies
   useEffect(() => {
-    const fetchLeavePolicyName = async () => {
-      if (!leavePolicyId) {
-        setPolicyLoading(false);
-        return;
-      }
-
+    const fetchData = async () => {
       try {
-        setPolicyLoading(true);
-        console.log("Fetching policy for ID:", leavePolicyId);
+        setLoading(true);
+        setError(null);
 
-        // Call the API to get the leave policy
-        const policy = await leavePolicyService.getLeavePolicyById(
-          leavePolicyId
-        );
-        console.log("Policy data:", policy);
-        const name = policy.name ;
-
-        setLeavePolicyName(name);
+        // Use the React Query hook's refetch method
+        const result = await listByPolicy.refetch();
+        if (result.data) {
+          setLeavePolicies(result.data);
+        }
       } catch (err) {
-        console.error("Error fetching leave policy:", err);
-        setError(`Failed to load policy: ${err.message || "Unknown error"}`);
-        setLeavePolicyName("Leave Policy");
+        console.error(err);
+        setError(
+          "Failed to load leave approval chains. Please try again later."
+        );
       } finally {
-        setPolicyLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchLeavePolicyName();
-  }, [leavePolicyId]); 
+    if (leavePolicyId) {
+      fetchData();
+    }
+  }, [leavePolicyId]); // Re-fetch when 
 
   // CRUD handlers
-  const handleAddLeaveAppChain = async (appChainData: LeaveAppChainAddDto) => {
+  const handleAddPolicyAssignmentRule = async (appChainData: LeaveAppChainAddDto) => {
     try {
       // Add leavePolicyId to the payload
       const payload = { ...appChainData, leavePolicyId };
 
       const newAppChain = await create.mutateAsync(payload);
       setLeavePolicies((prev) => [...prev, newAppChain]);
-      setIsAddAppChainModalOpen(false);
+      setIsAddPolicyAssignmentRuleModalOpen(false);
     } catch (err) {
       console.error(err);
       setError("Failed to create leave approval chain. Please try again.");
@@ -137,6 +121,8 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
     }
   };
 
+  const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
+
   const handleDeleteLeaveAppChain = async (appChainId: UUID) => {
     try {
       await remove.mutateAsync(appChainId);
@@ -151,21 +137,11 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
    console.log(`Viewing details for step ${stepId}`);
    // Add your logic here to show step details
  };
- const navigate = useNavigate();
-
- const onViewHistory = () => {
-   navigate(`/settings/hr/leave/leaveAppChainHistory/${leavePolicyId}
-    `);
- };
-
-const handleOpenAddStepModal = () => {
-  setIsAddStepModalOpen(true);
-};
-
-const handleCloseAddStepModal = () => {
-  setIsAddStepModalOpen(false);
-};
-
+ const [editingPolicy, setEditingPolicy] = useState<PolicyAssignmentRuleListDto | null>(
+    null
+  );
+  const [deletingPolicy, setDeletingPolicy] =
+    useState<PolicyAssignmentRuleListDto | null>(null);
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -174,8 +150,9 @@ const handleCloseAddStepModal = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <LeaveAppChainHeader
-          leavePolicyName={policyLoading ? "Loading..." : leavePolicyName}
+        <PolicyAssignmentRuleHeader
+          onAddClick={() => setIsAddPolicyAssignmentRuleModalOpen(true)}
+          onViewHistory={() => {}}
         />
       </motion.div>
 
@@ -198,47 +175,44 @@ const handleCloseAddStepModal = () => {
         </motion.div>
       )}
 
+      {/* Loading */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        </div>
+      )}
+
       {/* Search Filters */}
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="pb-2"
-      >
-        <LeaveAppChainSearchFilters
-          onAddClick={() => setIsAddAppChainModalOpen(true)}
-          onViewHistory={onViewHistory}
-        />
-      </motion.div>
-
-      {/* LeaveAppChainTable always visible */}
       {!loading && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="pt-0 pb-0"
+          transition={{ delay: 0.4 }}
+          className="pb-2"
         ></motion.div>
       )}
 
+      {!loading && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="pt-0 pb-0"
+        >
+          <PolicyAssignmentRuleTable
+            policyAssignmentRule={[]}
+            onEdit={setEditingPolicy as any}
+            onDelete={setDeletingPolicy as any}
+          />
+        </motion.div>
+      )}
+
       {/* Modals */}
-      <AddLeaveAppChainModal
-        isOpen={isAddAppChainModalOpen}
-        onClose={() => setIsAddAppChainModalOpen(false)}
-        onAddLeaveAppChain={handleAddLeaveAppChain}
+      <AddPolicyAssignmentRuleModal
+        isOpen={isAddPolicyAssignmentRuleModalOpen}
+        onClose={() => setIsAddPolicyAssignmentRuleModalOpen(false)}
+        onAddPolicyAssignmentRule={handleAddPolicyAssignmentRule}
         leavePolicyId={leavePolicyId}
-      />
-      <LeaveAppStepCard
-        steps={sampleApprovalSteps}
-        onAddStepClick={handleOpenAddStepModal}
-        // totalSteps={3}
-        // onViewDetails={handleViewDetails}
-      />
-      <AddLeaveAppStepModal
-        isOpen={isAddStepModalOpen}
-        onClose={handleCloseAddStepModal}
-        onAddLeaveAppStep={[() => {}]}
       />
       {/* <EditLeaveAppChainModal
         isOpen={!!editingAppChain}
@@ -258,4 +232,4 @@ const handleCloseAddStepModal = () => {
   );
 };
 
-export default LeaveAppChainSection;
+export default PolicyAssignmentRuleSection;

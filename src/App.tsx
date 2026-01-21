@@ -60,6 +60,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from "./contexts/AuthContext";
 import LeavePolicy from "./pages/settings/hrSettings/Leave/leavePolicy";
 import LeavePolicyConfig from "./pages/settings/hrSettings/Leave/leavePolicyConfig";
+import LeaveAppChainHistory from "./pages/settings/hrSettings/Leave/LeaveAppChainHistory";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -196,6 +197,10 @@ function App() {
                 <Route
                   path="/settings/hr/leave/leavePolicyConfig/:leavePolicyId"
                   element={<LeavePolicyConfig />}
+                />
+                <Route
+                  path="/settings/hr/leave/leaveAppChainHistory/:leavePolicyId"
+                  element={<LeaveAppChainHistory />}
                 />
                 <Route
                   path="/settings/hr/annualleave/:id/policy"

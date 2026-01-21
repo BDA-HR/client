@@ -24,29 +24,31 @@ export const leaveAppChainKeys = {
   all: ["leave-app-chain"] as const,
   byPolicy: (leavePolicyId: UUID) =>
     [...leaveAppChainKeys.all, leavePolicyId] as const,
+   byId: (leaveAppChainId: UUID) =>
+    [...leaveAppChainKeys.all, leaveAppChainId] as const,
 };
 
 export const leaveAppChainServices = (leavePolicyId: UUID) => {
   const queryClient = useQueryClient();
-
   const listByPolicy = useQuery({
     queryKey: leaveAppChainKeys.byPolicy(leavePolicyId),
     queryFn: async (): Promise<LeaveAppChainListDto[]> => {
-      const res = await api.get(`${baseUrl}/GetAppChain/${leavePolicyId}`);
+      const res = await api.get(`${baseUrl}/AllAppChain/${leavePolicyId}`);
       return res.data.data;
     },
     enabled: !!leavePolicyId,
   });
 
   const activeAppChain = useQuery({
-    queryKey:['activeAppChain'],
+    queryKey: leaveAppChainKeys.byPolicy(leavePolicyId),
     queryFn: async (): Promise<LeaveAppChainListDto | null> => {
-      const res = await api.get(`${baseUrl}/ActiveAppChain`);
+      const res = await api.get(`${baseUrl}/ActiveAppChain/${leavePolicyId}`);
       if (res.data.success && res.data.data) {
-        return res.data.data; 
+        return res.data.data;
       }
       return null;
     },
+    enabled: !!leavePolicyId,
   });
 
   const create = useMutation({
@@ -108,3 +110,16 @@ export const leaveAppChainServices = (leavePolicyId: UUID) => {
     activeAppChain
   };
 };
+export const GetAppChainById = ( leaveAppChainId:UUID) => {  
+  const GetAppChainById = useQuery({
+  queryKey: leaveAppChainKeys.byId(leaveAppChainId),
+  queryFn: async (): Promise<LeaveAppChainListDto[]> => {
+    const res = await api.get(`${baseUrl}/GetAppChain/${leaveAppChainId}`);
+    return res.data.data;
+  },
+  enabled: !!leaveAppChainId,
+});
+
+  return {
+    GetAppChainById,
+  };}

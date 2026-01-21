@@ -1,18 +1,17 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { BadgePlus, FileText, History } from "lucide-react";
-import { Button } from "../../../../../ui/button";
+import { Button } from "../../../../ui/button";
 
-interface LeavePolicyConfigProps {
+interface PolicyAssignementRuleProps {
   onAddClick: () => void;
   onViewHistory: () => void;
 }
 
-const LeavePolicyConfigHeader: React.FC<LeavePolicyConfigProps> = ({
+const PolicyAssignmentRuleHeader: React.FC<PolicyAssignementRuleProps> = ({
   onAddClick,
   onViewHistory,
 }) => {
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -20,9 +19,7 @@ const LeavePolicyConfigHeader: React.FC<LeavePolicyConfigProps> = ({
       transition={{ duration: 0.4 }}
       className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 justify-between flex"
     >
-      <div
-        className="flex items-center gap-2"
-      >
+      <div className="flex items-center gap-2">
         <FileText className="w-6 h-6 text-green-600" />
         <h1 className="text-2xl font-bold text-black">
           <motion.span
@@ -31,9 +28,9 @@ const LeavePolicyConfigHeader: React.FC<LeavePolicyConfigProps> = ({
             className="inline-block"
           >
             <span className="bg-gradient-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
-              Leave
-            </span>{" "}
-            Policy Configuraion
+              Leave {" "}
+            </span>
+            Policy Assignment Rule
           </motion.span>
         </h1>
       </div>
@@ -53,11 +50,11 @@ const LeavePolicyConfigHeader: React.FC<LeavePolicyConfigProps> = ({
           className="flex cursor-pointer items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
         >
           <BadgePlus className="h-4 w-4" />
-          Add Policy Configuration
+          Add Policy Assignment Rule
         </Button>
       </div>
     </motion.div>
   );
 };
 
-export default LeavePolicyConfigHeader;
+export default PolicyAssignmentRuleHeader;

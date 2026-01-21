@@ -78,25 +78,16 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
                 Accrual Rate
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Requires Attachment
-              </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Max Days PerReq
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Max Carry Over Days
-              </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Policy Configure
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Min Service Months
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Is Active
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Leave Policy
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Fiscal Year
@@ -126,13 +117,6 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
                   {/* Name */}
                   <td className="px-4 py-3 align-middle text-center">
                     <div className="flex items-center">
-                      {/* <div className="shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                        <span className="text-emerald-600 font-medium">
-                          {leavePolicyConfig.annualEntitlement
-                            .charAt(0)
-                            .toUpperCase()}
-                        </span>
-                      </div> */}
                       <div className="ml-3">
                         <div className="text-sm font-medium text-gray-900">
                           {leavePolicyConfig.annualEntitlement}
@@ -163,64 +147,13 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
                   <td className="px-4 py-3 align-middle text-center">
                     {leavePolicyConfig.minServiceMonths}
                   </td>
-
-                  {/* minServiceMonths */}
+                  {/* isActive */}
                   <td className="px-4 py-3 align-middle text-center">
-                    {leavePolicyConfig.leavePolicy}
+                    {leavePolicyConfig.isActiveStr}
                   </td>
                   {/* fiscalYear */}
                   <td className="px-4 py-3 align-middle text-center">
                     {leavePolicyConfig.fiscalYear}
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-4 py-3 align-middle text-right  text-sm font-medium">
-                    <Popover
-                      open={popoverOpen === leavePolicyConfig.id}
-                      onOpenChange={(open) => leavePolicyConfig}
-                    >
-                      <PopoverTrigger asChild>
-                        <button className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100">
-                          <MoreVertical className="h-5 w-5" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48 p-0" align="end">
-                        <div className="py-1">
-                          <button
-                            onClick={() => onEdit(leavePolicyConfig)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                          >
-                            <PenBox size={16} />
-                            Edit
-                          </button>
-                          {onToggleStatus && (
-                            <button
-                              onClick={() => onToggleStatus(leavePolicyConfig)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 text-gray-700"
-                            >
-                              {leavePolicyConfig.isActive ? (
-                                <>
-                                  <XCircle size={16} />
-                                  Deactivate
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle size={16} />
-                                  Activate
-                                </>
-                              )}
-                            </button>
-                          )}
-                          <button
-                            onClick={() => onDelete(leavePolicyConfig)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                          >
-                            <Trash2 size={16} />
-                            Delete
-                          </button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
                   </td>
                 </motion.tr>
               ))

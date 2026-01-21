@@ -81,13 +81,13 @@ export const PolicyStatus = {
 export type PolicyStatus = (typeof PolicyStatus)[keyof typeof PolicyStatus];
 
 export const ConditionOperator = {
-  "0": "=",
-  "1": "!=",
+  "0": "Equals",
+  "1": "Not Equals",
   "2": "In",
-  "3": ">",
-  "4": "<",
-  "5": ">=",
-  "6": "<=",
+  "3": "Greater than",
+  "4": "Less than",
+  "5": "Greater than or Equals",
+  "6": "Less than or Equals",
 } as const;
 export type ConditionOperator =
   (typeof ConditionOperator)[keyof typeof ConditionOperator];

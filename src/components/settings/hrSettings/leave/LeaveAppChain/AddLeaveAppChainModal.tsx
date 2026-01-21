@@ -114,14 +114,11 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3">
-            <BadgePlus size={20} className="text-emerald-600" />
+            <BadgePlus size={20} className="text-green-600" />
             <div>
               <h2 className="text-lg font-bold text-gray-800">
                 Add Leave AppChain
               </h2>
-              <p className="text-sm text-gray-500">
-                Policy ID: {leavePolicyId.substring(0, 8)}...
-              </p>
             </div>
           </div>
           <button
@@ -192,7 +189,7 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
                     isActive: e.target.checked,
                   })
                 }
-                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded bg-green-600"
                 disabled={loading}
               />
               <Label htmlFor="isActive" className="text-sm text-gray-700">
@@ -214,7 +211,7 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
                 Cancel
               </Button>
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 min-w-[100px]"
+                className="flex cursor-pointer items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
                 type="submit"
                 disabled={loading}
               >
