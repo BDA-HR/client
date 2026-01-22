@@ -5,23 +5,27 @@ import AppChainSearchFilters from './AppChainSearchFilter';
 import AppChainHistoryTable from './AppChainHistoryTable';
 import type { LeaveAppChainListDto, LeaveAppChainModDto, UUID } from '../../../../../../types/core/Settings/leaveAppChain';
 import { leaveAppChainServices } from '../../../../../../services/core/settings/ModHrm/leaveAppChainServices';
+import EditAppChainModal from './EditAppChainModal';
+import DeleteAppChainModal from './DeleteAppChainModal';
 interface LeaveAppChainHistorySectionProps{
   leavePolicyId: UUID;
 }
 
-const LeaveTypeSection: React.FC<LeaveAppChainHistorySectionProps> = ({
+const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
   leavePolicyId,
 }) => {
-   const [appChains, setAppChains] = useState<LeaveAppChainListDto[]>([]);
+  const [appChains, setAppChains] = useState<LeaveAppChainListDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-   const { listByPolicy, update, remove } =
-     leaveAppChainServices(leavePolicyId);
+  const { listByPolicy, update, remove } = leaveAppChainServices(leavePolicyId);
+  const [editingAppChain, setEditingAppChain] = useState<LeaveAppChainListDto | null>(null);
+    const [deletingAppChain, setDeletingAppChain] =
+      useState<LeaveAppChainListDto | null>(null);
 
   // Filter leave types based on search term
   const filteredAppChain = appChains.filter((appChains) =>
-    appChains.effectiveFromStr.includes(searchTerm.toLowerCase())
+    appChains.effectiveFromStr.includes(searchTerm.toLowerCase()),
   );
 
   const fetchAppChains = async () => {
@@ -57,15 +61,15 @@ const LeaveTypeSection: React.FC<LeaveAppChainHistorySectionProps> = ({
       const modData: LeaveAppChainModDto = {
         id: appChain.id,
         leavePolicyId: appChain.leavePolicyId,
-        effectiveFrom: appChain.effectiveFrom ,
-        effectiveTo: appChain.effectiveTo ,
+        effectiveFrom: appChain.effectiveFrom,
+        effectiveTo: appChain.effectiveTo,
         isActive: appChain.isActive,
         rowVersion: appChain.rowVersion,
       };
 
       const result = await update.mutateAsync(modData);
       setAppChains((prev) =>
-        prev.map((ac) => (ac.id === result.id ? result : ac))
+        prev.map((ac) => (ac.id === result.id ? result : ac)),
       );
       setError(null);
     } catch (err: any) {
@@ -82,6 +86,7 @@ const LeaveTypeSection: React.FC<LeaveAppChainHistorySectionProps> = ({
       await remove.mutateAsync(appChainId);
       setAppChains((prev) => prev.filter((ac) => ac.id !== appChainId));
       setError(null);
+       setDeletingAppChain(null);
     } catch (err: any) {
       console.error("Failed to delete approval chain:", err);
       const errorMessage =
@@ -90,40 +95,42 @@ const LeaveTypeSection: React.FC<LeaveAppChainHistorySectionProps> = ({
     }
   };
 
-  const handleToggleStatus = async (leaveType: LeaveAppChainListDto) => {
-    try {
-      const updatedLeaveAppChain = {
-        ...leaveType,
-        isActive: !leaveType.isActive,
-      };
-      // const result = await leaveTypeService.updateLeaveType(updatedLeaveAppChain as LeaveAppChainModDto);
-      // setLeaveTypes((prev) =>
-      //   prev.map((lt) => (lt.id === result.id ? result : lt))
-      // );
-      setError(null);
-    } catch (err) {
-      console.error("Failed to toggle leave type status:", err);
-      setError("Failed to update leave type status. Please try again.");
-    }
-  };
+    const handleToggleStatus = async (appChain: LeaveAppChainListDto) => {
+      try {
+        const updatedAppChain: LeaveAppChainModDto = {
+          ...appChain,
+          isActive: !appChain.isActive,
+          leavePolicyId: leavePolicyId,
+        };
+        const result = await update.mutateAsync(
+          updatedAppChain as LeaveAppChainModDto,
+        );
+        setAppChains((prev) =>
+          prev.map((ac) => (ac.id === result.id ? result : ac)),
+        );
+        setError(null);
+      } catch (err) {
+        console.error("Failed to toggle leave type status:", err);
+        setError("Failed to update leave type status. Please try again.");
+      }
+    };
 
+ const handleEdit = (appChain: LeaveAppChainListDto) => {
+   setEditingAppChain(appChain);
+ };
+
+ const handleCloseEditModal = () => {
+   setEditingAppChain(null);
+ };
+
+ const handleDelete = (appChain: LeaveAppChainListDto) => {
+   setDeletingAppChain(appChain);
  
+ };
 
-  // const handleEdit = (leaveAppChain: LeaveAppChainListDto) => {
-  //   setEditingLeaveType(leaveAppChain);
-  // };
-
-  // const handleDelete = (leaveAppChain: LeaveAppChainListDto) => {
-  //   setDeletingLeaveType(leaveAppChain);
-  // };
-
-  // const handleCloseEditModal = () => {
-  //   setEditingLeaveType(null);
-  // };
-
-  // const handleCloseDeleteModal = () => {
-  //   setDeletingLeaveType(null);
-  // };
+  const handleCloseDeleteModal = () => {
+    setDeletingAppChain(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -218,29 +225,30 @@ const LeaveTypeSection: React.FC<LeaveAppChainHistorySectionProps> = ({
         >
           <AppChainHistoryTable
             AppChainHistorys={appChains}
-            onEdit={() => {}}
-            onDelete={() => {}}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
           />
         </motion.div>
       )}
       {/* Edit Leave Type Modal */}
-      {/* <EditLeaveTypeModal
-        isOpen={!!editingLeaveType}
+      <EditAppChainModal
+        isOpen={!!editingAppChain}
         onClose={handleCloseEditModal}
-        onSave={handleEditLeaveType}
-        leaveType={editingLeaveType}
-      /> */}
+        onEditLeaveAppChain={handleEditAppChain}
+        appChain={editingAppChain}
+        leavePolicyId={leavePolicyId}
+      />
 
-      {/* Delete Leave Type Modal */}
-      {/* <DeleteLeaveTypeModal
-        leaveType={deletingLeaveType}
-        isOpen={!!deletingLeaveType}
+      {/* Delete Leave app chain Modal */}
+      <DeleteAppChainModal
+        appChain={deletingAppChain}
+        isOpen={!!deletingAppChain}
         onClose={handleCloseDeleteModal}
-        onConfirm={handleDeleteLeaveType}
-      /> */}
+        onConfirm={handleDeleteAppChain}
+      />
     </div>
   );
 };
 
-export default LeaveTypeSection;
+export default AppChainHisotrySection;

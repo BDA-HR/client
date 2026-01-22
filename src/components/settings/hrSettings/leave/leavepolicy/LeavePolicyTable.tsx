@@ -33,6 +33,23 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
 }) => {
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
+
+   const handleEdit = (leaveType: LeavePolicyListDto) => {
+     onEdit(leaveType);
+     setPopoverOpen(null);
+   };
+
+   const handleDelete = (leaveType: LeavePolicyListDto) => {
+     onDelete(leaveType);
+     setPopoverOpen(null);
+   };
+
+   const handleToggleStatus = (leaveType: LeavePolicyListDto) => {
+     if (onToggleStatus) {
+       onToggleStatus(leaveType);
+     }
+     setPopoverOpen(null);
+   };
   const getBooleanColor = (value: boolean) =>
     value
       ? "bg-green-500 text-white border border-green-200"
@@ -209,15 +226,15 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
                       <PopoverContent className="w-48 p-0" align="end">
                         <div className="py-1">
                           <button
-                            onClick={() => onEdit(leavePolicy)}
+                            onClick={() => handleEdit(leavePolicy)}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                           >
                             <PenBox size={16} />
                             Edit
                           </button>
-                          {onToggleStatus && (
+                          {handleToggleStatus && (
                             <button
-                              onClick={() => onToggleStatus(leavePolicy)}
+                              onClick={() => handleToggleStatus(leavePolicy)}
                               className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 text-gray-700"
                             >
                               {leavePolicy.status ? (
@@ -234,7 +251,7 @@ const LeavePolicyTable: React.FC<LeavePolicyTableProps> = ({
                             </button>
                           )}
                           <button
-                            onClick={() => onDelete(leavePolicy)}
+                            onClick={() => handleDelete(leavePolicy)}
                             className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                           >
                             <Trash2 size={16} />

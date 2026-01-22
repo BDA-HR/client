@@ -24,23 +24,16 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
   onDelete,
   onToggleStatus,
 }) => {
-  const [selectedAppChainHistory, setSelectedAppChainHistory] = useState<LeaveAppChainListDto | null>(null);
-  const [activeModal, setActiveModal] = useState<'view' | null>(null);
   const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
 
-  const handleViewDetails = (AppChainHistory: LeaveAppChainListDto) => {
-    setSelectedAppChainHistory(AppChainHistory);
-    setActiveModal('view');
-    setPopoverOpen(null);
-  };
 
-  const handleEdit = (AppChainHistory: LeaveAppChainListDto) => {
-    onEdit(AppChainHistory);
-    setPopoverOpen(null);
-  };
+ const handleEdit = (leaveType: LeaveAppChainListDto) => {
+   onEdit(leaveType);
+   setPopoverOpen(null);
+ };
 
-  const handleDelete = (AppChainHistory: LeaveAppChainListDto) => {
-    onDelete(AppChainHistory);
+  const handleDelete = (leaveType: LeaveAppChainListDto) => {
+    onDelete(leaveType);
     setPopoverOpen(null);
   };
 
@@ -51,19 +44,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
     setPopoverOpen(null);
   };
 
-  const handleCloseModal = () => {
-    setActiveModal(null);
-    setSelectedAppChainHistory(null);
-  };
-
-  const getCategoryColor = (category: string): string => {
-    const colors: Record<string, string> = {
-      'Paid': 'bg-blue-100 text-blue-800 border border-blue-200',
-      'Unpaid': 'bg-red-100 text-red-800 border border-red-200',
-      'Special': 'bg-gray-100 text-gray-800 border border-gray-200',
-    };
-    return colors[category] || 'bg-gray-100 text-gray-800 border border-gray-200';
-  };
+ 
 
   const getBooleanColor = (booleanColor: string): string => {
     const colors: Record<string, string> = {
@@ -83,13 +64,6 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
     return value ? (<CheckCircle className="h-4 w-4 text-white" />) : (<XCircle className="h-4 w-4 text-white" />);
   };
 
-  const getBooleanSmallIcon = (value: boolean) => {
-    return value ? (
-      <CheckCircle className="h-2.5 w-2.5 text-white" />
-    ) : (
-      <XCircle className="h-2.5 w-2.5 text-white" />
-    );
-  };
 
   // Animation variants for table rows
   const rowVariants = {
@@ -118,33 +92,39 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
               <tr>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                 >
                   Effective From
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Effective To
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   IsActive
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Added Steps
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Leave Policy
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -175,8 +155,8 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                     variants={rowVariants}
                     className="transition-colors hover:bg-gray-50"
                   >
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center">
+                    <td className="px-4 py-3 text-center align-middle">
+                      <div className="flex justify-center">
                         <div className="ml-3">
                           <div className="text-sm font-medium text-gray-900">
                             {AppChainHistory.effectiveFromStr}
@@ -184,16 +164,16 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
+                    <td className="px-4 py-3 text-center align-middle">
+                      <div className="flex gap-2 justify-center">
                         {AppChainHistory.effectiveToStr}
                       </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-1">
+                    <td className="px-4 py-3 text-center align-middle">
+                      <div className="flex gap-1 justify-center">
                         <span
                           className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
-                            AppChainHistory.isActiveStr
+                            AppChainHistory.isActiveStr,
                           )}`}
                         >
                           {getBooleanIcon(AppChainHistory.isActive)}
@@ -201,17 +181,17 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
+                    <td className="px-4 py-3 text-center align-middle">
+                      <div className="flex justify-center gap-2">
                         {AppChainHistory.addedSteps}
                       </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
+                    <td className="px-4 py-3 text-center align-middle">
+                      <div className="flex justify-center gap-2">
                         {AppChainHistory.leavePolicy}
                       </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-4 py-3 text-center align-middle text-sm font-medium">
                       <Popover
                         open={popoverOpen === AppChainHistory.id}
                         onOpenChange={(open) =>
@@ -230,15 +210,8 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                         <PopoverContent className="w-48 p-0" align="end">
                           <div className="py-1">
                             <button
-                              onClick={() => handleViewDetails(AppChainHistory)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                            >
-                              <Eye size={16} />
-                              View Details
-                            </button>
-                            <button
                               onClick={() => handleEdit(AppChainHistory)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                              className="w-full text-center px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
                             >
                               <PenBox size={16} />
                               Edit
@@ -248,7 +221,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                                 onClick={() =>
                                   handleToggleStatus(AppChainHistory)
                                 }
-                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${
+                                className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${
                                   AppChainHistory.isActive
                                     ? "text-amber-600 hover:bg-amber-50"
                                     : "text-green-600 hover:bg-green-50"
@@ -269,7 +242,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                             )}
                             <button
                               onClick={() => handleDelete(AppChainHistory)}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+                              className="w-full text-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
                             >
                               <Trash2 size={16} />
                               Delete

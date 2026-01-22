@@ -1,26 +1,26 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { LeaveTypeListDto, UUID } from "../../../../../types/core/Settings/leavetype";
-import { Button } from "../../../../ui/button";
+import { Button } from "../../../../../ui/button";
+import type {LeaveAppChainListDto, UUID } from "../../../../../../types/core/Settings/leaveAppChain";
 
-interface DeleteLeaveTypeModalProps {
-  leaveType: LeaveTypeListDto | null;
+interface DeleteAppChainModalProps {
+  appChain: LeaveAppChainListDto | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (leaveType: UUID) => void;
+  onConfirm: (appChain: UUID) => void;
 }
 
-const DeleteLeaveTypeModal: React.FC<DeleteLeaveTypeModalProps> = ({
-  leaveType,
+const DeleteAppChainModal: React.FC<DeleteAppChainModalProps> = ({
+  appChain,
   isOpen,
   onClose,
   onConfirm,
 }) => {
-  if (!isOpen || !leaveType) return null;
+  if (!isOpen || !appChain) return null;
 
   const handleConfirm = () => {
-    onConfirm(leaveType.id);
+    onConfirm(appChain.id);
   };
 
   return (
@@ -39,7 +39,7 @@ const DeleteLeaveTypeModal: React.FC<DeleteLeaveTypeModalProps> = ({
             </div>
 
             <p className="text-lg font-medium text-red-600 mt-4">
-              Are you sure you want to delete this leave type?
+              Are you sure you want to delete this approval chain?
             </p>
             <p className="text-sm text-red-600 mt-2">
               This action cannot be undone.
@@ -71,4 +71,4 @@ const DeleteLeaveTypeModal: React.FC<DeleteLeaveTypeModalProps> = ({
   );
 };
 
-export default DeleteLeaveTypeModal;
+export default DeleteAppChainModal;
