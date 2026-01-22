@@ -3,168 +3,103 @@ import { motion } from "framer-motion";
 import type {
   LeaveAppChainListDto,
   LeaveAppChainAddDto,
-  LeaveAppChainModDto,
   UUID,
 } from "../../../../../types/core/Settings/leaveAppChain";
 import LeaveAppChainHeader from "./LeaveAppChainHeader";
 import LeaveAppChainSearchFilters from "./LeaveAppChainSearchFilter";
 import AddLeaveAppChainModal from "./AddLeaveAppChainModal";
-// import EditLeaveAppChainModal from "./EditLeaveAppChainModal";
-// import DeleteLeaveAppChainModal from "./DeleteLeaveAppChainModal";
 import { leaveAppChainServices } from "../../../../../services/core/settings/ModHrm/leaveAppChainServices";
 import LeaveAppStepCard from "./LeaveAppStep/leaveAppStepCard";
 import { useNavigate } from "react-router-dom";
 import AddLeaveAppStepModal from "./LeaveAppStep/AddLeaveAppStepModal";
 import { leavePolicyService } from "../../../../../services/core/settings/ModHrm/LeavePolicyService";
+import type {
+  LeaveAppStepAddDto,
+  LeaveAppStepListDto,
+} from "../../../../../types/core/Settings/leaveAppStep";
+import { leaveAppStepServices } from "../../../../../services/core/settings/ModHrm/leaveAppStepService";
+import { toast } from "react-hot-toast";
 
-// Add props interface to receive leavePolicyId
 interface LeaveAppChainSectionProps {
   leavePolicyId: UUID;
 }
-const sampleApprovalSteps = [
-  {
-    id: 1,
-    stepNumber: 1,
-    stepName: "Initial Review",
-    employeeName: "John Manager",
-    role: "Manager" as const,
-    avatar: "https://i.pravatar.cc/150?u=john.manager@company.com",
-    isCompleted: true,
-    isActive: false,
-  },
-  {
-    id: 2,
-    stepNumber: 2,
-    stepName: "Department Approval",
-    employeeName: "Sarah Wilson",
-    role: "Manager" as const,
-    avatar: "https://i.pravatar.cc/150?u=sarah.wilson@company.com",
-    isCompleted: false,
-    isActive: true,
-  },
-  {
-    id: 3,
-    stepNumber: 3,
-    stepName: "HR Final Approval",
-    employeeName: "Michael Chen",
-    role: "HR" as const,
-    avatar: "https://i.pravatar.cc/150?u=michael.chen@company.com",
-    isCompleted: false,
-    isActive: false,
-  },
-];
 
 const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
   leavePolicyId,
 }) => {
-  const [leavePolicies, setLeavePolicies] = useState<LeaveAppChainListDto[]>(
-    []
+  const [leavePolicyName, setLeavePolicyName] =
+    useState<string>("Leave Policy");
+  const [policyLoading, setPolicyLoading] = useState<boolean>(true);
+  const [activeChainId, setActiveChainId] = useState<UUID | null>(null);
+
+  const navigate = useNavigate();
+
+  // Services
+  const { create, activeAppChain } = leaveAppChainServices(leavePolicyId);
+
+  // Wait until we have an activeChainId before enabling step query
+  const { listByChain, create: createStep } = leaveAppStepServices(
+    activeChainId ?? undefined,
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isAddAppChainModalOpen, setIsAddAppChainModalOpen] = useState(false);
-    const [isAddStepModalOpen, setIsAddStepModalOpen] = useState(false);
-     const [leavePolicyName, setLeavePolicyName] =
-       useState<string>("Leave Policy"); // ADD THIS
-     const [policyLoading, setPolicyLoading] = useState<boolean>(true);
-  // const [editingAppChain, setEditingAppChain] =
-  //   useState<LeaveAppChainListDto | null>(null);
-  // const [deletingAppChain, setDeletingAppChain] =
-  //   useState<LeaveAppChainListDto | null>(null);
 
-  // Initialize the service with leavePolicyId
-  const { listByPolicy, create, update, remove } =
-    leaveAppChainServices(leavePolicyId);
+  // Get actual active chain data
+  const activeChain = activeAppChain.data;
 
+  // Fetch leave policy name
   useEffect(() => {
     const fetchLeavePolicyName = async () => {
-      if (!leavePolicyId) {
-        setPolicyLoading(false);
-        return;
-      }
-
+      if (!leavePolicyId) return setPolicyLoading(false);
       try {
         setPolicyLoading(true);
-        console.log("Fetching policy for ID:", leavePolicyId);
-
-        // Call the API to get the leave policy
-        const policy = await leavePolicyService.getLeavePolicyById(
-          leavePolicyId
-        );
-        console.log("Policy data:", policy);
-        const name = policy.name ;
-
-        setLeavePolicyName(name);
-      } catch (err) {
-        console.error("Error fetching leave policy:", err);
-        setError(`Failed to load policy: ${err.message || "Unknown error"}`);
+        const policy =
+          await leavePolicyService.getLeavePolicyById(leavePolicyId);
+        setLeavePolicyName(policy.name);
+      } catch (err: any) {
+        console.error(err);
         setLeavePolicyName("Leave Policy");
       } finally {
         setPolicyLoading(false);
       }
     };
-
     fetchLeavePolicyName();
-  }, [leavePolicyId]); 
+  }, [leavePolicyId]);
 
-  // CRUD handlers
+  // Set active chain ID when loaded
+  useEffect(() => {
+    if (activeChain) {
+      setActiveChainId(activeChain.id);
+      toast.success(`Active chain loaded: ${activeChain.effectiveFromStr}`);
+    }
+  }, [activeChain]);
+
+  // Handlers
   const handleAddLeaveAppChain = async (appChainData: LeaveAppChainAddDto) => {
     try {
-      // Add leavePolicyId to the payload
       const payload = { ...appChainData, leavePolicyId };
-
-      const newAppChain = await create.mutateAsync(payload);
-      setLeavePolicies((prev) => [...prev, newAppChain]);
-      setIsAddAppChainModalOpen(false);
-    } catch (err) {
+      await create.mutateAsync(payload);
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to create leave approval chain. Please try again.");
+      toast.error("Failed to create leave approval chain");
     }
   };
 
-  const handleEditLeaveAppChain = async (
-    updatedAppChain: LeaveAppChainModDto
-  ) => {
+  const handleAddStep = async (stepData: LeaveAppStepAddDto) => {
+     if (!activeChainId) {
+       toast.error("Cannot add step: no active approval chain found");
+       return;
+     }
+
     try {
-      const result = await update.mutateAsync(updatedAppChain);
-      setLeavePolicies((prev) =>
-        prev.map((p) => (p.id === result.id ? result : p))
-      );
-      // setEditingAppChain(null);
-    } catch (err) {
+      await createStep.mutateAsync(stepData);
+      toast.success("Approval step created successfully");
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to update leave approval chain. Please try again.");
+      toast.error("Failed to create approval step");
     }
   };
 
-  const handleDeleteLeaveAppChain = async (appChainId: UUID) => {
-    try {
-      await remove.mutateAsync(appChainId);
-      setLeavePolicies((prev) => prev.filter((p) => p.id !== appChainId));
-      // setDeletingAppChain(null);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to delete leave approval chain. Please try again.");
-    }
-  };
- const handleViewDetails = (stepId: number) => {
-   console.log(`Viewing details for step ${stepId}`);
-   // Add your logic here to show step details
- };
- const navigate = useNavigate();
-
- const onViewHistory = () => {
-   navigate(`/settings/hr/leave/leaveAppChainHistory/${leavePolicyId}
-    `);
- };
-
-const handleOpenAddStepModal = () => {
-  setIsAddStepModalOpen(true);
-};
-
-const handleCloseAddStepModal = () => {
-  setIsAddStepModalOpen(false);
-};
+  const [isAddAppChainModalOpen, setIsAddAppChainModalOpen] = useState(false);
+  const [isAddStepModalOpen, setIsAddStepModalOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -179,27 +114,7 @@ const handleCloseAddStepModal = () => {
         />
       </motion.div>
 
-      {/* Error Banner */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
-        >
-          <div className="flex justify-between items-center">
-            <span className="font-medium">{error}</span>
-            <button
-              onClick={() => setError(null)}
-              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
-            >
-              ×
-            </button>
-          </div>
-        </motion.div>
-      )}
-
       {/* Search Filters */}
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -208,19 +123,11 @@ const handleCloseAddStepModal = () => {
       >
         <LeaveAppChainSearchFilters
           onAddClick={() => setIsAddAppChainModalOpen(true)}
-          onViewHistory={onViewHistory}
+          onViewHistory={() =>
+            navigate(`/settings/hr/leave/leaveAppChainHistory/${leavePolicyId}`)
+          }
         />
       </motion.div>
-
-      {/* LeaveAppChainTable always visible */}
-      {!loading && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="pt-0 pb-0"
-        ></motion.div>
-      )}
 
       {/* Modals */}
       <AddLeaveAppChainModal
@@ -229,31 +136,24 @@ const handleCloseAddStepModal = () => {
         onAddLeaveAppChain={handleAddLeaveAppChain}
         leavePolicyId={leavePolicyId}
       />
-      <LeaveAppStepCard
-        steps={sampleApprovalSteps}
-        onAddStepClick={handleOpenAddStepModal}
-        // totalSteps={3}
-        // onViewDetails={handleViewDetails}
-      />
+
       <AddLeaveAppStepModal
         isOpen={isAddStepModalOpen}
-        onClose={handleCloseAddStepModal}
-        onAddLeaveAppStep={[() => {}]}
+        onClose={() => setIsAddStepModalOpen(false)}
+        onAddLeaveAppStep={handleAddStep}
+        leaveAppChainId={activeChainId ?? ("" as UUID)}
       />
-      {/* <EditLeaveAppChainModal
-        isOpen={!!editingAppChain}
-        onClose={() => setEditingAppChain(null)}
-        onSave={handleEditLeaveAppChain}
-        appChain={editingAppChain}
-      />
-      <DeleteLeaveAppChainModal
-        isOpen={!!deletingAppChain}
-        onClose={() => setDeletingAppChain(null)}
-        onConfirm={() =>
-          deletingAppChain && handleDeleteLeaveAppChain(deletingAppChain.id)
-        }
-        appChain={deletingAppChain}
-      /> */}
+
+      {/* Approval Steps */}
+      {activeChain && (
+        <LeaveAppStepCard
+          steps={listByChain.data ?? []}
+          loading={listByChain.isLoading}
+          effectiveFrom={activeChain.effectiveFromStr}
+          effectiveTo={activeChain.effectiveToStr}
+          onAddStepClick={() => setIsAddStepModalOpen(true)}
+        />
+      )}
     </div>
   );
 };

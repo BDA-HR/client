@@ -12,14 +12,17 @@ import {
   SelectValue,
 } from "../../../../../ui/select";
 import toast from "react-hot-toast";
-import type { LeaveAppStepAddDto } from "../../../../../../types/core/Settings/leaveAppStep";
+import type {
+  LeaveAppStepAddDto,
+  UUID,
+} from "../../../../../../types/core/Settings/leaveAppStep";
 import { ApprovalRole } from "../../../../../../types/core/enum";
 
 interface AddLeaveAppStepModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddLeaveAppStep: (leaveAppStep: LeaveAppStepAddDto) => Promise<any>;
-  leaveAppChainId: string;
+  leaveAppChainId: UUID;
 }
 
 const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
@@ -30,7 +33,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
 }) => {
   const [stepName, setStepName] = useState("");
   const [stepOrder, setStepOrder] = useState<number>(1);
-  const [role, setRole] = useState<string>(ApprovalRole["0"]); // Default to first role
+  const [role, setRole] = useState<string>(ApprovalRole["0"]);
   const [isFinal, setIsFinal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,9 +63,10 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
         leaveAppChainId,
       };
 
-      const response = await onAddLeaveAppStep(payload);
-      toast.success(response?.message || "Approval step created");
+      // Call the handler passed as prop
+      await onAddLeaveAppStep(payload);
 
+      // Success toast is now handled by the parent component
       resetForm();
       onClose();
     } catch (error: any) {
@@ -75,6 +79,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
 
   const handleClose = useCallback(() => {
     if (!isLoading) {
+      resetForm();
       onClose();
     }
   }, [isLoading, onClose]);
@@ -90,6 +95,13 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
     document.addEventListener("keydown", onEsc);
     return () => document.removeEventListener("keydown", onEsc);
   }, [isOpen, handleClose]);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -139,6 +151,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
                     onChange={(e) => setStepName(e.target.value)}
                     disabled={isLoading}
                     placeholder="e.g. Manager Approval"
+                    required
                   />
                 </div>
               </div>
@@ -157,6 +170,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
                   onChange={(e) => setStepOrder(parseInt(e.target.value) || 1)}
                   disabled={isLoading}
                   placeholder="e.g. 1"
+                  required
                 />
               </div>
             </div>
@@ -183,9 +197,8 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
               </Select>
             </div>
 
-            {/* Boolean Options Inline */}
-            <div className="rounded-lg  p-4 space-y-3">
-
+            {/* Boolean Options */}
+            <div className="rounded-lg p-4 space-y-3">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"

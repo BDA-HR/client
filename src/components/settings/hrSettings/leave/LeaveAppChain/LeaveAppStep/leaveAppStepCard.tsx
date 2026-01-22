@@ -5,22 +5,17 @@ import { Badge } from "../../../../../ui/badge";
 import { Button } from "../../../../../ui/button";
 import { Eye, Calendar, ListOrdered, BadgePlus } from "lucide-react";
 import { Box } from "@radix-ui/themes";
+import type { LeaveAppStepListDto, UUID } from "../../../../../../types/core/Settings/leaveAppStep";
 
-interface ApprovalStep {
-  id: number;
-  stepNumber: number;
-  stepName: string;
-  employeeName: string;
-  role: "Manager" | "HR";
-  avatar?: string;
-}
+
 
 interface ApprovalStepCardProps {
-  steps: ApprovalStep[];
+  steps: LeaveAppStepListDto[];
   effectiveFrom?: string;
   effectiveTo?: string;
   onViewDetails?: () => void;
   onAddStepClick: () => void;
+  loading: boolean;
 }
 
 const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
@@ -137,11 +132,11 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                           <div className="flex flex-col items-center gap-1.5 mb-2">
                             <Avatar className="h-16 w-16 border-2 border-white dark:border-gray-800 shadow-sm">
                               <AvatarImage
-                                src={step.avatar}
-                                alt={step.employeeName}
+                                src="https://i.pravatar.cc/150?u=john.manager@company.com"
+                                alt={step.employee ?? "Unassigned"}
                               />
                               <AvatarFallback className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
-                                {step.employeeName
+                                {step.employee ?? "Unassigned"
                                   .split(" ")
                                   .map((n) => n[0])
                                   .join("")
@@ -149,11 +144,11 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                               </AvatarFallback>
                             </Avatar>
                             <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                              {step.employeeName}
+                              {step.employee}
                             </p>
                             <span className="flex">
                               <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium  border-2 border-white dark:border-gray-900 shadow-sm">
-                                {step.stepNumber}
+                                {step.stepOrder}
                               </span>
                               <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate mb-1.5 pt-1">
                                 {step.stepName}

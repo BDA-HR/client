@@ -21,17 +21,17 @@ export interface LeaveAppStepAddDto {
   role: string; 
   employeeId: string | null; 
   isFinal: boolean;
-  leaveAppChainId: string; 
+  leaveAppChainId: UUID; 
 }
 
 // Modify/Update DTO
 export interface LeaveAppStepModDto {
-  id: string;
+  id: UUID;
   stepName: string;
   stepOrder: number;
   role: string; 
-  employeeId: string | null; 
+  employeeId:UUID | null; 
   isFinal: boolean;
-  leaveAppChainId: string; 
+  leaveAppChainId: UUID; 
   rowVersion: string;
 }
