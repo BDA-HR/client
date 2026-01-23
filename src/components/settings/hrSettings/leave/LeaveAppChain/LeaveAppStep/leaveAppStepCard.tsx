@@ -6,6 +6,7 @@ import { Button } from "../../../../../ui/button";
 import { Eye, Calendar, ListOrdered, BadgePlus } from "lucide-react";
 import { Box } from "@radix-ui/themes";
 import type { LeaveAppStepListDto, UUID } from "../../../../../../types/core/Settings/leaveAppStep";
+import { ApprovalRole } from "../../../../../../types/core/enum";
 
 
 
@@ -25,12 +26,15 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
   onViewDetails,
   onAddStepClick,
 }) => {
-  const getRoleColor = (role: string) => {
+  const getRoleColor = (role: ApprovalRole) => {
     switch (role) {
-      case "Manager":
+      case ApprovalRole["0"]:
         return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border-blue-200 dark:border-blue-800";
-      case "HR":
+      case ApprovalRole["1"]:
         return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200 border-purple-200 dark:border-purple-800";
+      case ApprovalRole["2"]: 
+        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800";
+
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700";
     }
@@ -136,11 +140,12 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                                 alt={step.employee ?? "Unassigned"}
                               />
                               <AvatarFallback className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
-                                {step.employee ?? "Unassigned"
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")
-                                  .toUpperCase()}
+                                {step.employee ??
+                                  "Unassigned"
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
@@ -159,10 +164,16 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                           <Badge
                             variant="outline"
                             className={`text-sm px-3 py-0.5 ${getRoleColor(
-                              step.role
+                              ApprovalRole[
+                                step.role as keyof typeof ApprovalRole
+                              ],
                             )}`}
                           >
-                            {step.role}
+                            {
+                              ApprovalRole[
+                                step.role as keyof typeof ApprovalRole
+                              ]
+                            }
                           </Badge>
                         </div>
                       </div>

@@ -24,7 +24,9 @@ export const leaveAppChainKeys = {
   all: ["leave-app-chain"] as const,
   byPolicy: (leavePolicyId: UUID) =>
     [...leaveAppChainKeys.all, leavePolicyId] as const,
-   byId: (leaveAppChainId: UUID) =>
+  activeByPolicy: (leavePolicyId: UUID) =>
+    [...leaveAppChainKeys.all, "activeByPolicy", leavePolicyId] as const,
+  byId: (leaveAppChainId: UUID) =>
     [...leaveAppChainKeys.all, leaveAppChainId] as const,
 };
 
@@ -40,13 +42,23 @@ export const leaveAppChainServices = (leavePolicyId: UUID) => {
   });
 
   const activeAppChain = useQuery({
-    queryKey: leaveAppChainKeys.byPolicy(leavePolicyId),
+    queryKey: leaveAppChainKeys.activeByPolicy(leavePolicyId),
     queryFn: async (): Promise<LeaveAppChainListDto | null> => {
-      const res = await api.get(`${baseUrl}/ActiveAppChain/${leavePolicyId}`);
-      if (res.data.success && res.data.data) {
-        return res.data.data;
+      try {
+        const res = await api.get(`${baseUrl}/ActiveAppChain/${leavePolicyId}`);
+        console.log("Active chain response:", res.data);
+
+        if (res.data.success && res.data.data) {
+           return res.data.data;
+        }
+        return null;
+      } catch (error: any) {
+        console.error("Error fetching active chain:", error);
+        if (error.response?.status === 404) {
+          return null;
+        }
+        throw error;
       }
-      return null;
     },
     enabled: !!leavePolicyId,
   });

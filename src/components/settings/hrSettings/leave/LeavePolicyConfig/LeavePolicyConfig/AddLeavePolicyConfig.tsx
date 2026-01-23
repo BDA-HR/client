@@ -20,18 +20,22 @@ import type {
 import type { NameListItem } from "../../../../../../types/NameList/nameList";
 import toast from "react-hot-toast";
 import { useCreateLeavePolicyConfig } from "../../../../../../services/core/settings/ModHrm/LeavePolicyConfigService/leavePolicyConfig.queries";
+import { AccrualFrequency } from "../../../../../../types/core/enum";
 
 interface AddLeavePolicyConfigModalProps {
   onClose: () => void;
-  isOpen:boolean;
+  isOpen: boolean;
   leavePolicyId: UUID;
+  fiscalYear: NameListItem[];
 }
 
 const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
   isOpen,
   onClose,
   leavePolicyId,
+  fiscalYear,
 }) => {
+ const activeFiscalYearId = fiscalYear[0]?.id as UUID;
   const [newConfig, setNewConfig] = useState<LeavePolicyConfigAddDto>({
     annualEntitlement: 0,
     accrualFrequency: "", // enum.AccrualFrequency (0/1)
@@ -39,13 +43,9 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
     maxDaysPerReq: 0,
     maxCarryOverDays: 0,
     minServiceMonths: 0,
-    fiscalYearId: "" as UUID,
+    fiscalYearId: activeFiscalYearId,
     leavePolicyId: leavePolicyId,
   });
-
-  const [selectedFiscalYear, setSelectedFiscalYear] = useState<
-    UUID | undefined
-  >(undefined);
 
   const [errors, setErrors] = useState<{
     annualEntitlement?: string;
@@ -54,8 +54,6 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
     maxDaysPerReq?: string;
     maxCarryOverDays?: string;
     minServiceMonths?: string;
-    fiscalYearId?: string;
-    leavePolicyId?: string;
   }>({});
 
   // Use the create mutation hook
@@ -63,55 +61,29 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
   const isLoading = createMutation.isPending;
 
   // State for dropdown lists - You'll need to fetch these from your API
-  const [fiscalYearNames, setFiscalYearNames] = useState<NameListItem[]>([]);
   const [leavePolicyNames, setLeavePolicyNames] = useState<NameListItem[]>([]);
-  const [leaveAppChainNames, setLeaveAppChainNames] = useState<NameListItem[]>(
-    []
-  );
   const [isFetchingLists, setIsFetchingLists] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
 
   // Accrual frequency options
-  const accrualFrequencyOptions = [
-    { id: "0", name: "Monthly" },
-    { id: "1", name: "Yearly" },
-  ];
+  const accrualFrequencyOptions = Object.entries(AccrualFrequency).map(
+    ([key, value]) => ({
+      id: key,
+      name: value,
+    }),
+  );
 
   // Fetch all lists when modal opens
   const fetchAllLists = async () => {
     setIsFetchingLists(true);
     setListError(null);
     try {
-      // TODO: Replace these with actual API calls
-      // You'll need to implement services to fetch these lists
-      // Example:
-      // const fiscalYears = await fiscalYearService.getAll();
-      // const leavePolicies = await leavePolicyService.getAll();
-      // const leaveAppChains = await leaveAppChainService.getAll();
-
-      // Simulating API calls - replace with actual implementations
-      const fiscalYears: NameListItem[] = [
-        {
-          id: "bf250852-ed18-4dfa-931e-c726f191e38a" as UUID,
-          name: "Fiscal Year 2024",
-        },
-        {
-          id: "bf250852-ed18-4dfa-931e-c726f191e38ab" as UUID,
-          name: "Fiscal Year 2025",
-        },
-      ];
       const leavePolicies: NameListItem[] = [
         { id: "policy-1" as UUID, name: "Annual Leave" },
         { id: "policy-2" as UUID, name: "Sick Leave" },
       ];
-      const leaveAppChains: NameListItem[] = [
-        { id: "chain-1" as UUID, name: "Standard Approval" },
-        { id: "chain-2" as UUID, name: "Manager Approval" },
-      ];
 
-      setFiscalYearNames(fiscalYears);
       setLeavePolicyNames(leavePolicies);
-      setLeaveAppChainNames(leaveAppChains);
     } catch (error: any) {
       const errorMessage = error.message || "Failed to load configuration data";
       console.error("Error fetching lists:", error);
@@ -125,27 +97,9 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
     fetchAllLists();
   }, []);
 
-  const fiscalYearListItems: ListItem[] = Array.isArray(fiscalYearNames)
-    ? fiscalYearNames
-        .filter((item) => item && item.id && item.name)
-        .map((item) => ({
-          id: item.id,
-          name: item.name,
-        }))
-    : [];
-
-
-  const handleSelectFiscalYear = (item: ListItem) => {
-    setSelectedFiscalYear(item.id);
-    setNewConfig((prev) => ({ ...prev, fiscalYearId: item.id as UUID }));
-    if (errors.fiscalYearId)
-      setErrors((prev) => ({ ...prev, fiscalYearId: undefined }));
-  };
-
-
 
   const handleSelectAccrualFrequency = (item: ListItem) => {
-    setNewConfig((prev) => ({ ...prev, accrualFrequency: item.id }));
+    setNewConfig((prev) => ({ ...prev, accrualFrequency: item.id}));
     if (errors.accrualFrequency)
       setErrors((prev) => ({ ...prev, accrualFrequency: undefined }));
   };
@@ -179,11 +133,6 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
         "Minimum service months must be 0 or greater";
     }
 
-    if (!newConfig.fiscalYearId) {
-      newErrors.fiscalYearId = "Please select a fiscal year";
-    }
-
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -202,7 +151,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
         maxDaysPerReq: Number(newConfig.maxDaysPerReq),
         maxCarryOverDays: Number(newConfig.maxCarryOverDays),
         minServiceMonths: Number(newConfig.minServiceMonths),
-        fiscalYearId: newConfig.fiscalYearId,
+        fiscalYearId: activeFiscalYearId,
         leavePolicyId: leavePolicyId,
       };
 
@@ -231,9 +180,8 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
         maxCarryOverDays: 0,
         minServiceMonths: 0,
         fiscalYearId: "" as UUID,
-        leavePolicyId: leavePolicyId
+        leavePolicyId: leavePolicyId,
       });
-      setSelectedFiscalYear(undefined);
       setErrors({});
       setListError(null);
       onClose();
@@ -257,7 +205,6 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
     newConfig.maxDaysPerReq > 0 &&
     newConfig.maxCarryOverDays >= 0 &&
     newConfig.minServiceMonths >= 0 &&
-    newConfig.fiscalYearId &&
     newConfig.leavePolicyId &&
     !errors.annualEntitlement &&
     !errors.accrualFrequency &&
@@ -285,13 +232,13 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto"
+        className="bg-white rounded-xl shadow-xl max-w-xl w-full max-h-[80vh] overflow-y-auto"
         onKeyDown={handleKeyDown}
       >
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
+        <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3">
-            <Calendar size={20} className="text-emerald-600" />
+            <Calendar size={20} className="text-green-500" />
             <div>
               <h2 className="text-lg font-bold text-gray-800">
                 Add Leave Policy Configuration
@@ -311,7 +258,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
         {/* Body */}
         <div className="p-4">
           {/* Three Column Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Left Column - Entitlement & Accrual */}
             <div className="space-y-2">
               {/* Annual Entitlement */}
@@ -402,10 +349,6 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
                   <p className="text-sm text-red-500">{errors.accrualRate}</p>
                 )}
               </div>
-            </div>
-
-            {/* Middle Column - Limits */}
-            <div className="space-y-2">
               {/* Max Days Per Request */}
               <div className="space-y-2 min-h-[76px]">
                 <Label
@@ -444,51 +387,6 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
                 />
                 {errors.maxDaysPerReq && (
                   <p className="text-sm text-red-500">{errors.maxDaysPerReq}</p>
-                )}
-              </div>
-
-              {/* Max Carry Over Days */}
-              <div className="space-y-2 min-h-[76px]">
-                <Label
-                  htmlFor="maxCarryOverDays"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Max Carry Over Days
-                </Label>
-                <Input
-                  id="maxCarryOverDays"
-                  type="number"
-                  min="0"
-                  value={
-                    newConfig.maxCarryOverDays === 0
-                      ? ""
-                      : newConfig.maxCarryOverDays
-                  }
-                  onChange={(e) => {
-                    const value =
-                      e.target.value === "" ? 0 : parseInt(e.target.value) || 0;
-                    setNewConfig((prev) => ({
-                      ...prev,
-                      maxCarryOverDays: value,
-                    }));
-                    if (errors.maxCarryOverDays)
-                      setErrors((prev) => ({
-                        ...prev,
-                        maxCarryOverDays: undefined,
-                      }));
-                  }}
-                  placeholder="Enter days (e.g., 10)"
-                  className={`w-full ${
-                    errors.maxCarryOverDays
-                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                      : ""
-                  }`}
-                  disabled={isLoading || isFetchingLists}
-                />
-                {errors.maxCarryOverDays && (
-                  <p className="text-sm text-red-500">
-                    {errors.maxCarryOverDays}
-                  </p>
                 )}
               </div>
             </div>
@@ -560,51 +458,51 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
                   </p>
                 )}
               </div>
+              {/* Max Carry Over Days */}
+              <div className="space-y-2 min-h-[76px]">
+                <Label
+                  htmlFor="maxCarryOverDays"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Max Carry Over Days
+                </Label>
+                <Input
+                  id="maxCarryOverDays"
+                  type="number"
+                  min="0"
+                  value={
+                    newConfig.maxCarryOverDays === 0
+                      ? ""
+                      : newConfig.maxCarryOverDays
+                  }
+                  onChange={(e) => {
+                    const value =
+                      e.target.value === "" ? 0 : parseInt(e.target.value) || 0;
+                    setNewConfig((prev) => ({
+                      ...prev,
+                      maxCarryOverDays: value,
+                    }));
+                    if (errors.maxCarryOverDays)
+                      setErrors((prev) => ({
+                        ...prev,
+                        maxCarryOverDays: undefined,
+                      }));
+                  }}
+                  placeholder="Enter days (e.g., 10)"
+                  className={`w-full ${
+                    errors.maxCarryOverDays
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                      : ""
+                  }`}
+                  disabled={isLoading || isFetchingLists}
+                />
+                {errors.maxCarryOverDays && (
+                  <p className="text-sm text-red-500">
+                    {errors.maxCarryOverDays}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-
-          {/* Reference Selection Section */}
-          <div className="space-y-2">
-            {isFetchingLists ? (
-              <div className="flex items-center justify-center p-4 border rounded-lg bg-gray-50">
-                <div className="h-5 w-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
-                <span className="text-sm text-gray-600">
-                  Loading reference data...
-                </span>
-              </div>
-            ) : listError ? (
-              <div className="p-3 border border-red-200 bg-red-50 rounded-lg">
-                <p className="text-sm text-red-600">{listError}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {/* Fiscal Year */}
-                <div className="space-y-2 min-h-[76px]">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Fiscal Year <span className="text-red-500">*</span>
-                  </Label>
-                  <List
-                    items={fiscalYearListItems}
-                    selectedValue={selectedFiscalYear}
-                    onSelect={handleSelectFiscalYear}
-                    label=""
-                    placeholder="Select fiscal year"
-                    required
-                    disabled={isLoading || isFetchingLists}
-                  />
-                  {errors.fiscalYearId && (
-                    <p className="text-sm text-red-500">
-                      {errors.fiscalYearId}
-                    </p>
-                  )}
-                  {fiscalYearListItems.length === 0 && (
-                    <p className="text-sm text-amber-600">
-                      No fiscal years available
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -621,14 +519,13 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
               Cancel
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer px-6 min-w-[100px] shadow-sm hover:shadow transition-shadow duration-200"
+              className="bg-green-500 hover:bg-green-600 text-white cursor-pointer px-6 min-w-[100px] shadow-sm hover:shadow transition-shadow duration-200"
               onClick={handleSubmit}
               disabled={
                 !isFormValid ||
                 isLoading ||
                 isFetchingLists ||
-                listError !== null ||
-                fiscalYearListItems.length === 0 
+                listError !== null 
               }
               type="button"
             >

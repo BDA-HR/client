@@ -19,6 +19,7 @@ import type {
 } from "../../../../../types/core/Settings/leaveAppStep";
 import { leaveAppStepServices } from "../../../../../services/core/settings/ModHrm/leaveAppStepService";
 import { toast } from "react-hot-toast";
+import { employeeService } from "../../../../../services/hr/employee/employeeName";
 
 interface LeaveAppChainSectionProps {
   leavePolicyId: UUID;
@@ -42,9 +43,6 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
     activeChainId ?? undefined,
   );
 
-  // Get actual active chain data
-  const activeChain = activeAppChain.data;
-
   // Fetch leave policy name
   useEffect(() => {
     const fetchLeavePolicyName = async () => {
@@ -66,11 +64,24 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
 
   // Set active chain ID when loaded
   useEffect(() => {
-    if (activeChain) {
-      setActiveChainId(activeChain.id);
-      toast.success(`Active chain loaded: ${activeChain.effectiveFromStr}`);
+    if (activeAppChain.data) {
+      console.log("Active chain data loaded:", activeAppChain.data);
+      setActiveChainId(activeAppChain.data.id);
+      toast.success(
+        `Active chain loaded: ${activeAppChain.data.effectiveFromStr}`,
+      );
     }
-  }, [activeChain]);
+  }, [activeAppChain.data]);
+
+  // Debug: Log state changes
+  useEffect(() => {
+    console.log("Active chain query state:", {
+      data: activeAppChain.data,
+      isLoading: activeAppChain.isLoading,
+      error: activeAppChain.error,
+      status: activeAppChain.status,
+    });
+  }, [activeAppChain]);
 
   // Handlers
   const handleAddLeaveAppChain = async (appChainData: LeaveAppChainAddDto) => {
@@ -84,10 +95,10 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
   };
 
   const handleAddStep = async (stepData: LeaveAppStepAddDto) => {
-     if (!activeChainId) {
-       toast.error("Cannot add step: no active approval chain found");
-       return;
-     }
+    if (!activeChainId) {
+      toast.error("Cannot add step: no active approval chain found");
+      return;
+    }
 
     try {
       await createStep.mutateAsync(stepData);
@@ -100,6 +111,10 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
 
   const [isAddAppChainModalOpen, setIsAddAppChainModalOpen] = useState(false);
   const [isAddStepModalOpen, setIsAddStepModalOpen] = useState(false);
+
+  const { getAllNames } = employeeService();
+
+  const employees = getAllNames.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -142,20 +157,30 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
         onClose={() => setIsAddStepModalOpen(false)}
         onAddLeaveAppStep={handleAddStep}
         leaveAppChainId={activeChainId ?? ("" as UUID)}
+        employees={employees}
       />
 
       {/* Approval Steps */}
-      {activeChain && (
+      {activeAppChain.data ? (
         <LeaveAppStepCard
           steps={listByChain.data ?? []}
           loading={listByChain.isLoading}
-          effectiveFrom={activeChain.effectiveFromStr}
-          effectiveTo={activeChain.effectiveToStr}
+          effectiveFrom={activeAppChain.data.effectiveFromStr}
+          effectiveTo={activeAppChain.data.effectiveToStr}
           onAddStepClick={() => setIsAddStepModalOpen(true)}
         />
+      ) : (
+        <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+          <p className="text-gray-500">
+            No active approval chain found.
+          </p>
+          <p className="text-gray-500 mb-4">
+            Please add new approval chain.
+          </p>
+        </div>
       )}
     </div>
   );
-};
+};;
 
 export default LeaveAppChainSection;

@@ -9,6 +9,7 @@ import DeleteLeavePolicyConfig from "./LeavePolicyConfig/DeleteLeavePolicyConfig
 import LeaveAppChainSection from "../LeaveAppChain/LeaveAppChainSection";
 import LeavePolicyConfigTable from "./LeavePolicyConfig/LeavePolicyConfigTable";
 import PolicyAssignmentRuleSection from "../PolicyAssignmentRule/PolicyAssignmenRuleSection";
+import { ActiveFiscalYear } from "../../../../../services/core/fyNameList";
 
 interface LeavePolicyConfigSectionProps {
   leavePolicyId: UUID;
@@ -53,6 +54,9 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
       );
       const [deletingPolicy, setDeletingPolicy] =
         useState<LeavePolicyConfigListDto | null>(null);
+        const { getActiveFiscalYear } = ActiveFiscalYear();
+        
+          const fy = getActiveFiscalYear.data ?? [];
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -123,6 +127,7 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         isOpen={isAddPolicyModalOpen}
         onClose={() => setIsAddPolicyModalOpen(false)}
         leavePolicyId={leavePolicyId}
+        fiscalYear={fy}
         // onAddLeavePolicy={handleAddLeavePolicy}
         // leaveTypeOptions={leaveTypeOptions}
       />

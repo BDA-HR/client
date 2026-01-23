@@ -17,12 +17,14 @@ import type {
   UUID,
 } from "../../../../../../types/core/Settings/leaveAppStep";
 import { ApprovalRole } from "../../../../../../types/core/enum";
+import type { NameListDto } from "../../../../../../types/hr/NameListDto";
 
 interface AddLeaveAppStepModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddLeaveAppStep: (leaveAppStep: LeaveAppStepAddDto) => Promise<any>;
   leaveAppChainId: UUID;
+  employees: NameListDto[];
 }
 
 const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
@@ -30,19 +32,31 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
   onClose,
   onAddLeaveAppStep,
   leaveAppChainId,
+  employees,
 }) => {
   const [stepName, setStepName] = useState("");
   const [stepOrder, setStepOrder] = useState<number>(1);
-  const [role, setRole] = useState<string>(ApprovalRole["0"]);
+  const [role, setRole] = useState<string>("0"); // Default to "0" (Manager)
   const [isFinal, setIsFinal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+    const [employeeId, setEmployeeId] = useState<string>("");
 
-  const roleOptions = Object.values(ApprovalRole);
+  // Create options from enum entries
+  const roleOptions = Object.entries(ApprovalRole).map(([key, value]) => ({
+    key,
+    value,
+  }));
+
+   const employeeOptions = employees.map((employee) => ({
+     value: employee.id,
+     label: employee.name,
+   }));
 
   const resetForm = () => {
     setStepName("");
     setStepOrder(1);
-    setRole(ApprovalRole["0"]);
+    setRole("0"); 
+    setEmployeeId("");
     setIsFinal(false);
   };
 
@@ -52,16 +66,23 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
       return;
     }
 
+    if (!role || role.trim() === "") {
+      toast.error("Role is required");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const payload: LeaveAppStepAddDto = {
         stepName: stepName.trim(),
         stepOrder,
-        role,
-        employeeId: null, // You can add employee selection if needed
+        role: role, 
+        employeeId: employeeId || null,
         isFinal,
         leaveAppChainId,
       };
+
+      console.log("Sending payload:", payload);
 
       // Call the handler passed as prop
       await onAddLeaveAppStep(payload);
@@ -102,6 +123,9 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
       resetForm();
     }
   }, [isOpen]);
+
+    const selectedEmployee = employees.find((emp) => emp.id === employeeId);
+    const selectedEmployeeName = selectedEmployee?.name || "";
 
   if (!isOpen) return null;
 
@@ -185,12 +209,41 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
               </Label>
               <Select value={role} onValueChange={setRole} disabled={isLoading}>
                 <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                  <SelectValue placeholder="Select Approval Role" />
+                  <SelectValue placeholder="Select Approval Role">
+                    {ApprovalRole[role as keyof typeof ApprovalRole]}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {roleOptions.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
+                  {roleOptions.map((option) => (
+                    <SelectItem key={option.key} value={option.key}>
+                      {option.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* employee Selection */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="employee"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Employee (Optional) <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={employeeId}
+                onValueChange={setEmployeeId}
+                disabled={isLoading}
+              >
+                <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
+                  <SelectValue placeholder="Select Employee (Optional">
+                    {selectedEmployeeName}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {employeeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -229,7 +282,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
               <Button
                 className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
                 type="submit"
-                disabled={isLoading || !stepName.trim()}
+                disabled={isLoading || !stepName.trim() || !role.trim()}
               >
                 {isLoading ? "Saving..." : "Save"}
               </Button>

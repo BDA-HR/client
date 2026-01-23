@@ -69,7 +69,7 @@ export type LeaveCondition = (typeof LeaveCondition)[keyof typeof LeaveCondition
 
 export const ApprovalRole = {
   "0": "Manager",
-  "1": "HR",
+  "1": "Hr",
   "2": "Director",
 } as const;
 export type ApprovalRole = (typeof ApprovalRole)[keyof typeof ApprovalRole];

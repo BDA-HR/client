@@ -35,10 +35,35 @@ export const leaveAppStepServices = (leaveAppChainId?: UUID) => {
       ? leaveAppStepKeys.byChain(leaveAppChainId)
       : ["disabled"],
     queryFn: async (): Promise<LeaveAppStepListDto[]> => {
-      const res = await api.get(
+      if (!leaveAppChainId) {
+        throw new Error("leaveAppChainId is required");
+      }
+      console.log("📞 Fetching steps for chain ID:", leaveAppChainId);
+      console.log(
+        "📞 Endpoint:",
         `${baseUrl}/AllLeaveAppStep/${leaveAppChainId}`,
       );
-      return res.data.data;
+
+      try {
+        const res = await api.get(
+          `${baseUrl}/AllLeaveAppStep/${leaveAppChainId}`,
+        );
+        console.log("✅ Steps response:", res.data);
+        return res.data.data;
+      } catch (error: any) {
+        console.error("❌ Error fetching steps:", error);
+        console.error("❌ Error response:", error.response);
+
+        if (error.response?.status === 400) {
+          console.error(
+            "❌ 400 Bad Request - Check if chain ID is valid:",
+            leaveAppChainId,
+          );
+          // Return empty array instead of throwing
+          return [];
+        }
+        throw error;
+      }
     },
     enabled: !!leaveAppChainId,
   });
