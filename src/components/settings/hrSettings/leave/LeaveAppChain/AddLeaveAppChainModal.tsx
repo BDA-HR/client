@@ -28,7 +28,6 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
   >({
     effectiveFrom: new Date(), // Changed from null to empty string
     effectiveTo: null,
-    isActive: true,
   });
 
   const [loading, setLoading] = useState(false);
@@ -44,7 +43,6 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
     setFormData({
       effectiveFrom: new Date(),
       effectiveTo: null,
-      isActive: true,
     });
     setFormErrors({});
   };
@@ -53,8 +51,6 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
     const errors: Record<string, string> = {};
     if (!formData.effectiveFrom)
       errors.effectiveFrom = "Effective From is required";
-    if (!formData.effectiveTo) errors.effectiveTo = "Effective To is required";
-    setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
@@ -80,7 +76,6 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
           leavePolicyId: leavePolicyId,
           effectiveFrom: formData.effectiveFrom,
           effectiveTo: formData.effectiveTo, 
-          isActive: formData.isActive,
         };
 
       await onAddLeaveAppChain(completeData);
@@ -109,10 +104,10 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-6 py-4 sticky top-0 bg-white z-10">
+        <div className="flex justify-between items-center border-b px-6 py-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3">
             <BadgePlus size={20} className="text-green-600" />
             <div>
@@ -132,7 +127,7 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
 
         {/* Body */}
         <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-4">
+          <div className="px-5 py-3 space-y-2">
             {/* Effective From */}
             <div className="space-y-2">
               <Label className="text-sm text-gray-700 font-medium">
@@ -158,7 +153,7 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
             {/* Effective To */}
             <div className="space-y-2">
               <Label className="text-sm text-gray-700 font-medium">
-                Effective To <span className="text-red-500">*</span>
+                Effective To
               </Label>
               <Input
                 type="date"
@@ -176,34 +171,14 @@ const AddLeaveAppChainModal: React.FC<AddLeaveAppChainModalProps> = ({
                 </p>
               )}
             </div>
-
-            {/* Is Active Checkbox */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={formData.isActive}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    isActive: e.target.checked,
-                  })
-                }
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded bg-green-600"
-                disabled={loading}
-              />
-              <Label htmlFor="isActive" className="text-sm text-gray-700">
-                Is Active
-              </Label>
-            </div>
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 bg-gray-50">
+          <div className="border-t px-6 py-2 bg-gray-50">
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
-                className="px-6 min-w-[100px]"
+                className="px-6 min-w-25"
                 onClick={handleCancel}
                 disabled={loading}
                 type="button"

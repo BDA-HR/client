@@ -61,6 +61,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import LeavePolicy from "./pages/settings/hrSettings/Leave/leavePolicy";
 import LeavePolicyConfig from "./pages/settings/hrSettings/Leave/leavePolicyConfig";
 import LeaveAppChainHistory from "./pages/settings/hrSettings/Leave/LeaveAppChainHistory";
+import LeavePolicyConfigHistory from "./pages/settings/hrSettings/Leave/leavePolicyConfigHistory";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,10 +77,10 @@ function App() {
     return localStorage.getItem("isAuthenticated") === "true";
   });
 
-  const handleLogin = () => {
-    localStorage.setItem("isAuthenticated", "true");
-    setIsAuthenticated(true);
-  };
+  // const handleLogin = () => {
+  //   localStorage.setItem("isAuthenticated", "true");
+  //   setIsAuthenticated(true);
+  // };
 
   return (
     <AuthProvider>
@@ -201,6 +202,10 @@ function App() {
                 <Route
                   path="/settings/hr/leave/leaveAppChainHistory/:leavePolicyId"
                   element={<LeaveAppChainHistory />}
+                />
+                <Route
+                  path="/settings/hr/leave/leavePolicyConfigHistory/:leavePolicyId"
+                  element={<LeavePolicyConfigHistory />}
                 />
                 <Route
                   path="/settings/hr/annualleave/:id/policy"

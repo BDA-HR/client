@@ -40,10 +40,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
     }
   };
 
-  // Sample data for effective dates if not provided
-  const displayFrom = effectiveFrom || "2024-01-01";
-  const displayTo = effectiveTo || "2024-12-31";
-
+ 
   return (
     <Box
       asChild
@@ -53,7 +50,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
         overflow: "hidden",
       }}
     >
-      <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
+      <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm rounded-b-lg rounded-t-none">
         <CardContent className="p-4">
           {/* Header with Effective Dates */}
           <div className="flex items-center justify-between mb-4">
@@ -67,13 +64,13 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                       Effective:
                     </span>
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {displayFrom}
+                      {effectiveFrom}
                     </span>
                     <span className="text-sm text-gray-400 dark:text-gray-500">
                       to
                     </span>
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {displayTo}
+                      {effectiveTo? effectiveTo: "not Assigned"}
                     </span>
                   </div>
                 </div>
@@ -113,7 +110,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
           {/* Horizontal Steps Layout */}
           <div className="relative">
             {steps.length === 0 ? (
-              <div className="text-center py-6 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+              <div className="text-center py-6 border border-dashed border-gray-300 dark:border-gray-600 rounded-b-lg">
                 <ListOrdered className="h-6 w-6 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   No approval steps configured
@@ -123,7 +120,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                 </p>
               </div>
             ) : (
-              <div className="flex items-center justify-between px-2">
+              <div className="flex items-center justify-between px-2 rounded-b-lg">
                 {steps.map((step, index) => {
                   const isLast = index === steps.length - 1;
 

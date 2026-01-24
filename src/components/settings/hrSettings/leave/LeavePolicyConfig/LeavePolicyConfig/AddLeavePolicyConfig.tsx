@@ -27,6 +27,9 @@ interface AddLeavePolicyConfigModalProps {
   isOpen: boolean;
   leavePolicyId: UUID;
   fiscalYear: NameListItem[];
+  onAddLeavePolicyConfig: (
+    leavePolicyConfig: LeavePolicyConfigAddDto,
+  ) => Promise<void>;
 }
 
 const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
@@ -34,6 +37,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
   onClose,
   leavePolicyId,
   fiscalYear,
+  onAddLeavePolicyConfig,
 }) => {
  const activeFiscalYearId = fiscalYear[0]?.id as UUID;
   const [newConfig, setNewConfig] = useState<LeavePolicyConfigAddDto>({
@@ -157,7 +161,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
 
       console.log("Sending data to API:", dataToSend);
 
-      await createMutation.mutateAsync(dataToSend);
+      await onAddLeavePolicyConfig(dataToSend);
 
       toast.success("Leave policy configuration added successfully!");
 
@@ -256,13 +260,13 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="p-4">
-          {/* Three Column Layout */}
+        <div className="px-4 py-2">
+          {/* two Column Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Left Column - Entitlement & Accrual */}
-            <div className="space-y-2">
+            <div className="">
               {/* Annual Entitlement */}
-              <div className="space-y-2 min-h-[76px]">
+              <div className="space-y-1 min-h-[76px]">
                 <Label
                   htmlFor="annualEntitlement"
                   className="text-sm font-medium text-gray-700"
@@ -310,7 +314,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
               </div>
 
               {/* Accrual Rate */}
-              <div className="space-y-2 min-h-[76px]">
+              <div className="space-y-1 min-h-[76px]">
                 <Label
                   htmlFor="accrualRate"
                   className="text-sm font-medium text-gray-700"
@@ -350,7 +354,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
                 )}
               </div>
               {/* Max Days Per Request */}
-              <div className="space-y-2 min-h-[76px]">
+              <div className="space-y-1 min-h-[76px]">
                 <Label
                   htmlFor="maxDaysPerReq"
                   className="text-sm font-medium text-gray-700"
@@ -392,9 +396,9 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
             </div>
 
             {/* Right Column - Eligibility & References */}
-            <div className="space-y-2">
+            <div className="space-y-0">
               {/* Min Service Months */}
-              <div className="space-y-2 min-h-[76px]">
+              <div className="space-y-1 min-h-[76px]">
                 <Label
                   htmlFor="minServiceMonths"
                   className="text-sm font-medium text-gray-700"
@@ -439,7 +443,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
               </div>
 
               {/* Accrual Frequency */}
-              <div className="space-y-2 min-h-[76px]">
+              <div className="space-y-1 min-h-[76px]">
                 <Label className="text-sm font-medium text-gray-700">
                   Accrual Frequency <span className="text-red-500">*</span>
                 </Label>
@@ -459,7 +463,7 @@ const AddLeavePolicyConfigModal: React.FC<AddLeavePolicyConfigModalProps> = ({
                 )}
               </div>
               {/* Max Carry Over Days */}
-              <div className="space-y-2 min-h-[76px]">
+              <div className="space-y-1 min-h-[76px]">
                 <Label
                   htmlFor="maxCarryOverDays"
                   className="text-sm font-medium text-gray-700"

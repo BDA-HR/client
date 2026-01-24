@@ -134,7 +134,7 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="pb-2"
+        className=" border rounded-lg"
       >
         <LeaveAppChainSearchFilters
           onAddClick={() => setIsAddAppChainModalOpen(true)}
@@ -142,6 +142,22 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
             navigate(`/settings/hr/leave/leaveAppChainHistory/${leavePolicyId}`)
           }
         />
+
+        {/* Approval Steps */}
+        {activeAppChain.data ? (
+          <LeaveAppStepCard
+            steps={listByChain.data ?? []}
+            loading={listByChain.isLoading}
+            effectiveFrom={activeAppChain.data.effectiveFromStr}
+            effectiveTo={activeAppChain.data.effectiveToStr}
+            onAddStepClick={() => setIsAddStepModalOpen(true)}
+          />
+        ) : (
+          <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-b-lg">
+            <p className="text-gray-500">No active approval chain found.</p>
+            <p className="text-gray-500 mb-4">Please add new approval chain.</p>
+          </div>
+        )}
       </motion.div>
 
       {/* Modals */}
@@ -159,26 +175,6 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
         leaveAppChainId={activeChainId ?? ("" as UUID)}
         employees={employees}
       />
-
-      {/* Approval Steps */}
-      {activeAppChain.data ? (
-        <LeaveAppStepCard
-          steps={listByChain.data ?? []}
-          loading={listByChain.isLoading}
-          effectiveFrom={activeAppChain.data.effectiveFromStr}
-          effectiveTo={activeAppChain.data.effectiveToStr}
-          onAddStepClick={() => setIsAddStepModalOpen(true)}
-        />
-      ) : (
-        <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-          <p className="text-gray-500">
-            No active approval chain found.
-          </p>
-          <p className="text-gray-500 mb-4">
-            Please add new approval chain.
-          </p>
-        </div>
-      )}
     </div>
   );
 };;

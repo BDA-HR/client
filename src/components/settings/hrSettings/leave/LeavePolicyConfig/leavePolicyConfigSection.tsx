@@ -1,15 +1,14 @@
 import { motion } from "framer-motion";
 import React, { useState } from "react";
-import LeavePolicyConfigPageHeader from "./leavePolicyConfigPageHeader";
-import type { LeavePolicyConfigListDto, UUID } from "../../../../../types/core/Settings/leavePolicyConfig";
+import type { LeavePolicyConfigAddDto, LeavePolicyConfigListDto, UUID } from "../../../../../types/core/Settings/leavePolicyConfig";
 import LeavePolicyConfigHeader from "./LeavePolicyConfig/leaveConfigHeader";
-import LeavePolicyConfigCard from "./LeavePolicyConfig/LeavePolicyConfigCard";
-import AddLeavePolicyConfig from "./LeavePolicyConfig/AddLeavePolicyConfig";
-import DeleteLeavePolicyConfig from "./LeavePolicyConfig/DeleteLeavePolicyConfig";
 import LeaveAppChainSection from "../LeaveAppChain/LeaveAppChainSection";
 import LeavePolicyConfigTable from "./LeavePolicyConfig/LeavePolicyConfigTable";
 import PolicyAssignmentRuleSection from "../PolicyAssignmentRule/PolicyAssignmenRuleSection";
 import { ActiveFiscalYear } from "../../../../../services/core/fyNameList";
+import { useNavigate } from "react-router-dom";
+import { useActiveLeavePolicyConfig, useCreateLeavePolicyConfig } from "../../../../../services/core/settings/ModHrm/LeavePolicyConfigService/leavePolicyConfig.queries";
+import AddLeavePolicyConfig from "./LeavePolicyConfig/AddLeavePolicyConfig";
 
 interface LeavePolicyConfigSectionProps {
   leavePolicyId: UUID;
@@ -48,15 +47,34 @@ const mockActiveConfig: LeavePolicyConfigListDto[] = [{
 const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
   leavePolicyId,
 }) => {
+    const navigate = useNavigate();
+      const {
+        data: activeConfig,
+        isLoading,
+        isError,
+        error,
+      } = useActiveLeavePolicyConfig(leavePolicyId);
+
     const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
       const [editingPolicy, setEditingPolicy] = useState<LeavePolicyConfigListDto | null>(
         null
       );
       const [deletingPolicy, setDeletingPolicy] =
         useState<LeavePolicyConfigListDto | null>(null);
-        const { getActiveFiscalYear } = ActiveFiscalYear();
-        
-          const fy = getActiveFiscalYear.data ?? [];
+
+      const { getActiveFiscalYear } = ActiveFiscalYear();
+      const fy = getActiveFiscalYear.data ?? [];
+      const createPolicyConfig = useCreateLeavePolicyConfig();
+      const handleAddLeavePolicyConfig = async (leavePolicyConfig: LeavePolicyConfigAddDto) => {
+       
+        try {
+          await createPolicyConfig.mutateAsync(leavePolicyConfig);
+        } catch (err) {
+          console.error("Failed to create policy:", err);
+         
+        }
+      };
+    
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -68,26 +86,26 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         <LeaveAppChainSection leavePolicyId={leavePolicyId} />
       </motion.div>
       {/* Error Banner */}
-      {/* {error && (
+      {error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
         >
           <div className="flex justify-between items-center">
-            <span className="font-medium">{error}</span>
+            <span className="font-medium">{error.message}</span>
             <button
-              onClick={() => setError(null)}
+              onClick={() => {}}
               className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
             >
               ×
             </button>
           </div>
         </motion.div>
-      )} */}
+      )}
 
       {/* Loading */}
-      {/* {loading && (
+      {/* {isLoading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
         </div>
@@ -100,7 +118,11 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
       >
         <LeavePolicyConfigHeader
           onAddClick={() => setIsAddPolicyModalOpen(true)}
-          onViewHistory={() => {}}
+          onViewHistory={() =>
+            navigate(
+              `/settings/hr/leave/leavePolicyConfigHistory/${leavePolicyId}`,
+            )
+          }
         />
       </motion.div>
       <motion.div
@@ -116,7 +138,7 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
           onViewDetails={() => {}}
         /> */}
         <LeavePolicyConfigTable
-          leavePolicyConfig={mockActiveConfig} // empty array is fine
+          leavePolicyConfig={activeConfig ? [activeConfig] : []}
           onEdit={setEditingPolicy as any}
           onDelete={setDeletingPolicy as any}
         />
@@ -128,7 +150,7 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         onClose={() => setIsAddPolicyModalOpen(false)}
         leavePolicyId={leavePolicyId}
         fiscalYear={fy}
-        // onAddLeavePolicy={handleAddLeavePolicy}
+        onAddLeavePolicyConfig={handleAddLeavePolicyConfig}
         // leaveTypeOptions={leaveTypeOptions}
       />
       <PolicyAssignmentRuleSection leavePolicyId={leavePolicyId} />

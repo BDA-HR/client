@@ -135,12 +135,12 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-xl shadow-xl max-w-xl w-full"
+        className="bg-white rounded-xl shadow-xl max-w-lg w-full"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-3">
+        <div className="flex items-center justify-between border-b px-6 py-2">
           <div className="flex items-center gap-2">
-            <BadgePlus size={20} />
+            <BadgePlus size={20} className="text-green-400" />
             <h2 className="text-lg font-semibold">Add Approval Step</h2>
           </div>
           <button
@@ -159,10 +159,10 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
           }}
         >
           {/* Body */}
-          <div className="px-6 py-4 space-y-4">
+          <div className="px-6 py-3 space-y-3">
             {/* Step Name and Order */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label
                   htmlFor="stepName"
                   className="text-sm text-gray-700 font-medium"
@@ -180,7 +180,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label
                   htmlFor="stepOrder"
                   className="block text-sm font-medium text-gray-700"
@@ -200,7 +200,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
             </div>
 
             {/* Role Selection */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label
                 htmlFor="role"
                 className="block text-sm font-medium text-gray-700"
@@ -223,12 +223,12 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
               </Select>
             </div>
             {/* employee Selection */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label
                 htmlFor="employee"
                 className="block text-sm font-medium text-gray-700"
               >
-                Employee (Optional) <span className="text-red-500">*</span>
+                Employee (Optional) 
               </Label>
               <Select
                 value={employeeId}
@@ -251,7 +251,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
             </div>
 
             {/* Boolean Options */}
-            <div className="rounded-lg p-4 space-y-3">
+            <div className="rounded-lg px-1 py-1 space-y-1">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -268,7 +268,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 rounded-b-xl">
+          <div className="border-t px-6 py-2 rounded-b-xl">
             <div className="flex flex-row-reverse justify-center items-center gap-3">
               <Button
                 variant="outline"

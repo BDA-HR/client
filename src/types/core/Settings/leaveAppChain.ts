@@ -18,7 +18,6 @@ export interface LeaveAppChainAddDto {
   leavePolicyId: UUID;
   effectiveFrom: Date; 
   effectiveTo?: Date | null;
-  isActive: boolean;
 }
 
 export interface LeaveAppChainModDto {

@@ -1,19 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  MoreVertical,
-  Eye,
-  PenBox,
   CheckCircle,
   XCircle,
-  Trash2,
-  Cog,
 } from "lucide-react";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "../../../../../ui/popover";
+
 import { useNavigate } from "react-router-dom";
 import type { LeavePolicyConfigListDto } from "../../../../../../types/core/Settings/leavePolicyConfig";
 
@@ -68,28 +59,28 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
         <table className="min-w-full divide-y divide-gray-200 align-middle">
           <thead className="bg-white">
             <tr>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider ">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ">
                 Annual Entitlement
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
                 Accrual Frequency
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
                 Accrual Rate
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
                 Max Days PerReq
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
                 Max Carry Over Days
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
                 Min Service Months
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
                 Is Active
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
                 Fiscal Year
               </th>
             </tr>

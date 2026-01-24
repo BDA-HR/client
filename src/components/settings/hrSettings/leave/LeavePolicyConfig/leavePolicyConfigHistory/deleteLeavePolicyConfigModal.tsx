@@ -2,25 +2,25 @@ import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "../../../../../ui/button";
-import type {LeaveAppChainListDto, UUID } from "../../../../../../types/core/Settings/leaveAppChain";
+import type {
+  LeavePolicyConfigListDto,
+  UUID,
+} from "../../../../../../types/core/Settings/leavePolicyConfig";
 
-interface DeleteAppChainModalProps {
-  appChain: LeaveAppChainListDto | null;
+interface DeleteLeavePolicyConfigModalProps {
+  leavePolicyConfig: LeavePolicyConfigListDto | null;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (appChain: UUID) => void;
 }
 
-const DeleteAppChainModal: React.FC<DeleteAppChainModalProps> = ({
-  appChain,
-  isOpen,
-  onClose,
-  onConfirm,
-}) => {
-  if (!isOpen || !appChain) return null;
+const DeleteLeavePolicyConfigModal: React.FC<
+  DeleteLeavePolicyConfigModalProps
+> = ({ leavePolicyConfig, isOpen, onClose, onConfirm }) => {
+  if (!isOpen || !leavePolicyConfig) return null;
 
   const handleConfirm = () => {
-    onConfirm(appChain.id);
+    onConfirm(leavePolicyConfig.id);
   };
 
   return (
@@ -71,4 +71,4 @@ const DeleteAppChainModal: React.FC<DeleteAppChainModalProps> = ({
   );
 };
 
-export default DeleteAppChainModal;
+export default DeleteLeavePolicyConfigModal;

@@ -19,7 +19,7 @@ const LeaveAppChainSearchFilters: React.FC<LeaveAppChainSearchFiltersProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+      className="bg-white p-4 rounded-t-lg shadow-sm border border-gray-200"
     >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>

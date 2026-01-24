@@ -17,7 +17,7 @@ const itemVariants = {
   },
 };
 
-const leavePolicyConfigHeader = () => {
+const LeavePolicyConfigHistoryHeader = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -66,4 +66,4 @@ const leavePolicyConfigHeader = () => {
   );
 };
 
-export default leavePolicyConfigHeader;
+export default LeavePolicyConfigHistoryHeader;

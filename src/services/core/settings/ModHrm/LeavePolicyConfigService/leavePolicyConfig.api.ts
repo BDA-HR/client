@@ -1,10 +1,11 @@
-import {  api } from "../../../../api";
+import { api } from "../../../../api";
 import type {
   LeavePolicyConfigListDto,
   LeavePolicyConfigAddDto,
   LeavePolicyConfigModDto,
   UUID,
 } from "../../../../../types/core/Settings/leavePolicyConfig";
+
 class LeavePolicyConfigApi {
   private baseUrl = `${
     import.meta.env.VITE_HRMM_LEAVE_URL || "hrm/leave/v1"
@@ -28,8 +29,26 @@ class LeavePolicyConfigApi {
     }
   }
 
+  async getActiveById(id: UUID): Promise<LeavePolicyConfigListDto> {
+    try {
+      const res = await api.get(`${this.baseUrl}/ActivePolicyConfig/${id}`);
+      return res.data.data;
+    } catch (error) {
+      throw new Error(this.extractErrorMessage(error));
+    }
+  }
+
+  async getAllById(id: UUID): Promise<LeavePolicyConfigListDto[]> {
+    try {
+      const res = await api.get(`${this.baseUrl}/AllPolicyConfig/${id}`);
+      return res.data.data;
+    } catch (error) {
+      throw new Error(this.extractErrorMessage(error));
+    }
+  }
+
   async create(
-    data: LeavePolicyConfigAddDto
+    data: LeavePolicyConfigAddDto,
   ): Promise<LeavePolicyConfigListDto> {
     try {
       const res = await api.post(`${this.baseUrl}/AddPolicyConfig`, data);
@@ -40,12 +59,12 @@ class LeavePolicyConfigApi {
   }
 
   async update(
-    data: LeavePolicyConfigModDto
+    data: LeavePolicyConfigModDto,
   ): Promise<LeavePolicyConfigListDto> {
     try {
       const res = await api.put(
         `${this.baseUrl}/ModPolicyConfig/${data.id}`,
-        data
+        data,
       );
       return res.data.data;
     } catch (error) {
@@ -53,9 +72,10 @@ class LeavePolicyConfigApi {
     }
   }
 
-  async delete(id: UUID): Promise<void> {
+  async delete(id: UUID) {
     try {
-      await api.delete(`${this.baseUrl}/DelPolicyConfig/${id}`);
+      const res = await api.delete(`${this.baseUrl}/DelPolicyConfig/${id}`);
+      return res.data.data;
     } catch (error) {
       throw new Error(this.extractErrorMessage(error));
     }
@@ -66,7 +86,9 @@ export const leavePolicyConfigApi = new LeavePolicyConfigApi();
 
 export const leavePolicyConfigFetcher = {
   getById: (id: UUID) => leavePolicyConfigApi.getById(id),
+  getActiveById: (id: UUID) => leavePolicyConfigApi.getActiveById(id),
+  getAllById: (id: UUID) => leavePolicyConfigApi.getAllById(id),
   create: (data: LeavePolicyConfigAddDto) => leavePolicyConfigApi.create(data),
   update: (data: LeavePolicyConfigModDto) => leavePolicyConfigApi.update(data),
-  delete: (id: UUID) => leavePolicyConfigApi.delete(id),
+  delete:(id:UUID) => leavePolicyConfigApi.delete(id),
 };
