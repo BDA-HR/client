@@ -9,7 +9,7 @@ export const ActiveFiscalYear = () => {
   const getActiveFiscalYear = useQuery({
     queryKey: ["fiscalYear", "names"],
     queryFn: async (): Promise<NameListItem[]> => {
-      const res = await api.get(`${baseUrl}/ActiveFiscalYear`);
+      const res = await api.get(`${baseUrl}/ActiveFiscYear`);
       return res.data;
     },
   });
