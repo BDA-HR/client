@@ -61,8 +61,8 @@ const LeavePolicyConfigHistoryTable: React.FC<LeavePolicyHistoryTableProps> = ({
 
   const getStatusColor = (isActive: boolean): string => {
     return isActive
-      ? "bg-green-100 text-green-800 border border-green-200"
-      : "bg-red-100 text-red-800 border border-red-200";
+      ? "bg-green-500 text-white border border-green-200"
+      : "bg-red-500 text-white border border-red-200";
   };
 
   const getBooleanIcon = (value: boolean) => {
@@ -205,11 +205,12 @@ const LeavePolicyConfigHistoryTable: React.FC<LeavePolicyHistoryTableProps> = ({
                     {/* Is Active */}
                     <td className="px-4 py-3 align-middle text-center">
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getBooleanColor(
-                          config.isActiveStr,
+                        className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getStatusColor(
+                          config.isActive
                         )}`}
                       >
-                        {config.isActiveStr}
+                        {getBooleanIcon(config.isActive)}
+                        {config.isActive ? "Yes" : "No"}
                       </span>
                     </td>
 

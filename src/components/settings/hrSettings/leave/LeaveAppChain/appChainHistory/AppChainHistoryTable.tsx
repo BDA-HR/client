@@ -57,7 +57,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
   };
 
   const getStatusColor = (isActive: boolean): string => {
-    return isActive ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200";
+    return isActive ? "bg-green-500 text-white border border-green-200" : "bg-red-500 text-white border border-red-200";
   };
 
   const getBooleanIcon = (value: boolean) => {
@@ -172,12 +172,12 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                     <td className="px-4 py-3 text-center align-middle">
                       <div className="flex gap-1 justify-center">
                         <span
-                          className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
-                            AppChainHistory.isActiveStr,
+                          className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getStatusColor(
+                            AppChainHistory.isActive,
                           )}`}
                         >
                           {getBooleanIcon(AppChainHistory.isActive)}
-                          {AppChainHistory.isActiveStr}
+                          {AppChainHistory.isActive ? "Yes" : "No"}
                         </span>
                       </div>
                     </td>

@@ -6,6 +6,7 @@ import type {
   LeaveAppChainModDto,
 } from "../../../../types/core/Settings/leaveAppChain";
 import type { UUID } from "../../../../types/core/Settings/leavePolicyConfig";
+import type { StatChangeDto } from "../../../../types/core/Settings/statChangeDto";
 
 const baseUrl = `${
   import.meta.env.VITE_HRMM_LEAVE_URL || "hrm/leave/v1"
@@ -106,6 +107,23 @@ export const leaveAppChainServices = (leavePolicyId: UUID) => {
     },
   });
 
+  const changeStatus = useMutation({
+    mutationFn: async (payload: StatChangeDto): Promise<void> => {
+      await api.post(`${baseUrl}/StatAppChain`, payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: leaveAppChainKeys.byPolicy(leavePolicyId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: leaveAppChainKeys.activeByPolicy(leavePolicyId),
+      });
+    },
+    onError: (error) => {
+      throw new Error(extractErrorMessage(error));
+    },
+  });
+
   const remove = useMutation({
     mutationFn: async (id: UUID): Promise<void> => {
       await api.delete(`${baseUrl}/DelAppChain/${id}`);
@@ -124,6 +142,7 @@ export const leaveAppChainServices = (leavePolicyId: UUID) => {
     listByPolicy,
     create,
     update,
+    changeStatus,
     remove,
     activeAppChain
   };

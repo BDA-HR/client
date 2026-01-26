@@ -13,6 +13,7 @@ import {
   useAllPolicyAssignmentRules,
   useUpdatePolicyAssignmentRule,
   useDeletePolicyAssignmentRule,
+  useChangeStatusPolicyAssignmentRule,
 } from "../../../../../../services/core/settings/ModHrm/LeavePolicyAssignmentRule/policyAssignmentRule.query";
 import { ActiveFiscalYear } from "../../../../../../services/core/fyNameList";
 
@@ -35,6 +36,7 @@ const PolicyAssignmentRuleHistorySection: FC<
   // React Query: update & delete
   const updateMutation = useUpdatePolicyAssignmentRule();
   const deleteMutation = useDeletePolicyAssignmentRule();
+  const statusChangeMutation = useChangeStatusPolicyAssignmentRule();
 
   // Local state
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,10 +46,14 @@ const PolicyAssignmentRuleHistorySection: FC<
     useState<PolicyAssignmentRuleListDto | null>(null);
 
   // Filtered results
-  const filteredPolicyAssignmentRules = policyAssignmentRules.filter((rule) =>
-    rule.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rule.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPolicyAssignmentRules = policyAssignmentRules.filter((rule) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      rule.name.toLowerCase().includes(searchLower) ||
+      rule.code.toLowerCase().includes(searchLower) ||
+      (rule.isActive ? 'active' : 'inactive').includes(searchLower)
+    );
+  });
 
   // Edit handlers
   const handleEdit = (rule: PolicyAssignmentRuleListDto) =>
@@ -67,6 +73,19 @@ const PolicyAssignmentRuleHistorySection: FC<
       handleCloseEditModal();
     } catch (err) {
       console.error("Failed to update policy assignment rule:", err);
+    }
+  };
+
+  // Status change handler
+  const handleToggleStatus = async (rule: PolicyAssignmentRuleListDto) => {
+    try {
+      await statusChangeMutation.mutateAsync({
+        id: rule.id,
+        stat: !rule.isActive,
+      });
+      refetch();
+    } catch (err) {
+      console.error("Failed to change status:", err);
     }
   };
 
@@ -150,7 +169,7 @@ const PolicyAssignmentRuleHistorySection: FC<
             policyAssignmentRule={filteredPolicyAssignmentRules}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onToggleStatus={() => {}} // you can implement toggle later
+            onToggleStatus={handleToggleStatus}
           />
         </motion.div>
       )}

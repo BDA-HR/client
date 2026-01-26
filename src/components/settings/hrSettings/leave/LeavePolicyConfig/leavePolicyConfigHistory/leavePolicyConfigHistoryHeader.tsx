@@ -55,7 +55,7 @@ const LeavePolicyConfigHistoryHeader = () => {
               className="inline-block"
             >
               <span className="bg-gradient-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
-                Approval Chain
+                Leave Policy Configuration
               </span>{" "}
               History
             </motion.span>

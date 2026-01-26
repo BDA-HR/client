@@ -2,14 +2,12 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import type { UUID } from "../../../../../types/core/Settings/policyAssignmentRule";
 import PolicyAssignmentRuleTable from "./PolicyAssignmentRuleTable";
-import type { PolicyAssignmentRuleListDto, PolicyAssignmentRuleAddDto, PolicyAssignmentRuleModDto } from "../../../../../types/core/Settings/policyAssignmentRule";
+import type { PolicyAssignmentRuleAddDto } from "../../../../../types/core/Settings/policyAssignmentRule";
 import PolicyAssignmentRuleHeader from "./policyAssignmentRuleHeader";
 import AddPolicyAssignmentRuleModal from "./AddPolicyAssignmentRule";
-import { 
-  useAllPolicyAssignmentRules, 
-  useCreatePolicyAssignmentRule, 
-  useUpdatePolicyAssignmentRule, 
-  useDeletePolicyAssignmentRule 
+import {
+  useActivePolicyAssignmentRule,
+  useCreatePolicyAssignmentRule,
 } from "../../../../../services/core/settings/ModHrm/LeavePolicyAssignmentRule/policyAssignmentRule.query";
 import { useNavigate } from "react-router-dom";
 
@@ -17,48 +15,44 @@ import { useNavigate } from "react-router-dom";
 interface PolicyAssignmentRuleSectionProps {
   leavePolicyId: UUID;
 }
-const PolicyAssignmentRuleSection: React.FC<PolicyAssignmentRuleSectionProps> = ({
-  leavePolicyId,
-}) => {
+const PolicyAssignmentRuleSection: React.FC<
+  PolicyAssignmentRuleSectionProps
+> = ({ leavePolicyId }) => {
   const navigate = useNavigate();
-  const [isAddPolicyAssignmentRuleModalOpen, setIsAddPolicyAssignmentRuleModalOpen] = useState(false);
-  const [editingPolicy, setEditingPolicy] = useState<PolicyAssignmentRuleListDto | null>(null);
-  const [deletingPolicy, setDeletingPolicy] = useState<PolicyAssignmentRuleListDto | null>(null);
+  const [
+    isAddPolicyAssignmentRuleModalOpen,
+    setIsAddPolicyAssignmentRuleModalOpen,
+  ] = useState(false);
 
   // React Query hooks
   const {
-    data: policyAssignmentRules = [],
+    data: activePolicyAssignmentRules = [],
     isLoading,
     isError,
     error,
     refetch,
-  } = useAllPolicyAssignmentRules(leavePolicyId);
+  } = useActivePolicyAssignmentRule(leavePolicyId);
+
+  // Debug: Log the active policy data
+  console.log("Active Policy Assignment Rules:", activePolicyAssignmentRules);
+  console.log("Is Loading:", isLoading);
+  console.log("Is Error:", isError);
+
+  // Use the array directly since API returns an array
+  const policyAssignmentRules = activePolicyAssignmentRules;
 
   const createMutation = useCreatePolicyAssignmentRule();
-  const updateMutation = useUpdatePolicyAssignmentRule();
-  const deleteMutation = useDeletePolicyAssignmentRule();
 
   // CRUD handlers
-  const handleAddPolicyAssignmentRule = async (ruleData: PolicyAssignmentRuleAddDto) => {
+  const handleAddPolicyAssignmentRule = async (
+    ruleData: PolicyAssignmentRuleAddDto,
+  ) => {
     try {
       await createMutation.mutateAsync(ruleData);
       refetch();
       setIsAddPolicyAssignmentRuleModalOpen(false);
     } catch (err) {
       console.error("Failed to create policy assignment rule:", err);
-    }
-  };
-
-  const handleEditPolicyAssignmentRule = async (rule: PolicyAssignmentRuleListDto) => {
-    setEditingPolicy(rule);
-  };
-
-  const handleDeletePolicyAssignmentRule = async (rule: PolicyAssignmentRuleListDto) => {
-    try {
-      await deleteMutation.mutateAsync(rule.id as UUID);
-      refetch();
-    } catch (err) {
-      console.error("Failed to delete policy assignment rule:", err);
     }
   };
 

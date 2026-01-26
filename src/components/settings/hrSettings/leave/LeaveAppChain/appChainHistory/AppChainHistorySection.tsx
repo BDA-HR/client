@@ -18,15 +18,21 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const { listByPolicy, update, remove } = leaveAppChainServices(leavePolicyId);
+  const { listByPolicy, update, changeStatus, remove } = leaveAppChainServices(leavePolicyId);
   const [editingAppChain, setEditingAppChain] = useState<LeaveAppChainListDto | null>(null);
     const [deletingAppChain, setDeletingAppChain] =
       useState<LeaveAppChainListDto | null>(null);
 
   // Filter leave types based on search term
-  const filteredAppChain = appChains.filter((appChains) =>
-    appChains.effectiveFromStr.includes(searchTerm.toLowerCase()),
-  );
+  const filteredAppChain = appChains.filter((appChain) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      appChain.effectiveFromStr.toLowerCase().includes(searchLower) ||
+      appChain.effectiveToStr.toLowerCase().includes(searchLower) ||
+      appChain.isActiveStr.toLowerCase().includes(searchLower) ||
+      appChain.leavePolicy.toLowerCase().includes(searchLower)
+    );
+  });
 
   const fetchAppChains = async () => {
     try {
@@ -97,21 +103,17 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
 
     const handleToggleStatus = async (appChain: LeaveAppChainListDto) => {
       try {
-        const updatedAppChain: LeaveAppChainModDto = {
-          ...appChain,
-          isActive: !appChain.isActive,
-          leavePolicyId: leavePolicyId,
+        const statusPayload = {
+          id: appChain.id,
+          stat: !appChain.isActive,
         };
-        const result = await update.mutateAsync(
-          updatedAppChain as LeaveAppChainModDto,
-        );
-        setAppChains((prev) =>
-          prev.map((ac) => (ac.id === result.id ? result : ac)),
-        );
+        await changeStatus.mutateAsync(statusPayload);
+        // Refetch data instead of manual state update to ensure consistency
+        await fetchAppChains();
         setError(null);
       } catch (err) {
-        console.error("Failed to toggle leave type status:", err);
-        setError("Failed to update leave type status. Please try again.");
+        console.error("Failed to toggle approval chain status:", err);
+        setError("Failed to update approval chain status. Please try again.");
       }
     };
 
@@ -193,7 +195,28 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
         </div>
       )}
 
-      {/* No leave types message - Show when not loading and leaveTypes array is empty */}
+      {/* No leave types message - Show when not loading and filteredAppChain array is empty */}
+      {!loading && filteredAppChain.length === 0 && !error && appChains.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-yellow-50 to-red-100 border-l-4 border-yellow-500 rounded-lg shadow-sm p-6 mb-6"
+        >
+          <div className="flex items-center">
+            <XCircleIcon className="h-5 w-5 text-yellow-400 mr-3" />
+            <div>
+              <h3 className="text-yellow-800 font-medium">
+                No Results Found
+              </h3>
+              <p className="text-yellow-700 text-sm mt-1">
+                No approval chains match your search criteria. Try adjusting your search terms.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* No data message - Show when not loading and appChains array is empty */}
       {!loading && appChains.length === 0 && !error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -204,11 +227,10 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
             <XCircleIcon className="h-5 w-5 text-yellow-400 mr-3" />
             <div>
               <h3 className="text-yellow-800 font-medium">
-                No Leave Types Found
+                No Approval Chains Found
               </h3>
               <p className="text-yellow-700 text-sm mt-1">
-                There are currently no leave types in the system. Please add a
-                leave type to get started.
+                There are currently no approval chains in the system. Please add an approval chain to get started.
               </p>
             </div>
           </div>
@@ -216,7 +238,7 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
       )}
 
       {/* Leave Types Table */}
-      {!loading && appChains.length > 0 && (
+      {!loading && filteredAppChain.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -224,7 +246,7 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
           className="pt-0 pb-0 -mt-2"
         >
           <AppChainHistoryTable
-            AppChainHistorys={appChains}
+            AppChainHistorys={filteredAppChain}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}

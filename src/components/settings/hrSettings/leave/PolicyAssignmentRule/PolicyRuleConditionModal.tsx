@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { X, Settings, Edit, Trash2 } from "lucide-react";
+import { X, Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "../../../../ui/button";
 import { Label } from "../../../../ui/label";
 import { Input } from "../../../../ui/input";
@@ -54,8 +54,10 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
   ruleId,
   ruleName,
 }) => {
-  const [editingCondition, setEditingCondition] = useState<PolicyRuleCondListDto | null>(null);
-  const [deletingCondition, setDeletingCondition] = useState<PolicyRuleCondListDto | null>(null);
+  const [editingCondition, setEditingCondition] =
+    useState<PolicyRuleCondListDto | null>(null);
+  const [deletingCondition, setDeletingCondition] =
+    useState<PolicyRuleCondListDto | null>(null);
   const [formData, setFormData] = useState<ConditionFormData>({
     field: "",
     operator: "",
@@ -101,11 +103,6 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
       // Reset value when field changes
       ...(name === "field" && { value: "" }),
     }));
-  };
-
-  const handleAddCondition = () => {
-    setEditingCondition(null);
-    setFormData({ field: "", operator: "", value: "" });
   };
 
   const handleEditCondition = (condition: PolicyRuleCondListDto) => {
@@ -178,7 +175,10 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
       case "0": // Employment Type
         return Object.entries(EmpType).map(([key, value]) => ({ key, value }));
       case "1": // Employment Nature
-        return Object.entries(EmpNature).map(([key, value]) => ({ key, value }));
+        return Object.entries(EmpNature).map(([key, value]) => ({
+          key,
+          value,
+        }));
       case "2": // Gender
         return Object.entries(Gender).map(([key, value]) => ({ key, value }));
       case "4": // Disability Status
@@ -207,8 +207,9 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
 
   const renderValueInput = () => {
     const valueOptions = getValueOptions(formData.field);
-    
-    if (formData.field === "3") { // Service Year - input field
+
+    if (formData.field === "3") {
+      // Service Year - input field
       return (
         <Input
           name="value"
@@ -216,19 +217,20 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
           value={formData.value}
           onChange={handleInputChange}
           placeholder="Enter service years"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors"
+          className="w-full h-9 text-sm"
           min="0"
         />
       );
     }
 
-    if (valueOptions.length > 0) { // Dropdown for other fields
+    if (valueOptions.length > 0) {
+      // Dropdown for other fields
       return (
         <Select
           value={formData.value}
           onValueChange={(value) => handleSelectChange("value", value)}
         >
-          <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900 hover:border-gray-400 transition-colors">
+          <SelectTrigger className="w-full h-9 text-sm">
             <SelectValue placeholder="Select value" />
           </SelectTrigger>
           <SelectContent>
@@ -248,7 +250,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
         value={formData.value}
         onChange={handleInputChange}
         placeholder="Enter value"
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors"
+        className="w-full h-9 text-sm"
       />
     );
   };
@@ -258,10 +260,12 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
     value,
   }));
 
-  const operatorOptions = Object.entries(ConditionOperator).map(([key, value]) => ({
-    key,
-    value,
-  }));
+  const operatorOptions = Object.entries(ConditionOperator).map(
+    ([key, value]) => ({
+      key,
+      value,
+    }),
+  );
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -282,54 +286,51 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-6xl w-full h-[90vh] flex flex-col"
+        className="bg-white rounded-lg shadow-xl max-w-6xl w-full h-[80vh] flex flex-col"
       >
-        {/* Header - Fixed */}
-        <div className="flex justify-between items-center border-b px-6 py-4 bg-white rounded-t-xl">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Settings size={20} className="text-green-600" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-800">
-                Rule Conditions
-              </h2>
-              <p className="text-sm text-gray-600">
-                Configure conditions for "{ruleName}"
-              </p>
-            </div>
+        {/* Header */}
+        <div className="flex justify-between items-center border-b px-6 py-4 bg-white">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Rule Conditions
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Configure conditions for "{ruleName}"
+            </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Body - Scrollable */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-y-auto px-6 py-4">
-            {/* Add/Edit Condition Form - Always Visible */}
-            <div className="mb-6 p-6 border border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-sm">
+        {/* Body - 25% Form / 75% Table Layout */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Side - Form (25%) */}
+          <div className="w-2/5 border-r border-gray-200 p-4 bg-white">
+            <div className="h-full flex flex-col">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {editingCondition ? "Edit Condition" : "Add New Condition"}
+                <Plus size={16} className="text-green-600" />
+                <h3 className="text-base font-semibold text-gray-900">
+                  {editingCondition ? "Edit" : "Add"} Condition
                 </h3>
               </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+
+              <div className="space-y-4 flex-1">
                 {/* Field */}
-                <div className="space-y-2">
-                  <Label className="block text-sm font-semibold text-gray-700">
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-gray-700">
                     Field <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={formData.field}
-                    onValueChange={(value) => handleSelectChange("field", value)}
+                    onValueChange={(value) =>
+                      handleSelectChange("field", value)
+                    }
                   >
-                    <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900 hover:border-gray-400 transition-colors">
+                    <SelectTrigger className="w-full h-9 text-sm">
                       <SelectValue placeholder="Select field" />
                     </SelectTrigger>
                     <SelectContent>
@@ -343,15 +344,17 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
                 </div>
 
                 {/* Operator */}
-                <div className="space-y-2">
-                  <Label className="block text-sm font-semibold text-gray-700">
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-gray-700">
                     Operator <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={formData.operator}
-                    onValueChange={(value) => handleSelectChange("operator", value)}
+                    onValueChange={(value) =>
+                      handleSelectChange("operator", value)
+                    }
                   >
-                    <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white text-gray-900 hover:border-gray-400 transition-colors">
+                    <SelectTrigger className="w-full h-9 text-sm">
                       <SelectValue placeholder="Select operator" />
                     </SelectTrigger>
                     <SelectContent>
@@ -365,134 +368,160 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
                 </div>
 
                 {/* Value */}
-                <div className="space-y-2">
-                  <Label className="block text-sm font-semibold text-gray-700">
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-gray-700">
                     Value <span className="text-red-500">*</span>
                   </Label>
                   {renderValueInput()}
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              {/* Form Actions */}
+              <div className="space-y-2 ">
                 <Button
                   onClick={handleSaveCondition}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm transition-all duration-200 hover:shadow-md"
-                  disabled={!formData.field || !formData.operator || !formData.value}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white h-9 text-sm"
+                  disabled={
+                    !formData.field || !formData.operator || !formData.value
+                  }
                 >
-                  {editingCondition ? "Update Condition" : "Add Condition"}
+                  {editingCondition ? "Update" : "Add"}
                 </Button>
                 {editingCondition && (
                   <Button
                     onClick={handleCancelCondition}
                     variant="outline"
-                    className="px-6 py-2 rounded-lg font-medium border-gray-300 hover:bg-gray-50 transition-colors"
+                    className="w-full h-9 text-sm"
                   >
                     Cancel
                   </Button>
                 )}
-                {!editingCondition && (formData.field || formData.operator || formData.value) && (
-                  <Button
-                    onClick={handleAddCondition}
-                    variant="outline"
-                    className="px-6 py-2 rounded-lg font-medium border-gray-300 hover:bg-gray-50 transition-colors"
-                  >
-                    Clear Form
-                  </Button>
-                )}
               </div>
             </div>
+          </div>
 
-            {/* Conditions List */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Configured Conditions
-                    </h3>
-                    <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      {conditions.length}
-                    </span>
-                  </div>
+          {/* Right Side - Table (75%) */}
+          <div className="w-3/5 flex flex-col bg-white">
+            {/* Table Container */}
+            <div className="flex-1 overflow-hidden">
+              <div className="rounded-lg shadow-sm overflow-hidden bg-white h-full flex flex-col">
+                <div className="overflow-x-auto flex-1">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          #
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Field
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Operator
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Value
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {conditions.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-12 text-center">
+                            <div className="flex flex-col items-center">
+                              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                <Plus size={20} className="text-gray-400" />
+                              </div>
+                              <p className="text-gray-500 font-medium mb-1">
+                                No conditions configured
+                              </p>
+                              <p className="text-gray-400 text-sm">
+                                Add your first condition using the form
+                              </p>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        conditions.map((condition, index) => (
+                          <motion.tr
+                            key={condition.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="hover:bg-gray-50 transition-colors"
+                          >
+                            {/* Index */}
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="flex items-center justify-center w-6 h-6 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                {index + 1}
+                              </div>
+                            </td>
+
+                            {/* Field */}
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">
+                                {condition.fieldStr}
+                              </div>
+                            </td>
+
+                            {/* Operator */}
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {condition.operatorStr}
+                              </div>
+                            </td>
+
+                            {/* Value */}
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">
+                                {getDisplayValue(
+                                  condition.field,
+                                  condition.value,
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="px-4 py-3 whitespace-nowrap text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <button
+                                  onClick={() => handleEditCondition(condition)}
+                                  className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                  title="Edit condition"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteCondition(condition)
+                                  }
+                                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  title="Delete condition"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </motion.tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              
-              {conditions.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Settings size={24} className="text-gray-400" />
-                  </div>
-                  <p className="text-gray-500 text-lg font-medium mb-2">No conditions configured</p>
-                  <p className="text-gray-400 text-sm">Add your first condition using the form above</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-200">
-                  {conditions.map((condition, index) => (
-                    <motion.div
-                      key={condition.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="p-4 hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center justify-center w-6 h-6 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
-                              {index + 1}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-gray-900">
-                                {condition.fieldStr}
-                              </span>
-                              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">
-                                {condition.operatorStr}
-                              </span>
-                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
-                                {getDisplayValue(condition.field, condition.value)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleEditCondition(condition)}
-                            className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-150"
-                            title="Edit condition"
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCondition(condition)}
-                            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-150"
-                            title="Delete condition"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Footer - Fixed */}
-        <div className="border-t px-6 py-4 bg-gray-50 rounded-b-xl">
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-600">
-              {conditions.length > 0 && (
-                <span>
-                  Total conditions: <span className="font-semibold text-gray-800">{conditions.length}</span>
-                </span>
-              )}
-            </div>
+        {/* Footer */}
+        <div className="border-t px-6 py-4 bg-white">
+          <div className="flex justify-end">
             <Button
               onClick={handleClose}
               variant="outline"
-              className="px-6 py-2 rounded-lg font-medium border-gray-300 hover:bg-gray-100 transition-colors"
+              className="px-6 py-2"
             >
               Close
             </Button>

@@ -140,7 +140,14 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
                   </td>
                   {/* isActive */}
                   <td className="px-4 py-3 align-middle text-center">
-                    {leavePolicyConfig.isActiveStr}
+                    <span
+                      className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getBooleanColor(
+                        leavePolicyConfig.isActive
+                      )}`}
+                    >
+                      {getBooleanIcon(leavePolicyConfig.isActive)}
+                      {leavePolicyConfig.isActive ? "Yes" : "No"}
+                    </span>
                   </td>
                   {/* fiscalYear */}
                   <td className="px-4 py-3 align-middle text-center">

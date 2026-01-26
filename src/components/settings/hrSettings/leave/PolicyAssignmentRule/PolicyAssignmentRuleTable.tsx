@@ -163,15 +163,14 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                   </td>
 
                   {/* Actions */}
-                  <td className="px-4 py-3 align-middle text-center">
+                  <td className="px-4 py-3 text-center">
                     <Button
                       onClick={() => handleConditionClick(policyAssignmentRule)}
                       variant="outline"
                       size="sm"
-                      className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 border-blue-200"
+                      className="gap-2 hover:bg-green-50 hover:text-green-600"
                     >
                       <Settings size={16} />
-                      Condition Setting
                     </Button>
                   </td>
                 </motion.tr>

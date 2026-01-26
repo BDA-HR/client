@@ -5,6 +5,7 @@ import type {
   LeavePolicyConfigModDto,
   UUID,
 } from "../../../../../types/core/Settings/leavePolicyConfig";
+import type { StatChangeDto } from "../../../../../types/core/Settings/statChangeDto";
 
 class LeavePolicyConfigApi {
   private baseUrl = `${
@@ -72,6 +73,14 @@ class LeavePolicyConfigApi {
     }
   }
 
+  async changeStatus(data: StatChangeDto): Promise<void> {
+    try {
+      await api.post(`${this.baseUrl}/StatPolicyConfig`, data);
+    } catch (error) {
+      throw new Error(this.extractErrorMessage(error));
+    }
+  }
+
   async delete(id: UUID) {
     try {
       const res = await api.delete(`${this.baseUrl}/DelPolicyConfig/${id}`);
@@ -90,5 +99,6 @@ export const leavePolicyConfigFetcher = {
   getAllById: (id: UUID) => leavePolicyConfigApi.getAllById(id),
   create: (data: LeavePolicyConfigAddDto) => leavePolicyConfigApi.create(data),
   update: (data: LeavePolicyConfigModDto) => leavePolicyConfigApi.update(data),
+  changeStatus: (data: StatChangeDto) => leavePolicyConfigApi.changeStatus(data),
   delete:(id:UUID) => leavePolicyConfigApi.delete(id),
 };

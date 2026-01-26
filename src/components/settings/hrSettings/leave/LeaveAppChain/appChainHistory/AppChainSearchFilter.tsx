@@ -38,7 +38,7 @@ const AppChainSearchFilters: React.FC<AppChainSearchFiltersProps> = ({
             <input
               id="leave-search"
               name="leave-search"
-              placeholder="Search Leave Types"
+              placeholder="Search by date, status, or policy..."
               className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

@@ -48,15 +48,15 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
 
   const getBooleanColor = (value: boolean): string => {
     return value
-      ? "bg-green-100 text-green-800 border border-green-200"
-      : "bg-red-100 text-red-800 border border-red-200";
+      ? "bg-green-500 text-white border border-green-200"
+      : "bg-red-500 text-white border border-red-200";
   };
 
   const getBooleanIcon = (value: boolean) => {
     return value ? (
-      <CheckCircle className="h-4 w-4 text-green-600" />
+      <CheckCircle className="h-3 w-3 text-white" />
     ) : (
-      <XCircle className="h-4 w-4 text-red-600" />
+      <XCircle className="h-3 w-3 text-white" />
     );
   };
 

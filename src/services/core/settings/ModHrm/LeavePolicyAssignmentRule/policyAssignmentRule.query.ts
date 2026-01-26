@@ -15,6 +15,7 @@ import type {
   PolicyAssignmentRuleModDto,
   UUID,
 } from "../../../../../types/core/Settings/policyAssignmentRule";
+import type { StatChangeDto } from "../../../../../types/core/Settings/statChangeDto";
 
 // Get by ID
 export const usePolicyAssignmentRule = (
@@ -32,7 +33,7 @@ export const usePolicyAssignmentRule = (
 // Get Active by ID
 export const useActivePolicyAssignmentRule = (
   id: UUID,
-  options?: UseQueryOptions<PolicyAssignmentRuleListDto>,
+  options?: UseQueryOptions<PolicyAssignmentRuleListDto[]>,
 ) => {
   return useQuery({
     queryKey: policyAssignmentRuleKeys.active(id),
@@ -88,6 +89,23 @@ export const useUpdatePolicyAssignmentRule = (
 
   return useMutation({
     mutationFn: policyAssignmentRuleFetcher.update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: policyAssignmentRuleKeys.all,
+      });
+    },
+    ...options,
+  });
+};
+
+// Change Status
+export const useChangeStatusPolicyAssignmentRule = (
+  options?: UseMutationOptions<void, Error, StatChangeDto>,
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: policyAssignmentRuleFetcher.changeStatus,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: policyAssignmentRuleKeys.all,

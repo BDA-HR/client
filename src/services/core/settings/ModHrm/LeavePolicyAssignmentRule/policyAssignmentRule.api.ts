@@ -5,6 +5,7 @@ import type {
   PolicyAssignmentRuleModDto,
   UUID,
 } from "../../../../../types/core/Settings/policyAssignmentRule";
+import type { StatChangeDto } from "../../../../../types/core/Settings/statChangeDto";
 
 class PolicyAssignmentRuleApi {
   private baseUrl = `${
@@ -31,7 +32,7 @@ class PolicyAssignmentRuleApi {
   }
 
   // Get Active by ID
-  async getActiveById(id: UUID): Promise<PolicyAssignmentRuleListDto> {
+  async getActiveById(id: UUID): Promise<PolicyAssignmentRuleListDto[]> {
     try {
       const res = await api.get(`${this.baseUrl}/ActivePolicyAssRule/${id}`);
       return res.data.data;
@@ -77,6 +78,15 @@ class PolicyAssignmentRuleApi {
     }
   }
 
+  // Change Status
+  async changeStatus(data: StatChangeDto): Promise<void> {
+    try {
+      await api.post(`${this.baseUrl}/StatPolicyAssRule`, data);
+    } catch (error) {
+      throw new Error(this.extractErrorMessage(error));
+    }
+  }
+
   // Delete
   async delete(id: UUID) {
     try {
@@ -98,5 +108,7 @@ export const policyAssignmentRuleFetcher = {
     policyAssignmentRuleApi.create(data),
   update: (data: PolicyAssignmentRuleModDto) =>
     policyAssignmentRuleApi.update(data),
+  changeStatus: (data: StatChangeDto) =>
+    policyAssignmentRuleApi.changeStatus(data),
   delete: (id: UUID) => policyAssignmentRuleApi.delete(id),
 };

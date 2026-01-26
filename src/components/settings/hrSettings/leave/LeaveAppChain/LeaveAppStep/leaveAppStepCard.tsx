@@ -51,7 +51,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
       }}
     >
       <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm rounded-b-lg rounded-t-none">
-        <CardContent className="p-4">
+        <CardContent>
           {/* Header with Effective Dates */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -184,7 +184,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                         {/* Connector Line */}
                         {!isLast && (
                           <div className="flex-1 flex items-center justify-center px-2">
-                            <div className="w-full h-0.5 bg-gradient-to-r from-gray-300 via-gray-300 to-gray-400 dark:from-gray-600 dark:via-gray-600 dark:to-gray-700 relative min-w-8">
+                            <div className="w-full h-0.5 bg-linear-to-r from-gray-300 via-gray-300 to-gray-400 dark:from-gray-600 dark:via-gray-600 dark:to-gray-700 relative min-w-8">
                               {/* Arrow head */}
                               <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
                                 <div className="w-0 h-0 border-t-[3px] border-b-[3px] border-l-[5px] border-t-transparent border-b-transparent border-l-gray-400 dark:border-l-gray-600"></div>

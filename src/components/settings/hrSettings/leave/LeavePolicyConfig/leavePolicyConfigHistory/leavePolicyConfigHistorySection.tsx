@@ -13,6 +13,7 @@ import {
   useAllLeavePolicyConfigs,
   useUpdateLeavePolicyConfig,
   useDeleteLeavePolicyConfig,
+  useChangeStatusLeavePolicyConfig,
 } from "../../../../../../services/core/settings/ModHrm/LeavePolicyConfigService/leavePolicyConfig.queries";
 import { ActiveFiscalYear } from "../../../../../../services/core/fyNameList";
 
@@ -35,6 +36,7 @@ const LeavePolicyConfigHistorySection: FC<
   // React Query: update & delete
   const updateMutation = useUpdateLeavePolicyConfig();
   const deleteMutation = useDeleteLeavePolicyConfig();
+  const statusChangeMutation = useChangeStatusLeavePolicyConfig();
 
   // Local state
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,14 +46,23 @@ const LeavePolicyConfigHistorySection: FC<
     useState<LeavePolicyConfigListDto | null>(null);
 
   // Filtered results
-  const filteredLeavePolicyConfigs = leavePolicyConfigs.filter((config) =>
-    config.accrualFrequencyStr.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredLeavePolicyConfigs = leavePolicyConfigs.filter((config) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      config.accrualFrequencyStr.toLowerCase().includes(searchLower) ||
+      config.createdDate?.toLowerCase().includes(searchLower) ||
+      (config.isActive ? 'active' : 'inactive').includes(searchLower)
+    );
+  });
 
   // Edit handlers
   const handleEdit = (config: LeavePolicyConfigListDto) =>
     setEditingLeavePolicyConfig(config);
   const handleCloseEditModal = () => setEditingLeavePolicyConfig(null);
+  
+  // Delete handlers
+  const handleDelete = (config: LeavePolicyConfigListDto) =>
+    setDeletingLeavePolicyConfig(config);
 
   const handleEditLeavePolicyConfig = async (
     updated: LeavePolicyConfigModDto,
@@ -69,9 +80,18 @@ const LeavePolicyConfigHistorySection: FC<
     }
   };
 
-  // Delete handlers
-  const handleDelete = (config: LeavePolicyConfigListDto) =>
-    setDeletingLeavePolicyConfig(config);
+  // Status change handler
+  const handleToggleStatus = async (config: LeavePolicyConfigListDto) => {
+    try {
+      await statusChangeMutation.mutateAsync({
+        id: config.id,
+        stat: !config.isActive,
+      });
+      refetch();
+    } catch (err) {
+      console.error("Failed to change status:", err);
+    }
+  };
   const handleCloseDeleteModal = () => setDeletingLeavePolicyConfig(null);
 
   const handleDeleteLeavePolicyConfig = async () => {
@@ -151,7 +171,7 @@ const LeavePolicyConfigHistorySection: FC<
             leavePolicyConfig={filteredLeavePolicyConfigs}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onToggleStatus={() => {}} // you can implement toggle later
+            onToggleStatus={handleToggleStatus}
           />
         </motion.div>
       )}

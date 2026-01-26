@@ -13,6 +13,7 @@ import type {
   LeavePolicyConfigModDto,
   UUID,
 } from "../../../../../types/core/Settings/leavePolicyConfig";
+import type { StatChangeDto } from "../../../../../types/core/Settings/statChangeDto";
 
 export const useLeavePolicyConfig = (
   id: UUID | undefined,
@@ -117,5 +118,24 @@ export const useDeleteLeavePolicyConfig = () => {
         queryKey: leavePolicyConfigKeys.list(id),
       });
     },
+  });
+};
+
+export const useChangeStatusLeavePolicyConfig = (
+  options?: Omit<
+    UseMutationOptions<void, Error, StatChangeDto>,
+    "mutationFn"
+  >,
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: leavePolicyConfigFetcher.changeStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: leavePolicyConfigKeys.all,
+      });
+    },
+    ...options,
   });
 };
