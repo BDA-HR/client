@@ -87,8 +87,6 @@ const PolicyAssignmentRuleSection: React.FC<PolicyAssignmentRuleSectionProps> = 
           >
             <PolicyAssignmentRuleTable
               policyAssignmentRule={policyAssignmentRules}
-              onEdit={handleEditPolicyAssignmentRule}
-              onDelete={handleDeletePolicyAssignmentRule}
             />
           </motion.div>
         )}

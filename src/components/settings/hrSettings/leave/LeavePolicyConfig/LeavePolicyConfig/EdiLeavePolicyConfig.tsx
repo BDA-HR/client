@@ -12,6 +12,7 @@ import type {
   LeavePolicyConfigListDto,
 } from "../../../../../../types/core/Settings/leavePolicyConfig";
 import type { NameListItem } from "../../../../../../types/NameList/nameList";
+import { AccrualFrequency } from "../../../../../../types/core/enum";
 
 import toast from 'react-hot-toast';
 import { useLeavePolicyConfig, useUpdateLeavePolicyConfig } from '../../../../../../services/core/settings/ModHrm/LeavePolicyConfigService/leavePolicyConfig.queries';
@@ -59,18 +60,25 @@ const EditLeavePolicyConfigModal: React.FC<EditLeavePolicyConfigModalProps> = ({
   const [listError, setListError] = useState<string | null>(null);
 
   // Accrual frequency options
-  const accrualFrequencyOptions = [
-    { id: '0', name: 'Monthly' },
-    { id: '1', name: 'Yearly' }
-  ];
+  const accrualFrequencyOptions = Object.entries(AccrualFrequency).map(
+    ([key, value]) => ({
+      id: key,
+      name: value,
+    }),
+  );
 
   // When config data is fetched, convert it to ModDto
   useEffect(() => {
     if (configData) {
+      // Convert accrualFrequencyStr back to enum key for the form
+      const accrualFrequencyKey = Object.entries(AccrualFrequency).find(
+        ([key, value]) => value === configData.accrualFrequencyStr
+      )?.[0] || configData.accrualFrequency || "";
+
       const modDto: LeavePolicyConfigModDto = {
         id: configData.id,
         annualEntitlement: configData.annualEntitlement,
-        accrualFrequency: configData.accrualFrequency,
+        accrualFrequency: accrualFrequencyKey,
         accrualRate: configData.accrualRate,
         maxDaysPerReq: configData.maxDaysPerReq,
         maxCarryOverDays: configData.maxCarryOverDays,

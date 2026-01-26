@@ -120,78 +120,85 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                 </p>
               </div>
             ) : (
-              <div className="flex items-center justify-between px-2 rounded-b-lg">
-                {steps.map((step, index) => {
-                  const isLast = index === steps.length - 1;
+              <div className="relative py-4">
+                <div className="flex items-center justify-between">
+                  {steps.map((step, index) => {
+                    const isLast = index === steps.length - 1;
+                    const stepWidth = steps.length <= 2 ? 'w-48' : steps.length === 3 ? 'w-40' : 'w-32';
 
-                  return (
-                    <div key={step.id} className="relative flex items-center">
-                      {/* Step Card */}
-                      <div className="relative z-10 flex flex-col items-center w-48">
-                        {/* Step Info */}
-                        <div className="text-center w-full px-1">
-                          <div className="flex flex-col items-center gap-1.5 mb-2">
-                            <Avatar className="h-16 w-16 border-2 border-white dark:border-gray-800 shadow-sm">
-                              <AvatarImage
-                                src="https://i.pravatar.cc/150?u=john.manager@company.com"
-                                alt={step.employee ?? "Unassigned"}
-                              />
-                              <AvatarFallback className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
-                                {step.employee ??
-                                  "Unassigned"
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")
-                                    .toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                              {step.employee}
-                            </p>
-                            <span className="flex">
-                              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium  border-2 border-white dark:border-gray-900 shadow-sm">
-                                {step.stepOrder}
-                              </span>
-                              <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate mb-1.5 pt-1">
-                                {step.stepName}
-                              </h4>
-                            </span>
-                          </div>
-
-                          <Badge
-                            variant="outline"
-                            className={`text-sm px-3 py-0.5 ${getRoleColor(
-                              ApprovalRole[
-                                step.role as keyof typeof ApprovalRole
-                              ],
-                            )}`}
-                          >
-                            {
-                              ApprovalRole[
-                                step.role as keyof typeof ApprovalRole
-                              ]
-                            }
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {/* Connector Line */}
-                      {!isLast && (
-                        <div className="absolute left-full top-6 w-64 h-0.5">
-                          <div className="w-full h-full bg-gradient-to-r from-gray-300 via-gray-300 to-gray-400 dark:from-gray-600 dark:via-gray-600 dark:to-gray-700 relative">
-                            {/* Arrow head */}
-                            <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
-                              <div className="w-0 h-0 border-t-[4px] border-b-[4px] border-l-[6px] border-t-transparent border-b-transparent border-l-gray-400 dark:border-l-gray-600"></div>
+                    return (
+                      <React.Fragment key={step.id}>
+                        {/* Step Card */}
+                        <div className={`relative flex flex-col items-center ${stepWidth} flex-shrink-0`}>
+                          {/* Step Info */}
+                          <div className="text-center w-full px-2">
+                            <div className="flex flex-col items-center gap-2 mb-3">
+                              <div className="relative">
+                                <Avatar className="h-12 w-12 border-2 border-white dark:border-gray-800 shadow-sm">
+                                  <AvatarImage
+                                    src="https://i.pravatar.cc/150?u=john.manager@company.com"
+                                    alt={step.employee ?? "Unassigned"}
+                                  />
+                                  <AvatarFallback className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                                    {step.employee ??
+                                      "Unassigned"
+                                        .split(" ")
+                                        .map((n) => n[0])
+                                        .join("")
+                                        .toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                {/* Step Number Badge */}
+                                <div className="absolute -bottom-1 -right-1 flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white text-xs font-semibold border-2 border-white dark:border-gray-900 shadow-sm">
+                                  {step.stepOrder}
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-full">
+                                  {step.stepName}
+                                </p>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 truncate max-w-full">
+                                  {step.employee || "Unassigned"}
+                                </p>
+                              </div>
                             </div>
 
-                            {/* Dotted line effect */}
-                            <div className="absolute inset-0 border-t border-dashed border-gray-200 dark:border-gray-700 opacity-30"></div>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs px-2 py-1 ${getRoleColor(
+                                ApprovalRole[
+                                  step.role as keyof typeof ApprovalRole
+                                ],
+                              )}`}
+                            >
+                              {
+                                ApprovalRole[
+                                  step.role as keyof typeof ApprovalRole
+                                ]
+                              }
+                            </Badge>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+
+                        {/* Connector Line */}
+                        {!isLast && (
+                          <div className="flex-1 flex items-center justify-center px-2">
+                            <div className="w-full h-0.5 bg-gradient-to-r from-gray-300 via-gray-300 to-gray-400 dark:from-gray-600 dark:via-gray-600 dark:to-gray-700 relative min-w-8">
+                              {/* Arrow head */}
+                              <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+                                <div className="w-0 h-0 border-t-[3px] border-b-[3px] border-l-[5px] border-t-transparent border-b-transparent border-l-gray-400 dark:border-l-gray-600"></div>
+                              </div>
+                              
+                              {/* Dotted overlay for visual interest */}
+                              <div className="absolute inset-0 border-t border-dashed border-gray-200 dark:border-gray-700 opacity-40"></div>
+                            </div>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

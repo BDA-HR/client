@@ -1,34 +1,34 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  MoreVertical,
-  PenBox,
   CheckCircle,
   XCircle,
-  Trash2,
+  Settings,
 } from "lucide-react";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "../../../../ui/popover";
+import { Button } from "../../../../ui/button";
 import type { PolicyAssignmentRuleListDto } from "../../../../../types/core/Settings/policyAssignmentRule";
+import PolicyRuleConditionModal from "./PolicyRuleConditionModal";
 
 interface PolicyAssignmentRuleProps {
   policyAssignmentRule: PolicyAssignmentRuleListDto[];
-  onEdit: (leaveType: PolicyAssignmentRuleListDto) => void;
-  onDelete: (leaveType: PolicyAssignmentRuleListDto) => void;
-  onToggleStatus?: (leaveType: PolicyAssignmentRuleListDto) => void;
 }
 
 
 const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
   policyAssignmentRule,
-  onEdit,
-  onDelete,
-  onToggleStatus,
 }) => {
-  const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
+  const [conditionModalOpen, setConditionModalOpen] = useState(false);
+  const [selectedRule, setSelectedRule] = useState<PolicyAssignmentRuleListDto | null>(null);
+
+  const handleConditionClick = (rule: PolicyAssignmentRuleListDto) => {
+    setSelectedRule(rule);
+    setConditionModalOpen(true);
+  };
+
+  const handleCloseConditionModal = () => {
+    setConditionModalOpen(false);
+    setSelectedRule(null);
+  };
 
   const getBooleanColor = (value: boolean) =>
     value
@@ -80,7 +80,7 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                 Effective To
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+               Condition
               </th>
             </tr>
           </thead>
@@ -163,57 +163,16 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                   </td>
 
                   {/* Actions */}
-                  <td className="px-4 py-3 align-middle text-right text-sm font-medium">
-                    <Popover
-                      open={popoverOpen === policyAssignmentRule.id}
-                      onOpenChange={(open) =>
-                        setPopoverOpen(open ? policyAssignmentRule.id : null)
-                      }
+                  <td className="px-4 py-3 align-middle text-center">
+                    <Button
+                      onClick={() => handleConditionClick(policyAssignmentRule)}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 border-blue-200"
                     >
-                      <PopoverTrigger asChild>
-                        <button className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100">
-                          <MoreVertical className="h-5 w-5" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48 p-0" align="end">
-                        <div className="py-1">
-                          <button
-                            onClick={() => onEdit(policyAssignmentRule)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                          >
-                            <PenBox size={16} />
-                            Edit
-                          </button>
-                          {onToggleStatus && (
-                            <button
-                              onClick={() =>
-                                onToggleStatus(policyAssignmentRule)
-                              }
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 text-gray-700"
-                            >
-                              {policyAssignmentRule.isActive ? (
-                                <>
-                                  <XCircle size={16} />
-                                  Deactivate
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle size={16} />
-                                  Activate
-                                </>
-                              )}
-                            </button>
-                          )}
-                          <button
-                            onClick={() => onDelete(policyAssignmentRule)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                          >
-                            <Trash2 size={16} />
-                            Delete
-                          </button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                      <Settings size={16} />
+                      Condition Setting
+                    </Button>
                   </td>
                 </motion.tr>
               ))
@@ -221,6 +180,16 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
           </tbody>
         </table>
       </div>
+
+      {/* Condition Modal */}
+      {selectedRule && (
+        <PolicyRuleConditionModal
+          isOpen={conditionModalOpen}
+          onClose={handleCloseConditionModal}
+          ruleId={selectedRule.id}
+          ruleName={selectedRule.name}
+        />
+      )}
     </motion.div>
   );
 };

@@ -118,7 +118,7 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
 
                   {/* accrualFrequency */}
                   <td className="px-4 py-3 align-middle text-center">
-                    {leavePolicyConfig.accrualFrequency}
+                    {leavePolicyConfig.accrualFrequencyStr}
                   </td>
                   {/* accrualRate */}
                   <td className="px-4 py-3 align-middle text-center">

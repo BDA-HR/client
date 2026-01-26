@@ -88,10 +88,15 @@ const EditLeavePolicyConfigModal: React.FC<EditLeavePolicyConfigModalProps> = ({
 
       const fiscalYearId = (fiscalYearItem?.id as UUID) || activeFiscalYearId;
 
+      // Convert accrualFrequencyStr back to enum key for the form
+      const accrualFrequencyKey = Object.entries(AccrualFrequency).find(
+        ([key, value]) => value === leavePolicyConfig.accrualFrequencyStr
+      )?.[0] || leavePolicyConfig.accrualFrequency || "";
+
       setFormData({
         id: leavePolicyConfig.id,
         annualEntitlement: leavePolicyConfig.annualEntitlement || 0,
-        accrualFrequency: leavePolicyConfig.accrualFrequency || "",
+        accrualFrequency: accrualFrequencyKey,
         accrualRate: leavePolicyConfig.accrualRate || 0,
         maxDaysPerReq: leavePolicyConfig.maxDaysPerReq || 0,
         maxCarryOverDays: leavePolicyConfig.maxCarryOverDays || 0,
