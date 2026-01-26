@@ -22,31 +22,29 @@ const extractErrorMessage = (error: any): string => {
 
 export const leaveAppStepKeys = {
   all: ["leave-app-step"] as const,
-  byChain: (leaveAppChainId: UUID) =>
-    [...leaveAppStepKeys.all, "chain", leaveAppChainId] as const,
+  byChain: (leavePolicyId: UUID) =>
+    [...leaveAppStepKeys.all, "chain", leavePolicyId] as const,
   byId: (id: UUID) => [...leaveAppStepKeys.all, id] as const,
 };
 
-export const leaveAppStepServices = (leaveAppChainId?: UUID) => {
+export const leaveAppStepServices = (leavePolicyId?: UUID) => {
   const queryClient = useQueryClient();
 
   const listByChain = useQuery({
-    queryKey: leaveAppChainId
-      ? leaveAppStepKeys.byChain(leaveAppChainId)
-      : ["disabled"],
+    queryKey: leavePolicyId ? leaveAppStepKeys.byChain(leavePolicyId) : [],
     queryFn: async (): Promise<LeaveAppStepListDto[]> => {
-      if (!leaveAppChainId) {
-        throw new Error("leaveAppChainId is required");
+      if (!leavePolicyId) {
+        throw new Error("leavePolicyId is required");
       }
-      console.log("📞 Fetching steps for chain ID:", leaveAppChainId);
+      console.log("📞 Fetching steps for Policy ID:", leavePolicyId);
       console.log(
         "📞 Endpoint:",
-        `${baseUrl}/AllLeaveAppStep/${leaveAppChainId}`,
+        `${baseUrl}/AllLeaveAppStep/${leavePolicyId}`,
       );
 
       try {
         const res = await api.get(
-          `${baseUrl}/AllLeaveAppStep/${leaveAppChainId}`,
+          `${baseUrl}/AllLeaveAppStep/${leavePolicyId}`,
         );
         console.log("✅ Steps response:", res.data);
         return res.data.data;
@@ -56,8 +54,8 @@ export const leaveAppStepServices = (leaveAppChainId?: UUID) => {
 
         if (error.response?.status === 400) {
           console.error(
-            "❌ 400 Bad Request - Check if chain ID is valid:",
-            leaveAppChainId,
+            "❌ 400 Bad Request - Check if Policy ID is valid:",
+            leavePolicyId,
           );
           // Return empty array instead of throwing
           return [];
@@ -65,7 +63,7 @@ export const leaveAppStepServices = (leaveAppChainId?: UUID) => {
         throw error;
       }
     },
-    enabled: !!leaveAppChainId,
+    enabled: !!leavePolicyId,
   });
 
   const create = useMutation({
@@ -75,10 +73,12 @@ export const leaveAppStepServices = (leaveAppChainId?: UUID) => {
       const res = await api.post(`${baseUrl}/AddLeaveAppStep`, payload);
       return res.data.data;
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
+       if (leavePolicyId) {
       queryClient.invalidateQueries({
-        queryKey: leaveAppStepKeys.byChain(variables.leaveAppChainId),
+        queryKey: leaveAppStepKeys.byChain(leavePolicyId),
       });
+    }
     },
     onError: (error) => {
       throw new Error(extractErrorMessage(error));
@@ -100,7 +100,7 @@ export const leaveAppStepServices = (leaveAppChainId?: UUID) => {
         queryKey: leaveAppStepKeys.byId(variables.id),
       });
       queryClient.invalidateQueries({
-        queryKey: leaveAppStepKeys.byChain(variables.leaveAppChainId),
+        queryKey: leaveAppStepKeys.byChain(variables.leavePolicyId),
       });
     },
     onError: (error) => {
@@ -113,9 +113,9 @@ export const leaveAppStepServices = (leaveAppChainId?: UUID) => {
       await api.delete(`${baseUrl}/DelLeaveAppStep/${stepId}`);
     },
     onSuccess: () => {
-      if (leaveAppChainId) {
+      if (leavePolicyId) {
         queryClient.invalidateQueries({
-          queryKey: leaveAppStepKeys.byChain(leaveAppChainId),
+          queryKey: leaveAppStepKeys.byChain(leavePolicyId),
         });
       }
     },

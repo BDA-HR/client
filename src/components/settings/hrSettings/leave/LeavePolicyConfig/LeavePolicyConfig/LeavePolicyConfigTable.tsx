@@ -53,7 +53,7 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl shadow-sm overflow-hidden bg-white"
+      className="rounded-b-xl shadow-sm overflow-hidden bg-white"
     >
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 align-middle">

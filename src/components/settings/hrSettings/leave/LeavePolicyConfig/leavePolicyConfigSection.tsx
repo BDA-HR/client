@@ -114,8 +114,8 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="pb-2"
-      >
+        className="border rounded-lg">
+      
         <LeavePolicyConfigHeader
           onAddClick={() => setIsAddPolicyModalOpen(true)}
           onViewHistory={() =>
@@ -123,6 +123,12 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
               `/settings/hr/leave/leavePolicyConfigHistory/${leavePolicyId}`,
             )
           }
+          
+        />
+        <LeavePolicyConfigTable
+          leavePolicyConfig={activeConfig ? [activeConfig] : []}
+          onEdit={setEditingPolicy as any}
+          onDelete={setDeletingPolicy as any}
         />
       </motion.div>
       <motion.div
@@ -130,19 +136,7 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="pb-2"
-      >
-        {/* <LeavePolicyConfigCard
-          activeConfig={mockActiveConfig}
-          loading={false}
-          error={null}
-          onViewDetails={() => {}}
-        /> */}
-        <LeavePolicyConfigTable
-          leavePolicyConfig={activeConfig ? [activeConfig] : []}
-          onEdit={setEditingPolicy as any}
-          onDelete={setDeletingPolicy as any}
-        />
-      </motion.div>
+      ></motion.div>
 
       {/* Modals */}
       <AddLeavePolicyConfig

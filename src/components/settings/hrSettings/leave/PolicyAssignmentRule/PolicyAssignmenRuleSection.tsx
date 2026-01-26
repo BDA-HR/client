@@ -77,6 +77,21 @@ const PolicyAssignmentRuleSection: React.FC<PolicyAssignmentRuleSectionProps> = 
           onAddClick={() => setIsAddPolicyAssignmentRuleModalOpen(true)}
           onViewHistory={handleViewHistory}
         />
+        {/* Show table if there's data */}
+        {!isLoading && policyAssignmentRules.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="pt-0 pb-0"
+          >
+            <PolicyAssignmentRuleTable
+              policyAssignmentRule={policyAssignmentRules}
+              onEdit={handleEditPolicyAssignmentRule}
+              onDelete={handleDeletePolicyAssignmentRule}
+            />
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Error Banner */}
@@ -87,7 +102,8 @@ const PolicyAssignmentRuleSection: React.FC<PolicyAssignmentRuleSectionProps> = 
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
         >
           <span className="font-medium">
-            {(error as Error)?.message || "Failed to load policy assignment rules"}
+            {(error as Error)?.message ||
+              "Failed to load policy assignment rules"}
           </span>
         </motion.div>
       )}
@@ -111,22 +127,6 @@ const PolicyAssignmentRuleSection: React.FC<PolicyAssignmentRuleSectionProps> = 
               No Policy Assignment Rules Found
             </span>
           </div>
-        </motion.div>
-      )}
-
-      {/* Show table if there's data */}
-      {!isLoading && policyAssignmentRules.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="pt-0 pb-0"
-        >
-          <PolicyAssignmentRuleTable
-            policyAssignmentRule={policyAssignmentRules}
-            onEdit={handleEditPolicyAssignmentRule}
-            onDelete={handleDeletePolicyAssignmentRule}
-          />
         </motion.div>
       )}
 

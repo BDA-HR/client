@@ -12,6 +12,7 @@ export interface LeaveAppStepListDto extends BaseDto {
   isFinalStr: string;
   employee: string | null;
   leaveAppChain: string;
+  leavePolicyId: UUID;
 }
 
 // Add DTO
@@ -21,7 +22,7 @@ export interface LeaveAppStepAddDto {
   role: string; 
   employeeId: string | null; 
   isFinal: boolean;
-  leaveAppChainId: UUID; 
+  leavePolicyId: UUID; 
 }
 
 // Modify/Update DTO
@@ -29,9 +30,9 @@ export interface LeaveAppStepModDto {
   id: UUID;
   stepName: string;
   stepOrder: number;
-  role: string; 
-  employeeId:UUID | null; 
+  role: string;
+  employeeId: UUID | null;
   isFinal: boolean;
-  leaveAppChainId: UUID; 
+  leavePolicyId: UUID;
   rowVersion: string;
 }

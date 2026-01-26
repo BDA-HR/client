@@ -23,7 +23,7 @@ interface AddLeaveAppStepModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddLeaveAppStep: (leaveAppStep: LeaveAppStepAddDto) => Promise<any>;
-  leaveAppChainId: UUID;
+  leavePolicyId: UUID;
   employees: NameListDto[];
 }
 
@@ -31,7 +31,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
   isOpen,
   onClose,
   onAddLeaveAppStep,
-  leaveAppChainId,
+  leavePolicyId,
   employees,
 }) => {
   const [stepName, setStepName] = useState("");
@@ -39,7 +39,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
   const [role, setRole] = useState<string>("0"); // Default to "0" (Manager)
   const [isFinal, setIsFinal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-    const [employeeId, setEmployeeId] = useState<string>("");
+  const [employeeId, setEmployeeId] = useState<string>("");
 
   // Create options from enum entries
   const roleOptions = Object.entries(ApprovalRole).map(([key, value]) => ({
@@ -47,15 +47,15 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
     value,
   }));
 
-   const employeeOptions = employees.map((employee) => ({
-     value: employee.id,
-     label: employee.name,
-   }));
+  const employeeOptions = employees.map((employee) => ({
+    value: employee.id,
+    label: employee.name,
+  }));
 
   const resetForm = () => {
     setStepName("");
     setStepOrder(1);
-    setRole("0"); 
+    setRole("0");
     setEmployeeId("");
     setIsFinal(false);
   };
@@ -76,18 +76,14 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
       const payload: LeaveAppStepAddDto = {
         stepName: stepName.trim(),
         stepOrder,
-        role: role, 
+        role: role,
         employeeId: employeeId || null,
         isFinal,
-        leaveAppChainId,
+        leavePolicyId,
       };
 
       console.log("Sending payload:", payload);
-
-      // Call the handler passed as prop
       await onAddLeaveAppStep(payload);
-
-      // Success toast is now handled by the parent component
       resetForm();
       onClose();
     } catch (error: any) {
@@ -124,8 +120,8 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
     }
   }, [isOpen]);
 
-    const selectedEmployee = employees.find((emp) => emp.id === employeeId);
-    const selectedEmployeeName = selectedEmployee?.name || "";
+  const selectedEmployee = employees.find((emp) => emp.id === employeeId);
+  const selectedEmployeeName = selectedEmployee?.name || "";
 
   if (!isOpen) return null;
 
@@ -228,7 +224,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
                 htmlFor="employee"
                 className="block text-sm font-medium text-gray-700"
               >
-                Employee (Optional) 
+                Employee (Optional)
               </Label>
               <Select
                 value={employeeId}

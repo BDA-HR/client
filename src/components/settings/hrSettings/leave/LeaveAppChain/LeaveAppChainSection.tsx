@@ -172,7 +172,7 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
         isOpen={isAddStepModalOpen}
         onClose={() => setIsAddStepModalOpen(false)}
         onAddLeaveAppStep={handleAddStep}
-        leaveAppChainId={activeChainId ?? ("" as UUID)}
+        leavePolicyId={leavePolicyId}
         employees={employees}
       />
     </div>

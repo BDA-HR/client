@@ -17,7 +17,7 @@ const PolicyAssignmentRuleHeader: React.FC<PolicyAssignementRuleProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 justify-between flex"
+      className="bg-white p-4 rounded-t-lg shadow-sm border border-gray-200 justify-between flex"
     >
       <div className="flex items-center gap-2">
         <FileText className="w-6 h-6 text-green-600" />
