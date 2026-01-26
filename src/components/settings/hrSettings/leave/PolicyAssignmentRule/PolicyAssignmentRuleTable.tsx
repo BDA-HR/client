@@ -2,19 +2,16 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   MoreVertical,
-  Eye,
   PenBox,
   CheckCircle,
   XCircle,
   Trash2,
-  Cog,
 } from "lucide-react";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "../../../../ui/popover";
-import { useNavigate } from "react-router-dom";
 import type { PolicyAssignmentRuleListDto } from "../../../../../types/core/Settings/policyAssignmentRule";
 
 interface PolicyAssignmentRuleProps {
@@ -44,19 +41,15 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
     ) : (
       <XCircle className="h-3 w-3 text-white" />
     );
- const getStatusColor = (status: string): string => {
-   const colors: Record<string, string> = {
-     0: "bg-green-100 text-green-800 border border-green-200",
-     1: "bg-red-100 text-red-800 border border-red-200",
-   };
-   console.log("status", status);
-   return (
-     colors[status] || "bg-gray-100 text-gray-800 border border-gray-200"
 
-   );
- };
-
-     const navigate = useNavigate();
+  const getPriorityColor = (priority: string): string => {
+    const colors: Record<string, string> = {
+      "High": "bg-red-100 text-red-800 border border-red-200",
+      "Medium": "bg-yellow-100 text-yellow-800 border border-yellow-200", 
+      "Low": "bg-green-100 text-green-800 border border-green-200",
+    };
+    return colors[priority] || "bg-gray-100 text-gray-800 border border-gray-200";
+  };
 
   return (
     <motion.div
@@ -87,7 +80,7 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                 Effective To
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Condition
+                Actions
               </th>
             </tr>
           </thead>
@@ -99,7 +92,7 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                   colSpan={7}
                   className="px-6 py-8 text-center text-sm text-gray-500"
                 >
-                  No leave policies found.
+                  No policy assignment rules found.
                 </td>
               </tr>
             ) : (
@@ -132,15 +125,14 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                     {policyAssignmentRule.name}
                   </td>
 
-                  {/* Allow Encashment */}
+                  {/* Priority */}
                   <td className="px-4 py-3 align-middle text-center">
                     <span
-                      className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getBooleanColor(
-                        policyAssignmentRule.priority === "High"
+                      className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold rounded-full ${getPriorityColor(
+                        policyAssignmentRule.priority
                       )}`}
                     >
-                      {getBooleanIcon(policyAssignmentRule.priority === "High")}
-                      {policyAssignmentRule.priority ? "Yes" : "No"}
+                      {policyAssignmentRule.priority}
                     </span>
                   </td>
 
@@ -156,51 +148,22 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                     </span>
                   </td>
 
-                  {/* Status */}
+                  {/* Effective From */}
                   <td className="px-4 py-3 align-middle text-center">
-                    <span
-                      className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${getStatusColor(
-                        policyAssignmentRule.effectiveFrom
-                      )}`}
-                    >
-                      {policyAssignmentRule.effectiveFrom === "0"
-                        ? "Active"
-                        : "Inactive"}
+                    <span className="text-sm text-gray-700">
+                      {policyAssignmentRule.effectiveFromStr || policyAssignmentRule.effectiveFrom}
                     </span>
                   </td>
-                  {/*effectiveTo*/}
+                  
+                  {/* Effective To */}
                   <td className="px-4 py-3 align-middle text-center">
-                    <span
-                      className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${getStatusColor(
-                        policyAssignmentRule.effectiveTo || ""
-                      )}`}
-                    >
-                      {policyAssignmentRule.effectiveTo === "0"
-                        ? "Active"
-                        : "Inactive"}
+                    <span className="text-sm text-gray-700">
+                      {policyAssignmentRule.effectiveToStr || policyAssignmentRule.effectiveTo || "N/A"}
                     </span>
-                  </td>
-
-                  {/* Leave Config */}
-                  <td className="px-4 py-3 align-middle text-center">
-                    <div className="flex justify-center">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigate(
-                            `/settings/hr/leave/policyAssignmentRuleConfig/${policyAssignmentRule.id}`
-                          )
-                        }
-                        className="flex items-center gap-2 p-1 rounded hover:bg-muted transition"
-                        title="Configure Leave Policy"
-                      >
-                        <Cog className="w-6 h-6 cursor-pointer text-gray-500" />
-                      </button>
-                    </div>
                   </td>
 
                   {/* Actions */}
-                  <td className="px-4 py-3 align-middle text-right  text-sm font-medium">
+                  <td className="px-4 py-3 align-middle text-right text-sm font-medium">
                     <Popover
                       open={popoverOpen === policyAssignmentRule.id}
                       onOpenChange={(open) =>

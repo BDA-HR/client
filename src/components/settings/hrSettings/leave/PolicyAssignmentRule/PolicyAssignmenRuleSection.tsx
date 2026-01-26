@@ -1,147 +1,70 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import type {
-  LeaveAppChainListDto,
-  LeaveAppChainAddDto,
-  LeaveAppChainModDto,
-  UUID,
-} from "../../../../../types/core/Settings/leaveAppChain";
-// import EditLeaveAppChainModal from "./EditLeaveAppChainModal";
-// import DeleteLeaveAppChainModal from "./DeleteLeaveAppChainModal";
-import { leaveAppChainServices } from "../../../../../services/core/settings/ModHrm/leaveAppChainServices";
+import type { UUID } from "../../../../../types/core/Settings/policyAssignmentRule";
 import PolicyAssignmentRuleTable from "./PolicyAssignmentRuleTable";
-import type {  PolicyAssignmentRuleListDto } from "../../../../../types/core/Settings/policyAssignmentRule";
+import type { PolicyAssignmentRuleListDto, PolicyAssignmentRuleAddDto, PolicyAssignmentRuleModDto } from "../../../../../types/core/Settings/policyAssignmentRule";
 import PolicyAssignmentRuleHeader from "./policyAssignmentRuleHeader";
 import AddPolicyAssignmentRuleModal from "./AddPolicyAssignmentRule";
+import { 
+  useAllPolicyAssignmentRules, 
+  useCreatePolicyAssignmentRule, 
+  useUpdatePolicyAssignmentRule, 
+  useDeletePolicyAssignmentRule 
+} from "../../../../../services/core/settings/ModHrm/LeavePolicyAssignmentRule/policyAssignmentRule.query";
+import { useNavigate } from "react-router-dom";
 
 // Add props interface to receive leavePolicyId
-interface LeaveAppChainSectionProps {
+interface PolicyAssignmentRuleSectionProps {
   leavePolicyId: UUID;
 }
-const sampleApprovalSteps = [
-  {
-    id: 1,
-    stepNumber: 1,
-    stepName: "Initial Review",
-    employeeName: "John Manager",
-    role: "Manager" as const,
-    avatar: "https://i.pravatar.cc/150?u=john.manager@company.com",
-    isCompleted: true,
-    isActive: false,
-  },
-  {
-    id: 2,
-    stepNumber: 2,
-    stepName: "Department Approval",
-    employeeName: "Sarah Wilson",
-    role: "Manager" as const,
-    avatar: "https://i.pravatar.cc/150?u=sarah.wilson@company.com",
-    isCompleted: false,
-    isActive: true,
-  },
-  {
-    id: 3,
-    stepNumber: 3,
-    stepName: "HR Final Approval",
-    employeeName: "Michael Chen",
-    role: "HR" as const,
-    avatar: "https://i.pravatar.cc/150?u=michael.chen@company.com",
-    isCompleted: false,
-    isActive: false,
-  },
-];
-
-const PolicyAssignmentRuleSection: React.FC<LeaveAppChainSectionProps> = ({
+const PolicyAssignmentRuleSection: React.FC<PolicyAssignmentRuleSectionProps> = ({
   leavePolicyId,
 }) => {
-  const [leavePolicies, setLeavePolicies] = useState<LeaveAppChainListDto[]>(
-    []
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [isAddPolicyAssignmentRuleModalOpen, setIsAddPolicyAssignmentRuleModalOpen] = useState(false);
-  
-  const { listByPolicy, create, update, remove } =
-    leaveAppChainServices(leavePolicyId);
+  const [editingPolicy, setEditingPolicy] = useState<PolicyAssignmentRuleListDto | null>(null);
+  const [deletingPolicy, setDeletingPolicy] = useState<PolicyAssignmentRuleListDto | null>(null);
 
-  // Fetch policies
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // React Query hooks
+  const {
+    data: policyAssignmentRules = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useAllPolicyAssignmentRules(leavePolicyId);
 
-        // Use the React Query hook's refetch method
-        const result = await listByPolicy.refetch();
-        if (result.data) {
-          setLeavePolicies(result.data);
-        }
-      } catch (err) {
-        console.error(err);
-        setError(
-          "Failed to load leave approval chains. Please try again later."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (leavePolicyId) {
-      fetchData();
-    }
-  }, [leavePolicyId]); // Re-fetch when 
+  const createMutation = useCreatePolicyAssignmentRule();
+  const updateMutation = useUpdatePolicyAssignmentRule();
+  const deleteMutation = useDeletePolicyAssignmentRule();
 
   // CRUD handlers
-  const handleAddPolicyAssignmentRule = async (appChainData: LeaveAppChainAddDto) => {
+  const handleAddPolicyAssignmentRule = async (ruleData: PolicyAssignmentRuleAddDto) => {
     try {
-      // Add leavePolicyId to the payload
-      const payload = { ...appChainData, leavePolicyId };
-
-      const newAppChain = await create.mutateAsync(payload);
-      setLeavePolicies((prev) => [...prev, newAppChain]);
+      await createMutation.mutateAsync(ruleData);
+      refetch();
       setIsAddPolicyAssignmentRuleModalOpen(false);
     } catch (err) {
-      console.error(err);
-      setError("Failed to create leave approval chain. Please try again.");
+      console.error("Failed to create policy assignment rule:", err);
     }
   };
 
-  const handleEditLeaveAppChain = async (
-    updatedAppChain: LeaveAppChainModDto
-  ) => {
+  const handleEditPolicyAssignmentRule = async (rule: PolicyAssignmentRuleListDto) => {
+    setEditingPolicy(rule);
+  };
+
+  const handleDeletePolicyAssignmentRule = async (rule: PolicyAssignmentRuleListDto) => {
     try {
-      const result = await update.mutateAsync(updatedAppChain);
-      setLeavePolicies((prev) =>
-        prev.map((p) => (p.id === result.id ? result : p))
-      );
-      // setEditingAppChain(null);
+      await deleteMutation.mutateAsync(rule.id as UUID);
+      refetch();
     } catch (err) {
-      console.error(err);
-      setError("Failed to update leave approval chain. Please try again.");
+      console.error("Failed to delete policy assignment rule:", err);
     }
   };
 
-  const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
-
-  const handleDeleteLeaveAppChain = async (appChainId: UUID) => {
-    try {
-      await remove.mutateAsync(appChainId);
-      setLeavePolicies((prev) => prev.filter((p) => p.id !== appChainId));
-      // setDeletingAppChain(null);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to delete leave approval chain. Please try again.");
-    }
+  const handleViewHistory = () => {
+    navigate(`/settings/hr/leave/policyAssignmentRuleHistory/${leavePolicyId}`);
   };
- const handleViewDetails = (stepId: number) => {
-   console.log(`Viewing details for step ${stepId}`);
-   // Add your logic here to show step details
- };
- const [editingPolicy, setEditingPolicy] = useState<PolicyAssignmentRuleListDto | null>(
-    null
-  );
-  const [deletingPolicy, setDeletingPolicy] =
-    useState<PolicyAssignmentRuleListDto | null>(null);
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -152,47 +75,47 @@ const PolicyAssignmentRuleSection: React.FC<LeaveAppChainSectionProps> = ({
       >
         <PolicyAssignmentRuleHeader
           onAddClick={() => setIsAddPolicyAssignmentRuleModalOpen(true)}
-          onViewHistory={() => {}}
+          onViewHistory={handleViewHistory}
         />
       </motion.div>
 
       {/* Error Banner */}
-      {error && (
+      {isError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
         >
-          <div className="flex justify-between items-center">
-            <span className="font-medium">{error}</span>
-            <button
-              onClick={() => setError(null)}
-              className="text-red-700 hover:text-red-900 font-bold text-lg ml-4"
-            >
-              ×
-            </button>
-          </div>
+          <span className="font-medium">
+            {(error as Error)?.message || "Failed to load policy assignment rules"}
+          </span>
         </motion.div>
       )}
 
       {/* Loading */}
-      {loading && (
+      {isLoading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
         </div>
       )}
 
-      {/* Search Filters */}
-      {!loading && (
+      {/* No data message */}
+      {!isLoading && policyAssignmentRules.length === 0 && !isError && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="pb-2"
-        ></motion.div>
+          className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg shadow-sm p-6"
+        >
+          <div className="flex items-center">
+            <span className="text-yellow-700 font-medium">
+              No Policy Assignment Rules Found
+            </span>
+          </div>
+        </motion.div>
       )}
 
-      {!loading && (
+      {/* Show table if there's data */}
+      {!isLoading && policyAssignmentRules.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -200,9 +123,9 @@ const PolicyAssignmentRuleSection: React.FC<LeaveAppChainSectionProps> = ({
           className="pt-0 pb-0"
         >
           <PolicyAssignmentRuleTable
-            policyAssignmentRule={[]}
-            onEdit={setEditingPolicy as any}
-            onDelete={setDeletingPolicy as any}
+            policyAssignmentRule={policyAssignmentRules}
+            onEdit={handleEditPolicyAssignmentRule}
+            onDelete={handleDeletePolicyAssignmentRule}
           />
         </motion.div>
       )}
@@ -214,20 +137,6 @@ const PolicyAssignmentRuleSection: React.FC<LeaveAppChainSectionProps> = ({
         onAddPolicyAssignmentRule={handleAddPolicyAssignmentRule}
         leavePolicyId={leavePolicyId}
       />
-      {/* <EditLeaveAppChainModal
-        isOpen={!!editingAppChain}
-        onClose={() => setEditingAppChain(null)}
-        onSave={handleEditLeaveAppChain}
-        appChain={editingAppChain}
-      />
-      <DeleteLeaveAppChainModal
-        isOpen={!!deletingAppChain}
-        onClose={() => setDeletingAppChain(null)}
-        onConfirm={() =>
-          deletingAppChain && handleDeleteLeaveAppChain(deletingAppChain.id)
-        }
-        appChain={deletingAppChain}
-      /> */}
     </div>
   );
 };

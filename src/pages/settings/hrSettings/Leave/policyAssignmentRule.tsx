@@ -1,0 +1,23 @@
+import React from "react";
+import { motion } from "framer-motion";
+import { useParams } from "react-router-dom";
+import PolicyAssignmentRuleSection from "../../../../components/settings/hrSettings/leave/PolicyAssignmentRule/PolicyAssignmenRuleSection";
+import type { UUID } from "../../../../types/core/Settings/policyAssignmentRule";
+
+const PolicyAssignmentRule: React.FC = () => {
+  const { leavePolicyId } = useParams<{ leavePolicyId: string }>();
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="p-6 space-y-6"
+    >
+      {/* Policy Assignment Rule Section */}
+      <PolicyAssignmentRuleSection leavePolicyId={leavePolicyId as UUID} />
+    </motion.section>
+  );
+};
+
+export default PolicyAssignmentRule;
