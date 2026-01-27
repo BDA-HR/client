@@ -48,9 +48,9 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
       }}
     >
       <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm rounded-b-lg rounded-t-none">
-        <CardContent className="p-3 sm:p-6">
+        <CardContent className="">
           {/* Header with Effective Dates */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+          <div className="flex  sm:items-center justify-between mb-4 gap-3">
             <div className="flex items-center gap-3">
               <div>
                 {/* Effective Dates */}
