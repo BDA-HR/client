@@ -62,25 +62,25 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ">
                 Annual Entitlement
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                 Accrual Frequency
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                 Accrual Rate
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                 Max Days PerReq
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                 Max Carry Over Days
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                 Min Service Months
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                 Is Active
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                 Fiscal Year
               </th>
             </tr>
@@ -142,7 +142,7 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
                   <td className="px-4 py-3 align-middle text-center">
                     <span
                       className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getBooleanColor(
-                        leavePolicyConfig.isActive
+                        leavePolicyConfig.isActive,
                       )}`}
                     >
                       {getBooleanIcon(leavePolicyConfig.isActive)}

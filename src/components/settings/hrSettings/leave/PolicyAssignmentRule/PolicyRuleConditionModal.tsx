@@ -310,7 +310,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
         <div className="flex-1 flex overflow-hidden">
           {/* Left Side - Form (25%) */}
           <div className="w-2/5 border-r border-gray-200 p-4 bg-white">
-            <div className="h-full flex flex-col">
+            <div className="flex flex-col">
               <div className="flex items-center gap-2 mb-4">
                 <Plus size={16} className="text-green-600" />
                 <h3 className="text-base font-semibold text-gray-900">
@@ -377,7 +377,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
               </div>
 
               {/* Form Actions */}
-              <div className="space-y-2 ">
+              <div className="space-y-2 mt-8">
                 <Button
                   onClick={handleSaveCondition}
                   className="w-full bg-green-600 hover:bg-green-700 text-white h-9 text-sm"
@@ -512,19 +512,6 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="border-t px-6 py-4 bg-white">
-          <div className="flex justify-end">
-            <Button
-              onClick={handleClose}
-              variant="outline"
-              className="px-6 py-2"
-            >
-              Close
-            </Button>
           </div>
         </div>
 

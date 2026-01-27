@@ -161,7 +161,7 @@ const LeavePolicyConfigHistoryTable: React.FC<LeavePolicyHistoryTableProps> = ({
                     className="transition-colors hover:bg-gray-50"
                   >
                     {/* Annual Entitlement */}
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="px-6 py-3 text-left">
                       <div className="text-sm font-medium text-gray-900">
                         {config.annualEntitlement}
                       </div>

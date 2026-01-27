@@ -92,13 +92,13 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
               <tr>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                 >
                   Effective From
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Effective To
                 </th>
@@ -155,17 +155,15 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                     variants={rowVariants}
                     className="transition-colors hover:bg-gray-50"
                   >
-                    <td className="px-4 py-3 text-center align-middle">
-                      <div className="flex justify-center">
-                        <div className="ml-3">
+                    <td className="px-4 py-3 text-left">
+                      <div className="flex">
                           <div className="text-sm font-medium text-gray-900">
                             {AppChainHistory.effectiveFromStr}
                           </div>
-                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-center align-middle">
-                      <div className="flex gap-2 justify-center">
+                    <td className="px-4 py-3 text-left">
+                      <div className="flex gap-2">
                         {AppChainHistory.effectiveToStr}
                       </div>
                     </td>

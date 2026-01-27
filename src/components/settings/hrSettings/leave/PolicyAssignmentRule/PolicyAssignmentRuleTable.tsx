@@ -61,10 +61,10 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
         <table className="min-w-full divide-y divide-gray-200 align-middle">
           <thead className="bg-white">
             <tr>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider ">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Code
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -73,10 +73,10 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Is Active
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Effective From
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Effective To
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -104,12 +104,12 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                   transition={{ delay: index * 0.05 }}
                   className="transition-colors hover:bg-gray-50"
                 >
-                  {/* Name */}
-                  <td className="px-4 py-3 align-middle text-center">
+                  {/* code */}
+                  <td className="px-3 py-3 text-left">
                     <div className="flex items-center">
                       <div className="shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
                         <span className="text-emerald-600 font-medium">
-                          {policyAssignmentRule.name.charAt(0).toUpperCase()}
+                          {policyAssignmentRule.code.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="ml-3">
@@ -121,7 +121,7 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                   </td>
 
                   {/* name */}
-                  <td className="px-4 py-3 align-middle text-center">
+                  <td className="px-4 py-3 text-left">
                     {policyAssignmentRule.name}
                   </td>
 
@@ -149,14 +149,14 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                   </td>
 
                   {/* Effective From */}
-                  <td className="px-4 py-3 align-middle text-center">
+                  <td className="px-4 py-3 text-left">
                     <span className="text-sm text-gray-700">
                       {policyAssignmentRule.effectiveFromStr || policyAssignmentRule.effectiveFrom}
                     </span>
                   </td>
                   
                   {/* Effective To */}
-                  <td className="px-4 py-3 align-middle text-center">
+                  <td className="px-4 py-3 text-left">
                     <span className="text-sm text-gray-700">
                       {policyAssignmentRule.effectiveToStr || policyAssignmentRule.effectiveTo || "N/A"}
                     </span>

@@ -83,13 +83,13 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
               <tr>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                 >
                   Code
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Name
                 </th>
@@ -107,19 +107,19 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Effective From
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Effective To
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Actions
                 </th>
@@ -145,24 +145,22 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
                     className="transition-colors hover:bg-gray-50"
                   >
                     {/* Code */}
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="px-4 py-3 text-left">
                       <div className="text-sm font-medium text-gray-900">
                         {rule.code}
                       </div>
                     </td>
 
                     {/* Name */}
-                    <td className="px-4 py-3 align-middle text-center">
-                      <span className="text-sm text-gray-700">
-                        {rule.name}
-                      </span>
+                    <td className="px-4 py-3 text-left">
+                      <span className="text-sm text-gray-700">{rule.name}</span>
                     </td>
 
                     {/* Priority */}
                     <td className="px-4 py-3 align-middle text-center">
                       <span
                         className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold rounded-full ${getPriorityColor(
-                          rule.priority
+                          rule.priority,
                         )}`}
                       >
                         {rule.priority}
@@ -173,7 +171,7 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
                     <td className="px-4 py-3 align-middle text-center">
                       <span
                         className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getBooleanColor(
-                          rule.isActive
+                          rule.isActive,
                         )}`}
                       >
                         {getBooleanIcon(rule.isActive)}
@@ -182,21 +180,21 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
                     </td>
 
                     {/* Effective From */}
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="px-4 py-3 text-left">
                       <span className="text-sm text-gray-700">
                         {rule.effectiveFromStr || rule.effectiveFrom}
                       </span>
                     </td>
 
                     {/* Effective To */}
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="px-4 py-3 text-left">
                       <span className="text-sm text-gray-700">
                         {rule.effectiveToStr || rule.effectiveTo || "N/A"}
                       </span>
                     </td>
 
                     {/* Actions */}
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="px-4 py-3 text-right">
                       <Popover
                         open={popoverOpen === rule.id}
                         onOpenChange={(open) =>
