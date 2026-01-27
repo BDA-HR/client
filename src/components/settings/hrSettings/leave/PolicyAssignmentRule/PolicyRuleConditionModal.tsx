@@ -185,9 +185,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
 
   const getValueOptions = (field: string) => {
     switch (field) {
-      case "0": // Employment Type
-        return Object.entries(EmpType).map(([key, value]) => ({ key, value }));
-      case "1": // Employment Nature
+      case "0": // Employment Nature
         return Object.entries(EmpNature).map(([key, value]) => ({
           key,
           value,
@@ -203,16 +201,12 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
 
   const getDisplayValue = (field: string, value: string) => {
     switch (field) {
-      case "0": // Employment Type
-        return EmpType[value as keyof typeof EmpType] || value;
-      case "1": // Employment Nature
+      case "0": // Employment Nature
         return EmpNature[value as keyof typeof EmpNature] || value;
-      case "2": // Gender
+      case "1": // Gender
         return Gender[value as keyof typeof Gender] || value;
-      case "4": // Disability Status
-        return YesNo[value as keyof typeof YesNo] || value;
-      case "3": // Service Year
-        return `${value} years`;
+      case "2": // Service Months
+        return `${value} Months`;
       default:
         return value;
     }

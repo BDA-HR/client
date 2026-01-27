@@ -83,11 +83,10 @@ export type PolicyStatus = (typeof PolicyStatus)[keyof typeof PolicyStatus];
 export const ConditionOperator = {
   "0": "Equals",
   "1": "Not Equals",
-  "2": "In",
-  "3": "Greater than",
-  "4": "Less than",
-  "5": "Greater than or Equals",
-  "6": "Less than or Equals",
+  "2": "Greater than",
+  "3": "Less than",
+  "4": "Greater than or Equals",
+  "5": "Less than or Equals",
 } as const;
 export type ConditionOperator =
   (typeof ConditionOperator)[keyof typeof ConditionOperator];
@@ -100,11 +99,11 @@ export type ConditionOperator =
   export type Priority = (typeof Priority)[keyof typeof Priority];
 
   export const ConditionField = {
-    "0": "Employement Type",
-    "1": "Employement Nature",
-    "2": "Gender",
-    "3": "Service Year",
-    "4": "Disablity Status",
+    "0": "Employement Nature",
+    "1": "Gender",
+    "2": "Service Months",
+    "3": "Work Arrangement",
+    "4": "Job Grade",
   } as const;
   export type ConditionField =
     (typeof ConditionField)[keyof typeof ConditionField];
