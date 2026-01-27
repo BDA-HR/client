@@ -542,6 +542,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                   <label className="text-sm font-medium text-gray-500">Branch</label>
                   <p className="text-gray-900 font-medium">{reviewData.branch || 'Not provided'}</p>
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Work Arrangement</label>
+                  <p className="text-gray-900 font-medium">{reviewData.workArr || 'Not provided'}</p>
+                </div>
               </div>
             </div>
           </div>

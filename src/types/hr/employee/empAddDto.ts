@@ -1,5 +1,5 @@
 import type { UUID } from "crypto";
-import type { AddressType, EmpNature, EmpType, Gender, MaritalStat, YesNo } from "../enum";
+import type { AddressType, EmpNature, EmpType, Gender, MaritalStat, WorkArrangement, YesNo } from "../enum";
 
 export type { UUID }
 export interface Step1Dto {
@@ -17,6 +17,7 @@ export interface Step1Dto {
     departmentId: UUID;
     employmentType: EmpType;
     employmentNature: EmpNature;
+    workArrangement: WorkArrangement;
     File: File | null; // Fixed: proper File type
 }
 
@@ -117,6 +118,7 @@ export interface Step5Dto {
     branch: string;
     employmentType: string;
     employmentNature: string;
+    workArr: string;
 
     // Biographical
     birthDate: string;
