@@ -18,10 +18,13 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const { listByPolicy, update, changeStatus, remove } = leaveAppChainServices(leavePolicyId);
   const [editingAppChain, setEditingAppChain] = useState<LeaveAppChainListDto | null>(null);
     const [deletingAppChain, setDeletingAppChain] =
       useState<LeaveAppChainListDto | null>(null);
+
+  const itemsPerPage = 10;
 
   // Filter leave types based on search term
   const filteredAppChain = appChains.filter((appChain) => {
@@ -33,6 +36,20 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
       appChain.leavePolicy.toLowerCase().includes(searchLower)
     );
   });
+
+  // Pagination calculations
+  const totalItems = filteredAppChain.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedAppChains = filteredAppChain.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when search changes
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
 
   const fetchAppChains = async () => {
     try {
@@ -185,7 +202,7 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
       >
         <AppChainSearchFilters
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={handleSearchChange}
         />
       </motion.div>
       {/* Loading state */}
@@ -196,7 +213,7 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
       )}
 
       {/* No leave types message - Show when not loading and filteredAppChain array is empty */}
-      {!loading && filteredAppChain.length === 0 && !error && appChains.length > 0 && (
+      {!loading && totalItems === 0 && !error && appChains.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -238,7 +255,7 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
       )}
 
       {/* Leave Types Table */}
-      {!loading && filteredAppChain.length > 0 && (
+      {!loading && totalItems > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -246,7 +263,12 @@ const AppChainHisotrySection: React.FC<LeaveAppChainHistorySectionProps> = ({
           className="pt-0 pb-0 -mt-2"
         >
           <AppChainHistoryTable
-            AppChainHistorys={filteredAppChain}
+            AppChainHistorys={paginatedAppChains}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            isLoading={loading}
+            onPageChange={setCurrentPage}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}

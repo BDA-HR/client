@@ -105,11 +105,11 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
       )}
 
       {/* Loading */}
-      {/* {isLoading && (
+      {isLoading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
         </div>
-      )} */}
+      )}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -127,6 +127,11 @@ const LeavePolicyConfigSection: React.FC<LeavePolicyConfigSectionProps> = ({
         />
         <LeavePolicyConfigTable
           leavePolicyConfig={activeConfig ? [activeConfig] : []}
+          currentPage={1}
+          totalPages={1}
+          totalItems={activeConfig ? 1 : 0}
+          isLoading={isLoading}
+          onPageChange={() => {}}
           onEdit={setEditingPolicy as any}
           onDelete={setDeletingPolicy as any}
         />

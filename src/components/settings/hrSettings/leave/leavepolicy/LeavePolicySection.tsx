@@ -25,12 +25,15 @@ const LeavePolicySection: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState<LeavePolicyListDto | null>(
     null
   );
   const [deletingPolicy, setDeletingPolicy] =
     useState<LeavePolicyListDto | null>(null);
+
+  const itemsPerPage = 10;
 
   // Fetch policies and leave types
   useEffect(() => {
@@ -60,6 +63,20 @@ const LeavePolicySection: React.FC = () => {
       policy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       policy.leaveType.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Pagination calculations
+  const totalItems = filteredLeavePolicies.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedPolicies = filteredLeavePolicies.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when search changes
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
 
   // CRUD handlers
   const handleAddLeavePolicy = async (policyData: LeavePolicyAddDto) => {
@@ -144,7 +161,7 @@ const LeavePolicySection: React.FC = () => {
         >
           <LeavePolicySearchFilters
             searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
+            setSearchTerm={handleSearchChange}
             onAddClick={() => setIsAddPolicyModalOpen(true)}
           />
         </motion.div>
@@ -159,7 +176,12 @@ const LeavePolicySection: React.FC = () => {
           className="pt-0 pb-0"
         >
           <LeavePolicyTable
-            leavePolicies={filteredLeavePolicies} // empty array is fine
+            leavePolicies={paginatedPolicies}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            isLoading={loading}
+            onPageChange={setCurrentPage}
             onEdit={setEditingPolicy as any}
             onDelete={setDeletingPolicy as any}
           />

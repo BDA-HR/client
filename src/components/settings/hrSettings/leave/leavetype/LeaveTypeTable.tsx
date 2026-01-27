@@ -7,12 +7,19 @@ import {
   CheckCircle,
   XCircle,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../../../../ui/popover';
 import type { LeaveTypeListDto } from '../../../../../types/core/Settings/leavetype';
 
 interface LeaveTypeTableProps {
   leaveTypes: LeaveTypeListDto[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  isLoading?: boolean;
+  onPageChange: (page: number) => void;
   onEdit: (leaveType: LeaveTypeListDto) => void;
   onDelete: (leaveType: LeaveTypeListDto) => void;
   onToggleStatus?: (leaveType: LeaveTypeListDto) => void;
@@ -20,6 +27,11 @@ interface LeaveTypeTableProps {
 
 const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
   leaveTypes,
+  currentPage,
+  totalPages,
+  totalItems,
+  isLoading = false,
+  onPageChange,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -112,219 +124,292 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
         transition={{ duration: 0.5 }}
         className="rounded-xl shadow-sm overflow-hidden bg-white"
       >
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-white">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-                >
-                  Leave Type
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Category
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Requires Approval?
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Allow Half Day?
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Holidays as Leave?
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {leaveTypes.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-8 text-center text-sm text-gray-500"
-                  >
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="text-gray-400 text-lg mb-2">
-                        No leave types found
-                      </div>
-                      <p className="text-gray-400 text-sm">
-                        Try adjusting your search terms or add a new leave type.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                leaveTypes.map((leaveType, index) => (
-                  <motion.tr
-                    key={leaveType.id}
-                    custom={index}
-                    initial="hidden"
-                    animate="visible"
-                    variants={rowVariants}
-                    className="transition-colors hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <motion.div
-                          whileHover={{ rotate: 10 }}
-                          className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
-                        >
-                          <span className="text-emerald-600 font-medium">
-                            {leaveType.name.charAt(0).toUpperCase()}
-                          </span>
-                        </motion.div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {leaveType.name}
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-white">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                    >
+                      Leave Type
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Category
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Requires Approval?
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Allow Half Day?
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Holidays as Leave?
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {leaveTypes.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="px-6 py-8 text-center text-sm text-gray-500"
+                      >
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="text-gray-400 text-lg mb-2">
+                            No leave types found
                           </div>
-                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                            <span>Is Active?: </span>
+                          <p className="text-gray-400 text-sm">
+                            Try adjusting your search terms or add a new leave type.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    leaveTypes.map((leaveType, index) => (
+                      <motion.tr
+                        key={leaveType.id}
+                        custom={index}
+                        initial="hidden"
+                        animate="visible"
+                        variants={rowVariants}
+                        className="transition-colors hover:bg-gray-50"
+                      >
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <motion.div
+                              whileHover={{ rotate: 10 }}
+                              className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
+                            >
+                              <span className="text-emerald-600 font-medium">
+                                {leaveType.name.charAt(0).toUpperCase()}
+                              </span>
+                            </motion.div>
+                            <div className="ml-3">
+                              <div className="text-sm font-medium text-gray-900">
+                                {leaveType.name}
+                              </div>
+                              <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                <span>Is Active?: </span>
+                                <span
+                                  className={`px-2 py-1 inline-flex text-[10px] leading-2 font-semibold rounded-full gap-0.5 ${getBooleanColor(
+                                    leaveType.isActiveStr
+                                  )}`}
+                                >
+                                  {getBooleanSmallIcon(leaveType.isActive)}{" "}
+                                  {leaveType.isActiveStr}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
                             <span
-                              className={`px-2 py-1 inline-flex text-[10px] leading-2 font-semibold rounded-full gap-0.5 ${getBooleanColor(
-                                leaveType.isActiveStr
+                              className={`px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full ${getCategoryColor(
+                                leaveType.leaveCategory
                               )}`}
                             >
-                              {getBooleanSmallIcon(leaveType.isActive)}{" "}
-                              {leaveType.isActiveStr}
+                              {leaveType.leaveCategoryStr}
                             </span>
                           </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full ${getCategoryColor(
-                            leaveType.leaveCategory
-                          )}`}
-                        >
-                          {leaveType.leaveCategoryStr}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-1">
-                        <span
-                          className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
-                            leaveType.requiresApprovalStr
-                          )}`}
-                        >
-                          {getBooleanIcon(leaveType.requiresApproval)}{" "}
-                          {leaveType.requiresApprovalStr}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
-                            leaveType.allowHalfDayStr
-                          )}`}
-                        >
-                          {getBooleanIcon(leaveType.allowHalfDay)}{" "}
-                          {leaveType.allowHalfDayStr}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {/* {getBooleanIcon(leaveType.holidaysAsLeave)} */}
-                        <span
-                          className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(leaveType.holidaysAsLeaveStr)}`}
-                        >
-                          {getBooleanIcon(leaveType.holidaysAsLeave)}{" "}
-                          {leaveType.holidaysAsLeaveStr}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                      <Popover
-                        open={popoverOpen === leaveType.id}
-                        onOpenChange={(open) =>
-                          setPopoverOpen(open ? leaveType.id : null)
-                        }
-                      >
-                        <PopoverTrigger asChild>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
-                          >
-                            <MoreVertical className="h-5 w-5" />
-                          </motion.button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-48 p-0" align="end">
-                          <div className="py-1">
-                            <button
-                              onClick={() => handleViewDetails(leaveType)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-1">
+                            <span
+                              className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
+                                leaveType.requiresApprovalStr
+                              )}`}
                             >
-                              <Eye size={16} />
-                              View Details
-                            </button>
-                            <button
-                              onClick={() => handleEdit(leaveType)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                            >
-                              <PenBox size={16} />
-                              Edit
-                            </button>
-                            {onToggleStatus && (
-                              <button
-                                onClick={() => handleToggleStatus(leaveType)}
-                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${leaveType.isActive
-                                  ? "text-amber-600 hover:bg-amber-50"
-                                  : "text-green-600 hover:bg-green-50"
-                                  }`}
-                              >
-                                {leaveType.isActive ? (
-                                  <>
-                                    <XCircle size={16} />
-                                    Deactivate
-                                  </>
-                                ) : (
-                                  <>
-                                    <CheckCircle size={16} />
-                                    Activate
-                                  </>
-                                )}
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDelete(leaveType)}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                            >
-                              <Trash2 size={16} />
-                              Delete
-                            </button>
+                              {getBooleanIcon(leaveType.requiresApproval)}{" "}
+                              {leaveType.requiresApprovalStr}
+                            </span>
                           </div>
-                        </PopoverContent>
-                      </Popover>
-                    </td>
-                  </motion.tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
+                                leaveType.allowHalfDayStr
+                              )}`}
+                            >
+                              {getBooleanIcon(leaveType.allowHalfDay)}{" "}
+                              {leaveType.allowHalfDayStr}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            {/* {getBooleanIcon(leaveType.holidaysAsLeave)} */}
+                            <span
+                              className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(leaveType.holidaysAsLeaveStr)}`}
+                            >
+                              {getBooleanIcon(leaveType.holidaysAsLeave)}{" "}
+                              {leaveType.holidaysAsLeaveStr}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                          <Popover
+                            open={popoverOpen === leaveType.id}
+                            onOpenChange={(open) =>
+                              setPopoverOpen(open ? leaveType.id : null)
+                            }
+                          >
+                            <PopoverTrigger asChild>
+                              <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
+                              >
+                                <MoreVertical className="h-5 w-5" />
+                              </motion.button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-48 p-0" align="end">
+                              <div className="py-1">
+                                <button
+                                  onClick={() => handleViewDetails(leaveType)}
+                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                                >
+                                  <Eye size={16} />
+                                  View Details
+                                </button>
+                                <button
+                                  onClick={() => handleEdit(leaveType)}
+                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                                >
+                                  <PenBox size={16} />
+                                  Edit
+                                </button>
+                                {onToggleStatus && (
+                                  <button
+                                    onClick={() => handleToggleStatus(leaveType)}
+                                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2 ${leaveType.isActive
+                                      ? "text-amber-600 hover:bg-amber-50"
+                                      : "text-green-600 hover:bg-green-50"
+                                      }`}
+                                  >
+                                    {leaveType.isActive ? (
+                                      <>
+                                        <XCircle size={16} />
+                                        Deactivate
+                                      </>
+                                    ) : (
+                                      <>
+                                        <CheckCircle size={16} />
+                                        Activate
+                                      </>
+                                    )}
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDelete(leaveType)}
+                                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
+                                >
+                                  <Trash2 size={16} />
+                                  Delete
+                                </button>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalItems > 0 && (
+              <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <button
+                    onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{' '}
+                      <span className="font-medium">{Math.min(currentPage * 10, totalItems)}</span> of{' '}
+                      <span className="font-medium">{totalItems}</span> leave types
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <button
+                        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <span className="sr-only">Previous</span>
+                        <ChevronLeft size={16} />
+                      </button>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => onPageChange(page)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === page
+                              ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
+                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <span className="sr-only">Next</span>
+                        <ChevronRight size={16} />
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </motion.div>
 
       {/* View Details Modal - Keep only this one since delete has its own component now */}

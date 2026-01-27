@@ -40,10 +40,13 @@ const PolicyAssignmentRuleHistorySection: FC<
 
   // Local state
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingPolicyAssignmentRule, setEditingPolicyAssignmentRule] =
     useState<PolicyAssignmentRuleListDto | null>(null);
   const [deletingPolicyAssignmentRule, setDeletingPolicyAssignmentRule] =
     useState<PolicyAssignmentRuleListDto | null>(null);
+
+  const itemsPerPage = 10;
 
   // Filtered results
   const filteredPolicyAssignmentRules = policyAssignmentRules.filter((rule) => {
@@ -54,6 +57,20 @@ const PolicyAssignmentRuleHistorySection: FC<
       (rule.isActive ? 'active' : 'inactive').includes(searchLower)
     );
   });
+
+  // Pagination calculations
+  const totalItems = filteredPolicyAssignmentRules.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedRules = filteredPolicyAssignmentRules.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when search changes
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
 
   // Edit handlers
   const handleEdit = (rule: PolicyAssignmentRuleListDto) =>
@@ -119,7 +136,7 @@ const PolicyAssignmentRuleHistorySection: FC<
       >
         <PolicyAssignmentRuleSearchFilter
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={handleSearchChange}
         />
       </motion.div>
 
@@ -144,7 +161,7 @@ const PolicyAssignmentRuleHistorySection: FC<
       )}
 
       {/* No data message */}
-      {!isLoading && filteredPolicyAssignmentRules.length === 0 && !isError && (
+      {!isLoading && totalItems === 0 && !isError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -159,14 +176,19 @@ const PolicyAssignmentRuleHistorySection: FC<
       )}
 
       {/* Table */}
-      {!isLoading && filteredPolicyAssignmentRules.length > 0 && (
+      {!isLoading && totalItems > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
           <PolicyAssignmentRuleHistoryTable
-            policyAssignmentRule={filteredPolicyAssignmentRules}
+            policyAssignmentRule={paginatedRules}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            isLoading={isLoading}
+            onPageChange={setCurrentPage}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}

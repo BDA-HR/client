@@ -24,43 +24,43 @@ const DeleteLeavePolicyConfigModal: React.FC<
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-xl shadow-xl max-w-4xl w-1/3 max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl shadow-xl w-full max-w-md sm:max-w-lg"
       >
         {/* Modal Body */}
-        <div className="p-6">
-          <div className="py-4 text-center">
-            <div className="flex items-center justify-center p-3 rounded-full gap-2 text-red-600 mx-auto">
-              <AlertTriangle size={50} />
+        <div className="p-4 sm:p-6">
+          <div className="py-2 sm:py-4 text-center">
+            <div className="flex items-center justify-center p-2 sm:p-3 rounded-full gap-2 text-red-600 mx-auto">
+              <AlertTriangle className="w-8 h-8 sm:w-12 sm:h-12" />
             </div>
 
-            <p className="text-lg font-medium text-red-600 mt-4">
-              Are you sure you want to delete this approval chain?
+            <p className="text-base sm:text-lg font-medium text-red-600 mt-3 sm:mt-4">
+              Are you sure you want to delete this policy config?
             </p>
-            <p className="text-sm text-red-600 mt-2">
+            <p className="text-xs sm:text-sm text-red-600 mt-2">
               This action cannot be undone.
             </p>
           </div>
         </div>
 
         {/* Modal Footer */}
-        <div className="border-t px-6 py-2">
-          <div className="mx-auto flex justify-center items-center gap-1.5">
+        <div className="border-t p-4 sm:px-6 sm:py-4">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-1.5">
             <Button
               variant="destructive"
               onClick={handleConfirm}
-              className="cursor-pointer px-6"
+              className="w-full sm:w-auto cursor-pointer px-4 sm:px-6"
             >
               Delete
             </Button>
             <Button
               onClick={onClose}
               variant="outline"
-              className="px-6 py-2 cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
             >
               Cancel
             </Button>

@@ -14,13 +14,30 @@ const LeaveTypeSection: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingLeaveType, setEditingLeaveType] = useState<LeaveTypeListDto | null>(null);
   const [deletingLeaveType, setDeletingLeaveType] = useState<LeaveTypeListDto | null>(null);
 
+  const itemsPerPage = 10;
+
   // Filter leave types based on search term
   const filteredLeaveTypes = leaveTypes.filter(leaveType =>
     leaveType.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  // Pagination calculations
+  const totalItems = filteredLeaveTypes.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedLeaveTypes = filteredLeaveTypes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when search changes
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
 
   const fetchLeaveTypes = async () => {
     try {
@@ -172,7 +189,7 @@ const LeaveTypeSection: React.FC = () => {
       >
         <LeaveSearchFilters
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={handleSearchChange}
           onAddClick={handleOpenAddModal}
         />
       </motion.div>
@@ -211,7 +228,12 @@ const LeaveTypeSection: React.FC = () => {
           className="pt-0 pb-0 -mt-2"
         >
           <LeaveTypeTable
-            leaveTypes={filteredLeaveTypes}
+            leaveTypes={paginatedLeaveTypes}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            isLoading={loading}
+            onPageChange={setCurrentPage}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}

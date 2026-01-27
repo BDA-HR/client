@@ -71,8 +71,8 @@ const PolicyAssignmentRuleSection: React.FC<
           onAddClick={() => setIsAddPolicyAssignmentRuleModalOpen(true)}
           onViewHistory={handleViewHistory}
         />
-        {/* Show table if there's data */}
-        {!isLoading && policyAssignmentRules.length > 0 && (
+        {/* Show table if there's data or loading */}
+        {(policyAssignmentRules.length > 0 || isLoading) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -81,6 +81,11 @@ const PolicyAssignmentRuleSection: React.FC<
           >
             <PolicyAssignmentRuleTable
               policyAssignmentRule={policyAssignmentRules}
+              currentPage={1}
+              totalPages={1}
+              totalItems={policyAssignmentRules.length}
+              isLoading={isLoading}
+              onPageChange={() => {}}
             />
           </motion.div>
         )}
@@ -101,11 +106,11 @@ const PolicyAssignmentRuleSection: React.FC<
       )}
 
       {/* Loading */}
-      {isLoading && (
+      {/* {isLoading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
         </div>
-      )}
+      )} */}
 
       {/* No data message */}
       {!isLoading && policyAssignmentRules.length === 0 && !isError && (

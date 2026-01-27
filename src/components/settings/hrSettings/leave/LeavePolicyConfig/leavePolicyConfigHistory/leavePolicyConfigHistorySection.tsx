@@ -40,10 +40,13 @@ const LeavePolicyConfigHistorySection: FC<
 
   // Local state
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingLeavePolicyConfig, setEditingLeavePolicyConfig] =
     useState<LeavePolicyConfigListDto | null>(null);
   const [deletingLeavePolicyConfig, setDeletingLeavePolicyConfig] =
     useState<LeavePolicyConfigListDto | null>(null);
+
+  const itemsPerPage = 10;
 
   // Filtered results
   const filteredLeavePolicyConfigs = leavePolicyConfigs.filter((config) => {
@@ -54,6 +57,20 @@ const LeavePolicyConfigHistorySection: FC<
       (config.isActive ? 'active' : 'inactive').includes(searchLower)
     );
   });
+
+  // Pagination calculations
+  const totalItems = filteredLeavePolicyConfigs.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedConfigs = filteredLeavePolicyConfigs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to first page when search changes
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
 
   // Edit handlers
   const handleEdit = (config: LeavePolicyConfigListDto) =>
@@ -121,7 +138,7 @@ const LeavePolicyConfigHistorySection: FC<
       >
         <LeavePolicyConfigSearchFilters
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={handleSearchChange}
         />
       </motion.div>
 
@@ -146,7 +163,7 @@ const LeavePolicyConfigHistorySection: FC<
       )}
 
       {/* No data message */}
-      {!isLoading && filteredLeavePolicyConfigs.length === 0 && !isError && (
+      {!isLoading && totalItems === 0 && !isError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,14 +178,19 @@ const LeavePolicyConfigHistorySection: FC<
       )}
 
       {/* Table */}
-      {!isLoading && filteredLeavePolicyConfigs.length > 0 && (
+      {!isLoading && totalItems > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
           <LeavePolicyConfigHistoryTable
-            leavePolicyConfig={filteredLeavePolicyConfigs}
+            leavePolicyConfig={paginatedConfigs}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            isLoading={isLoading}
+            onPageChange={setCurrentPage}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
