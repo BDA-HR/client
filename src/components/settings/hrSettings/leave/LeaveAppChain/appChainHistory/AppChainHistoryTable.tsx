@@ -122,7 +122,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Actions
                 </th>
@@ -189,7 +189,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                         {AppChainHistory.leavePolicy}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-center align-middle text-sm font-medium">
+                    <td className="px-4 py-3 text-right text-sm font-medium">
                       <Popover
                         open={popoverOpen === AppChainHistory.id}
                         onOpenChange={(open) =>

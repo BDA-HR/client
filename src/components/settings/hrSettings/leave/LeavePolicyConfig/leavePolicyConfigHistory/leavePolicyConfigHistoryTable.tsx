@@ -135,7 +135,7 @@ const LeavePolicyConfigHistoryTable: React.FC<LeavePolicyHistoryTableProps> = ({
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Actions
                 </th>
@@ -222,7 +222,7 @@ const LeavePolicyConfigHistoryTable: React.FC<LeavePolicyHistoryTableProps> = ({
                     </td>
 
                     {/* Actions */}
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="px-4 py-3 text-right">
                       <Popover
                         open={popoverOpen === config.id}
                         onOpenChange={(open) =>
