@@ -14,6 +14,7 @@ export interface EmployeeListDto extends BaseDto {
   jobGrade: string;
   empType: string;
   empNature: string;
+  workArr: string;
   photo: string;
 }
 

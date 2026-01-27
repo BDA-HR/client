@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { ProfilePictureUpload } from './ProfileUpload';
 import { Input } from '../../../../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/select';
-import { Gender, EmpType, EmpNature } from '../../../../../types/hr/enum';
+import { Gender, EmpType, EmpNature, WorkArrangement } from '../../../../../types/hr/enum';
 import type { Step1Dto } from '../../../../../types/hr/employee/empAddDto';
 import type { UUID } from 'crypto';
 import { amharicRegex } from '../../../../../utils/amharic-regex';
@@ -90,6 +90,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       departmentId: data.departmentId || '' as UUID,
       employmentType: data.employmentType || '' as EmpType,
       employmentNature: data.employmentNature || '' as EmpNature,
+      workArrangement: data.workArrangement || '' as WorkArrangement,
       File: data.File || null,
     },
     validationSchema,
@@ -307,7 +308,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
-    
+
     // Scroll to top before form submission
     scrollToTop();
     formik.handleSubmit();
@@ -638,7 +639,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           </div>
 
           {/* Row 2: Employment Date, Employment Type, Employment Nature */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Employment Date */}
             <div className="space-y-2">
               <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-1">
@@ -711,6 +712,33 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               </Select>
               {getErrorMessage('employmentNature') && (
                 <div className="text-red-500 text-xs mt-1">{getErrorMessage('employmentNature')}</div>
+              )}
+            </div>
+
+            {/* Work Arrangement */}
+            <div className="space-y-2">
+              <label htmlFor="employmentNature" className="block text-sm font-medium text-gray-700 mb-1">
+                Work Arrangement *
+              </label>
+              <Select
+                value={formik.values.workArrangement}
+                onValueChange={(value: WorkArrangement) => formik.setFieldValue('workArrangement', value)}
+                disabled={loading}
+              >
+                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('workArrangement') ? "border-red-500" : "border-gray-300"
+                  }`}>
+                  <SelectValue placeholder="Select Work Arrangement" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(WorkArrangement).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {getErrorMessage('workArrangement') && (
+                <div className="text-red-500 text-xs mt-1">{getErrorMessage('workArrangement')}</div>
               )}
             </div>
           </div>

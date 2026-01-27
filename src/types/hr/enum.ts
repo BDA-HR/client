@@ -82,18 +82,20 @@ export const EmpType = {
 export type EmpType = typeof EmpType[keyof typeof EmpType];
 
 export const EmpNature = {
-  "0": 'Permanent',
-  "1": 'Contract'
+  "0": 'Permanent / Full-time',
+  "1": 'Contract / Fixed-term',
+  "2": 'Probation',
+  "3": 'Intern / Trainee',
+  "4": 'Part-time / Casual'
 } as const;
 export type EmpNature = typeof EmpNature[keyof typeof EmpNature];
 
 export const MaritalStat = {
-  "0": 'Not Married',
-  "1": 'Single',
-  "2": 'Non-Married',
-  "3": 'Widow/er',
-  "4": 'Divorced',
-  "5": 'Not Mentioned'
+  "0": 'Single / Not Married',
+  "1": 'Married',
+  "2": 'Widow/er',
+  "3": 'Divorced',
+  "4": 'Not Mentioned'
 } as const;
 export type MaritalStat = typeof MaritalStat[keyof typeof MaritalStat];
 
@@ -102,3 +104,12 @@ export const AddressType = {
   "1": 'Work Place'
 } as const;
 export type AddressType = typeof AddressType[keyof typeof AddressType];
+
+export const WorkArrangement = {
+  "0": 'On-site',
+  "1": 'Remote',
+  "2": 'Hybrid',
+  "3": 'Shift-based',
+  "4": 'Rotational / Roster-based'
+} as const;
+export type WorkArrangement = typeof WorkArrangement[keyof typeof WorkArrangement];
