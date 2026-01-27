@@ -29,12 +29,12 @@ const LeavePolicyConfigHistoryHeader = () => {
       variants={itemVariants}
       className="mb-4 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
     >
-      <div className="flex items-center gap-3">
+      <div className="flex md:items-center gap-3 md:flex-row flex-col">
         {/* Back Button */}
         <Button
           variant="outline"
           onClick={handleBack}
-          className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+          className="flex md:items-center gap-2 px-3 py-2 cursor-pointer w-1/3 md:w-auto"
           aria-label="Go back"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -48,7 +48,7 @@ const LeavePolicyConfigHistoryHeader = () => {
           className="flex items-center gap-2"
         >
           <Calendar className="w-6 h-6 text-green-600" />
-          <h1 className="text-2xl font-bold text-black">
+          <h1 className="md:text-2xl text-xl font-bold text-black">
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
