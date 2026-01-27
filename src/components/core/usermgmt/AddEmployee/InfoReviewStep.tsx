@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { CheckCircle, User, Printer } from 'lucide-react';
-import type { Step1Dto } from '../../../../types/hr/employee/empAddDto';
-import type { UUID } from 'crypto';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { CheckCircle, User, Printer } from "lucide-react";
+import type {
+  Step1Dto,
+  BasicInfoDto,
+} from "../../../../types/hr/employee/empAddDto";
+import type { UUID } from "crypto";
 
 interface BasicInfoReviewStepProps {
   step1Data: Step1Dto & { branchId: UUID };
-  employeeCode?: string;
+  step2Data: BasicInfoDto | null;
   photo?: string | null;
   onBack: () => void;
   onConfirm: () => void;
@@ -16,7 +19,7 @@ interface BasicInfoReviewStepProps {
 
 export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
   step1Data,
-  employeeCode,
+  step2Data,
   photo,
   onBack,
   onConfirm,
@@ -27,7 +30,7 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
 
   // Scroll to top function
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
@@ -47,9 +50,13 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
     onConfirm();
   };
 
-  // Format the full name
-  const fullName = `${step1Data.firstName || ''} ${step1Data.middleName || ''} ${step1Data.lastName || ''}`.trim();
-  const fullNameAm = `${step1Data.firstNameAm || ''} ${step1Data.middleNameAm || ''} ${step1Data.lastNameAm || ''}`.trim();
+  // Format the full name - use Step 2 data if available, otherwise fallback to Step 1
+  const fullName =
+    step2Data?.fullName ||
+    `${step1Data.firstName || ""} ${step1Data.middleName || ""} ${step1Data.lastName || ""}`.trim();
+  const fullNameAm =
+    step2Data?.fullNameAm ||
+    `${step1Data.firstNameAm || ""} ${step1Data.middleNameAm || ""} ${step1Data.lastNameAm || ""}`.trim();
 
   return (
     <motion.div
@@ -68,8 +75,16 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
         >
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -81,7 +96,11 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
                 onClick={() => setSubmitError(null)}
                 className="text-red-800 hover:text-red-900"
               >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
                   <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                 </svg>
               </button>
@@ -92,16 +111,25 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
 
       <div className="text-center mb-8">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Basic Information</h2>
-        <p className="text-gray-600">Please review all the information before confirming</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Review Basic Information
+        </h2>
+        <p className="text-gray-600">
+          Please review all the information before confirming
+        </p>
       </div>
 
       {/* Basic Information Section */}
-      <div className="border border-gray-200 rounded-xl p-6 mb-6 print-section" id='basic-info-section'>
+      <div
+        className="border border-gray-200 rounded-xl p-6 mb-6 print-section"
+        id="basic-info-section"
+      >
         <div className="flex items-center mb-4">
           <div className="flex items-center">
             <User className="w-5 h-5 text-green-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Basic Information
+            </h3>
           </div>
         </div>
 
@@ -111,7 +139,13 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
             {/* Profile Picture Preview */}
             <div className="border-dashed border-2 rounded-lg px-4 py-2 flex flex-col items-center justify-center mb-4">
               <div className="photo-section">
-                {photo ? (
+                {step2Data?.photo ? (
+                  <img
+                    src={step2Data.photo}
+                    alt="Employee Profile"
+                    className="employee-photo"
+                  />
+                ) : photo ? (
                   <img
                     src={`data:image/png;base64,${photo}`}
                     alt="Employee Profile"
@@ -134,11 +168,15 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
               </p>
             </div>
 
-            {employeeCode && (
+            {step2Data?.code && (
               <div className="employee-code text-center">
                 <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                  <span className="text-xs font-medium text-green-600">Employee Code: </span>
-                  <span className="text-sm font-bold text-green-800">{employeeCode}</span>
+                  <span className="text-xs font-medium text-green-600">
+                    Employee Code:{" "}
+                  </span>
+                  <span className="text-sm font-bold text-green-800">
+                    {step2Data.code}
+                  </span>
                 </div>
               </div>
             )}
@@ -150,90 +188,113 @@ export const BasicInfoReviewStep: React.FC<BasicInfoReviewStepProps> = ({
               {/* Left Column */}
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Full Name (English)</label>
-                  <p className="text-gray-900 font-medium">{fullName || 'Not provided'}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Full Name (English)
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {fullName || "Not provided"}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">First Name (English)</label>
-                  <p className="text-gray-900 font-medium">{step1Data.firstName || 'Not provided'}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Gender
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {step2Data?.gender || step1Data.gender || "Not provided"}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Middle Name (English)</label>
-                  <p className="text-gray-900 font-medium">{step1Data.middleName || 'Not provided'}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Nationality
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {step2Data?.nationality ||
+                      step1Data.nationality ||
+                      "Not provided"}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Last Name (English)</label>
-                  <p className="text-gray-900 font-medium">{step1Data.lastName || 'Not provided'}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Employment Date
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {step2Data?.employmentDate ||
+                      step1Data.employmentDate ||
+                      "Not provided"}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Gender</label>
-                  <p className="text-gray-900 font-medium">{step1Data.gender || 'Not provided'}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Employment Type
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {step2Data?.employmentType ||
+                      step1Data.employmentType ||
+                      "Not provided"}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Nationality</label>
-                  <p className="text-gray-900 font-medium">{step1Data.nationality || 'Not provided'}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Employment Nature
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {step2Data?.employmentNature ||
+                      step1Data.employmentNature ||
+                      "Not provided"}
+                  </p>
                 </div>
               </div>
 
               {/* Right Column */}
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">ሙሉ ስም</label>
-                  <p className="text-gray-900 font-medium">{fullNameAm || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">ስም</label>
-                  <p className="text-gray-900 font-medium">{step1Data.firstNameAm || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">የአባት ስም</label>
-                  <p className="text-gray-900 font-medium">{step1Data.middleNameAm || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">የአያት ስም</label>
-                  <p className="text-gray-900 font-medium">{step1Data.lastNameAm || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Employment Date</label>
-                  <p className="text-gray-900 font-medium">{step1Data.employmentDate || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Employment Type</label>
-                  <p className="text-gray-900 font-medium">{step1Data.employmentType || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Employment Nature</label>
-                  <p className="text-gray-900 font-medium">{step1Data.employmentNature || 'Not provided'}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Employment Details */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h4 className="font-semibold text-gray-900 mb-4">Employment Details</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Branch</label>
+                  <label className="text-sm font-medium text-gray-500">
+                    ሙሉ ስም
+                  </label>
                   <p className="text-gray-900 font-medium">
-                    {step1Data.branchId ? `Selected (ID: ${step1Data.branchId})` : 'Not selected'}
+                    {fullNameAm || "Not provided"}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Department</label>
+                  <label className="text-sm font-medium text-gray-500">
+                    Department
+                  </label>
                   <p className="text-gray-900 font-medium">
-                    {step1Data.departmentId ? `Selected (ID: ${step1Data.departmentId})` : 'Not selected'}
+                    {step2Data?.department || "Not provided"}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Position</label>
+                  <label className="text-sm font-medium text-gray-500">
+                    Position
+                  </label>
                   <p className="text-gray-900 font-medium">
-                    {step1Data.positionId ? `Selected (ID: ${step1Data.positionId})` : 'Not selected'}
+                    {step2Data?.position || "Not provided"}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Job Grade</label>
+                  <label className="text-sm font-medium text-gray-500">
+                    Job Grade
+                  </label>
                   <p className="text-gray-900 font-medium">
-                    {step1Data.jobGradeId ? `Selected (ID: ${step1Data.jobGradeId})` : 'Not selected'}
+                    {step2Data?.jobGrade || "Not provided"}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">
+                    Branch
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {step2Data?.branch || "Not provided"}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">
+                    Work Arrangement
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {step2Data?.workArrangement ||
+                      step1Data.workArrangement ||
+                      "Not provided"}
                   </p>
                 </div>
               </div>

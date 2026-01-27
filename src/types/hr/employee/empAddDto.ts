@@ -156,6 +156,25 @@ export interface Step5Dto {
     guaFileType: string;
 }
 
+export interface BasicInfoDto {
+  employeeId: UUID;
+  photo: string;
+  fullName: string;
+  fullNameAm: string;
+  code: string;
+  gender: string;
+  nationality: string;
+  employmentDate: string;
+  employmentDateAm: string;
+  jobGrade: string;
+  position: string;
+  department: string;
+  branch: string;
+  employmentType: string;
+  employmentNature: string;
+  workArrangement: string;
+}
+
 export interface EmpAddRes {
     id: UUID;
 }

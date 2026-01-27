@@ -1,17 +1,23 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CheckCircle } from 'lucide-react';
-import { BasicInfoStep } from '../../../components/hr/employee/AddEmployee/steps/BasicInfoStep';
-import { BasicInfoReviewStep } from '../../../components/core/usermgmt/AddEmployee/InfoReviewStep';
-import type { Step1Dto } from '../../../types/hr/employee/empAddDto';
-import type { UUID } from 'crypto';
-import { usermgmtService } from '../../../services/core/usermgtservice';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { CheckCircle } from "lucide-react";
+import { BasicInfoStep } from "../../../components/hr/employee/AddEmployee/steps/BasicInfoStep";
+import { BasicInfoReviewStep } from "../../../components/core/usermgmt/AddEmployee/InfoReviewStep";
+import type {
+  Step1Dto,
+  BasicInfoDto,
+} from "../../../types/hr/employee/empAddDto";
+import type { UUID } from "crypto";
+import { usermgmtService } from "../../../services/core/usermgtservice";
 
 function PageAddUser() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [basicInfoData, setBasicInfoData] = useState<Partial<Step1Dto & { branchId: UUID }>>({});
-  const [employeeCode, setEmployeeCode] = useState<string>('');
+  const [basicInfoData, setBasicInfoData] = useState<
+    Partial<Step1Dto & { branchId: UUID }>
+  >({});
+  const [employeeId, setEmployeeId] = useState<UUID | null>(null);
+  const [step2Data, setStep2Data] = useState<BasicInfoDto | null>(null);
   const [photoData, setPhotoData] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -29,14 +35,16 @@ function PageAddUser() {
   };
 
   // Handle when Basic Info step is completed
-  const handleBasicInfoComplete = async (data: Step1Dto & { branchId: UUID }) => {
+  const handleBasicInfoComplete = async (
+    data: Step1Dto & { branchId: UUID },
+  ) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Store the data locally first
       setBasicInfoData(data);
-      
+
       // If a file is uploaded, create a preview
       if (data.File) {
         const reader = new FileReader();
@@ -45,21 +53,30 @@ function PageAddUser() {
         };
         reader.readAsDataURL(data.File);
       }
-      
-      // Call the API to create employee
+
+      // Call the API to create employee (Step 1)
       const result = await usermgmtService.addEmployeeStep1(data);
-      
-      console.log('Employee created successfully:', result);
-      
-      // Set employee code from API response
-      setEmployeeCode(result.code);
-      
+
+      console.log("Employee Step 1 completed successfully:", result);
+
+      // Store the employee ID from the response
+      setEmployeeId(result.id);
+
+      // Fetch Step 2 data using the employee ID
+      const step2Response = await usermgmtService.getEmployeeStep2Data(
+        result.id,
+      );
+
+      console.log("Employee Step 2 data fetched successfully:", step2Response);
+
+      // Store the Step 2 data
+      setStep2Data(step2Response);
+
       // Move to review step
       setCurrentStep(2);
-      
     } catch (err: any) {
-      console.error('Failed to create employee:', err);
-      setError(err.message || 'Failed to create employee. Please try again.');
+      console.error("Failed to create employee or fetch Step 2 data:", err);
+      setError(err.message || "Failed to create employee. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -69,19 +86,21 @@ function PageAddUser() {
   const handleConfirmAndSave = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Show success
       setSaveSuccess(true);
-      
+
       // Redirect after 2 seconds
       setTimeout(() => {
-        navigate('/core/users');
+        navigate("/core/users");
       }, 2000);
-      
     } catch (err: any) {
-      console.error('Failed to complete employee creation:', err);
-      setError(err.message || 'Failed to complete employee creation. Please try again.');
+      console.error("Failed to complete employee creation:", err);
+      setError(
+        err.message ||
+          "Failed to complete employee creation. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +109,7 @@ function PageAddUser() {
   // Handle print functionality
   const handlePrint = () => {
     // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     setTimeout(() => {
       const basicInfoElement = document.getElementById("basic-info-section");
@@ -109,7 +128,9 @@ function PageAddUser() {
       if (!printWindow) return;
 
       // Extract styles
-      const styles = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
+      const styles = Array.from(
+        document.querySelectorAll("style, link[rel='stylesheet']"),
+      )
         .map((node) => node.outerHTML)
         .join("\n");
 
@@ -310,8 +331,15 @@ function PageAddUser() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-3">Employee Added Successfully!</h1>
-            <p className="text-gray-600 mb-6">Employee code: <span className="font-semibold text-green-600">{employeeCode}</span></p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">
+              Employee Added Successfully!
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Employee code:{" "}
+              <span className="font-semibold text-green-600">
+                {step2Data?.code || "N/A"}
+              </span>
+            </p>
             <p className="text-gray-500">Redirecting to employees list...</p>
           </div>
         </div>
@@ -327,8 +355,16 @@ function PageAddUser() {
           <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <div className="ml-3">
@@ -340,7 +376,11 @@ function PageAddUser() {
                   onClick={() => setError(null)}
                   className="text-red-800 hover:text-red-900"
                 >
-                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                   </svg>
                 </button>
@@ -361,7 +401,7 @@ function PageAddUser() {
           ) : (
             <BasicInfoReviewStep
               step1Data={basicInfoData as Step1Dto & { branchId: UUID }}
-              employeeCode={employeeCode}
+              step2Data={step2Data}
               photo={photoData}
               onBack={handleBackToBasicInfo}
               onConfirm={handleConfirmAndSave}
