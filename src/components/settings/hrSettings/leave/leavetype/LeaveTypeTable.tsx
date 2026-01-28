@@ -79,8 +79,8 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
 
   const getBooleanColor = (booleanColor: string): string => {
     const colors: Record<string, string> = {
-      YES: "bg-green-500 text-white border border-green-200",
-      NO: "bg-red-500 text-white border border-red-200",
+      YES: "bg-green-100 text-green-800 border border-green-300",
+      No: "bg-red-100 text-red-700 border border-red-300",
     };
     return (
       colors[booleanColor] || "bg-green-100 text-gray-800 border border-green-200"
@@ -88,18 +88,20 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
   };
 
   const getStatusColor = (isActive: boolean): string => {
-    return isActive ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200";
+    return isActive
+      ? "bg-green-100 text-green-800 border border-green-300"
+      : "bg-red-100 text-red-700 border border-red-300";
   };
 
   const getBooleanIcon = (value: boolean) => {
-    return value ? (<CheckCircle className="h-4 w-4 text-white" />) : (<XCircle className="h-4 w-4 text-white" />);
+    return value ? (<CheckCircle className="h-3 w-3 text-green-800" />) : (<XCircle className="h-3 w-3 text-red-800" />);
   };
 
   const getBooleanSmallIcon = (value: boolean) => {
     return value ? (
-      <CheckCircle className="h-2.5 w-2.5 text-white" />
+      <CheckCircle className="h-2.5 w-2.5 text-green-800" />
     ) : (
-      <XCircle className="h-2.5 w-2.5 text-white" />
+      <XCircle className="h-2.5 w-2.5 text-red-800" />
     );
   };
 
@@ -115,6 +117,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
       }
     })
   };
+  console.log("leave type", leaveTypes);
 
   return (
     <>
@@ -204,7 +207,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                           <div className="flex items-center">
                             <motion.div
                               whileHover={{ rotate: 10 }}
-                              className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
+                              className="shrink-0 h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center"
                             >
                               <span className="text-emerald-600 font-medium">
                                 {leaveType.name.charAt(0).toUpperCase()}
@@ -217,8 +220,8 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                               <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                                 <span>Is Active?: </span>
                                 <span
-                                  className={`px-2 py-1 inline-flex text-[10px] leading-2 font-semibold rounded-full gap-0.5 ${getBooleanColor(
-                                    leaveType.isActiveStr
+                                  className={`px-2 py-1 inline-flex text-[10px] leading-2 font-semibold rounded-full gap-0.5 ${getStatusColor(
+                                    leaveType.isActive
                                   )}`}
                                 >
                                   {getBooleanSmallIcon(leaveType.isActive)}{" "}
@@ -242,7 +245,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-1">
                             <span
-                              className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
+                              className={`px-2 py-1 inline-flex text-xs leading-2 font-semibold gap-1 rounded-full ${getBooleanColor(
                                 leaveType.requiresApprovalStr
                               )}`}
                             >
@@ -254,7 +257,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(
+                              className={`px-2 py-1 inline-flex text-xs leading-2 font-semibold gap-1 rounded-full ${getBooleanColor(
                                 leaveType.allowHalfDayStr
                               )}`}
                             >
@@ -267,7 +270,7 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
                           <div className="flex items-center gap-2">
                             {/* {getBooleanIcon(leaveType.holidaysAsLeave)} */}
                             <span
-                              className={`px-3 py-1 inline-flex text-xs leading-4 font-semibold gap-2 rounded-full ${getBooleanColor(leaveType.holidaysAsLeaveStr)}`}
+                              className={`px-2 py-1 inline-flex text-xs leading-2 font-semibold gap-1 rounded-full ${getBooleanColor(leaveType.holidaysAsLeaveStr)}`}
                             >
                               {getBooleanIcon(leaveType.holidaysAsLeave)}{" "}
                               {leaveType.holidaysAsLeaveStr}

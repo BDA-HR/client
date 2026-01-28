@@ -91,7 +91,7 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                     Priority
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Is Active
+                    Status
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Effective From
@@ -164,7 +164,7 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                           )}`}
                         >
                           {getBooleanIcon(policyAssignmentRule.isActive)}
-                          {policyAssignmentRule.isActive ? "Yes" : "No"}
+                          {policyAssignmentRule.isActiveStr}
                         </span>
                       </td>
 

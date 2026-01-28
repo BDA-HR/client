@@ -126,7 +126,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                       scope="col"
                       className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      IsActive
+                      Status
                     </th>
                     <th
                       scope="col"
@@ -200,7 +200,7 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
                               )}`}
                             >
                               {getBooleanIcon(AppChainHistory.isActive)}
-                              {AppChainHistory.isActive ? "Yes" : "No"}
+                              {AppChainHistory.isActiveStr}
                             </span>
                           </div>
                         </td>

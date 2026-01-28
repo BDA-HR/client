@@ -128,7 +128,7 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
                   scope="col"
                   className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Is Active
+                  Status
                 </th>
                 <th
                   scope="col"
@@ -207,7 +207,7 @@ const PolicyAssignmentRuleHistoryTable: React.FC<PolicyAssignmentRuleHistoryTabl
                         )}`}
                       >
                         {getBooleanIcon(rule.isActive)}
-                        {rule.isActive ? "Yes" : "No"}
+                        {rule.isActiveStr}
                       </span>
                     </td>
 

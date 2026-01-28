@@ -113,6 +113,21 @@ const LeavePolicySection: React.FC = () => {
       setError("Failed to delete leave policy. Please try again.");
     }
   };
+      const handleToggleStatus = async (leavePolicy: LeavePolicyListDto) => {
+        try {
+          const statusPayload = {
+            id: leavePolicy.id,
+            stat: !leavePolicy.status,
+          };
+          // await changeStatus.mutateAsync(statusPayload);
+          // // Refetch data instead of manual state update to ensure consistency
+          // await fetchAppChains();
+          setError(null);
+        } catch (err) {
+          console.error("Failed to toggle approval chain status:", err);
+          setError("Failed to update approval chain status. Please try again.");
+        }
+      };
 
   return (
     <div className="space-y-6">
@@ -184,6 +199,7 @@ const LeavePolicySection: React.FC = () => {
             onPageChange={setCurrentPage}
             onEdit={setEditingPolicy as any}
             onDelete={setDeletingPolicy as any}
+            onToggleStatus={handleToggleStatus}
           />
         </motion.div>
       )}

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import type {
-  LeaveAppChainListDto,
   LeaveAppChainAddDto,
   UUID,
 } from "../../../../../types/core/Settings/leaveAppChain";
@@ -12,10 +11,11 @@ import { leaveAppChainServices } from "../../../../../services/core/settings/Mod
 import LeaveAppStepCard from "./LeaveAppStep/leaveAppStepCard";
 import { useNavigate } from "react-router-dom";
 import AddLeaveAppStepModal from "./LeaveAppStep/AddLeaveAppStepModal";
+import LeaveAppStepListModal from "./LeaveAppStep/LeaveAppStepListModal";
 import { leavePolicyService } from "../../../../../services/core/settings/ModHrm/LeavePolicyService";
 import type {
   LeaveAppStepAddDto,
-  LeaveAppStepListDto,
+  LeaveAppStepModDto,
 } from "../../../../../types/core/Settings/leaveAppStep";
 import { leaveAppStepServices } from "../../../../../services/core/settings/ModHrm/leaveAppStepService";
 import { toast } from "react-hot-toast";
@@ -39,7 +39,7 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
   const { create, activeAppChain } = leaveAppChainServices(leavePolicyId);
 
   // Wait until we have an activeChainId before enabling step query
-  const { listByChain, create: createStep } = leaveAppStepServices(
+  const { listByChain, create: createStep, update: updateStep, remove: deleteStep } = leaveAppStepServices(
     activeChainId ?? undefined,
   );
 
@@ -67,11 +67,12 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
     if (activeAppChain.data) {
       console.log("Active chain data loaded:", activeAppChain.data);
       setActiveChainId(activeAppChain.data.id);
-      toast.success(
-        `Active chain loaded: ${activeAppChain.data.effectiveFromStr}`,
-      );
+    } else if (activeAppChain.data === null && !activeAppChain.isLoading) {
+      // Explicitly handle when there's no active chain
+      console.log("No active chain found, resetting activeChainId");
+      setActiveChainId(null);
     }
-  }, [activeAppChain.data]);
+  }, [activeAppChain.data, activeAppChain.isLoading]);
 
   // Debug: Log state changes
   useEffect(() => {
@@ -109,8 +110,27 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
     }
   };
 
+  const handleUpdateStep = async (stepData: LeaveAppStepModDto) => {
+    try {
+      await updateStep.mutateAsync(stepData);
+    } catch (err: any) {
+      console.error(err);
+      throw err; // Re-throw to let the modal handle the error display
+    }
+  };
+
+  const handleDeleteStep = async (stepId: UUID) => {
+    try {
+      await deleteStep.mutateAsync(stepId);
+    } catch (err: any) {
+      console.error(err);
+      throw err; // Re-throw to let the modal handle the error display
+    }
+  };
+
   const [isAddAppChainModalOpen, setIsAddAppChainModalOpen] = useState(false);
   const [isAddStepModalOpen, setIsAddStepModalOpen] = useState(false);
+  const [isManageStepsModalOpen, setIsManageStepsModalOpen] = useState(false);
 
   const { getAllNames } = employeeService();
 
@@ -144,13 +164,19 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
         />
 
         {/* Approval Steps */}
-        {activeAppChain.data ? (
+        {activeAppChain.isLoading ? (
+          <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-b-lg">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading approval chain...</p>
+          </div>
+        ) : activeAppChain.data ? (
           <LeaveAppStepCard
             steps={listByChain.data ?? []}
             loading={listByChain.isLoading}
             effectiveFrom={activeAppChain.data.effectiveFromStr}
             effectiveTo={activeAppChain.data.effectiveToStr}
             onAddStepClick={() => setIsAddStepModalOpen(true)}
+            onManageStepsClick={() => setIsManageStepsModalOpen(true)}
           />
         ) : (
           <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-b-lg">
@@ -174,6 +200,16 @@ const LeaveAppChainSection: React.FC<LeaveAppChainSectionProps> = ({
         onAddLeaveAppStep={handleAddStep}
         leavePolicyId={leavePolicyId}
         employees={employees}
+      />
+
+      <LeaveAppStepListModal
+        isOpen={isManageStepsModalOpen}
+        onClose={() => setIsManageStepsModalOpen(false)}
+        steps={listByChain.data ?? []}
+        onUpdateStep={handleUpdateStep}
+        onDeleteStep={handleDeleteStep}
+        employees={employees}
+        loading={listByChain.isLoading}
       />
     </div>
   );
