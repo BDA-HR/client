@@ -39,7 +39,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
   const [role, setRole] = useState<string>("0"); // Default to "0" (Manager)
   const [isFinal, setIsFinal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [employeeId, setEmployeeId] = useState<string>("");
+  const [employeeId, setEmployeeId] = useState<string>("none");
 
   // Create options from enum entries
   const roleOptions = Object.entries(ApprovalRole).map(([key, value]) => ({
@@ -56,7 +56,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
     setStepName("");
     setStepOrder(1);
     setRole("0");
-    setEmployeeId("");
+    setEmployeeId("none");
     setIsFinal(false);
   };
 
@@ -77,7 +77,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
         stepName: stepName.trim(),
         stepOrder,
         role: role,
-        employeeId: employeeId || null,
+        employeeId: employeeId === "none" ? null : employeeId,
         isFinal,
         leavePolicyId,
       };
@@ -121,7 +121,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
   }, [isOpen]);
 
   const selectedEmployee = employees.find((emp) => emp.id === employeeId);
-  const selectedEmployeeName = selectedEmployee?.name || "";
+  const selectedEmployeeName = employeeId === "none" ? "No Employee Selected" : (selectedEmployee?.name || "");
 
   if (!isOpen) return null;
 
@@ -209,7 +209,7 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
                     {ApprovalRole[role as keyof typeof ApprovalRole]}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[60]">
                   {roleOptions.map((option) => (
                     <SelectItem key={option.key} value={option.key}>
                       {option.value}
@@ -236,7 +236,8 @@ const AddLeaveAppStepModal: React.FC<AddLeaveAppStepModalProps> = ({
                     {selectedEmployeeName}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[60]">
+                  <SelectItem value="none">No Employee Selected</SelectItem>
                   {employeeOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}

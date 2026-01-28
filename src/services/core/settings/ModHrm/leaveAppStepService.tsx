@@ -74,11 +74,14 @@ export const leaveAppStepServices = (leavePolicyId?: UUID) => {
       return res.data.data;
     },
     onSuccess: () => {
-       if (leavePolicyId) {
-      queryClient.invalidateQueries({
-        queryKey: leaveAppStepKeys.byChain(leavePolicyId),
-      });
-    }
+      if (leavePolicyId) {
+        queryClient.invalidateQueries({
+          queryKey: leaveAppStepKeys.byChain(leavePolicyId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: leaveAppStepKeys.all,
+        });
+      }
     },
     onError: (error) => {
       throw new Error(extractErrorMessage(error));
@@ -102,6 +105,9 @@ export const leaveAppStepServices = (leavePolicyId?: UUID) => {
       queryClient.invalidateQueries({
         queryKey: leaveAppStepKeys.byChain(variables.leavePolicyId),
       });
+      queryClient.invalidateQueries({
+        queryKey: leaveAppStepKeys.all,
+      });
     },
     onError: (error) => {
       throw new Error(extractErrorMessage(error));
@@ -116,6 +122,9 @@ export const leaveAppStepServices = (leavePolicyId?: UUID) => {
       if (leavePolicyId) {
         queryClient.invalidateQueries({
           queryKey: leaveAppStepKeys.byChain(leavePolicyId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: leaveAppStepKeys.all,
         });
       }
     },

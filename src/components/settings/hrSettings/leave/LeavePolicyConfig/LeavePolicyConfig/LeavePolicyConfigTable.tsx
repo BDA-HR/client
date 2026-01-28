@@ -83,7 +83,7 @@ const getBooleanIcon = (value: boolean) =>
                     Min Service Months
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
-                    Is Active
+                    Status
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 tracking-wider">
                     Fiscal Year
@@ -151,7 +151,7 @@ const getBooleanIcon = (value: boolean) =>
                           )}`}
                         >
                           {getBooleanIcon(leavePolicyConfig.isActive)}
-                          {leavePolicyConfig.isActive ? "Yes" : "No"}
+                          {leavePolicyConfig.isActiveStr}
                         </span>
                       </td>
                       {/* fiscalYear */}

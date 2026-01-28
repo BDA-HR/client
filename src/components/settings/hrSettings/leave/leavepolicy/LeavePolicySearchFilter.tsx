@@ -60,7 +60,13 @@ const LeavePolicySearchFilters: React.FC<LeavePolicySearchFiltersProps> = ({
             )}
           </div>
         </div>
-
+<div className="flex gap-2 sm:flex-row flex-col">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 cursor-pointer border-emerald-200"
+          >
+            <span>Assign Policy</span>
+          </Button>
         <Button
           onClick={onAddClick}
           size="sm"
@@ -69,6 +75,7 @@ const LeavePolicySearchFilters: React.FC<LeavePolicySearchFiltersProps> = ({
           <BadgePlus className="h-4 w-4" />
           Add New
         </Button>
+        </div>
       </div>
     </motion.div>
   );

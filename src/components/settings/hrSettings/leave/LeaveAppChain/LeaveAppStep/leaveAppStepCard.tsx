@@ -3,9 +3,9 @@ import { Card, CardContent } from "../../../../../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../../../../../ui/avatar";
 import { Badge } from "../../../../../ui/badge";
 import { Button } from "../../../../../ui/button";
-import { Eye, Calendar, ListOrdered, BadgePlus } from "lucide-react";
+import { Eye, Calendar, ListOrdered, BadgePlus, Settings } from "lucide-react";
 import { Box } from "@radix-ui/themes";
-import type { LeaveAppStepListDto, UUID } from "../../../../../../types/core/Settings/leaveAppStep";
+import type { LeaveAppStepListDto } from "../../../../../../types/core/Settings/leaveAppStep";
 import { ApprovalRole } from "../../../../../../types/core/enum";
 
 interface ApprovalStepCardProps {
@@ -14,6 +14,7 @@ interface ApprovalStepCardProps {
   effectiveTo?: string;
   onViewDetails?: () => void;
   onAddStepClick: () => void;
+  onManageStepsClick: () => void;
   loading: boolean;
 }
 
@@ -23,6 +24,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
   effectiveTo,
   onViewDetails,
   onAddStepClick,
+  onManageStepsClick,
   loading,
 }) => {
   const getRoleColor = (role: ApprovalRole) => {
@@ -91,6 +93,18 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
                   <span className="hidden sm:inline">Add Approval Step</span>
                   <span className="sm:hidden">Add Step</span>
                 </Button>
+                {steps.length > 0 && (
+                  <Button
+                    onClick={onManageStepsClick}
+                    size="sm"
+                    variant="outline"
+                    className="flex cursor-pointer items-center justify-center gap-1 sm:gap-2 hover:bg-blue-50 hover:border-blue-200 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2"
+                  >
+                    <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Manage Steps</span>
+                    <span className="sm:hidden">Manage</span>
+                  </Button>
+                )}
               </div>
 
               {onViewDetails && steps.length > 0 && (
@@ -128,7 +142,7 @@ const LeaveAppStepCard: React.FC<ApprovalStepCardProps> = ({
               <div className="relative py-2 sm:py-4">
                 {/* Mobile: Vertical Layout */}
                 <div className="block sm:hidden space-y-3">
-                  {steps.map((step, index) => (
+                  {steps.map((step) => (
                     <div key={step.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="relative">
                         <Avatar className="h-10 w-10 border-2 border-white dark:border-gray-800 shadow-sm">

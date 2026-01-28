@@ -132,6 +132,9 @@ export const leaveAppChainServices = (leavePolicyId: UUID) => {
       queryClient.invalidateQueries({
         queryKey: leaveAppChainKeys.byPolicy(leavePolicyId),
       });
+      queryClient.invalidateQueries({
+        queryKey: leaveAppChainKeys.activeByPolicy(leavePolicyId),
+      });
     },
     onError: (error) => {
       throw new Error(extractErrorMessage(error));

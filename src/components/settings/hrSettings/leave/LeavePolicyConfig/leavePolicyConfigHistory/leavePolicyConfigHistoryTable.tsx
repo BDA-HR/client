@@ -135,9 +135,9 @@ const LeavePolicyConfigHistoryTable: React.FC<LeavePolicyHistoryTableProps> = ({
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Is Active
+                 Status
                 </th>
                 <th
                   scope="col"
@@ -222,14 +222,14 @@ const LeavePolicyConfigHistoryTable: React.FC<LeavePolicyHistoryTableProps> = ({
                     </td>
 
                     {/* Is Active */}
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="px-4 py-3 text-left">
                       <span
                         className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getStatusColor(
                           config.isActive
                         )}`}
                       >
                         {getBooleanIcon(config.isActive)}
-                        {config.isActive ? "Yes" : "No"}
+                        {config.isActiveStr==="Active"?"Active":"Inactive"}
                       </span>
                     </td>
 
