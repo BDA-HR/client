@@ -64,6 +64,9 @@ import LeaveAppChainHistory from "./pages/settings/hrSettings/Leave/LeaveAppChai
 import LeavePolicyConfigHistory from "./pages/settings/hrSettings/Leave/leavePolicyConfigHistory";
 import PolicyAssignmentRule from "./pages/settings/hrSettings/Leave/policyAssignmentRule";
 import PolicyAssignmentRuleHistory from "./pages/settings/hrSettings/Leave/policyAssignmentRuleHistory";
+import PageAccounts from "./pages/finance/PageAccounts";
+import PageJournal from "./pages/finance/PageJournal";
+import PageReports from "./pages/finance/PageReports";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -227,6 +230,9 @@ function App() {
                 {/* START FINANCE ROUTES */}
                 <Route path="/finance/gl" element={<GlPage />} />
                 <Route path="/finance/budget-list" element={<BudgetList />} />
+                <Route path="/finance/accounts" element={<PageAccounts />} />
+                <Route path="/finance/journals" element={<PageJournal />} />
+                <Route path="/finance/reports" element={<PageReports />} />
                 <Route
                   path="/finance/budget-create"
                   element={<BudgetCreate />}
