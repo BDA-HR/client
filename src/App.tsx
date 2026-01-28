@@ -67,6 +67,9 @@ import PolicyAssignmentRuleHistory from "./pages/settings/hrSettings/Leave/polic
 import PageAccounts from "./pages/finance/PageAccounts";
 import PageJournal from "./pages/finance/PageJournal";
 import PageReports from "./pages/finance/PageReports";
+import PageAssets from "./pages/finance/PageAssets";
+import PageTransactions from "./pages/finance/PageTransactions";
+import PagePayroll from "./pages/finance/PagePayroll";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -232,6 +235,9 @@ function App() {
                 <Route path="/finance/budget-list" element={<BudgetList />} />
                 <Route path="/finance/accounts" element={<PageAccounts />} />
                 <Route path="/finance/journals" element={<PageJournal />} />
+                <Route path="/finance/payroll" element={<PagePayroll />} />
+                <Route path="/finance/transactions" element={<PageTransactions />} />
+                <Route path="/finance/assets" element={<PageAssets />} />
                 <Route path="/finance/reports" element={<PageReports />} />
                 <Route
                   path="/finance/budget-create"
