@@ -5,6 +5,8 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
+  Check,
+  X,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -30,36 +32,20 @@ const LeavePolicyConfigTable: React.FC<LeavePolicyConfigTableProps> = ({
   totalItems,
   isLoading = false,
   onPageChange,
-  onEdit,
-  onDelete,
-  onToggleStatus,
 }) => {
-  const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
+ 
 
-  const getBooleanColor = (value: boolean) =>
-    value
-      ? "bg-green-500 text-white border border-green-200"
-      : "bg-red-500 text-white border border-red-200";
+const getBooleanColor = (value: boolean) =>
+  value
+    ? "bg-green-100 text-green-800 border border-green-300"
+    : "bg-red-100 text-red-700 border border-red-300";
 
-  const getBooleanIcon = (value: boolean) =>
-    value ? (
-      <CheckCircle className="h-3 w-3 text-white" />
-    ) : (
-      <XCircle className="h-3 w-3 text-white" />
-    );
- const getStatusColor = (status: string): string => {
-   const colors: Record<string, string> = {
-     0: "bg-green-100 text-green-800 border border-green-200",
-     1: "bg-red-100 text-red-800 border border-red-200",
-   };
-   console.log("status", status);
-   return (
-     colors[status] || "bg-gray-100 text-gray-800 border border-gray-200"
-
-   );
- };
-
-     const navigate = useNavigate();
+const getBooleanIcon = (value: boolean) =>
+  value ? (
+    <CheckCircle className="h-3 w-3 text-green-700" />
+  ) : (
+    <XCircle className="h-3 w-3 text-red-600" />
+  );
 
   return (
     <motion.div

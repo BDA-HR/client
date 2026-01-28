@@ -275,7 +275,6 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
     }
 
     if (valueOptions.length > 0) {
-      // Dropdown for other fields
       return (
         <Select
           value={formData.value}
@@ -337,17 +336,14 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-lg shadow-xl w-full max-w-6xl h-[90vh] sm:h-[80vh] flex flex-col"
+        className="bg-white rounded-lg shadow-xl w-full max-w-5xl h-[90vh] sm:h-[75vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 sm:py-4 bg-white">
+        <div className="flex justify-between items-center border-b px-4 sm:px-6 py-3 bg-white rounded-lg">
           <div>
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-              Rule Conditions
+              {ruleName} conditions
             </h2>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 hidden sm:block">
-              Configure conditions for "{ruleName}"
-            </p>
           </div>
           <button
             onClick={handleClose}
@@ -358,7 +354,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
         </div>
 
         {/* Body - Responsive Layout */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden rounded-lg">
           {/* Form Section */}
           <div className="w-full lg:w-2/5 border-b lg:border-b-0 lg:border-r border-gray-200 p-3 sm:p-4 bg-white">
             <div className="flex flex-col h-full">
@@ -404,7 +400,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
                     onValueChange={(value) =>
                       handleSelectChange("operator", value)
                     }
-                    disabled={formData.field !== "2"} // Only enable for Service Months (field "2")
+                    disabled={formData.field !== "2"} 
                   >
                     <SelectTrigger
                       className={`w-full h-8 sm:h-9 text-xs sm:text-sm ${
@@ -431,8 +427,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
                   </Select>
                   {formData.field !== "2" && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Operator is automatically set to "Equals" for this field
-                      type
+                      Operator "Equals" only works for this field type.
                     </p>
                   )}
                 </div>
@@ -567,7 +562,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
                               <div className="flex items-center justify-center gap-1">
                                 <button
                                   onClick={() => handleEditCondition(condition)}
-                                  className="p-1 sm:p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                  className="p-1 sm:p-1.5 text-gray-400 hover:text-green-600 hover:bg-blue-50 rounded transition-colors"
                                   title="Edit condition"
                                 >
                                   <Edit
@@ -597,7 +592,7 @@ const PolicyRuleConditionModal: React.FC<PolicyRuleConditionModalProps> = ({
                 </div>
 
                 {/* Pagination */}
-                {totalItems > 0 && totalPages > 1 && (
+                {totalItems > 0 && (
                   <div className="bg-white px-4 sm:px-6 py-3 flex items-center justify-between border-t border-gray-200">
                     <div className="flex-1 flex justify-between sm:hidden">
                       <button

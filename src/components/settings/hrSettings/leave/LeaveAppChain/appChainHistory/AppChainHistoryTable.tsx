@@ -56,24 +56,19 @@ const AppChainHistoryTable: React.FC<AppChainHistoryTableProps> = ({
     setPopoverOpen(null);
   };
 
- 
-
-  const getBooleanColor = (booleanColor: string): string => {
-    const colors: Record<string, string> = {
-      YES: "bg-green-500 text-white border border-green-200",
-      NO: "bg-red-500 text-white border border-red-200",
-    };
-    return (
-      colors[booleanColor] || "bg-green-100 text-gray-800 border border-green-200"
-    );
-  };
 
   const getStatusColor = (isActive: boolean): string => {
-    return isActive ? "bg-green-500 text-white border border-green-200" : "bg-red-500 text-white border border-red-200";
+    return isActive
+      ? "bg-green-100 text-green-800 border border-green-300"
+      : "bg-red-100 text-red-700 border border-red-300";
   };
 
   const getBooleanIcon = (value: boolean) => {
-    return value ? (<CheckCircle className="h-4 w-4 text-white" />) : (<XCircle className="h-4 w-4 text-white" />);
+    return value ? (
+      <CheckCircle className="h-3 w-3 text-green-700" />
+    ) : (
+      <XCircle className="h-3 w-3 text-red-600" />
+    );
   };
 
 

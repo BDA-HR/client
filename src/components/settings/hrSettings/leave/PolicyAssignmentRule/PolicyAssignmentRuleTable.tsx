@@ -44,15 +44,16 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
 
   const getBooleanColor = (value: boolean) =>
     value
-      ? "bg-green-500 text-white border border-green-200"
-      : "bg-red-500 text-white border border-red-200";
+      ? "bg-green-100 text-green-800 border border-green-300"
+      : "bg-red-100 text-red-700 border border-red-300";
 
   const getBooleanIcon = (value: boolean) =>
     value ? (
-      <CheckCircle className="h-3 w-3 text-white" />
+      <CheckCircle className="h-3 w-3 text-green-700" />
     ) : (
-      <XCircle className="h-3 w-3 text-white" />
+      <XCircle className="h-3 w-3 text-red-600" />
     );
+
 
   const getPriorityColor = (priority: string): string => {
     const colors: Record<string, string> = {
