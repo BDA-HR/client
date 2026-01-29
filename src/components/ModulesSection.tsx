@@ -12,7 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { BorderBeam } from "../components/ui/border-beam";
-import { hasRole } from "../utils/jwt.utils";
+import { hasPermission, hasRole } from "../utils/jwt.utils";
 
 interface ModuleCardProps {
   label: string;
@@ -227,13 +227,10 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({ onModuleSelect }) => {
       },
     ];
 
-    // If no token, show nothing
     if (!token) {
       return [];
     }
 
-    // Use hasRole function to check each role
-    // Employee role - gets all modules except Core
     if (hasRole(token, "emp")) {
       return allModules.filter((module) => module.label !== "Core");
     }
@@ -247,62 +244,34 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({ onModuleSelect }) => {
     ) {
       return allModules;
     }
-
+else{
     // Departmental roles - check each department
-    if (
-      hasRole(token, "hrm.dir") ||
-      hasRole(token, "hrm.mgr") ||
-      hasRole(token, "hrm.stf") ||
-      hasRole(token, "hrm")
+    if (hasPermission(token,"mod.hrm","module")
     ) {
       return allModules.filter((module) => module.label === "HR");
     }
 
-    if (
-      hasRole(token, "fin.dir") ||
-      hasRole(token, "fin.mgr") ||
-      hasRole(token, "fin.stf") ||
-      hasRole(token, "fin")
+    if (hasPermission(token,"mod.fnm","module")
     ) {
       return allModules.filter((module) => module.label === "Finance");
     }
 
-    if (
-      hasRole(token, "crm.dir") ||
-      hasRole(token, "crm.mgr") ||
-      hasRole(token, "crm.stf") ||
-      hasRole(token, "crm")
-    ) {
+       if (hasPermission(token,"mod.crm","module")) {
       return allModules.filter((module) => module.label === "CRM");
     }
 
-    if (
-      hasRole(token, "inv.dir") ||
-      hasRole(token, "inv.mgr") ||
-      hasRole(token, "inv.stf") ||
-      hasRole(token, "inv")
-    ) {
+       if (hasPermission(token,"mod.inv","module")) {
       return allModules.filter((module) => module.label === "Inventory");
     }
 
-    if (
-      hasRole(token, "pro.dir") ||
-      hasRole(token, "pro.mgr") ||
-      hasRole(token, "pro.stf") ||
-      hasRole(token, "pro")
-    ) {
+    if (hasPermission(token, "mod.pro", "module")) {
       return allModules.filter((module) => module.label === "Procurement");
     }
 
-    if (
-      hasRole(token, "file.dir") ||
-      hasRole(token, "file.mgr") ||
-      hasRole(token, "file.stf") ||
-      hasRole(token, "file")
-    ) {
+    if (hasPermission(token, "mod.flm", "module")) {
       return allModules.filter((module) => module.label === "File");
     }
-
+  }
     return [];
   };
 
@@ -330,7 +299,7 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({ onModuleSelect }) => {
   return (
     <div className="relative w-full h-full flex items-center justify-center p-4">
       {/* Background effects */}
-      <style jsx global>{`
+      <style>{`
         @keyframes float {
           0%,
           100% {
