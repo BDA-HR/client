@@ -180,100 +180,93 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({ onModuleSelect }) => {
   // Get token from cookies
   const token = getCookie("accessToken") || getCookie("access_token") || "";
 
-  // Determine which modules to show based on role USING hasRole function
-  const getAllowedModules = () => {
-    const allModules = [
-      {
-        label: "HR",
-        path: "/hr",
-        icon: <Users size={24} />,
-        color: "from-blue-500 via-blue-400 to-cyan-400",
-      },
-      {
-        label: "CRM",
-        path: "/crm",
-        icon: <BarChart3 size={24} />,
-        color: "from-purple-500 via-purple-400 to-pink-400",
-      },
-      {
-        label: "File",
-        path: "/file",
-        icon: <FileText size={24} />,
-        color: "from-emerald-500 via-emerald-400 to-teal-400",
-      },
-      {
-        label: "Inventory",
-        path: "/inventory",
-        icon: <Package size={24} />,
-        color: "from-amber-500 via-amber-400 to-orange-400",
-      },
-      {
-        label: "Procurement",
-        path: "/procurement",
-        icon: <ShoppingCart size={24} />,
-        color: "from-rose-500 via-rose-400 to-red-400",
-      },
-      {
-        label: "Finance",
-        path: "/finance",
-        icon: <CreditCard size={24} />,
-        color: "from-green-500 via-green-400 to-lime-400",
-      },
-      {
-        label: "Core",
-        path: "/core",
-        icon: <Cpu size={24} />,
-        color: "from-gray-700 via-gray-600 to-gray-500",
-      },
-    ];
+ const getAllowedModules = () => {
+   const allModules = [
+     {
+       label: "HR",
+       path: "/hr",
+       icon: <Users size={24} />,
+       color: "from-blue-500 via-blue-400 to-cyan-400",
+     },
+     {
+       label: "CRM",
+       path: "/crm",
+       icon: <BarChart3 size={24} />,
+       color: "from-purple-500 via-purple-400 to-pink-400",
+     },
+     {
+       label: "File",
+       path: "/file",
+       icon: <FileText size={24} />,
+       color: "from-emerald-500 via-emerald-400 to-teal-400",
+     },
+     {
+       label: "Inventory",
+       path: "/inventory",
+       icon: <Package size={24} />,
+       color: "from-amber-500 via-amber-400 to-orange-400",
+     },
+     {
+       label: "Procurement",
+       path: "/procurement",
+       icon: <ShoppingCart size={24} />,
+       color: "from-rose-500 via-rose-400 to-red-400",
+     },
+     {
+       label: "Finance",
+       path: "/finance",
+       icon: <CreditCard size={24} />,
+       color: "from-green-500 via-green-400 to-lime-400",
+     },
+     {
+       label: "Core",
+       path: "/core",
+       icon: <Cpu size={24} />,
+       color: "from-gray-700 via-gray-600 to-gray-500",
+     },
+   ];
 
-    if (!token) {
-      return [];
-    }
+   if (!token) return [];
 
-    if (hasRole(token, "emp")) {
-      return allModules.filter((module) => module.label !== "Core");
-    }
+   // 1️⃣ Admin / Executive → ALL modules
+   if (
+     hasRole(token, "admin") ||
+     hasRole(token, "ceo") ||
+     hasRole(token, "vice.ceo") ||
+     hasRole(token, "auditor")
+   ) {
+     return allModules;
+   }
 
-    // Admin/Executive roles - only Core
-    if (
-      hasRole(token, "admin") ||
-      hasRole(token, "ceo") ||
-      hasRole(token, "vice.ceo") ||
-      hasRole(token, "auditor")
-    ) {
-      return allModules;
-    }
-else{
-    // Departmental roles - check each department
-    if (hasPermission(token,"mod.hrm","module")
-    ) {
-      return allModules.filter((module) => module.label === "HR");
-    }
+   const permitted: typeof allModules = [];
 
-    if (hasPermission(token,"mod.fnm","module")
-    ) {
-      return allModules.filter((module) => module.label === "Finance");
-    }
+   if (hasPermission(token, "mod.hrm", "module")) {
+     permitted.push(allModules.find((m) => m.label === "HR")!);
+   }
 
-       if (hasPermission(token,"mod.crm","module")) {
-      return allModules.filter((module) => module.label === "CRM");
-    }
+   if (hasPermission(token, "mod.fnm", "module")) {
+     permitted.push(allModules.find((m) => m.label === "Finance")!);
+   }
 
-       if (hasPermission(token,"mod.inv","module")) {
-      return allModules.filter((module) => module.label === "Inventory");
-    }
+   if (hasPermission(token, "mod.crm", "module")) {
+     permitted.push(allModules.find((m) => m.label === "CRM")!);
+   }
 
-    if (hasPermission(token, "mod.pro", "module")) {
-      return allModules.filter((module) => module.label === "Procurement");
-    }
+   if (hasPermission(token, "mod.inv", "module")) {
+     permitted.push(allModules.find((m) => m.label === "Inventory")!);
+   }
 
-    if (hasPermission(token, "mod.flm", "module")) {
-      return allModules.filter((module) => module.label === "File");
-    }
-  }
-    return [];
-  };
+   if (hasPermission(token, "mod.pro", "module")) {
+     permitted.push(allModules.find((m) => m.label === "Procurement")!);
+   }
+
+   if (hasPermission(token, "mod.flm", "module")) {
+     permitted.push(allModules.find((m) => m.label === "File")!);
+   }
+
+   return permitted;
+ };
+
 
   const allowedModules = getAllowedModules();
 

@@ -50,7 +50,7 @@ const LeavePolicyHeader = () => {
               animate={{ opacity: 1, x: 0 }}
               className="inline-block"
             >
-              <span className="bg-gradient-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
                 Leave 
               </span>{" "}Policies
              

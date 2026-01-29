@@ -182,7 +182,7 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                         </span>
                       </td>
 
-                      {/* Actions */}
+                      {/* condition */}
                       <td className="px-4 py-3 text-center">
                         <Button
                           onClick={() => handleConditionClick(policyAssignmentRule)}

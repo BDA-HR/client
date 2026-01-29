@@ -16,6 +16,7 @@ import {
   useChangeStatusPolicyAssignmentRule,
 } from "../../../../../../services/core/settings/ModHrm/LeavePolicyAssignmentRule/policyAssignmentRule.query";
 import { ActiveFiscalYear } from "../../../../../../services/core/fyNameList";
+import RuleConditionModal from "./RuleCondtionsModal";
 
 interface PolicyAssignmentRuleHistorySectionProps {
   leavePolicyId: UUID;
@@ -46,6 +47,11 @@ const PolicyAssignmentRuleHistorySection: FC<
   const [deletingPolicyAssignmentRule, setDeletingPolicyAssignmentRule] =
     useState<PolicyAssignmentRuleListDto | null>(null);
 
+  // --- New states for RuleConditionModal ---
+  const [conditionModalOpen, setConditionModalOpen] = useState(false);
+  const [selectedRule, setSelectedRule] =
+    useState<PolicyAssignmentRuleListDto | null>(null);
+
   const itemsPerPage = 10;
 
   // Filtered results
@@ -54,7 +60,7 @@ const PolicyAssignmentRuleHistorySection: FC<
     return (
       rule.name.toLowerCase().includes(searchLower) ||
       rule.code.toLowerCase().includes(searchLower) ||
-      (rule.isActive ? 'active' : 'inactive').includes(searchLower)
+      (rule.isActive ? "active" : "inactive").includes(searchLower)
     );
   });
 
@@ -63,10 +69,9 @@ const PolicyAssignmentRuleHistorySection: FC<
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const paginatedRules = filteredPolicyAssignmentRules.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
-  // Reset to first page when search changes
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
     setCurrentPage(1);
@@ -122,6 +127,16 @@ const PolicyAssignmentRuleHistorySection: FC<
     }
   };
 
+  // --- Condition modal handlers ---
+  const handleConditionClick = (rule: PolicyAssignmentRuleListDto) => {
+    setSelectedRule(rule);
+    setConditionModalOpen(true);
+  };
+  const handleCloseConditionModal = () => {
+    setSelectedRule(null);
+    setConditionModalOpen(false);
+  };
+
   const { getActiveFiscalYear } = ActiveFiscalYear();
   const fy = getActiveFiscalYear.data ?? [];
 
@@ -140,14 +155,14 @@ const PolicyAssignmentRuleHistorySection: FC<
         />
       </motion.div>
 
-      {/* Loading state */}
+      {/* Loading */}
       {isLoading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
         </div>
       )}
 
-      {/* Error state */}
+      {/* Error */}
       {isError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -155,12 +170,13 @@ const PolicyAssignmentRuleHistorySection: FC<
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
         >
           <span className="font-medium">
-            {(error as Error)?.message || "Failed to load policy assignment rules"}
+            {(error as Error)?.message ||
+              "Failed to load policy assignment rules"}
           </span>
         </motion.div>
       )}
 
-      {/* No data message */}
+      {/* No data */}
       {!isLoading && totalItems === 0 && !isError && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -192,11 +208,12 @@ const PolicyAssignmentRuleHistorySection: FC<
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
+            onConditionClick={handleConditionClick} // <-- passes rule to modal
           />
         </motion.div>
       )}
 
-      {/* Edit Modal */}
+      {/* Modals */}
       <EditPolicyAssignmentRuleModal
         isOpen={!!editingPolicyAssignmentRule}
         onClose={handleCloseEditModal}
@@ -206,13 +223,21 @@ const PolicyAssignmentRuleHistorySection: FC<
         fiscalYear={fy}
       />
 
-      {/* Delete Modal */}
       <DeletePolicyAssignmentRuleModal
         isOpen={!!deletingPolicyAssignmentRule}
         onClose={handleCloseDeleteModal}
         onConfirm={handleDeletePolicyAssignmentRule}
         leavePolicyConfig={deletingPolicyAssignmentRule}
       />
+
+      {selectedRule && (
+        <RuleConditionModal
+          isOpen={conditionModalOpen}
+          onClose={handleCloseConditionModal}
+          ruleId={selectedRule.id}
+          ruleName={selectedRule.name} 
+        />
+      )}
     </div>
   );
 };

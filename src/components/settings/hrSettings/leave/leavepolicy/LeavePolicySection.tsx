@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { XCircleIcon } from "lucide-react";
 import type {
   LeavePolicyListDto,
   LeavePolicyAddDto,
@@ -16,6 +15,7 @@ import DeleteLeavePolicyModal from "./DeleteLeavePolicyModal";
 import LeavePolicyTable from "./LeavePolicyTable";
 import { leavePolicyService } from "../../../../../services/core/settings/ModHrm/LeavePolicyService";
 import { hrmLeaveList } from "../../../../../services/List/HrmLeaveList";
+import AssignPolicyConfirmationModal from "./AssignPolicyConfirmationModal";
 
 const LeavePolicySection: React.FC = () => {
   const [leavePolicies, setLeavePolicies] = useState<LeavePolicyListDto[]>([]);
@@ -27,6 +27,7 @@ const LeavePolicySection: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
+   const [isAssignPolicyModalOpen, setIsAssignPolicyModalOpen] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState<LeavePolicyListDto | null>(
     null
   );
@@ -129,6 +130,11 @@ const LeavePolicySection: React.FC = () => {
         }
       };
 
+     const handleAssignPolicy = () => {
+       setIsAssignPolicyModalOpen(false);
+     };
+
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -226,6 +232,11 @@ const LeavePolicySection: React.FC = () => {
           deletingPolicy && handleDeleteLeavePolicy(deletingPolicy.id)
         }
         policy={deletingPolicy}
+      />
+      <AssignPolicyConfirmationModal
+        isOpen={isAssignPolicyModalOpen}
+        onClose={() => setIsAssignPolicyModalOpen(false)}
+        onConfirm={handleAssignPolicy}
       />
     </div>
   );
