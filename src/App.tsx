@@ -70,6 +70,28 @@ import PageReports from "./pages/finance/PageReports";
 import PageAssets from "./pages/finance/PageAssets";
 import PageTransactions from "./pages/finance/PageTransactions";
 import PagePayroll from "./pages/finance/PagePayroll";
+import LeadManagement from "./pages/crm/LeadManagement";
+import AddLeadPage from "./pages/crm/AddLeadPage";
+import ImportLeadPage from "./pages/crm/ImportLeadPage";
+import LeadDetailPage from "./pages/crm/LeadDetailPage";
+import LeadConversion from "./pages/crm/LeadConversion";
+import ContactManagement from "./pages/crm/ContactManagement";
+import SalesManagement from "./pages/crm/SalesManagement";
+import MarketingAutomation from "./pages/crm/MarketingAutomation";
+import CustomerSupport from "./pages/crm/CustomerService";
+import ActivityManagement from "./pages/crm/ActivityManagement";
+import AnalyticsReporting from "./pages/crm/AnalyticsReporting";
+import CRMSettings from "./components/settings/coreSettings/crmSettings/CRMSettings";
+import PageCrmSettings from "./pages/settings/crmSettings/PageCrmSettings";
+import PageLeadSources from "./pages/settings/crmSettings/pageLeadSources";
+import PageLeadStatuses from "./pages/settings/crmSettings/pageLeadStatuses";
+import PageLeadQualificationStatuses from "./pages/settings/crmSettings/pageLeadQualificationStatuses";
+import PageLeadCategories from "./pages/settings/crmSettings/pageLeadCategories";
+import PageIndustries from "./pages/settings/crmSettings/pageIndustries";
+import PageContactMethods from "./pages/settings/crmSettings/pageContactMethods";
+import PageActivityTypes from "./pages/settings/crmSettings/pageActivityTypes";
+import PageAssignmentModes from "./pages/settings/crmSettings/pageAssignmentModes";
+import PageConversionTargets from "./pages/settings/crmSettings/pageConversionTargets";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -120,6 +142,63 @@ function App() {
                 <Route path="/file" element={<FileDashboard />} />
                 {/* End MENU ROUTES */}
                 {/* START CRM ROUTES */}
+                <Route path="/crm/leads" element={<LeadManagement />} />
+                <Route path="/crm/leads/add" element={<AddLeadPage />} />
+                <Route path="/crm/leads/import" element={<ImportLeadPage />} />
+                <Route path="/crm/leads/:id" element={<LeadDetailPage />} />
+                <Route
+                  path="/crm/leads/:id/convert"
+                  element={<LeadConversion />}
+                />
+                <Route path="/crm/contacts" element={<ContactManagement />} />
+                <Route path="/crm/sales" element={<SalesManagement />} />
+                <Route
+                  path="/crm/marketing"
+                  element={<MarketingAutomation />}
+                />
+                <Route path="/crm/support" element={<CustomerSupport />} />
+                <Route
+                  path="/crm/activities"
+                  element={<ActivityManagement />}
+                />
+                <Route path="/crm/analytics" element={<AnalyticsReporting />} />
+                <Route path="/settings/crm" element={<PageCrmSettings />} />
+                <Route
+                  path="/settings/crm/lead-sources"
+                  element={<PageLeadSources />}
+                />
+                <Route
+                  path="/settings/crm/lead-statuses"
+                  element={<PageLeadStatuses />}
+                />
+                <Route
+                  path="/settings/crm/lead-qualification-statuses"
+                  element={<PageLeadQualificationStatuses />}
+                />
+                <Route
+                  path="/settings/crm/lead-categories"
+                  element={<PageLeadCategories />}
+                />
+                <Route
+                  path="/settings/crm/industries"
+                  element={<PageIndustries />}
+                />
+                <Route
+                  path="/settings/crm/contact-methods"
+                  element={<PageContactMethods />}
+                />
+                <Route
+                  path="/settings/crm/activity-types"
+                  element={<PageActivityTypes />}
+                />
+                <Route
+                  path="/settings/crm/assignment-modes"
+                  element={<PageAssignmentModes />}
+                />
+                <Route
+                  path="/settings/crm/conversion-targets"
+                  element={<PageConversionTargets />}
+                />
                 {/* END CRM ROUTES */}
                 {/* START HR ROUTES */}
                 <Route
@@ -236,7 +315,10 @@ function App() {
                 <Route path="/finance/accounts" element={<PageAccounts />} />
                 <Route path="/finance/journals" element={<PageJournal />} />
                 <Route path="/finance/payroll" element={<PagePayroll />} />
-                <Route path="/finance/transactions" element={<PageTransactions />} />
+                <Route
+                  path="/finance/transactions"
+                  element={<PageTransactions />}
+                />
                 <Route path="/finance/assets" element={<PageAssets />} />
                 <Route path="/finance/reports" element={<PageReports />} />
                 <Route
@@ -285,6 +367,7 @@ function App() {
                   path="/settings/core/menu-permissions"
                   element={<PageMenuSettings />}
                 />
+                <Route path="/settings/core/crm" element={<CRMSettings />} />
               </Route>
               {/* END CORE ROUTES */}
               {/*START CORE ROUTES */}

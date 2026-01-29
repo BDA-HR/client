@@ -118,7 +118,7 @@ const AddPolicyAssignmentRuleModal: React.FC<
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full"
+        className="bg-white rounded-xl shadow-xl max-w-xl w-full"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-3">
