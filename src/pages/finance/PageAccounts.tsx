@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AccountsHeader from '../../components/finance/accounts/AccountsHeader';
 import { AccountsSearchFilters } from '../../components/finance/accounts/AccountsSearchFilters';
 import AccountsTable from '../../components/finance/accounts/AccountsTable';

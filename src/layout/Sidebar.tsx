@@ -38,6 +38,7 @@ import {
   Image,
   User,
   Trash2,
+  Notebook,
 } from 'lucide-react';
 import { useModule } from '../ModuleContext';
 
@@ -313,6 +314,7 @@ const Sidebar: React.FC = () => {
             <>
               <NavItem to="/finance/gl" icon={<FileText size={18} />} label="General Ledger" {...theme} />
               <NavItem to="/finance/accounts" icon={<Package size={18} />} label="Accounts" {...theme} />
+              <NavItem to="/finance/journals" icon={<Notebook size={18} />} label="Journals" {...theme} />
               <NavItem to="/finance/assets" icon={<Briefcase size={18} />} label="Assets" {...theme} />
               <NavItem to="/finance/budget-list" icon={<FileSpreadsheet size={18} />} label="Budgeting" {...theme} />
               <NavItem to="/finance/payroll" icon={<FileSpreadsheet size={18} />} label="Payroll" {...theme} />
