@@ -149,14 +149,14 @@ const PolicyAssignmentRule: React.FC<PolicyAssignmentRuleProps> = ({
                       <td className="px-4 py-3 align-middle text-center">
                         <span
                           className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold rounded-full ${getPriorityColor(
-                            policyAssignmentRule.priority
+                            policyAssignmentRule.priorityStr
                           )}`}
                         >
-                          {policyAssignmentRule.priority}
+                          {policyAssignmentRule.priorityStr}
                         </span>
                       </td>
 
-                      {/* Requires Attachment */}
+                      {/* status */}
                       <td className="px-4 py-3 align-middle text-center">
                         <span
                           className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold gap-1 rounded-full ${getBooleanColor(

@@ -211,10 +211,10 @@ const PolicyAssignmentRuleHistoryTable: React.FC<
                         <td className="px-4 py-3 align-middle text-center">
                           <span
                             className={`px-3 py-1 inline-flex text-xs leading-3 font-semibold rounded-full ${getPriorityColor(
-                              rule.priority,
+                              rule.priorityStr,
                             )}`}
                           >
-                            {rule.priority}
+                            {rule.priorityStr}
                           </span>
                         </td>
 

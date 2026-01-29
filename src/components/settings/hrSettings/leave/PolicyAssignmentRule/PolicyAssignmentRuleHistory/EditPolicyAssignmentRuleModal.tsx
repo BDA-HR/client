@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "../../../../../ui/select";
 import type { UUID } from "../../../../../../types/core/Settings/policyAssignmentRule";
-import type { NameListItem } from "../../../../../../types/NameList/nameList";
 import toast from "react-hot-toast";
 import { Priority } from "../../../../../../types/core/enum";
 import type { PolicyAssignmentRuleListDto, PolicyAssignmentRuleModDto } from "../../../../../../types/core/Settings/policyAssignmentRule";
@@ -20,10 +19,8 @@ import type { PolicyAssignmentRuleListDto, PolicyAssignmentRuleModDto } from "..
 interface EditPolicyAssignmentRuleModalProps {
   onClose: () => void;
   isOpen: boolean;
-  leavePolicyId: UUID;
-  leavePolicyConfig: PolicyAssignmentRuleListDto | null;
-  fiscalYear: NameListItem[];
-  onEditLeavePolicyConfig: (
+  policyAssignmetRule: PolicyAssignmentRuleListDto | null;
+  onEditPolicyAssignmetRule: (
     policyAssignmentRule: PolicyAssignmentRuleModDto,
   ) => Promise<void>;
 }
@@ -31,10 +28,8 @@ interface EditPolicyAssignmentRuleModalProps {
 const EditPolicyAssignmentRuleModal: React.FC<EditPolicyAssignmentRuleModalProps> = ({
   isOpen,
   onClose,
-  leavePolicyId,
-  leavePolicyConfig,
-  fiscalYear,
-  onEditLeavePolicyConfig,
+  policyAssignmetRule,
+  onEditPolicyAssignmetRule,
 }) => {
   const [formData, setFormData] = useState<PolicyAssignmentRuleModDto>({
     id: "" as UUID,
@@ -56,22 +51,28 @@ const EditPolicyAssignmentRuleModal: React.FC<EditPolicyAssignmentRuleModalProps
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const priorityOptions = Object.values(Priority);
+  const priorityOptions = Object.entries(Priority);
 
   useEffect(() => {
-    if (leavePolicyConfig) {
+    if (policyAssignmetRule) {
+      const formatDate = (date?: string | null) =>
+        date ? date.split("T")[0] : "";
+       const priorityKey =
+         Object.entries(Priority).find(
+           ([key, label]) => label === policyAssignmetRule.priority,
+         )?.[0] ?? "0";
       setFormData({
-        id: leavePolicyConfig.id,
-        code: leavePolicyConfig.code || "",
-        name: leavePolicyConfig.name || "",
-        priority: leavePolicyConfig.priority || Priority["0"],
-        isActive: leavePolicyConfig.isActive ?? true,
-        effectiveFrom: leavePolicyConfig.effectiveFrom || "",
-        effectiveTo: leavePolicyConfig.effectiveTo || null,
-        rowVersion: leavePolicyConfig.rowVersion || "",
+        id: policyAssignmetRule.id,
+        code: policyAssignmetRule.code || "",
+        name: policyAssignmetRule.name || "",
+        priority: priorityKey,
+        isActive: policyAssignmetRule.isActive ?? true,
+        effectiveFrom: formatDate(policyAssignmetRule.effectiveFrom) || "",
+        effectiveTo: formatDate(policyAssignmetRule.effectiveTo )|| null,
+        rowVersion: policyAssignmetRule.rowVersion || "",
       });
     }
-  }, [leavePolicyConfig]);
+  }, [policyAssignmetRule]);
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
@@ -104,7 +105,7 @@ const EditPolicyAssignmentRuleModal: React.FC<EditPolicyAssignmentRuleModalProps
 
     setIsLoading(true);
     try {
-      await onEditLeavePolicyConfig(formData);
+      await onEditPolicyAssignmetRule(formData);
       toast.success("Policy assignment rule updated successfully");
       handleClose();
     } catch (error: any) {
@@ -141,8 +142,7 @@ const EditPolicyAssignmentRuleModal: React.FC<EditPolicyAssignmentRuleModalProps
       handleClose();
     }
   };
-
-  if (!isOpen || !leavePolicyConfig) return null;
+  if (!isOpen || !policyAssignmetRule) return null;
 
   return (
     <motion.div
@@ -244,9 +244,9 @@ const EditPolicyAssignmentRuleModal: React.FC<EditPolicyAssignmentRuleModalProps
                   <SelectValue placeholder="Select Priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  {priorityOptions.map((p) => (
-                    <SelectItem key={p} value={p}>
-                      {p}
+                  {priorityOptions.map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>

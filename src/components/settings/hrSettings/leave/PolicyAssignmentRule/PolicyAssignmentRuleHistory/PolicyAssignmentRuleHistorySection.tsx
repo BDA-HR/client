@@ -217,10 +217,8 @@ const PolicyAssignmentRuleHistorySection: FC<
       <EditPolicyAssignmentRuleModal
         isOpen={!!editingPolicyAssignmentRule}
         onClose={handleCloseEditModal}
-        onEditLeavePolicyConfig={handleEditPolicyAssignmentRule}
-        leavePolicyConfig={editingPolicyAssignmentRule}
-        leavePolicyId={leavePolicyId}
-        fiscalYear={fy}
+        onEditPolicyAssignmetRule={handleEditPolicyAssignmentRule}
+        policyAssignmetRule={editingPolicyAssignmentRule}
       />
 
       <DeletePolicyAssignmentRuleModal
@@ -235,7 +233,7 @@ const PolicyAssignmentRuleHistorySection: FC<
           isOpen={conditionModalOpen}
           onClose={handleCloseConditionModal}
           ruleId={selectedRule.id}
-          ruleName={selectedRule.name} 
+          ruleName={selectedRule.name}
         />
       )}
     </div>

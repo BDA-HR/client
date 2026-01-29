@@ -34,7 +34,7 @@ const AddPolicyAssignmentRuleModal: React.FC<
   const [effectiveTo, setEffectiveTo] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const priorityOptions = Object.values(Priority);
+  const priorityOptions = Object.entries(Priority);
 
   const resetForm = () => {
     setCode("");
@@ -197,9 +197,9 @@ const AddPolicyAssignmentRuleModal: React.FC<
                   <SelectValue placeholder="Select Priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  {priorityOptions.map((p) => (
-                    <SelectItem key={p} value={p}>
-                      {p}
+                  {priorityOptions.map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
