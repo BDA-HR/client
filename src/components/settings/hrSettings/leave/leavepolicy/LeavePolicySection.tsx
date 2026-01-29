@@ -178,6 +178,7 @@ const LeavePolicySection: React.FC = () => {
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
             onAddClick={() => setIsAddPolicyModalOpen(true)}
+            onAssignPolicy={() => setIsAssignPolicyModalOpen(true)}
           />
         </motion.div>
       )}

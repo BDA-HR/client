@@ -7,12 +7,14 @@ interface LeavePolicySearchFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   onAddClick: () => void;
+  onAssignPolicy: () => void;
 }
 
 const LeavePolicySearchFilters: React.FC<LeavePolicySearchFiltersProps> = ({
   searchTerm,
   setSearchTerm,
   onAddClick,
+  onAssignPolicy,
 }) => {
   const clearSearch = () => {
     setSearchTerm("");
@@ -60,21 +62,22 @@ const LeavePolicySearchFilters: React.FC<LeavePolicySearchFiltersProps> = ({
             )}
           </div>
         </div>
-<div className="flex gap-2 sm:flex-row flex-col">
+        <div className="flex gap-2 sm:flex-row flex-col">
           <Button
             variant="outline"
-            className="flex items-center gap-2 cursor-pointer border-emerald-200"
+            onClick={onAssignPolicy}
+            className="flex items-center gap-2 cursor-pointer border-white bg-red-500 hover:bg-red-600  hover:text-white text-white"
           >
             <span>Assign Policy</span>
           </Button>
-        <Button
-          onClick={onAddClick}
-          size="sm"
-          className="flex cursor-pointer items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
-        >
-          <BadgePlus className="h-4 w-4" />
-          Add New
-        </Button>
+          <Button
+            onClick={onAddClick}
+            size="sm"
+            className="flex cursor-pointer items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
+          >
+            <BadgePlus className="h-4 w-4" />
+            Add New
+          </Button>
         </div>
       </div>
     </motion.div>

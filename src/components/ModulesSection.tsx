@@ -245,7 +245,7 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({ onModuleSelect }) => {
       hasRole(token, "vice.ceo") ||
       hasRole(token, "auditor")
     ) {
-      return allModules.filter((module) => module.label === "Core");
+      return allModules;
     }
 
     // Departmental roles - check each department
