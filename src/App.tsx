@@ -72,6 +72,9 @@ import PageTransactions from "./pages/finance/PageTransactions";
 import PagePayroll from "./pages/finance/PagePayroll";
 import LeadManagement from "./pages/crm/LeadManagement";
 import AddLeadPage from "./pages/crm/AddLeadPage";
+import LeadAnalyticsPage from "./pages/crm/LeadAnalyticsPage";
+import LeadRoutingPage from "./pages/crm/LeadRoutingPage";
+import LeadNurturingPage from "./pages/crm/LeadNurturingPage";
 import ImportLeadPage from "./pages/crm/ImportLeadPage";
 import LeadDetailPage from "./pages/crm/LeadDetailPage";
 import LeadConversion from "./pages/crm/LeadConversion";
@@ -145,6 +148,9 @@ function App() {
                 <Route path="/crm/leads" element={<LeadManagement />} />
                 <Route path="/crm/leads/add" element={<AddLeadPage />} />
                 <Route path="/crm/leads/import" element={<ImportLeadPage />} />
+                <Route path="/crm/leads/analytics" element={<LeadAnalyticsPage />} />
+                <Route path="/crm/leads/routing" element={<LeadRoutingPage />} />
+                <Route path="/crm/leads/nurturing" element={<LeadNurturingPage />} />
                 <Route path="/crm/leads/:id" element={<LeadDetailPage />} />
                 <Route
                   path="/crm/leads/:id/convert"

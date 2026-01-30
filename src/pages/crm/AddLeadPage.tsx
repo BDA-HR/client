@@ -123,11 +123,11 @@ export default function AddLeadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div>
         {/* Header */}
-        <div className="space-y-8 mb-8">
-          <div className="flex items-center justify-between">
+        <div className="space-y-4 mb-4">
+          <div className="flex items-center gap-3">
             <Button
               type="button"
               variant="outline"
@@ -138,7 +138,7 @@ export default function AddLeadPage() {
               <span className="font-medium text-gray-700">Back to Leads</span>
             </Button>
             
-            <div className="text-center flex-1">
+            <div className=" flex-1">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-orange-700 to-orange-800 bg-clip-text text-transparent mb-2 tracking-tight">
                 Add New Lead
               </h1>
@@ -161,7 +161,7 @@ export default function AddLeadPage() {
                     <div className="flex flex-col items-center flex-1 relative">
                       <div className="relative">
                         <div
-                          className={`relative w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all duration-300 ${
+                          className={`relative w-14 h-14 rounded-2xl flex items-center justify-center border-2 transition-all duration-300 ${
                             isCompleted
                               ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-200'
                               : isCurrent
@@ -235,12 +235,12 @@ export default function AddLeadPage() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.3 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-100 p-8"
+          className="bg-white rounded-xl shadow-sm border border-gray-100 py-4 px-8"
         >
 
           {/* Step 1: Contact Info */}
           {currentStep === 1 && (
-            <div className="space-y-6">
+            <div className="space-y-3">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Information</h2>
               
               <div className="grid grid-cols-2 gap-6">
@@ -510,7 +510,7 @@ export default function AddLeadPage() {
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between pt-8 border-t mt-8">
+          <div className="flex justify-between pt-4 border-t mt-5">
             {currentStep > 1 && (
               <Button
                 type="button"

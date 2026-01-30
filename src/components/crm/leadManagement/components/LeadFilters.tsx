@@ -1,11 +1,12 @@
 import React from 'react';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, Plus, Upload } from 'lucide-react';
 import { Input } from '../../../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
 import { Button } from '../../../ui/button';
 import { Badge } from '../../../ui/badge';
 import { Card, CardContent } from '../../../ui/card';
 import { useCRMSettings } from '../../../../hooks/useCRMSettings';
+import { useNavigate } from 'react-router-dom';
 
 interface FilterState {
   searchTerm: string;
@@ -65,42 +66,55 @@ export default function LeadFilters({
 
   const activeFiltersCount = getActiveFiltersCount();
 
+    const navigate = useNavigate();
+  
+    
+
   return (
     <Card>
-      <CardContent className="pt-6">
-        <div className="space-y-4">
+      <CardContent>
+        <div className="flex flex-col space-y-2">
           {/* Search and Quick Actions */}
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex-1 min-w-64">
-              <div className="relative">
+          <div className="flex items-center justify-between">
+              <div className="relative w-full max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   placeholder="Search leads by name, email, or company..."
                   value={filters.searchTerm}
                   onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pr-10"
                 />
+                {filters.searchTerm && (
+                  <button
+                    onClick={() => handleFilterChange('searchTerm', '')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
-            </div>
-            
-            {activeFiltersCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onClearFilters}
-                className="flex items-center space-x-2"
-              >
-                <X className="w-4 h-4" />
-                <span>Clear Filters</span>
-                <Badge variant="secondary" className="ml-1">
-                  {activeFiltersCount}
-                </Badge>
-              </Button>
-            )}
+             <div className="flex space-x-2">
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate('/crm/leads/import')}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Import
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/crm/leads/add')}
+                    className="bg-orange-600 hover:bg-orange-700"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Lead
+                  </Button>
+                </div>
+         
           </div>
 
           {/* Filter Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="flex gap-3">
+
             {/* Status Filter */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
@@ -190,101 +204,20 @@ export default function LeadFilters({
                 </SelectContent>
               </Select>
             </div>
+            <div className="sm:mt-6">
 
-            {/* Results Count */}
-            <div className="flex items-end">
-              <div className="text-sm text-gray-600">
-                <div className="font-medium">
-                  {filteredCount} of {totalCount} leads
-                </div>
-                {activeFiltersCount > 0 && (
-                  <div className="text-xs text-gray-500">
-                    {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} applied
-                  </div>
-                )}
-              </div>
-            </div>
+               <Button
+              variant="outline"
+              size="sm"
+              onClick={onClearFilters}
+              className="flex items-center space-x-2 p-4"
+            >
+              <X className="w-4 h-4" />
+              <span>Clear Filters</span>
+            </Button></div>
           </div>
-
-          {/* Active Filters Display */}
-          {activeFiltersCount > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2 border-t">
-              <span className="text-sm font-medium text-gray-700">Active filters:</span>
-              
-              {filters.searchTerm && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>Search: "{filters.searchTerm}"</span>
-                  <button
-                    onClick={() => handleFilterChange('searchTerm', '')}
-                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              )}
-              
-              {filters.status !== 'all' && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>Status: {filters.status}</span>
-                  <button
-                    onClick={() => handleFilterChange('status', 'all')}
-                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              )}
-              
-              {filters.source !== 'all' && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>Source: {filters.source}</span>
-                  <button
-                    onClick={() => handleFilterChange('source', 'all')}
-                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              )}
-              
-              {filters.assignedTo !== 'all' && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>Assigned: {filters.assignedTo}</span>
-                  <button
-                    onClick={() => handleFilterChange('assignedTo', 'all')}
-                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              )}
-              
-              {filters.scoreRange !== 'all' && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>Score: {filters.scoreRange}</span>
-                  <button
-                    onClick={() => handleFilterChange('scoreRange', 'all')}
-                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              )}
-              
-              {filters.dateRange !== 'all' && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>Date: {filters.dateRange}</span>
-                  <button
-                    onClick={() => handleFilterChange('dateRange', 'all')}
-                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              )}
-            </div>
-          )}
-        </div>
+               
+     </div>
       </CardContent>
     </Card>
   );

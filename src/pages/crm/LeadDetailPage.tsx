@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit, Phone, Mail, Building, User, Calendar, DollarSign, Target, CheckSquare } from 'lucide-react';
+import { ArrowLeft, Edit, Phone, Mail, Building, User, Calendar, DollarSign, Target, CheckSquare, MessageSquare } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
+import { showToast } from '../../layout/layout';
 import { mockLeads } from '../../data/crmMockData';
 import LeadActivities from '../../components/crm/leadManagement/components/LeadActivities';
 import LeadNotes from '../../components/crm/leadManagement/components/LeadNotes';
 import LeadHistory from '../../components/crm/leadManagement/components/LeadHistory';
+import LeadCommunication from '../../components/crm/leadManagement/components/LeadCommunication';
+import LeadScoring from '../../components/crm/leadManagement/components/LeadScoring';
+import type { Lead } from '../../types/crm';
 
-const statusColors = {
+const statusColors: Record<string, string> = {
   'New': 'bg-blue-100 text-blue-800',
   'Contacted': 'bg-yellow-100 text-yellow-800',
   'Qualified': 'bg-green-100 text-green-800',
@@ -21,7 +25,7 @@ const statusColors = {
   'Closed Lost': 'bg-red-100 text-red-800'
 };
 
-const sourceColors = {
+const sourceColors: Record<string, string> = {
   'Website': 'bg-orange-100 text-orange-800',
   'Email': 'bg-blue-100 text-blue-800',
   'Phone': 'bg-green-100 text-green-800',
@@ -34,6 +38,9 @@ export default function LeadDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
+  const [isCommunicationDialogOpen, setIsCommunicationDialogOpen] = useState(false);
+  const [isScoringDialogOpen, setIsScoringDialogOpen] = useState(false);
+  const [leadData, setLeadData] = useState<Lead | null>(null);
 
   // Load lead from localStorage or mockLeads
   const loadLead = () => {
@@ -50,7 +57,37 @@ export default function LeadDetailPage() {
     return mockLeads.find(l => l.id === id);
   };
 
-  const lead = loadLead();
+  const lead = leadData || loadLead();
+
+  // Update lead data when component mounts
+  useState(() => {
+    setLeadData(loadLead());
+  });
+
+  const handleCommunicationSent = (_communication: any) => {
+    // In a real app, this would log the communication
+    showToast.success('Communication sent successfully');
+  };
+
+  const handleScoreUpdate = (leadId: string, newScore: number, _breakdown: any[]) => {
+    const storedLeads = localStorage.getItem('leads');
+    if (storedLeads) {
+      try {
+        const leads = JSON.parse(storedLeads);
+        const updatedLeads = leads.map((l: Lead) => 
+          l.id === leadId 
+            ? { ...l, score: newScore, updatedAt: new Date().toISOString() }
+            : l
+        );
+        localStorage.setItem('leads', JSON.stringify(updatedLeads));
+        setLeadData(updatedLeads.find((l: Lead) => l.id === leadId));
+        showToast.success('Lead score updated successfully');
+      } catch (error) {
+        console.error('Error updating lead score:', error);
+        showToast.error('Failed to update lead score');
+      }
+    }
+  };
 
   if (!lead) {
     return (
@@ -92,6 +129,20 @@ export default function LeadDetailPage() {
           </div>
         </div>
         <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsCommunicationDialogOpen(true)}
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Communicate
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setIsScoringDialogOpen(true)}
+          >
+            <Target className="w-4 h-4 mr-2" />
+            Update Score
+          </Button>
           <Button
             variant="outline"
             onClick={() => navigate(`/crm/leads/${lead.id}/edit`)}
@@ -313,6 +364,26 @@ export default function LeadDetailPage() {
           <LeadHistory leadId={lead.id} />
         </TabsContent>
       </Tabs>
+
+      {/* Lead Communication Dialog */}
+      {lead && (
+        <LeadCommunication
+          lead={lead}
+          isOpen={isCommunicationDialogOpen}
+          onClose={() => setIsCommunicationDialogOpen(false)}
+          onCommunicationSent={handleCommunicationSent}
+        />
+      )}
+
+      {/* Lead Scoring Dialog */}
+      {lead && (
+        <LeadScoring
+          lead={lead}
+          isOpen={isScoringDialogOpen}
+          onClose={() => setIsScoringDialogOpen(false)}
+          onScoreUpdate={handleScoreUpdate}
+        />
+      )}
     </motion.div>
   );
 }

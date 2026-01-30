@@ -247,7 +247,7 @@ export default function LeadImportContent({ onClose, onImportComplete }: LeadImp
             <CardHeader>
               <CardTitle>Upload Lead Data</CardTitle>
               <p className="text-sm text-gray-600">
-                Upload a CSV or Excel file with lead data. Required columns: <span className="font-medium">First Name, Last Name, Company</span>
+                Upload a CSV or Excel file with lead data.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -273,7 +273,7 @@ export default function LeadImportContent({ onClose, onImportComplete }: LeadImp
                 </Button>
               </div>
 
-              <Alert>
+              {/* <Alert>
                 <AlertCircle className="w-4 h-4" />
                 <AlertDescription>
                   <div className="text-sm">
@@ -286,7 +286,7 @@ export default function LeadImportContent({ onClose, onImportComplete }: LeadImp
                     </ul>
                   </div>
                 </AlertDescription>
-              </Alert>
+              </Alert> */}
 
               <div className="flex items-center justify-between pt-4 border-t">
                 <div>

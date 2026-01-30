@@ -8,6 +8,9 @@ import CustomerSupport from "./customerSupport/CustomerSupport";
 import ActivityManagement from "./activityManagement/ActivityManagement";
 import AnalyticsReporting from "./analytics/AnalyticsReporting";
 import LeadManagement from '../../pages/crm/LeadManagement';
+import LeadAnalyticsPage from '../../pages/crm/LeadAnalyticsPage';
+import LeadRoutingPage from '../../pages/crm/LeadRoutingPage';
+import LeadNurturingPage from '../../pages/crm/LeadNurturingPage';
 
 export default function CRMRouter() {
   return (
@@ -15,6 +18,9 @@ export default function CRMRouter() {
       <Route path="/" element={<CRMDashboard />} />
       <Route path="/dashboard" element={<CRMDashboard />} />
       <Route path="/leads" element={<LeadManagement />} />
+      <Route path="/leads/analytics" element={<LeadAnalyticsPage />} />
+      <Route path="/leads/routing" element={<LeadRoutingPage />} />
+      <Route path="/leads/nurturing" element={<LeadNurturingPage />} />
       <Route path="/contacts" element={<ContactManagement />} />
       <Route path="/sales" element={<SalesManagement />} />
       <Route path="/marketing" element={<MarketingAutomation />} />

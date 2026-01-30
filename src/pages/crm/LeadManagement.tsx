@@ -1,20 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Upload, Route, Heart, BarChart3, MessageSquare, Settings, List } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { showToast } from '../../layout/layout';
 import { mockLeads } from '../../data/crmMockData';
 import LeadList from '../../components/crm/leadManagement/components/LeadList';
 import LeadForm from '../../components/crm/leadManagement/components/LeadForm';
 import LeadFilters from '../../components/crm/leadManagement/components/LeadFilters';
-import LeadCommunication from '../../components/crm/leadManagement/components/LeadCommunication';
-import LeadScoring from '../../components/crm/leadManagement/components/LeadScoring';
-import LeadAnalytics from '../../components/crm/leadManagement/components/LeadAnalytics';
-import LeadRouting from '../../components/crm/leadManagement/components/LeadRouting';
-import LeadNurturing from '../../components/crm/leadManagement/components/LeadNurturing';
-import type { Lead, RoutingRule } from '../../types/crm';
+import type { Lead } from '../../types/crm';
 
 interface FilterState {
   searchTerm: string;
@@ -55,13 +49,6 @@ export default function LeadManagement() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
-  
-  // Active tab state
-  const [activeTab, setActiveTab] = useState<string>('leads');
-  
-  // Dialog states for communication and scoring (still modals)
-  const [isCommunicationDialogOpen, setIsCommunicationDialogOpen] = useState(false);
-  const [isScoringDialogOpen, setIsScoringDialogOpen] = useState(false);
 
   // Reload leads when component mounts or when returning from add/import pages
   useEffect(() => {
@@ -159,8 +146,26 @@ export default function LeadManagement() {
       setLeads(updatedLeads);
       localStorage.setItem('leads', JSON.stringify(updatedLeads));
       setSelectedLead(null);
+      setIsEditDialogOpen(false);
       showToast.success('Lead updated successfully');
     }
+  };
+
+  const handleDeleteLead = (leadId: string) => {
+    const updatedLeads = leads.filter(lead => lead.id !== leadId);
+    setLeads(updatedLeads);
+    localStorage.setItem('leads', JSON.stringify(updatedLeads));
+    showToast.success('Lead deleted successfully');
+  };
+
+  const handleAssignRep = (leadId: string, repName: string) => {
+    const updatedLeads = leads.map(lead => 
+      lead.id === leadId 
+        ? { ...lead, assignedTo: repName, updatedAt: new Date().toISOString() }
+        : lead
+    );
+    setLeads(updatedLeads);
+    localStorage.setItem('leads', JSON.stringify(updatedLeads));
   };
 
   const handleStatusChange = (leadId: string, newStatus: Lead['status']) => {
@@ -251,17 +256,12 @@ export default function LeadManagement() {
     });
   };
 
-  const handleCommunicationSent = (communication: any) => {
+  const handleCommunicationSent = (_communication: any) => {
     // In a real app, this would log the communication
-    showToast('Communication sent successfully', 'success');
+    showToast.success('Communication sent successfully');
   };
 
-  const handleRoutingRulesUpdate = (rules: RoutingRule[]) => {
-    // In a real app, this would save the routing rules
-    showToast.success('Routing rules updated successfully');
-  };
-
-  const handleScoreUpdate = (leadId: string, newScore: number, breakdown: any[]) => {
+  const handleScoreUpdate = (leadId: string, newScore: number, _breakdown: any[]) => {
     const updatedLeads = leads.map(lead => 
       lead.id === leadId 
         ? { ...lead, score: newScore, updatedAt: new Date().toISOString() }
@@ -269,7 +269,7 @@ export default function LeadManagement() {
     );
     setLeads(updatedLeads);
     localStorage.setItem('leads', JSON.stringify(updatedLeads));
-    showToast('Lead score updated successfully', 'success');
+    showToast.success('Lead score updated successfully');
   };
 
   return (
@@ -283,53 +283,13 @@ export default function LeadManagement() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Lead Management</h1>
-          <p className="text-gray-600">Manage and track your sales leads</p>
-        </div>
-        <div className="flex space-x-2">
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/crm/leads/import')}
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Import
-          </Button>
-          <Button 
-            onClick={() => navigate('/crm/leads/add')}
-            className="bg-orange-600 hover:bg-orange-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Lead
-          </Button>
         </div>
       </div>
 
-      {/* Tabs for different views */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-          <TabsTrigger value="leads" className="flex items-center gap-2">
-            <List className="w-4 h-4" />
-            Leads
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
-            Analytics
-          </TabsTrigger>
-          <TabsTrigger value="routing" className="flex items-center gap-2">
-            <Route className="w-4 h-4" />
-            Routing
-          </TabsTrigger>
-          <TabsTrigger value="nurturing" className="flex items-center gap-2">
-            <Heart className="w-4 h-4" />
-            Nurturing
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Leads Tab */}
-        <TabsContent value="leads" className="space-y-6 mt-6">
-          {/* Filters */}
-          <LeadFilters
-            filters={filters}
-            onFiltersChange={setFilters}
+      {/* Filters */}
+      <LeadFilters
+        filters={filters}
+        onFiltersChange={setFilters}
         onClearFilters={clearFilters}
         totalCount={leads.length}
         filteredCount={filteredLeads.length}
@@ -343,46 +303,13 @@ export default function LeadManagement() {
           setSelectedLead(lead);
           setIsEditDialogOpen(true);
         }}
-        onCommunicate={(lead) => {
-          setSelectedLead(lead);
-          setIsCommunicationDialogOpen(true);
-        }}
-        onScore={(lead) => {
-          setSelectedLead(lead);
-          setIsScoringDialogOpen(true);
-        }}
+        onDelete={handleDeleteLead}
+        onAssignRep={handleAssignRep}
         onBulkAction={handleBulkAction}
         selectedLeads={selectedLeads}
         onSelectLead={handleSelectLead}
         onSelectAll={handleSelectAll}
       />
-        </TabsContent>
-
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="mt-6">
-          <LeadAnalytics
-            isOpen={true}
-            onClose={() => setActiveTab('leads')}
-          />
-        </TabsContent>
-
-        {/* Routing Tab */}
-        <TabsContent value="routing" className="mt-6">
-          <LeadRouting
-            isOpen={true}
-            onClose={() => setActiveTab('leads')}
-            onRulesUpdate={handleRoutingRulesUpdate}
-          />
-        </TabsContent>
-
-        {/* Nurturing Tab */}
-        <TabsContent value="nurturing" className="mt-6">
-          <LeadNurturing
-            isOpen={true}
-            onClose={() => setActiveTab('leads')}
-          />
-        </TabsContent>
-      </Tabs>
 
       {/* Add Lead Form */}
       <LeadForm
@@ -403,32 +330,6 @@ export default function LeadManagement() {
         onSubmit={handleEditLead}
         mode="edit"
       />
-
-      {/* Lead Communication Dialog */}
-      {selectedLead && (
-        <LeadCommunication
-          lead={selectedLead}
-          isOpen={isCommunicationDialogOpen}
-          onClose={() => {
-            setIsCommunicationDialogOpen(false);
-            setSelectedLead(null);
-          }}
-          onCommunicationSent={handleCommunicationSent}
-        />
-      )}
-
-      {/* Lead Scoring Dialog */}
-      {selectedLead && (
-        <LeadScoring
-          lead={selectedLead}
-          isOpen={isScoringDialogOpen}
-          onClose={() => {
-            setIsScoringDialogOpen(false);
-            setSelectedLead(null);
-          }}
-          onScoreUpdate={handleScoreUpdate}
-        />
-      )}
     </motion.div>
   );
 }

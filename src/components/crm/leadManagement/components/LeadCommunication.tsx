@@ -265,7 +265,7 @@ export default function LeadCommunication({ lead, isOpen, onClose, onCommunicati
                     rows={8}
                   />
                   <div className="text-xs text-gray-500 mt-1">
-                    Available variables: {{firstName}}, {{lastName}}, {{company}}, {{industry}}
+                    Available variables: {`{firstName}, {lastName}, {company}, {industry}`}
                   </div>
                 </div>
 
