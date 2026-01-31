@@ -89,6 +89,7 @@ const NavItem: React.FC<NavItemProps> = ({
 
     // Check if current path matches any of the additional matchPaths
     if (matchPaths && matchPaths.length > 0) {
+    if (matchPaths && matchPaths.length > 0) {
       return matchPaths.some((path) => currentPath.startsWith(path));
     }
 
@@ -486,6 +487,7 @@ const Sidebar: React.FC = () => {
                   {...theme}
                   isChild
                   matchPaths={["/crm/leads"]}
+                  matchPaths={["/crm/leads"]}
                 />
                 <NavItem
                   to="/crm/leads/analytics"
@@ -494,6 +496,7 @@ const Sidebar: React.FC = () => {
                   {...theme}
                   isChild
                   matchPaths={["/crm/leads/analytics"]}
+                  matchPaths={["/crm/leads/analytics"]}
                 />
                 <NavItem
                   to="/crm/leads/nurturing"
@@ -501,6 +504,7 @@ const Sidebar: React.FC = () => {
                   label="Nurturing"
                   {...theme}
                   isChild
+                  matchPaths={["/crm/leads/nurturing"]}
                   matchPaths={["/crm/leads/nurturing"]}
                 />
               </NavGroup>
