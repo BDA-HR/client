@@ -9,11 +9,11 @@ import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { showToast } from '../../layout/layout';
 import { mockLeads } from '../../data/crmMockData';
-import LeadActivities from '../../components/crm/leadManagement/components/LeadActivities';
-import LeadNotes from '../../components/crm/leadManagement/components/LeadNotes';
-import LeadHistory from '../../components/crm/leadManagement/components/LeadHistory';
-import LeadCommunication from '../../components/crm/leadManagement/components/LeadCommunication';
-import LeadScoring from '../../components/crm/leadManagement/components/LeadScoring';
+import LeadActivities from '../../components/crm/leadManagement/leads/detail/LeadActivities';
+import LeadNotes from '../../components/crm/leadManagement/leads/detail/LeadNotes';
+import LeadHistory from '../../components/crm/leadManagement/leads/detail/LeadHistory';
+import LeadCommunication from '../../components/crm/leadManagement/leads/detail/LeadCommunication';
+import LeadScoring from '../../components/crm/leadManagement/leads/detail/LeadScoring';
 import type { Lead } from '../../types/crm';
 
 const statusColors: Record<string, string> = {
@@ -142,13 +142,6 @@ export default function LeadDetailPage() {
           >
             <Target className="w-4 h-4 mr-2" />
             Update Score
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate(`/crm/leads/${lead.id}/edit`)}
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Edit Lead
           </Button>
           <Button
             className="bg-orange-600 hover:bg-orange-700"

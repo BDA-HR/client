@@ -1,11 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '../../components/ui/button';
-import LeadImportContent from '../../components/crm/leadManagement/components/LeadImportContent';
+import { motion } from 'framer-motion';
+import { ImportLeadHeader, ImportLeadContent } from '../../components/crm/leadManagement/leads';
 import { showToast } from '../../layout/layout';
 import type { LeadImportResult } from '../../types/crm';
-import LeadImportHeader from '../../components/crm/leadManagement/components/leadImportHeader';
 
 export default function ImportLeadPage() {
   const navigate = useNavigate();
@@ -16,19 +14,19 @@ export default function ImportLeadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div >
-        {/* Header */}
-        <LeadImportHeader/>
-
-        {/* Import Component - No Dialog wrapper */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <LeadImportContent
-            onClose={() => navigate('/crm/leads')}
-            onImportComplete={handleImportComplete}
-          />
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="min-h-screen bg-gray-50"
+    >
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <ImportLeadHeader />
+        <ImportLeadContent
+          onClose={() => navigate('/crm/leads')}
+          onImportComplete={handleImportComplete}
+        />
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -27,7 +27,7 @@ const containerVariants = {
   },
 }
 
-// CRM specific settings card data - Only 9 required settings
+// CRM specific settings card data - Only 10 required settings
 const crmSettingsCards = [
   {
     id: 1,
@@ -111,6 +111,16 @@ const crmSettingsCards = [
   },
   {
     id: 9,
+    title: "Routing Rules",
+    description: "Configure automatic lead routing and assignment rules",
+    icon: Shield,
+    href: "/settings/crm/routing-rules",
+    color: "from-cyan-500 to-cyan-600",
+    bgColor: "bg-cyan-50",
+    iconColor: "text-cyan-600"
+  },
+  {
+    id: 10,
     title: "Conversion Targets",
     description: "Define conversion targets and goals for lead management",
     icon: Settings,

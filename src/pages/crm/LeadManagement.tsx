@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Upload } from 'lucide-react';
-import { Button } from '../../components/ui/button';
 import { showToast } from '../../layout/layout';
 import { mockLeads } from '../../data/crmMockData';
-import LeadList from '../../components/crm/leadManagement/components/LeadList';
-import LeadForm from '../../components/crm/leadManagement/components/LeadForm';
-import LeadFilters from '../../components/crm/leadManagement/components/LeadFilters';
+import { LeadListHeader, LeadSearchFilters, LeadTable } from '../../components/crm/leadManagement/leads';
 import type { Lead } from '../../types/crm';
 
 interface FilterState {
@@ -45,9 +41,6 @@ export default function LeadManagement() {
     scoreRange: 'all',
     dateRange: 'all'
   });
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
 
   // Reload leads when component mounts or when returning from add/import pages
@@ -122,33 +115,9 @@ export default function LeadManagement() {
     return matchesSearch && matchesStatus && matchesSource && matchesAssignedTo && matchesScore && matchesDate;
   });
 
-  const handleAddLead = (leadData: Partial<Lead>) => {
-    const lead: Lead = {
-      ...leadData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    } as Lead;
-    
-    const updatedLeads = [lead, ...leads];
-    setLeads(updatedLeads);
-    localStorage.setItem('leads', JSON.stringify(updatedLeads));
-    showToast.success('Lead added successfully');
-  };
-
-  const handleEditLead = (leadData: Partial<Lead>) => {
-    if (selectedLead) {
-      const updatedLeads = leads.map(lead => 
-        lead.id === selectedLead.id 
-          ? { ...lead, ...leadData, updatedAt: new Date().toISOString() }
-          : lead
-      );
-      setLeads(updatedLeads);
-      localStorage.setItem('leads', JSON.stringify(updatedLeads));
-      setSelectedLead(null);
-      setIsEditDialogOpen(false);
-      showToast.success('Lead updated successfully');
-    }
+  const handleEditLead = (lead: Lead) => {
+    // Navigate to edit page (to be implemented)
+    navigate(`/crm/leads/${lead.id}/edit`);
   };
 
   const handleDeleteLead = (leadId: string) => {
@@ -178,73 +147,6 @@ export default function LeadManagement() {
     localStorage.setItem('leads', JSON.stringify(updatedLeads));
   };
 
-  const handleBulkAction = (action: string, leadIds: string[]) => {
-    switch (action) {
-      case 'delete':
-        showToast.promise(
-          new Promise((resolve) => {
-            setTimeout(() => {
-              const updatedLeads = leads.filter(lead => !leadIds.includes(lead.id));
-              setLeads(updatedLeads);
-              localStorage.setItem('leads', JSON.stringify(updatedLeads));
-              setSelectedLeads([]);
-              resolve(true);
-            }, 1000);
-          }),
-          {
-            loading: `Deleting ${leadIds.length} lead(s)...`,
-            success: `${leadIds.length} lead(s) deleted successfully`,
-            error: 'Failed to delete leads'
-          }
-        );
-        break;
-      case 'assign':
-        // In a real app, this would open an assignment dialog
-        const assignee = prompt('Assign to:');
-        if (assignee) {
-          const updatedLeads = leads.map(lead => 
-            leadIds.includes(lead.id) 
-              ? { ...lead, assignedTo: assignee, updatedAt: new Date().toISOString() }
-              : lead
-          );
-          setLeads(updatedLeads);
-          localStorage.setItem('leads', JSON.stringify(updatedLeads));
-          setSelectedLeads([]);
-          showToast.success(`${leadIds.length} lead(s) assigned to ${assignee}`);
-        }
-        break;
-      case 'status-contacted':
-      case 'status-qualified':
-        const newStatus = action.replace('status-', '') as Lead['status'];
-        const statusUpdatedLeads = leads.map(lead => 
-          leadIds.includes(lead.id) 
-            ? { ...lead, status: newStatus, updatedAt: new Date().toISOString() }
-            : lead
-        );
-        setLeads(statusUpdatedLeads);
-        localStorage.setItem('leads', JSON.stringify(statusUpdatedLeads));
-        setSelectedLeads([]);
-        showToast.success(`${leadIds.length} lead(s) moved to ${newStatus}`);
-        break;
-    }
-  };
-
-  const handleSelectLead = (leadId: string, selected: boolean) => {
-    if (selected) {
-      setSelectedLeads([...selectedLeads, leadId]);
-    } else {
-      setSelectedLeads(selectedLeads.filter(id => id !== leadId));
-    }
-  };
-
-  const handleSelectAll = (selected: boolean) => {
-    if (selected) {
-      setSelectedLeads(filteredLeads.map(lead => lead.id));
-    } else {
-      setSelectedLeads([]);
-    }
-  };
-
   const clearFilters = () => {
     setFilters({
       searchTerm: '',
@@ -256,22 +158,6 @@ export default function LeadManagement() {
     });
   };
 
-  const handleCommunicationSent = (_communication: any) => {
-    // In a real app, this would log the communication
-    showToast.success('Communication sent successfully');
-  };
-
-  const handleScoreUpdate = (leadId: string, newScore: number, _breakdown: any[]) => {
-    const updatedLeads = leads.map(lead => 
-      lead.id === leadId 
-        ? { ...lead, score: newScore, updatedAt: new Date().toISOString() }
-        : lead
-    );
-    setLeads(updatedLeads);
-    localStorage.setItem('leads', JSON.stringify(updatedLeads));
-    showToast.success('Lead score updated successfully');
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -280,55 +166,26 @@ export default function LeadManagement() {
       className="space-y-6"
     >
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Lead Management</h1>
-        </div>
-      </div>
+      <LeadListHeader
+        totalCount={leads.length}
+        filteredCount={filteredLeads.length}
+        selectedCount={selectedLeads.length}
+      />
 
       {/* Filters */}
-      <LeadFilters
+      <LeadSearchFilters
         filters={filters}
         onFiltersChange={setFilters}
         onClearFilters={clearFilters}
-        totalCount={leads.length}
-        filteredCount={filteredLeads.length}
       />
 
-      {/* Leads List */}
-      <LeadList
+      {/* Leads Table */}
+      <LeadTable
         leads={filteredLeads}
         onStatusChange={handleStatusChange}
-        onEdit={(lead) => {
-          setSelectedLead(lead);
-          setIsEditDialogOpen(true);
-        }}
+        onEdit={handleEditLead}
         onDelete={handleDeleteLead}
         onAssignRep={handleAssignRep}
-        onBulkAction={handleBulkAction}
-        selectedLeads={selectedLeads}
-        onSelectLead={handleSelectLead}
-        onSelectAll={handleSelectAll}
-      />
-
-      {/* Add Lead Form */}
-      <LeadForm
-        isOpen={isAddDialogOpen}
-        onClose={() => setIsAddDialogOpen(false)}
-        onSubmit={handleAddLead}
-        mode="add"
-      />
-
-      {/* Edit Lead Form */}
-      <LeadForm
-        lead={selectedLead}
-        isOpen={isEditDialogOpen}
-        onClose={() => {
-          setIsEditDialogOpen(false);
-          setSelectedLead(null);
-        }}
-        onSubmit={handleEditLead}
-        mode="edit"
       />
     </motion.div>
   );

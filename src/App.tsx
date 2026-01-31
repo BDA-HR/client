@@ -72,6 +72,7 @@ import PageTransactions from "./pages/finance/PageTransactions";
 import PagePayroll from "./pages/finance/PagePayroll";
 import LeadManagement from "./pages/crm/LeadManagement";
 import AddLeadPage from "./pages/crm/AddLeadPage";
+import EditLeadPage from "./pages/crm/EditLeadPage";
 import LeadAnalyticsPage from "./pages/crm/LeadAnalyticsPage";
 import LeadRoutingPage from "./pages/crm/LeadRoutingPage";
 import LeadNurturingPage from "./pages/crm/LeadNurturingPage";
@@ -95,6 +96,7 @@ import PageContactMethods from "./pages/settings/crmSettings/pageContactMethods"
 import PageActivityTypes from "./pages/settings/crmSettings/pageActivityTypes";
 import PageAssignmentModes from "./pages/settings/crmSettings/pageAssignmentModes";
 import PageConversionTargets from "./pages/settings/crmSettings/pageConversionTargets";
+import PageRoutingRules from "./pages/settings/crmSettings/pageRoutingRules";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -147,6 +149,7 @@ function App() {
                 {/* START CRM ROUTES */}
                 <Route path="/crm/leads" element={<LeadManagement />} />
                 <Route path="/crm/leads/add" element={<AddLeadPage />} />
+                <Route path="/crm/leads/:id/edit" element={<EditLeadPage />} />
                 <Route path="/crm/leads/import" element={<ImportLeadPage />} />
                 <Route path="/crm/leads/analytics" element={<LeadAnalyticsPage />} />
                 <Route path="/crm/leads/routing" element={<LeadRoutingPage />} />
@@ -204,6 +207,10 @@ function App() {
                 <Route
                   path="/settings/crm/conversion-targets"
                   element={<PageConversionTargets />}
+                />
+                <Route
+                  path="/settings/crm/routing-rules"
+                  element={<PageRoutingRules />}
                 />
                 {/* END CRM ROUTES */}
                 {/* START HR ROUTES */}

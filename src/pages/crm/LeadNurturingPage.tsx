@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import LeadNurturing from '../../components/crm/leadManagement/components/LeadNurturing';
+import LeadNurturing from '../../components/crm/leadManagement/components_old/LeadNurturing';
 
 export default function LeadNurturingPage() {
   const navigate = useNavigate();
