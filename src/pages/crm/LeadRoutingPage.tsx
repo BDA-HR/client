@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../layout/layout';
-import LeadRouting from '../../components/crm/leadManagement/components/LeadRouting';
+import LeadRouting from '../../components/crm/leadManagement/components_old/LeadRouting';
 import type { RoutingRule } from '../../types/crm';
 
 export default function LeadRoutingPage() {

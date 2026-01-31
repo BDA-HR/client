@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, User, Building, Target, FileText, CheckCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
@@ -9,7 +9,6 @@ import { Textarea } from '../../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { useCRMSettings } from '../../hooks/useCRMSettings';
 import { showToast } from '../../layout/layout';
-import { RoutingService } from '../../services/routingService';
 import type { Lead } from '../../types/crm';
 
 const salesReps = [
@@ -27,10 +26,12 @@ const steps = [
   { id: 4, title: 'Additional Info', icon: FileText },
 ];
 
-export default function AddLeadPage() {
+export default function EditLeadPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
 
   const {
     leadSourceNames,
@@ -59,6 +60,22 @@ export default function AddLeadPage() {
     leadQuality: 'Warm',
     preferredContactMethod: 'Any',
   });
+
+  // Load lead data on component mount
+  useEffect(() => {
+    if (id) {
+      const leads = JSON.parse(localStorage.getItem('leads') || '[]');
+      const lead = leads.find((l: Lead) => l.id === id);
+      
+      if (lead) {
+        setFormData(lead);
+        setLoading(false);
+      } else {
+        showToast.error('Lead not found');
+        navigate('/crm/leads');
+      }
+    }
+  }, [id, navigate]);
 
   const handleChange = (field: keyof Lead, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -105,32 +122,36 @@ export default function AddLeadPage() {
     if (!validateStep(currentStep)) return;
 
     try {
-      // Auto-assign sales rep based on routing rules if not manually assigned
-      let finalFormData = { ...formData };
-      
-      if (!finalFormData.assignedTo) {
-        const assignedRep = RoutingService.assignLeadToSalesRep(finalFormData);
-        if (assignedRep) {
-          finalFormData.assignedTo = assignedRep;
-        }
-      }
-
-      const newLead: Lead = {
-        ...finalFormData,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
+      const updatedLead: Lead = {
+        ...formData,
+        id: id!,
         updatedAt: new Date().toISOString()
       } as Lead;
 
       const existingLeads = JSON.parse(localStorage.getItem('leads') || '[]');
-      localStorage.setItem('leads', JSON.stringify([newLead, ...existingLeads]));
+      const updatedLeads = existingLeads.map((lead: Lead) => 
+        lead.id === id ? updatedLead : lead
+      );
+      
+      localStorage.setItem('leads', JSON.stringify(updatedLeads));
 
-      showToast.success('Lead added successfully');
+      showToast.success('Lead updated successfully');
       navigate('/crm/leads');
     } catch (error) {
-      showToast.error('Failed to add lead');
+      showToast.error('Failed to update lead');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading lead data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -150,7 +171,7 @@ export default function AddLeadPage() {
             
             <div className=" flex-1">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-orange-700 to-orange-800 bg-clip-text text-transparent mb-2 tracking-tight">
-                Add New Lead
+                Edit Lead
               </h1>
             </div>
             
@@ -462,7 +483,7 @@ export default function AddLeadPage() {
                   <Label htmlFor="assignedTo" className="text-sm text-gray-500">Assigned To</Label>
                   <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
                     <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent">
-                      <SelectValue placeholder="Auto-assign or select sales rep" />
+                      <SelectValue placeholder="Select sales rep" />
                     </SelectTrigger>
                     <SelectContent>
                       {salesReps.map((rep) => (
@@ -556,7 +577,7 @@ export default function AddLeadPage() {
                   onClick={handleSubmit}
                   className="bg-green-600 hover:bg-green-700 px-6"
                 >
-                  Save Lead
+                  Update Lead
                 </Button>
               )}
             </div>

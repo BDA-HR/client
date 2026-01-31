@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import LeadAnalytics from '../../components/crm/leadManagement/components/LeadAnalytics';
+import LeadAnalytics from '../../components/crm/leadManagement/components_old/LeadAnalytics';
 
 export default function LeadAnalyticsPage() {
   const navigate = useNavigate();

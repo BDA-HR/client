@@ -7,6 +7,10 @@ export { default as CustomerSupport } from './customerSupport/CustomerSupport';
 export { default as ActivityManagement } from './activityManagement/ActivityManagement';
 export { default as AnalyticsReporting } from './analytics/AnalyticsReporting';
 
+// Lead Management Components
+export * from './leadManagement';
+export { default as LeadManagementSidebar } from './leadManagement/LeadManagementSidebar';
+
 // Overview Components
 export { default as LeadOverview } from './LeadOverview';
 export { default as ContactOverview } from './ContactOverview';

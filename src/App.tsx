@@ -35,28 +35,28 @@ import UserOverview from "./pages/core/usermanagement/pageUserManagement";
 import DepartmentOverview from "./pages/core/pageDepartments";
 import CompanyBranchesPage from "./pages/core/pageCompanies";
 // import CompanyDetailsPage from './components/core/company/CompDetails';
-import BranchesPage from './pages/core/pageBranches';
-import FiscalYearHistory from './pages/core/pageFiscYearHist';
-import PagePeriod from './pages/core/pagePeriod';
-import PageSettings from './pages/settings/pageSettings';
-import JobGradeSubgrades from './pages/settings/hrSettings/jobgrade/JobGradeSubgrades';
-import PageBenefitSet from './pages/settings/hrSettings/pageBenefitSet';
-import PageEducationalQual from './pages/settings/hrSettings/pageEducationalQual';
-import PagePosition from './pages/settings/hrSettings/position/pagePosition';
-import PositionDetails from './pages/settings/hrSettings/position/PositionDetails';
-import AddEmployeePage from './pages/hr/employeepage/AddEmployeePage';
-import PageAnnualLeave from './pages/settings/hrSettings/pageAnnualLeave';
-import LeavePolicyAccrualPage from './pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage';
-import { PageHolidayHist } from './pages/core/pageHolidayHist';
-import ProfilePage from './pages/profile';
-import PageAddUser from './pages/core/usermanagement/pageAddUser';
-import PageHrSettings from './pages/settings/hrSettings/PageHrSettings';
-import PageCoreSettings from './pages/settings/coreSettings/PageCoreSettings';
-import PageApiSettings from './pages/settings/coreSettings/PageApiSettings';
-import PageMenuSettings from './pages/settings/coreSettings/PageMenuSettings';
-import FileDashboard from './pages/modules/File';
+import BranchesPage from "./pages/core/pageBranches";
+import FiscalYearHistory from "./pages/core/pageFiscYearHist";
+import PagePeriod from "./pages/core/pagePeriod";
+import PageSettings from "./pages/settings/pageSettings";
+import JobGradeSubgrades from "./pages/settings/hrSettings/jobgrade/JobGradeSubgrades";
+import PageBenefitSet from "./pages/settings/hrSettings/pageBenefitSet";
+import PageEducationalQual from "./pages/settings/hrSettings/pageEducationalQual";
+import PagePosition from "./pages/settings/hrSettings/position/pagePosition";
+import PositionDetails from "./pages/settings/hrSettings/position/PositionDetails";
+import AddEmployeePage from "./pages/hr/employeepage/AddEmployeePage";
+import PageAnnualLeave from "./pages/settings/hrSettings/pageAnnualLeave";
+import LeavePolicyAccrualPage from "./pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage";
+import { PageHolidayHist } from "./pages/core/pageHolidayHist";
+import ProfilePage from "./pages/profile";
+import PageAddUser from "./pages/core/usermanagement/pageAddUser";
+import PageHrSettings from "./pages/settings/hrSettings/PageHrSettings";
+import PageCoreSettings from "./pages/settings/coreSettings/PageCoreSettings";
+import PageApiSettings from "./pages/settings/coreSettings/PageApiSettings";
+import PageMenuSettings from "./pages/settings/coreSettings/PageMenuSettings";
+import FileDashboard from "./pages/modules/File";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
 import LeavePolicy from "./pages/settings/hrSettings/Leave/leavePolicy";
 import LeavePolicyConfig from "./pages/settings/hrSettings/Leave/leavePolicyConfig";
@@ -72,6 +72,7 @@ import PageTransactions from "./pages/finance/PageTransactions";
 import PagePayroll from "./pages/finance/PagePayroll";
 import LeadManagement from "./pages/crm/LeadManagement";
 import AddLeadPage from "./pages/crm/AddLeadPage";
+import EditLeadPage from "./pages/crm/EditLeadPage";
 import LeadAnalyticsPage from "./pages/crm/LeadAnalyticsPage";
 import LeadRoutingPage from "./pages/crm/LeadRoutingPage";
 import LeadNurturingPage from "./pages/crm/LeadNurturingPage";
@@ -95,6 +96,7 @@ import PageContactMethods from "./pages/settings/crmSettings/pageContactMethods"
 import PageActivityTypes from "./pages/settings/crmSettings/pageActivityTypes";
 import PageAssignmentModes from "./pages/settings/crmSettings/pageAssignmentModes";
 import PageConversionTargets from "./pages/settings/crmSettings/pageConversionTargets";
+import PageRoutingRules from "./pages/settings/crmSettings/pageRoutingRules";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -147,10 +149,20 @@ function App() {
                 {/* START CRM ROUTES */}
                 <Route path="/crm/leads" element={<LeadManagement />} />
                 <Route path="/crm/leads/add" element={<AddLeadPage />} />
+                <Route path="/crm/leads/:id/edit" element={<EditLeadPage />} />
                 <Route path="/crm/leads/import" element={<ImportLeadPage />} />
-                <Route path="/crm/leads/analytics" element={<LeadAnalyticsPage />} />
-                <Route path="/crm/leads/routing" element={<LeadRoutingPage />} />
-                <Route path="/crm/leads/nurturing" element={<LeadNurturingPage />} />
+                <Route
+                  path="/crm/leads/analytics"
+                  element={<LeadAnalyticsPage />}
+                />
+                <Route
+                  path="/crm/leads/routing"
+                  element={<LeadRoutingPage />}
+                />
+                <Route
+                  path="/crm/leads/nurturing"
+                  element={<LeadNurturingPage />}
+                />
                 <Route path="/crm/leads/:id" element={<LeadDetailPage />} />
                 <Route
                   path="/crm/leads/:id/convert"
@@ -204,6 +216,10 @@ function App() {
                 <Route
                   path="/settings/crm/conversion-targets"
                   element={<PageConversionTargets />}
+                />
+                <Route
+                  path="/settings/crm/routing-rules"
+                  element={<PageRoutingRules />}
                 />
                 {/* END CRM ROUTES */}
                 {/* START HR ROUTES */}
