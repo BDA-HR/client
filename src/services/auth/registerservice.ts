@@ -36,7 +36,7 @@ class RegistrationService {
   async step2(registrationData: RegStep2): Promise<RegRes> {
     try {
       const response = await api.post(`${this.baseUrl}/Step2`, registrationData);
-      console.info('Registration step 2 completed successfully:', response.data.data.userId);
+      console.info(response.data.data.message);
       return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
@@ -49,7 +49,7 @@ class RegistrationService {
   async step3(registrationData: RegStep3): Promise<RegRes> {
     try {
       const response = await api.post(`${this.baseUrl}/Step3`, registrationData);
-      console.info('Registration step 3 completed successfully:', response.data.data.userId);
+      console.info(response.data.data.message);
       return response.data.data;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
@@ -59,27 +59,14 @@ class RegistrationService {
   }
 
   // Combined registration method
-  async completeRegistration(
-    step1Data: RegStep1,
-    step2Data: Omit<RegStep2, 'userId'>,
-    step3Data: Omit<RegStep3, 'userId'>
-  ): Promise<RegRes> {
+  async completeRegistration(step1Data: RegStep1, step2Data: Omit<RegStep2, 'userId'>, step3Data: Omit<RegStep3, 'userId'>): Promise<RegRes> {
     try {
       // Step 1
       const step1Result = await this.step1(step1Data);
-      
       // Step 2
-      await this.step2({
-      userId: step1Result.userId,
-      ...step2Data
-    });
-      
+      await this.step2({ userId: step1Result.userId, ...step2Data });
       // Step 3
-      const step3Result = await this.step3({
-        userId: step1Result.userId,
-        ...step3Data
-      });
-      
+      const step3Result = await this.step3({ userId: step1Result.userId, ...step3Data });
       return step3Result;
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error);
