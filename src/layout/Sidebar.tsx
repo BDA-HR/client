@@ -73,7 +73,11 @@ const NavItem: React.FC<NavItemProps> = ({
 
     // For child items, be more specific about matching
     if (isChild && matchPaths && matchPaths.length > 0) {
-      return matchPaths.some((path) => currentPath === path || (currentPath.startsWith(path) && currentPath !== path));
+      return matchPaths.some(
+        (path) =>
+          currentPath === path ||
+          (currentPath.startsWith(path) && currentPath !== path),
+      );
     }
 
     // Check if current path matches the main 'to' path
@@ -481,7 +485,7 @@ const Sidebar: React.FC = () => {
                   label="Leads"
                   {...theme}
                   isChild
-                  matchPaths={["/crm/leads"]}
+                  end={true}
                 />
                 <NavItem
                   to="/crm/leads/analytics"
@@ -489,7 +493,6 @@ const Sidebar: React.FC = () => {
                   label="Analytics"
                   {...theme}
                   isChild
-                  matchPaths={["/crm/leads/analytics"]}
                 />
                 <NavItem
                   to="/crm/leads/nurturing"
@@ -497,7 +500,6 @@ const Sidebar: React.FC = () => {
                   label="Nurturing"
                   {...theme}
                   isChild
-                  matchPaths={["/crm/leads/nurturing"]}
                 />
               </NavGroup>
               <NavItem

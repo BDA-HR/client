@@ -27,17 +27,16 @@ Jane,Smith,jane.smith@example.com,555-0124,Tech Solutions,Marketing Director,Ema
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-4">
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => navigate('/crm/leads')}
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-1"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Leads</span>
+          <span>Back</span>
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Import Leads</h1>
-          <p className="text-gray-600 mt-1">Upload a CSV file to import multiple leads</p>
         </div>
       </div>
       

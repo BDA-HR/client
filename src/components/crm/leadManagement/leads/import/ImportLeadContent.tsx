@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from 'react';
-import { Upload, FileText, AlertCircle, CheckCircle, X } from 'lucide-react';
-import { Button } from '../../../../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../ui/card';
-import { Alert, AlertDescription } from '../../../../ui/alert';
-import { Progress } from '../../../../ui/progress';
-import { Badge } from '../../../../ui/badge';
-import { RoutingService } from '../../../../../services/routingService';
+import React, { useState, useCallback, useRef } from "react";
+import { Upload, FileText, AlertCircle, CheckCircle, X } from "lucide-react";
+import { Button } from "../../../../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../ui/card";
+import { Alert, AlertDescription } from "../../../../ui/alert";
+import { Progress } from "../../../../ui/progress";
+import { Badge } from "../../../../ui/badge";
+import { RoutingService } from "../../../../../services/routingService";
 
 interface ImportResult {
   success: boolean;
@@ -20,12 +20,17 @@ interface ImportLeadContentProps {
   onImportComplete?: (result: any) => void;
 }
 
-export default function ImportLeadContent({ onImport, onClose, onImportComplete }: ImportLeadContentProps) {
+export default function ImportLeadContent({
+  onImport,
+  onClose,
+  onImportComplete,
+}: ImportLeadContentProps) {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [progress, setProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -41,10 +46,13 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type === 'text/csv' || droppedFile.name.endsWith('.csv')) {
+      if (
+        droppedFile.type === "text/csv" ||
+        droppedFile.name.endsWith(".csv")
+      ) {
         setFile(droppedFile);
         setResult(null);
       }
@@ -63,10 +71,10 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
 
     setImporting(true);
     setProgress(0);
-    
+
     // Simulate progress
     const progressInterval = setInterval(() => {
-      setProgress(prev => {
+      setProgress((prev) => {
         if (prev >= 90) {
           clearInterval(progressInterval);
           return prev;
@@ -83,22 +91,22 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
         // Process CSV file and apply routing rules
         importResult = await processCSVFile(file);
       }
-      
+
       setResult(importResult);
       setProgress(100);
-      
+
       if (onImportComplete && importResult.success) {
         onImportComplete({
           successfulImports: importResult.imported,
-          errors: importResult.errors
+          errors: importResult.errors,
         });
       }
     } catch (error) {
       setResult({
         success: false,
-        message: 'Import failed due to an unexpected error',
+        message: "Import failed due to an unexpected error",
         imported: 0,
-        errors: ['Unexpected error occurred during import']
+        errors: ["Unexpected error occurred during import"],
       });
       setProgress(100);
     } finally {
@@ -113,95 +121,102 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
       reader.onload = (e) => {
         try {
           const csv = e.target?.result as string;
-          const lines = csv.split('\n');
-          const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-          
+          const lines = csv.split("\n");
+          const headers = lines[0]
+            .split(",")
+            .map((h) => h.trim().replace(/"/g, ""));
+
           const leads = [];
           const errors = [];
-          
+
           for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim()) {
               try {
-                const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                const values = lines[i]
+                  .split(",")
+                  .map((v) => v.trim().replace(/"/g, ""));
                 const leadData: any = {};
-                
+
                 headers.forEach((header, index) => {
-                  const value = values[index] || '';
+                  const value = values[index] || "";
                   switch (header.toLowerCase()) {
-                    case 'first name':
+                    case "first name":
                       leadData.firstName = value;
                       break;
-                    case 'last name':
+                    case "last name":
                       leadData.lastName = value;
                       break;
-                    case 'email':
+                    case "email":
                       leadData.email = value;
                       break;
-                    case 'phone':
+                    case "phone":
                       leadData.phone = value;
                       break;
-                    case 'company':
+                    case "company":
                       leadData.company = value;
                       break;
-                    case 'job title':
+                    case "job title":
                       leadData.jobTitle = value;
                       break;
-                    case 'source':
-                      leadData.source = value || 'Website';
+                    case "source":
+                      leadData.source = value || "Website";
                       break;
-                    case 'status':
-                      leadData.status = value || 'New';
+                    case "status":
+                      leadData.status = value || "New";
                       break;
-                    case 'industry':
+                    case "industry":
                       leadData.industry = value;
                       break;
-                    case 'budget':
+                    case "budget":
                       leadData.budget = value ? Number(value) : 0;
                       break;
-                    case 'notes':
+                    case "notes":
                       leadData.notes = value;
                       break;
                   }
                 });
-                
+
                 // Apply routing rules for automatic assignment
                 if (!leadData.assignedTo) {
-                  const assignedRep = RoutingService.assignLeadToSalesRep(leadData);
+                  const assignedRep =
+                    RoutingService.assignLeadToSalesRep(leadData);
                   if (assignedRep) {
                     leadData.assignedTo = assignedRep;
                   }
                 }
-                
+
                 // Add required fields
                 leadData.id = Date.now().toString() + i;
                 leadData.createdAt = new Date().toISOString();
                 leadData.updatedAt = new Date().toISOString();
                 leadData.score = leadData.score || 0;
-                
+
                 leads.push(leadData);
               } catch (error) {
                 errors.push(`Row ${i + 1}: Invalid data format`);
               }
             }
           }
-          
+
           // Save leads to localStorage
-          const existingLeads = JSON.parse(localStorage.getItem('leads') || '[]');
+          const existingLeads = JSON.parse(
+            localStorage.getItem("leads") || "[]",
+          );
           const updatedLeads = [...leads, ...existingLeads];
-          localStorage.setItem('leads', JSON.stringify(updatedLeads));
-          
+          localStorage.setItem("leads", JSON.stringify(updatedLeads));
+
           resolve({
             success: true,
             message: `Successfully imported ${leads.length} leads`,
             imported: leads.length,
-            errors
+            errors,
           });
         } catch (error) {
           resolve({
             success: false,
-            message: 'Failed to parse CSV file',
+            message: "Failed to parse CSV file",
             imported: 0,
-            errors: ['Invalid CSV format']
+            errors: ["Invalid CSV format"],
           });
         }
       };
@@ -213,6 +228,10 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
     setFile(null);
     setResult(null);
     setProgress(0);
+    // Reset the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -224,15 +243,16 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
         </CardHeader>
         <CardContent>
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive 
-                ? 'border-orange-500 bg-orange-50' 
-                : 'border-gray-300 hover:border-gray-400'
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+              dragActive
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300 hover:border-gray-400"
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
+            onClick={() => !file && fileInputRef.current?.click()}
           >
             {file ? (
               <div className="space-y-4">
@@ -251,7 +271,7 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
                     disabled={importing}
                     className="bg-orange-600 hover:bg-orange-700"
                   >
-                    {importing ? 'Importing...' : 'Import Leads'}
+                    {importing ? "Importing..." : "Import Leads"}
                   </Button>
                   <Button variant="outline" onClick={resetImport}>
                     <X className="w-4 h-4 mr-2" />
@@ -267,17 +287,20 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
                   <p className="text-gray-500">or click to browse</p>
                 </div>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   accept=".csv"
                   onChange={handleFileSelect}
                   className="hidden"
                   id="file-upload"
                 />
-                <label htmlFor="file-upload">
-                  <Button variant="outline" className="cursor-pointer">
-                    Choose File
-                  </Button>
-                </label>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Choose File
+                </Button>
               </div>
             )}
           </div>
@@ -308,10 +331,14 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Alert className={result.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
-              <AlertDescription>
-                {result.message}
-              </AlertDescription>
+            <Alert
+              className={
+                result.success
+                  ? "border-green-200 bg-green-50"
+                  : "border-red-200 bg-red-50"
+              }
+            >
+              <AlertDescription>{result.message}</AlertDescription>
             </Alert>
 
             {result.success && (
@@ -327,8 +354,11 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
                 <h4 className="font-medium text-red-800 mb-2">Errors:</h4>
                 <ul className="space-y-1">
                   {result.errors.map((error, index) => (
-                    <li key={index} className="text-sm text-red-600 flex items-start space-x-2">
-                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <li
+                      key={index}
+                      className="text-sm text-red-600 flex items-start space-x-2"
+                    >
+                      <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                       <span>{error}</span>
                     </li>
                   ))}
@@ -344,19 +374,20 @@ export default function ImportLeadContent({ onImport, onClose, onImportComplete 
         <CardHeader>
           <CardTitle>Import Instructions</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="text-sm text-gray-600 space-y-2">
+        <CardContent className="space-y-2">
+          {/* <div className="text-sm text-gray-600 space-y-2">
             <p><strong>Required columns:</strong> First Name, Last Name, Company</p>
             <p><strong>Optional columns:</strong> Email, Phone, Job Title, Source, Status, Industry, Budget, Notes</p>
             <p><strong>File format:</strong> CSV (Comma Separated Values)</p>
             <p><strong>Maximum file size:</strong> 10 MB</p>
             <p><strong>Maximum records:</strong> 1,000 leads per import</p>
-          </div>
-          
+          </div> */}
+
           <Alert>
             <AlertCircle className="w-4 h-4" />
             <AlertDescription>
-              Make sure your CSV file includes headers in the first row. Download the template above for the correct format.
+              Make sure your CSV file includes headers in the first row.
+              Download the template above for the correct format.
             </AlertDescription>
           </Alert>
         </CardContent>

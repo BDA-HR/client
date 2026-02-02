@@ -79,13 +79,13 @@ export default function LeadSearchFilters({
           <Upload className="w-4 h-4 mr-2" />
           Import
         </Button>
-        <Button 
+        {/* <Button 
           variant="outline"
-          onClick={() => {/* Handle export */}}
+          onClick={() => {}}
         >
           <Download className="w-4 h-4 mr-2" />
           Export
-        </Button>
+        </Button> */}
         <Button 
           onClick={() => navigate('/crm/leads/add')}
           className="bg-orange-600 hover:bg-orange-700"

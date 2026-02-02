@@ -20,7 +20,7 @@ export default function ImportLeadPage() {
       transition={{ duration: 0.3 }}
       className="min-h-screen bg-gray-50"
     >
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <div className=" space-y-6">
         <ImportLeadHeader />
         <ImportLeadContent
           onClose={() => navigate('/crm/leads')}
