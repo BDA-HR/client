@@ -16,6 +16,7 @@ export interface EmployeeListDto extends BaseDto {
   empNature: string;
   workArr: string;
   photo: string;
+  hasAccount: boolean;
 }
 
 export interface EmployeeModDto {

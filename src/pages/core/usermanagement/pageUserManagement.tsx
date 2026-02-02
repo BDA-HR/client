@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { AddAccountStepForm } from "../../../components/core/usermgmt/AddAccountStepForm";
-import type { EmpSearchRes } from "../../../types/core/EmpSearchRes";
-import type { EmployeeListDto, UUID } from "../../../types/hr/employee";
-import EmployeeTable from "../../../components/hr/employee/EmployeeTable";
+import { EditAccountStepForm } from "../../../components/core/usermgmt/EditAccountStepForm";
+import type { EmpSearchRes, UUID } from "../../../types/core/EmpSearchRes";
 import EmployeeSearchFilters from "../../../components/hr/employee/EmployeeSearchFilters";
 import { motion } from "framer-motion";
 import { usermgmtService } from "../../../services/core/usermgtservice";
+import EmployeeTable from "../../../components/core/usermgmt/employeeTable";
+import type { EmployeeListDto } from "../../../types/hr/employee";
 
 interface TableEmployee {
   id: string;
@@ -25,19 +26,28 @@ interface TableEmployee {
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
+  hasAccount: boolean;
 }
 
 const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAccountForm, setShowAccountForm] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<EmpSearchRes | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<EmpSearchRes | null>(
+    null,
+  );
+  const [selectedAccountData, setSelectedAccountData] = useState<any>(null);
   const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
   // State for employee table
-  const [employeesTableData, setEmployeesTableData] = useState<TableEmployee[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<TableEmployee[]>([]);
+  const [employeesTableData, setEmployeesTableData] = useState<TableEmployee[]>(
+    [],
+  );
+  const [filteredEmployees, setFilteredEmployees] = useState<TableEmployee[]>(
+    [],
+  );
   const [allEmployees, setAllEmployees] = useState<TableEmployee[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -48,11 +58,13 @@ const UserManagement: React.FC = () => {
   const [filters, setFilters] = useState({
     department: "",
     status: "",
-    employmentType: ""
+    employmentType: "",
   });
 
   // Helper function to determine employee status based on actual data
-  const determineEmployeeStatus = (employee: EmployeeListDto): "active" | "on-leave" => {
+  const determineEmployeeStatus = (
+    employee: EmployeeListDto,
+  ): "active" | "on-leave" => {
     // TODO: Replace with actual status logic from your API
     // For now, default to "active"
     return "active";
@@ -81,6 +93,7 @@ const UserManagement: React.FC = () => {
       empNature: employee.empNature,
       photo: employee.photo || "",
       status: status,
+      hasAccount: true,
       // employmentDate: employmentDate,
       createdAt: employee.createdAt,
       updatedAt: employee.modifiedAt,
@@ -89,28 +102,36 @@ const UserManagement: React.FC = () => {
 
   // Filter and search employees
   const applyFiltersAndSearch = (employees: TableEmployee[]) => {
-    return employees.filter(employee => {
+    return employees.filter((employee) => {
       // Apply search term filter
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = !searchTerm ||
+      const matchesSearch =
+        !searchTerm ||
         employee.empFullName.toLowerCase().includes(searchLower) ||
         employee.code.toLowerCase().includes(searchLower) ||
-        (employee.department && employee.department.toLowerCase().includes(searchLower)) ||
-        (employee.position && employee.position.toLowerCase().includes(searchLower));
+        (employee.department &&
+          employee.department.toLowerCase().includes(searchLower)) ||
+        (employee.position &&
+          employee.position.toLowerCase().includes(searchLower));
 
       // Apply department filter
-      const matchesDepartment = !filters.department ||
-        employee.department === filters.department;
+      const matchesDepartment =
+        !filters.department || employee.department === filters.department;
 
       // Apply status filter
-      const matchesStatus = !filters.status ||
-        employee.status === filters.status;
+      const matchesStatus =
+        !filters.status || employee.status === filters.status;
 
       // Apply employment type filter
-      const matchesEmploymentType = !filters.employmentType ||
-        employee.empType === filters.employmentType;
+      const matchesEmploymentType =
+        !filters.employmentType || employee.empType === filters.employmentType;
 
-      return matchesSearch && matchesDepartment && matchesStatus && matchesEmploymentType;
+      return (
+        matchesSearch &&
+        matchesDepartment &&
+        matchesStatus &&
+        matchesEmploymentType
+      );
     });
   };
 
@@ -144,12 +165,14 @@ const UserManagement: React.FC = () => {
       // Apply pagination
       const itemsPerPage = 10;
       const startIndex = (page - 1) * itemsPerPage;
-      const paginatedEmployees = filtered.slice(startIndex, startIndex + itemsPerPage);
+      const paginatedEmployees = filtered.slice(
+        startIndex,
+        startIndex + itemsPerPage,
+      );
 
       setEmployeesTableData(paginatedEmployees);
       setTotalPages(Math.ceil(filtered.length / itemsPerPage));
       setTotalItems(filtered.length);
-
     } catch (err: any) {
       console.error("Failed to fetch employees:", err);
       setError(err.message || "Failed to load employee list");
@@ -178,7 +201,10 @@ const UserManagement: React.FC = () => {
 
       const itemsPerPage = 10;
       const startIndex = (currentPage - 1) * itemsPerPage;
-      const paginatedEmployees = filtered.slice(startIndex, startIndex + itemsPerPage);
+      const paginatedEmployees = filtered.slice(
+        startIndex,
+        startIndex + itemsPerPage,
+      );
 
       setEmployeesTableData(paginatedEmployees);
       setTotalPages(Math.ceil(filtered.length / itemsPerPage));
@@ -201,26 +227,88 @@ const UserManagement: React.FC = () => {
       gender: employeeData.gender,
       dept: employeeData.department,
       position: employeeData.position,
-      photo: employeeData.photo || ""
+      photo: employeeData.photo || "",
+      hasAccount: true,
     };
 
     setSelectedEmployee(empSearchRes);
     setShowAccountForm(true);
+    setShowEditForm(false);
+  };
+
+  const handleEditAccount = async (employeeData: TableEmployee) => {
+    const empSearchRes: EmpSearchRes = {
+      id: employeeData.id as UUID,
+      code: employeeData.code,
+      fullName: employeeData.empFullName,
+      fullNameAm: employeeData.empFullNameAm,
+      gender: employeeData.gender,
+      dept: employeeData.department,
+      position: employeeData.position,
+      photo: employeeData.photo || "",
+      hasAccount: true,
+    };
+
+    try {
+      setTableLoading(true);
+      // Fetch actual account data from API
+      const accountData = await usermgmtService.getAccountData(
+        employeeData.id as UUID,
+      );
+
+      setSelectedEmployee(empSearchRes);
+      setSelectedAccountData(accountData);
+      setShowEditForm(true);
+      setShowAccountForm(false);
+    } catch (error: any) {
+      console.error("Failed to fetch account data:", error);
+      setError(error.message || "Failed to load account data");
+    } finally {
+      setTableLoading(false);
+    }
   };
 
   const handleAccountAdded = (result: any) => {
     console.log("Account created:", result);
     setShowAccountForm(false);
+    setShowEditForm(false);
     setSelectedEmployee(null);
+    setSelectedAccountData(null);
     setError(null);
     setHasSearched(false);
     // Refresh the employee list after account creation
     fetchAllEmployees(currentPage);
   };
 
+  const handleAccountUpdated = (result: any) => {
+    console.log("Account updated:", result);
+    setShowAccountForm(false);
+    setShowEditForm(false);
+    setSelectedEmployee(null);
+    setSelectedAccountData(null);
+    setError(null);
+    setHasSearched(false);
+    // Refresh the employee list after account update
+    fetchAllEmployees(currentPage);
+  };
+
+  const handleAccountDeleted = (result: any) => {
+    console.log("Account deleted:", result);
+    setShowAccountForm(false);
+    setShowEditForm(false);
+    setSelectedEmployee(null);
+    setSelectedAccountData(null);
+    setError(null);
+    setHasSearched(false);
+    // Refresh the employee list after account deletion
+    fetchAllEmployees(currentPage);
+  };
+
   const handleBackToAccounts = () => {
     setShowAccountForm(false);
+    setShowEditForm(false);
     setSelectedEmployee(null);
+    setSelectedAccountData(null);
     setError(null);
     setHasSearched(false);
   };
@@ -242,14 +330,16 @@ const UserManagement: React.FC = () => {
 
   const handleEmployeeDelete = (employeeId: string) => {
     console.log("Delete employee:", employeeId);
-    setEmployeesTableData(prev => prev.filter(emp => emp.id !== employeeId));
-    setFilteredEmployees(prev => prev.filter(emp => emp.id !== employeeId));
-    setAllEmployees(prev => prev.filter(emp => emp.id !== employeeId));
-    setTotalItems(prev => prev - 1);
+    setEmployeesTableData((prev) =>
+      prev.filter((emp) => emp.id !== employeeId),
+    );
+    setFilteredEmployees((prev) => prev.filter((emp) => emp.id !== employeeId));
+    setAllEmployees((prev) => prev.filter((emp) => emp.id !== employeeId));
+    setTotalItems((prev) => prev - 1);
   };
 
   const handleAddEmployee = () => {
-    window.location.href = '/core/Add-Employee';
+    window.location.href = "/core/Add-Employee";
   };
 
   const handleRefreshEmployees = () => {
@@ -257,7 +347,8 @@ const UserManagement: React.FC = () => {
   };
 
   // Check if we should show "no results" message
-  const showNoResultsMessage = hasSearched && filteredEmployees.length === 0 && !tableLoading;
+  const showNoResultsMessage =
+    hasSearched && filteredEmployees.length === 0 && !tableLoading;
 
   // Check if we should show the table (always show it, even if empty)
   // const showEmployeeTable = !showNoResultsMessage;
@@ -270,6 +361,16 @@ const UserManagement: React.FC = () => {
             onBackToAccounts={handleBackToAccounts}
             onAccountAdded={handleAccountAdded}
             employee={selectedEmployee || undefined}
+          />
+        </div>
+      ) : showEditForm ? (
+        <div className="w-full bg-gray-50 overflow-auto">
+          <EditAccountStepForm
+            onBackToAccounts={handleBackToAccounts}
+            onAccountUpdated={handleAccountUpdated}
+            onAccountDeleted={handleAccountDeleted}
+            employee={selectedEmployee || undefined}
+            accountData={selectedAccountData}
           />
         </div>
       ) : (
@@ -293,8 +394,16 @@ const UserManagement: React.FC = () => {
               {error && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-2 text-red-700">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <span className="font-medium">Error:</span> {error}
                   </div>
@@ -331,11 +440,23 @@ const UserManagement: React.FC = () => {
                   className="text-center py-12 bg-white rounded-lg border border-gray-200 shadow-sm"
                 >
                   <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-10 h-10 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No employees found</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    No employees found
+                  </h3>
                   <p className="text-gray-600 mb-6 max-w-md mx-auto">
                     {searchTerm
                       ? `No employees found matching "${searchTerm}". Try adjusting your search terms or filters.`
@@ -344,7 +465,11 @@ const UserManagement: React.FC = () => {
                   <button
                     onClick={() => {
                       setSearchTerm("");
-                      setFilters({ department: "", status: "", employmentType: "" });
+                      setFilters({
+                        department: "",
+                        status: "",
+                        employmentType: "",
+                      });
                       setHasSearched(false);
                     }}
                     className="px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-md font-medium transition-colors duration-200"
@@ -367,11 +492,12 @@ const UserManagement: React.FC = () => {
                   totalPages={totalPages}
                   totalItems={totalItems}
                   onPageChange={handlePageChange}
-                  onEmployeeUpdate={() => { }}
-                  onEmployeeStatusChange={() => { }}
-                  onEmployeeTerminate={() => { }}
+                  onEmployeeUpdate={() => {}}
+                  onEmployeeStatusChange={() => {}}
+                  onEmployeeTerminate={() => {}}
                   onEmployeeDelete={handleEmployeeDelete}
                   onAddAccount={handleAddAccount}
+                  onEditAccount={handleEditAccount}
                   showAddAccountButton={true}
                   loading={tableLoading}
                 />

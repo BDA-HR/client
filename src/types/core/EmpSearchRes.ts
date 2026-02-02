@@ -10,4 +10,5 @@ export interface EmpSearchRes {
   gender: string;
   dept: string;
   position: string;
+  hasAccount: boolean;
 }

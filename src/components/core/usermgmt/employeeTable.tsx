@@ -1,18 +1,14 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
-  MoreVertical,
   User,
   Loader2,
-  Eye,
   PenBox,
-  Trash2,
-  Lock
-} from 'lucide-react';
-import { Popover, PopoverTrigger, PopoverContent } from '../../ui/popover';
-import DeleteEmployeeModal from './DeleteEmployeeModal';
+  Lock,
+} from "lucide-react";
+import DeleteEmployeeModal from "../../hr/employee/DeleteEmployeeModal";
 
 interface Employee {
   id: string;
@@ -32,6 +28,7 @@ interface Employee {
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
+  hasAccount: boolean;
 }
 
 interface EmployeeTableProps {
@@ -41,10 +38,14 @@ interface EmployeeTableProps {
   totalItems: number;
   onPageChange: (page: number) => void;
   onEmployeeUpdate: (updatedEmployee: Employee) => void;
-  onEmployeeStatusChange: (employeeId: string, newStatus: "active" | "on-leave") => void;
+  onEmployeeStatusChange: (
+    employeeId: string,
+    newStatus: "active" | "on-leave",
+  ) => void;
   onEmployeeTerminate: (employeeId: string) => void;
   onEmployeeDelete: (employeeId: string) => void;
   onAddAccount?: (employee: Employee) => void;
+  onEditAccount?: (employee: Employee) => void;
   showAddAccountButton?: boolean;
   loading?: boolean;
 }
@@ -57,29 +58,24 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onPageChange,
   onEmployeeDelete,
   onAddAccount,
+  onEditAccount,
   showAddAccountButton = false,
-  loading = false
+  loading = false,
 }) => {
-  const [popoverOpen, setPopoverOpen] = useState<string | null>(null);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null,
+  );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const sortedEmployees = [...employees].sort((a, b) => {
-    const dateA = a.employmentDate || a.createdAt || '';
-    const dateB = b.employmentDate || b.createdAt || '';
+    const dateA = a.employmentDate || a.createdAt || "";
+    const dateB = b.employmentDate || b.createdAt || "";
     return new Date(dateB).getTime() - new Date(dateA).getTime();
   });
-
-  const handleViewDetails = (employee: Employee) => {
-    sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
-    sessionStorage.setItem('currentModule', 'HR');
-    window.location.href = `/hr/employees/${employee.id}`;
-  };
 
   const handleDelete = (employee: Employee) => {
     setSelectedEmployee(employee);
     setIsDeleteModalOpen(true);
-    setPopoverOpen(null);
   };
 
   const confirmDeletion = (employeeId: string) => {
@@ -97,6 +93,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const handleAddAccountClick = (employee: Employee) => {
     if (onAddAccount) {
       onAddAccount(employee);
+    }
+  };
+
+  // Handle Edit Account button click
+  const handleEditAccountClick = (employee: Employee) => {
+    if (onEditAccount) {
+      onEditAccount(employee);
     }
   };
 
@@ -285,8 +288,19 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       </div>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                      {showAddAccountButton ? (
-                        // Add Account button for User Management
+                      {employee.hasAccount ? (
+                        // Direct Edit button for users with accounts
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleEditAccountClick(employee)}
+                          className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
+                          title="Manage Account"
+                        >
+                          <PenBox className="h-4 w-4" />
+                        </motion.button>
+                      ) : (
+                        // Add Account button for users without accounts
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
@@ -296,50 +310,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         >
                           <Lock className="h-5 w-5" />
                         </motion.button>
-                      ) : (
-                        // Original dropdown for HR module
-                        <Popover
-                          open={popoverOpen === employee.id}
-                          onOpenChange={(open) =>
-                            setPopoverOpen(open ? employee.id : null)
-                          }
-                        >
-                          <PopoverTrigger asChild>
-                            <motion.button
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
-                            >
-                              <MoreVertical className="h-5 w-5 cursor-pointer" />
-                            </motion.button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-48 p-0" align="end">
-                            <div className="py-1">
-                              <button
-                                onClick={() => handleViewDetails(employee)}
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
-                              >
-                                <Eye size={16} />
-                                View Details
-                              </button>
-                              <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2">
-                                <PenBox size={16} />
-                                Edit
-                              </button>
-                              <button className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded flex items-center gap-2">
-                                <Trash2 size={16} />
-                                Change Status
-                              </button>
-                              <button
-                                onClick={() => handleDelete(employee)}
-                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-2"
-                              >
-                                <Trash2 size={16} />
-                                Delete
-                              </button>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
                       )}
                     </td>
                   </motion.tr>
@@ -426,14 +396,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
           </div>
         </div>
       </motion.div>
-
-      {/* Delete Employee Modal */}
-      <DeleteEmployeeModal
-        employee={selectedEmployee}
-        isOpen={isDeleteModalOpen}
-        onClose={handleCloseDeleteModal}
-        onConfirm={confirmDeletion}
-      />
     </>
   );
 };

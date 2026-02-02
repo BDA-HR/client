@@ -70,6 +70,46 @@ class UsermgmtService {
       throw new Error(errorMessage);
     }
   }
+  // GET: Fetch account data for editing (placeholder - replace with actual endpoint)
+  async getAccountData(employeeId: UUID): Promise<any> {
+    try {
+      console.info("Fetching account data for employee:", employeeId);
+
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Mock account data - replace with actual API call
+      const mockAccountData = {
+        userId: employeeId,
+        modules: ["module-1", "module-2"],
+        permissions: ["perm-1", "perm-2"],
+        apiPermissions: ["api-1", "api-2"],
+      };
+
+      return mockAccountData;
+    } catch (error) {
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Failed to fetch account data:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  }
+
+  async deleteAccount(userId: UUID): Promise<void> {
+    try {
+      // TODO: Replace with actual API endpoint for deleting account
+      // For now, simulate the delete operation
+      console.info("Deleting account for user:", userId);
+
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      console.info("Account deleted successfully:", userId);
+    } catch (error) {
+      const errorMessage = this.extractErrorMessage(error);
+      console.error("Failed to delete account:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  }
 }
 
 export const usermgmtService = new UsermgmtService();
