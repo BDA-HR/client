@@ -97,6 +97,7 @@ import PageActivityTypes from "./pages/settings/crmSettings/pageActivityTypes";
 import PageAssignmentModes from "./pages/settings/crmSettings/pageAssignmentModes";
 import PageConversionTargets from "./pages/settings/crmSettings/pageConversionTargets";
 import PageRoutingRules from "./pages/settings/crmSettings/pageRoutingRules";
+import AllLeave from "./pages/hr/leavepage/AllLeave";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -265,6 +266,10 @@ function App() {
                 <Route
                   path="/hr/leave/entitlement"
                   element={<LeaveEntitlementPage />}
+                />
+                 <Route
+                  path="/hr/leave/allLeave"
+                  element={<AllLeave />}
                 />
                 <Route
                   path="/hr/attendance/list"

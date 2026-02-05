@@ -345,6 +345,13 @@ const Sidebar: React.FC = () => {
                   {...theme}
                   isChild
                 />
+                <NavItem
+                  to="/hr/leave/allLeave"
+                  icon={<Users size={18} />}
+                  label="Requested Leave"
+                  {...theme}
+                  isChild
+                />
               </NavGroup>
 
               <NavGroup
