@@ -132,13 +132,11 @@ function PageTransactions() {
   const handleViewDetails = (item: TransactionItem) => {
     console.log('View transaction details:', item);
     // Implement view details logic
-    // Could open a details modal here
   };
 
   const handleEdit = (item: TransactionItem) => {
     console.log('Edit transaction:', item);
     // Implement edit logic
-    // Could open the same modal in edit mode
   };
 
   const handleCategorize = (item: TransactionItem) => {
