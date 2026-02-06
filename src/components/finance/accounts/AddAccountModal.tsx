@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { UUID } from 'crypto';
 import { motion } from 'framer-motion';
-import { X, BadgePlus, Calculator, TrendingUp, TrendingDown, DollarSign, Layers } from 'lucide-react';
+import { X, BadgePlus, Calculator, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
 import { Input } from '../../../components/ui/input';
