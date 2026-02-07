@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, PlusCircle } from 'lucide-react';
+import { Search, Filter, BadgePlus } from 'lucide-react';
 
 interface TransactionsSearchFiltersProps {
   searchTerm: string;
@@ -129,7 +129,7 @@ export const TransactionsSearchFilters: React.FC<TransactionsSearchFiltersProps>
             onClick={onAddTransaction}
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300"
           >
-            <PlusCircle size={18} />
+            <BadgePlus size={18} />
             <span>Add Transaction</span>
           </button>
         </div>
