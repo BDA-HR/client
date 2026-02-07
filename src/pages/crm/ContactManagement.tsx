@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../layout/layout';
 import { mockContacts } from '../../data/crmMockData';
 import ContactList from '../../components/crm/contactManagement/components/ContactList';
 import ContactForm from '../../components/crm/contactManagement/components/ContactForm';
 import ContactFilters from '../../components/crm/contactManagement/components/ContactFilters';
-import ContactStats from '../../components/crm/contactManagement/components/ContactStats';
 import type { Contact } from '../../types/crm';
 
 interface FilterState {
@@ -21,7 +21,8 @@ interface FilterState {
 }
 
 export default function ContactManagement() {
-  const [contacts, setContacts] = useState<Contact[]>(mockContacts);
+  const navigate = useNavigate();
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [filters, setFilters] = useState<FilterState>({
     searchTerm: '',
     stage: 'all',
@@ -35,6 +36,58 @@ export default function ContactManagement() {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+
+  // Load contacts from localStorage on component mount
+  useEffect(() => {
+    const loadContacts = () => {
+      const storedContacts = localStorage.getItem('contacts');
+      if (storedContacts) {
+        try {
+          const parsedContacts = JSON.parse(storedContacts);
+          console.log('Loaded contacts from localStorage:', parsedContacts.length);
+          setContacts(parsedContacts);
+        } catch (error) {
+          console.error('Error loading contacts from localStorage:', error);
+          // Fallback to mock data
+          setContacts(mockContacts);
+        }
+      } else {
+        // Initialize with mock data if no stored contacts
+        console.log('No stored contacts, initializing with mock data');
+        setContacts(mockContacts);
+        localStorage.setItem('contacts', JSON.stringify(mockContacts));
+      }
+    };
+
+    loadContacts();
+  }, []);
+
+  // Add a listener for storage changes to refresh when data is updated from other components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedContacts = localStorage.getItem('contacts');
+      if (storedContacts) {
+        try {
+          const parsedContacts = JSON.parse(storedContacts);
+          console.log('Storage changed, reloading contacts:', parsedContacts.length);
+          setContacts(parsedContacts);
+        } catch (error) {
+          console.error('Error loading contacts after storage change:', error);
+        }
+      }
+    };
+
+    // Listen for storage events (when localStorage is updated from other tabs/components)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for a custom event we can dispatch when updating localStorage in the same tab
+    window.addEventListener('contactsUpdated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('contactsUpdated', handleStorageChange);
+    };
+  }, []);
 
   // Filter contacts based on current filters
   const filteredContacts = contacts.filter(contact => {
@@ -89,7 +142,15 @@ export default function ContactManagement() {
       consentStatus: 'pending'
     } as Contact;
     
-    setContacts([...contacts, contact]);
+    const updatedContacts = [...contacts, contact];
+    setContacts(updatedContacts);
+    
+    // Save to localStorage
+    localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('contactsUpdated'));
+    
     showToast.success('Contact added successfully');
   };
 
@@ -101,6 +162,10 @@ export default function ContactManagement() {
           : contact
       );
       setContacts(updatedContacts);
+      
+      // Save to localStorage
+      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+      
       setSelectedContact(null);
       showToast.success('Contact updated successfully');
     }
@@ -114,6 +179,10 @@ export default function ContactManagement() {
         : contact
     );
     setContacts(updatedContacts);
+    
+    // Save to localStorage
+    localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+    
     showToast.success('Contact archived successfully');
   };
 
@@ -126,6 +195,7 @@ export default function ContactManagement() {
             : contact
         );
         setContacts(updatedContacts);
+        localStorage.setItem('contacts', JSON.stringify(updatedContacts));
         setSelectedContacts([]);
         showToast.success(`${contactIds.length} contact(s) archived successfully`);
         break;
@@ -138,6 +208,7 @@ export default function ContactManagement() {
             : contact
         );
         setContacts(stageUpdatedContacts);
+        localStorage.setItem('contacts', JSON.stringify(stageUpdatedContacts));
         setSelectedContacts([]);
         showToast.success(`${contactIds.length} contact(s) moved to ${newStage} stage`);
         break;
@@ -190,16 +261,13 @@ export default function ContactManagement() {
           <p className="text-gray-600">Manage your business contacts and relationships</p>
         </div>
         <Button 
-          onClick={() => setIsAddDialogOpen(true)}
+          onClick={() => navigate('/crm/contacts/add')}
           className="bg-green-600 hover:bg-green-700"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Contact
         </Button>
       </div>
-
-      {/* Stats */}
-      <ContactStats contacts={contacts} />
 
       {/* Filters */}
       <ContactFilters

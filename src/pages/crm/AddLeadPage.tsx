@@ -21,10 +21,8 @@ const salesReps = [
 ];
 
 const steps = [
-  { id: 1, title: 'Contact Info', icon: User },
-  { id: 2, title: 'Company Info', icon: Building },
-  { id: 3, title: 'Lead Details', icon: Target },
-  { id: 4, title: 'Additional Info', icon: FileText },
+  { id: 1, title: 'Contact & Company Info', icon: User },
+  { id: 2, title: 'Lead Details', icon: Target },
 ];
 
 export default function AddLeadPage() {
@@ -71,6 +69,7 @@ export default function AddLeadPage() {
     const newErrors: Record<string, string> = {};
 
     if (step === 1) {
+      // Contact validation
       if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
       if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
       if (!formData.email?.trim() && !formData.phone?.trim()) {
@@ -79,9 +78,7 @@ export default function AddLeadPage() {
       if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
         newErrors.email = 'Please enter a valid email address';
       }
-    }
-
-    if (step === 2) {
+      // Company validation
       if (!formData.company?.trim()) newErrors.company = 'Company is required';
     }
 
@@ -248,136 +245,149 @@ export default function AddLeadPage() {
           className="bg-white rounded-xl shadow-sm border border-gray-100 py-4 px-8"
         >
 
-          {/* Step 1: Contact Info */}
+          {/* Step 1: Contact & Company Info */}
           {currentStep === 1 && (
-            <div className="space-y-3">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Information</h2>
-              
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-sm text-gray-500">
-                    First Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleChange('firstName', e.target.value)}
-                    className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.firstName ? 'border-red-500' : ''}`}
-                  />
-                  {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-sm text-gray-500">
-                    Last Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleChange('lastName', e.target.value)}
-                    className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.lastName ? 'border-red-500' : ''}`}
-                  />
-                  {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm text-gray-500">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : ''}`}
-                  />
-                  {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-sm text-gray-500">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleChange('phone', e.target.value)}
-                    pattern="[0-9+\-\s\(\)]+"
-                    placeholder="+1-555-0123"
-                    className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {errors.contact && <p className="text-sm text-red-500">{errors.contact}</p>}
-            </div>
-          )}
-
-          {/* Step 2: Company Info */}
-          {currentStep === 2 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Company Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact & Company Information</h2>
               
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="company" className="text-sm text-gray-500">
-                    Company <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="company"
-                    value={formData.company}
-                    onChange={(e) => handleChange('company', e.target.value)}
-                    className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.company ? 'border-red-500' : ''}`}
-                  />
-                  {errors.company && <p className="text-sm text-red-500 mt-1">{errors.company}</p>}
+              {/* Contact Information */}
+              <div className="border-b pb-6 mb-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName" className="text-sm text-gray-500">
+                      First Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => handleChange('firstName', e.target.value)}
+                      className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.firstName ? 'border-red-500' : ''}`}
+                    />
+                    {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName" className="text-sm text-gray-500">
+                      Last Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => handleChange('lastName', e.target.value)}
+                      className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.lastName ? 'border-red-500' : ''}`}
+                    />
+                    {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="jobTitle" className="text-sm text-gray-500">Job Title</Label>
-                  <Input
-                    id="jobTitle"
-                    value={formData.jobTitle}
-                    onChange={(e) => handleChange('jobTitle', e.target.value)}
-                    className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
-                  />
+                <div className="grid grid-cols-2 gap-6 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm text-gray-500">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleChange('email', e.target.value)}
+                      className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : ''}`}
+                    />
+                    {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm text-gray-500">Phone</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                      pattern="[0-9+\-\s\(\)]+"
+                      placeholder="+1-555-0123"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                {errors.contact && <p className="text-sm text-red-500 mt-2">{errors.contact}</p>}
+
+                <div className="mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="jobTitle" className="text-sm text-gray-500">Job Title</Label>
+                    <Input
+                      id="jobTitle"
+                      value={formData.jobTitle}
+                      onChange={(e) => handleChange('jobTitle', e.target.value)}
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="industry" className="text-sm text-gray-500">Industry</Label>
-                  <Select value={formData.industry} onValueChange={(value) => handleChange('industry', value)}>
-                    <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent">
-                      <SelectValue placeholder="Select industry" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {settingsLoading ? (
-                        <SelectItem value="loading" disabled>Loading...</SelectItem>
-                      ) : (
-                        industryNames.map((industry) => (
-                          <SelectItem key={industry} value={industry}>{industry}</SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+              {/* Company Information */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Company Information</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="company" className="text-sm text-gray-500">
+                      Company <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="company"
+                      value={formData.company}
+                      onChange={(e) => handleChange('company', e.target.value)}
+                      className={`w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.company ? 'border-red-500' : ''}`}
+                    />
+                    {errors.company && <p className="text-sm text-red-500 mt-1">{errors.company}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="industry" className="text-sm text-gray-500">Industry</Label>
+                    <Select value={formData.industry} onValueChange={(value) => handleChange('industry', value)}>
+                      <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent">
+                        <SelectValue placeholder="Select industry" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {settingsLoading ? (
+                          <SelectItem value="loading" disabled>Loading...</SelectItem>
+                        ) : (
+                          industryNames.map((industry) => (
+                            <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="budget" className="text-sm text-gray-500">Budget ($)</Label>
-                  <Input
-                    id="budget"
-                    type="number"
-                    value={formData.budget || ''}
-                    onChange={(e) => handleChange('budget', e.target.value ? Number(e.target.value) : undefined)}
-                    placeholder="0"
-                    className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
-                  />
+                <div className="grid grid-cols-2 gap-6 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="budget" className="text-sm text-gray-500">Budget ($)</Label>
+                    <Input
+                      id="budget"
+                      type="number"
+                      value={formData.budget || ''}
+                      onChange={(e) => handleChange('budget', e.target.value ? Number(e.target.value) : undefined)}
+                      placeholder="0"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="timeline" className="text-sm text-gray-500">Timeline</Label>
+                    <Input
+                      id="timeline"
+                      value={formData.timeline}
+                      onChange={(e) => handleChange('timeline', e.target.value)}
+                      placeholder="e.g., Q2 2024, Immediate"
+                      className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Step 3: Lead Details */}
-          {currentStep === 3 && (
+          {/* Step 2: Lead Details */}
+          {currentStep === 2 && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Lead Details</h2>
               
@@ -487,24 +497,6 @@ export default function AddLeadPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="timeline" className="text-sm text-gray-500">Timeline</Label>
-                <Input
-                  id="timeline"
-                  value={formData.timeline}
-                  onChange={(e) => handleChange('timeline', e.target.value)}
-                  placeholder="e.g., Q2 2024, Immediate"
-                  className="w-full focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 4: Additional Info */}
-          {currentStep === 4 && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Additional Information</h2>
-              
               <div className="space-y-2">
                 <Label htmlFor="notes" className="text-sm text-gray-500">Notes</Label>
                 <Textarea

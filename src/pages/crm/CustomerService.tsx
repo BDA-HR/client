@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Headphones } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { showToast } from '../../layout/layout';
 import { mockSupportTickets } from '../../data/crmMockData';
-import TicketStats from '../../components/crm/customerService/components/TicketStats';
 import TicketList from '../../components/crm/customerService/components/TicketList';
 import TicketFilters from '../../components/crm/customerService/components/TicketFilters';
 import TicketForm from '../../components/crm/customerService/components/TicketForm';
-import SLATracking from '../../components/crm/customerService/components/SLATracking';
 import KnowledgeBase from '../../components/crm/customerService/components/KnowledgeBase';
 import type { SupportTicket } from '../../types/crm';
 
@@ -18,8 +16,7 @@ interface FilterState {
   priority: string;
   category: string;
   assignedTo: string;
-  channel: string;
-  slaStatus: string;
+  slaStatus?: string;
 }
 
 export default function CustomerService() {
@@ -30,13 +27,30 @@ export default function CustomerService() {
     priority: 'all',
     category: 'all',
     assignedTo: 'all',
-    channel: 'all',
     slaStatus: 'all'
   });
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'tickets' | 'sla' | 'knowledge'>('tickets');
+  const [viewMode, setViewMode] = useState<'tickets' | 'knowledge'>('tickets');
+
+  // Helper function to get SLA status
+  const getSLAStatus = (ticket: SupportTicket) => {
+    const now = new Date();
+    const deadline = new Date(ticket.slaDeadline);
+    const timeLeft = deadline.getTime() - now.getTime();
+    const twoHours = 2 * 60 * 60 * 1000;
+
+    if (['Resolved', 'Closed'].includes(ticket.status)) {
+      return 'completed';
+    } else if (timeLeft < 0) {
+      return 'overdue';
+    } else if (timeLeft < twoHours) {
+      return 'at-risk';
+    } else {
+      return 'on-track';
+    }
+  };
 
   // Filter tickets based on current filters
   const filteredTickets = tickets.filter(ticket => {
@@ -49,23 +63,11 @@ export default function CustomerService() {
     const matchesPriority = filters.priority === 'all' || ticket.priority === filters.priority;
     const matchesCategory = filters.category === 'all' || ticket.category === filters.category;
     const matchesAssignedTo = filters.assignedTo === 'all' || ticket.assignedTo === filters.assignedTo;
-    const matchesChannel = filters.channel === 'all' || ticket.channel === filters.channel;
     
-    const matchesSLA = filters.slaStatus === 'all' || (() => {
-      const now = new Date();
-      const deadline = new Date(ticket.slaDeadline);
-      const isOverdue = deadline < now && !['Resolved', 'Closed'].includes(ticket.status);
-      const isAtRisk = (deadline.getTime() - now.getTime()) < (2 * 60 * 60 * 1000) && !['Resolved', 'Closed'].includes(ticket.status); // 2 hours
-      
-      switch (filters.slaStatus) {
-        case 'overdue': return isOverdue;
-        case 'at-risk': return isAtRisk;
-        case 'on-track': return !isOverdue && !isAtRisk;
-        default: return true;
-      }
-    })();
+    // SLA Status filtering
+    const matchesSLA = !filters.slaStatus || filters.slaStatus === 'all' || getSLAStatus(ticket) === filters.slaStatus;
     
-    return matchesSearch && matchesStatus && matchesPriority && matchesCategory && matchesAssignedTo && matchesChannel && matchesSLA;
+    return matchesSearch && matchesStatus && matchesPriority && matchesCategory && matchesAssignedTo && matchesSLA;
   });
 
   const handleAddTicket = (ticketData: Partial<SupportTicket>) => {
@@ -82,14 +84,13 @@ export default function CustomerService() {
       slaPolicy: {
         id: '1',
         name: 'Standard SLA',
-        responseTime: 240, // 4 hours
-        resolutionTime: 1440, // 24 hours
+        responseTime: 240,
+        resolutionTime: 1440,
         priority: ticketData.priority || 'Medium',
         businessHoursOnly: true
       }
     } as SupportTicket;
     
-    // Calculate SLA deadline
     const now = new Date();
     const deadline = new Date(now.getTime() + ticket.slaPolicy.resolutionTime * 60 * 1000);
     ticket.slaDeadline = deadline.toISOString();
@@ -120,14 +121,11 @@ export default function CustomerService() {
           updatedAt: new Date().toISOString() 
         };
         
-        // Set resolved date if status is Resolved or Closed
         if (['Resolved', 'Closed'].includes(newStatus) && !ticket.resolvedAt) {
           updatedTicket.resolvedAt = new Date().toISOString();
-          
-          // Calculate resolution time
           const createdTime = new Date(ticket.createdAt).getTime();
           const resolvedTime = new Date().getTime();
-          updatedTicket.resolutionTime = Math.floor((resolvedTime - createdTime) / (1000 * 60)); // in minutes
+          updatedTicket.resolutionTime = Math.floor((resolvedTime - createdTime) / (1000 * 60));
         }
         
         return updatedTicket;
@@ -139,6 +137,11 @@ export default function CustomerService() {
     showToast.success(`Ticket ${newStatus.toLowerCase()}`);
   };
 
+  const handleDeleteTicket = (ticketId: string) => {
+    setTickets(tickets.filter(ticket => ticket.id !== ticketId));
+    showToast.success('Ticket deleted successfully');
+  };
+
   const clearFilters = () => {
     setFilters({
       searchTerm: '',
@@ -146,7 +149,6 @@ export default function CustomerService() {
       priority: 'all',
       category: 'all',
       assignedTo: 'all',
-      channel: 'all',
       slaStatus: 'all'
     });
   };
@@ -177,16 +179,6 @@ export default function CustomerService() {
               Tickets
             </button>
             <button
-              onClick={() => setViewMode('sla')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                viewMode === 'sla' 
-                  ? 'bg-white text-red-600 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              SLA Tracking
-            </button>
-            <button
               onClick={() => setViewMode('knowledge')}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                 viewMode === 'knowledge' 
@@ -207,13 +199,9 @@ export default function CustomerService() {
         </div>
       </div>
 
-      {/* Stats */}
-      <TicketStats tickets={tickets} />
-
       {/* Content based on view mode */}
       {viewMode === 'tickets' && (
         <>
-          {/* Filters */}
           <TicketFilters
             filters={filters}
             onFiltersChange={setFilters}
@@ -222,7 +210,6 @@ export default function CustomerService() {
             filteredCount={filteredTickets.length}
           />
 
-          {/* Ticket List */}
           <TicketList
             tickets={filteredTickets}
             onStatusChange={handleStatusChange}
@@ -230,19 +217,15 @@ export default function CustomerService() {
               setSelectedTicket(ticket);
               setIsEditDialogOpen(true);
             }}
+            onDelete={handleDeleteTicket}
           />
         </>
-      )}
-
-      {viewMode === 'sla' && (
-        <SLATracking tickets={tickets} />
       )}
 
       {viewMode === 'knowledge' && (
         <KnowledgeBase />
       )}
 
-      {/* Add Ticket Form */}
       <TicketForm
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
@@ -250,7 +233,6 @@ export default function CustomerService() {
         mode="add"
       />
 
-      {/* Edit Ticket Form */}
       <TicketForm
         ticket={selectedTicket}
         isOpen={isEditDialogOpen}

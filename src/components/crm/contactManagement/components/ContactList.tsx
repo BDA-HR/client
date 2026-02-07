@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, Edit, MoreHorizontal, Phone, Mail, User, Building, CheckSquare, Download } from 'lucide-react';
 import { Button } from '../../../ui/button';
@@ -7,6 +7,7 @@ import { Badge } from '../../../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
 import { Checkbox } from '../../../ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/dropdown-menu';
+import { Pagination } from '../../../ui/pagination';
 import { useNavigate } from 'react-router-dom';
 import type { Contact } from '../../../../types/crm';
 
@@ -38,6 +39,18 @@ export default function ContactList({
 }: ContactListProps) {
   const navigate = useNavigate();
   const [bulkAction, setBulkAction] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const itemsPerPage = 10;
+
+  // Pagination calculations
+  const totalItems = contacts.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedContacts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return contacts.slice(startIndex, endIndex);
+  }, [contacts, currentPage]);
 
   const handleBulkActionExecute = () => {
     if (bulkAction && selectedContacts.length > 0) {
@@ -102,31 +115,30 @@ export default function ContactList({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead className="w-12">
+              {/* <TableHead className="w-12">
                 <Checkbox
                   checked={selectedContacts.length === contacts.length}
                   onCheckedChange={onSelectAll}
                 />
-              </TableHead>
+              </TableHead> */}
               <TableHead>Contact</TableHead>
               <TableHead>Company & Role</TableHead>
               <TableHead>Contact Info</TableHead>
               <TableHead>Stage</TableHead>
-              <TableHead>Relationship Score</TableHead>
               <TableHead>Owner</TableHead>
               <TableHead>Last Contact</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {contacts.map((contact) => (
+            {paginatedContacts.map((contact) => (
               <TableRow key={contact.id} className="hover:bg-gray-50">
-                <TableCell>
+                {/* <TableCell>
                   <Checkbox
                     checked={selectedContacts.includes(contact.id)}
                     onCheckedChange={(checked) => onSelectContact(contact.id, checked as boolean)}
                   />
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
@@ -178,17 +190,6 @@ export default function ContactList({
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-16 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full" 
-                        style={{ width: `${contact.relationshipScore}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm font-medium">{contact.relationshipScore}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
                   <span className="text-sm text-gray-600">{contact.owner}</span>
                 </TableCell>
                 <TableCell>
@@ -235,6 +236,16 @@ export default function ContactList({
             ))}
           </TableBody>
         </Table>
+        
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          itemLabel="contacts"
+        />
       </div>
     </motion.div>
   );

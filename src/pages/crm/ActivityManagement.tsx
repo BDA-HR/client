@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Calendar, Clock, CheckSquare, Bell } from 'lucide-react';
+import { Plus, Calendar, List, Clock, Bell } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { showToast } from '../../layout/layout';
 import { mockActivities } from '../../data/crmMockData';
@@ -13,7 +13,8 @@ import type { Activity } from '../../types/crm';
 
 export default function ActivityManagement() {
   const [activities, setActivities] = useState<Activity[]>(mockActivities);
-  const [viewMode, setViewMode] = useState<'calendar' | 'tasks' | 'time' | 'notifications'>('calendar');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [secondaryView, setSecondaryView] = useState<'time' | 'notifications' | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -72,17 +73,6 @@ export default function ActivityManagement() {
     showToast.success('Activity deleted successfully');
   };
 
-  // Calculate stats
-  const totalActivities = activities.length;
-  const pendingActivities = activities.filter(a => a.status === 'Pending').length;
-  const inProgressActivities = activities.filter(a => a.status === 'In Progress').length;
-  const completedActivities = activities.filter(a => a.status === 'Completed').length;
-  const overdueActivities = activities.filter(a => {
-    const scheduledDate = new Date(a.scheduledDate);
-    const now = new Date();
-    return scheduledDate < now && a.status !== 'Completed';
-  }).length;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -97,52 +87,52 @@ export default function ActivityManagement() {
           <p className="text-gray-600">Manage tasks, meetings, calls, and time tracking</p>
         </div>
         <div className="flex space-x-2">
+          {/* View Mode Toggle Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 cursor-pointer border-blue-300 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
+            onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')}
+          >
+            {viewMode === 'list' ? (
+              <>
+                <Calendar className="h-4 w-4" />
+                Calendar View
+              </>
+            ) : (
+              <>
+                <List className="h-4 w-4" />
+                List View
+              </>
+            )}
+          </Button>
+
+          {/* Secondary Views */}
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
-              onClick={() => setViewMode('calendar')}
+              onClick={() => setSecondaryView(secondaryView === 'time' ? null : 'time')}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                viewMode === 'calendar' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <Calendar className="w-4 h-4 mr-1 inline" />
-              Calendar
-            </button>
-            <button
-              onClick={() => setViewMode('tasks')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                viewMode === 'tasks' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <CheckSquare className="w-4 h-4 mr-1 inline" />
-              Tasks
-            </button>
-            <button
-              onClick={() => setViewMode('time')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                viewMode === 'time' 
+                secondaryView === 'time' 
                   ? 'bg-white text-blue-600 shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               <Clock className="w-4 h-4 mr-1 inline" />
-              Time Tracking
+              Time
             </button>
             <button
-              onClick={() => setViewMode('notifications')}
+              onClick={() => setSecondaryView(secondaryView === 'notifications' ? null : 'notifications')}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                viewMode === 'notifications' 
+                secondaryView === 'notifications' 
                   ? 'bg-white text-blue-600 shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               <Bell className="w-4 h-4 mr-1 inline" />
-              Notifications
+              Alerts
             </button>
           </div>
+
           <Button 
             onClick={() => setIsAddDialogOpen(true)}
             className="bg-blue-600 hover:bg-blue-700"
@@ -153,99 +143,40 @@ export default function ActivityManagement() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Activities</p>
-              <p className="text-2xl font-bold text-gray-900">{totalActivities}</p>
-            </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-orange-600">{pendingActivities}</p>
-            </div>
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Clock className="w-5 h-5 text-orange-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">In Progress</p>
-              <p className="text-2xl font-bold text-blue-600">{inProgressActivities}</p>
-            </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <CheckSquare className="w-5 h-5 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-green-600">{completedActivities}</p>
-            </div>
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckSquare className="w-5 h-5 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Overdue</p>
-              <p className="text-2xl font-bold text-red-600">{overdueActivities}</p>
-            </div>
-            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-              <Bell className="w-5 h-5 text-red-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Content based on view mode */}
-      {viewMode === 'calendar' && (
-        <ActivityCalendar
-          activities={activities}
-          onStatusChange={handleStatusChange}
-          onEdit={(activity) => {
-            setSelectedActivity(activity);
-            setIsEditDialogOpen(true);
-          }}
-          onDelete={handleDeleteActivity}
-        />
+      {secondaryView === null && (
+        <>
+          {viewMode === 'list' && (
+            <TaskList
+              activities={activities}
+              onStatusChange={handleStatusChange}
+              onEdit={(activity) => {
+                setSelectedActivity(activity);
+                setIsEditDialogOpen(true);
+              }}
+              onDelete={handleDeleteActivity}
+            />
+          )}
+
+          {viewMode === 'calendar' && (
+            <ActivityCalendar
+              activities={activities}
+              onStatusChange={handleStatusChange}
+              onEdit={(activity) => {
+                setSelectedActivity(activity);
+                setIsEditDialogOpen(true);
+              }}
+              onDelete={handleDeleteActivity}
+            />
+          )}
+        </>
       )}
 
-      {viewMode === 'tasks' && (
-        <TaskList
-          activities={activities}
-          onStatusChange={handleStatusChange}
-          onEdit={(activity) => {
-            setSelectedActivity(activity);
-            setIsEditDialogOpen(true);
-          }}
-          onDelete={handleDeleteActivity}
-        />
-      )}
-
-      {viewMode === 'time' && (
+      {secondaryView === 'time' && (
         <TimeTracking activities={activities} />
       )}
 
-      {viewMode === 'notifications' && (
+      {secondaryView === 'notifications' && (
         <NotificationCenter activities={activities} />
       )}
 

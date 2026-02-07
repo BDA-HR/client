@@ -305,7 +305,7 @@ export default function KnowledgeBase() {
 
       {/* Search and Filters */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="px-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />

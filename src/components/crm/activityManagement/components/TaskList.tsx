@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, CheckSquare, Clock, User, Calendar, MoreHorizontal, Plus } from 'lucide-react';
+import { Search, CheckSquare, User, MoreHorizontal, Eye, Edit, Trash2 } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Input } from '../../../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
 import { Badge } from '../../../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../../ui/dropdown-menu';
 import { Checkbox } from '../../../ui/checkbox';
+import { Pagination } from '../../../ui/pagination';
+import TaskDetailModal from './TaskDetailModal.tsx';
 import type { Activity } from '../../../../types/crm';
 
 interface TaskListProps {
@@ -39,6 +41,16 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'dueDate' | 'priority' | 'status' | 'created'>('dueDate');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const itemsPerPage = 10;
+
+  const handleViewDetails = (activity: Activity) => {
+    setSelectedTask(activity);
+    setIsDetailModalOpen(true);
+  };
 
   // Filter activities
   const filteredActivities = activities.filter(activity => {
@@ -182,14 +194,22 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
     return scheduledDate < now && activity.status !== 'Completed';
   };
 
-  const uniqueAssignees = Array.from(new Set(activities.map(a => a.assignedTo)));
+  // Pagination calculations
+  const totalItems = sortedActivities.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedActivities = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return sortedActivities.slice(startIndex, endIndex);
+  }, [sortedActivities, currentPage]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6"
+      >
       {/* Filters */}
       <Card>
         <CardContent className="p-6">
@@ -322,8 +342,9 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
               <p className="text-gray-500">No tasks match your current filters.</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
+            <>
+              <Table>
+                <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">
                     <Checkbox
@@ -342,7 +363,7 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedActivities.map((activity) => (
+                {paginatedActivities.map((activity) => (
                   <TableRow 
                     key={activity.id} 
                     className={`hover:bg-gray-50 ${isOverdue(activity) ? 'bg-red-50' : ''}`}
@@ -364,7 +385,6 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 line-clamp-2">{activity.description}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -419,9 +439,6 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
                           <Badge variant="outline" className="text-xs">
                             {activity.relatedTo.type}
                           </Badge>
-                          <div className="text-sm text-gray-600 line-clamp-1">
-                            {activity.relatedTo.name}
-                          </div>
                         </div>
                       )}
                     </TableCell>
@@ -433,9 +450,15 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => handleViewDetails(activity)}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onEdit(activity)}>
+                            <Edit className="w-4 h-4 mr-2" />
                             Edit Task
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             onClick={() => onStatusChange(activity.id, 'Completed')}
                             disabled={activity.status === 'Completed'}
@@ -446,6 +469,7 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
                             onClick={() => onDelete(activity.id)}
                             className="text-red-600"
                           >
+                            <Trash2 className="w-4 h-4 mr-2" />
                             Delete Task
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -455,9 +479,31 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
                 ))}
               </TableBody>
             </Table>
+            
+            {/* Pagination */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              itemLabel="tasks"
+            />
+            </>
           )}
         </CardContent>
       </Card>
-    </motion.div>
+      </motion.div>
+
+      {/* Task Detail Modal */}
+      <TaskDetailModal
+        task={selectedTask}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedTask(null);
+        }}
+      />
+    </>
   );
 }

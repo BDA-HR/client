@@ -136,7 +136,7 @@ export default function LeadHistory({ leadId }: LeadHistoryProps) {
       <div className="space-y-4">
         {historyEntries.map((entry, index) => (
           <Card key={entry.id}>
-            <CardContent className="p-4">
+            <CardContent>
               <div className="flex items-start space-x-4">
                 <div className={`p-2 rounded-full ${getHistoryColor(entry.type)} flex-shrink-0`}>
                   {getHistoryIcon(entry.type)}

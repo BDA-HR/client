@@ -73,15 +73,22 @@ import PagePayroll from "./pages/finance/PagePayroll";
 import LeadManagement from "./pages/crm/LeadManagement";
 import AddLeadPage from "./pages/crm/AddLeadPage";
 import EditLeadPage from "./pages/crm/EditLeadPage";
-import LeadAnalyticsPage from "./pages/crm/LeadAnalyticsPage";
 import LeadRoutingPage from "./pages/crm/LeadRoutingPage";
-import LeadNurturingPage from "./pages/crm/LeadNurturingPage";
 import ImportLeadPage from "./pages/crm/ImportLeadPage";
 import LeadDetailPage from "./pages/crm/LeadDetailPage";
 import LeadConversion from "./pages/crm/LeadConversion";
 import ContactManagement from "./pages/crm/ContactManagement";
+import AddContactPage from "./pages/crm/AddContactPage";
+import ContactDetailPage from "./pages/crm/ContactDetailPage";
+import OpportunityDetailPage from "./pages/crm/OpportunityDetailPage";
 import SalesManagement from "./pages/crm/SalesManagement";
+import QuotationsPage from "./pages/crm/QuotationsPage";
+import OrdersPage from "./pages/crm/OrdersPage";
+import OrderDetailPage from "./pages/crm/OrderDetailPage";
 import MarketingAutomation from "./pages/crm/MarketingAutomation";
+import CampaignsPage from "./pages/crm/CampaignsPage";
+import EmailCampaignsPage from "./pages/crm/EmailCampaignsPage";
+import SMSCampaignsPage from "./pages/crm/SMSCampaignsPage";
 import CustomerSupport from "./pages/crm/CustomerService";
 import ActivityManagement from "./pages/crm/ActivityManagement";
 import AnalyticsReporting from "./pages/crm/AnalyticsReporting";
@@ -97,7 +104,6 @@ import PageActivityTypes from "./pages/settings/crmSettings/pageActivityTypes";
 import PageAssignmentModes from "./pages/settings/crmSettings/pageAssignmentModes";
 import PageConversionTargets from "./pages/settings/crmSettings/pageConversionTargets";
 import PageRoutingRules from "./pages/settings/crmSettings/pageRoutingRules";
-import AllLeave from "./pages/hr/leavepage/AllLeave";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -153,16 +159,8 @@ function App() {
                 <Route path="/crm/leads/:id/edit" element={<EditLeadPage />} />
                 <Route path="/crm/leads/import" element={<ImportLeadPage />} />
                 <Route
-                  path="/crm/leads/analytics"
-                  element={<LeadAnalyticsPage />}
-                />
-                <Route
                   path="/crm/leads/routing"
                   element={<LeadRoutingPage />}
-                />
-                <Route
-                  path="/crm/leads/nurturing"
-                  element={<LeadNurturingPage />}
                 />
                 <Route path="/crm/leads/:id" element={<LeadDetailPage />} />
                 <Route
@@ -170,10 +168,35 @@ function App() {
                   element={<LeadConversion />}
                 />
                 <Route path="/crm/contacts" element={<ContactManagement />} />
+                <Route path="/crm/contacts/add" element={<AddContactPage />} />
+                <Route
+                  path="/crm/contacts/:id"
+                  element={<ContactDetailPage />}
+                />
+                <Route
+                  path="/crm/contacts/:id/activities"
+                  element={<ContactDetailPage />}
+                />
                 <Route path="/crm/sales" element={<SalesManagement />} />
+                <Route path="/crm/quotations" element={<QuotationsPage />} />
+                <Route path="/crm/orders" element={<OrdersPage />} />
+                <Route path="/crm/orders/:id" element={<OrderDetailPage />} />
+                <Route
+                  path="/crm/opportunity/:id"
+                  element={<OpportunityDetailPage />}
+                />
                 <Route
                   path="/crm/marketing"
                   element={<MarketingAutomation />}
+                />
+                <Route path="/crm/campaigns" element={<CampaignsPage />} />
+                <Route
+                  path="/crm/campaigns/email"
+                  element={<EmailCampaignsPage />}
+                />
+                <Route
+                  path="/crm/campaigns/sms"
+                  element={<SMSCampaignsPage />}
                 />
                 <Route path="/crm/support" element={<CustomerSupport />} />
                 <Route
@@ -266,10 +289,6 @@ function App() {
                 <Route
                   path="/hr/leave/entitlement"
                   element={<LeaveEntitlementPage />}
-                />
-                 <Route
-                  path="/hr/leave/allLeave"
-                  element={<AllLeave />}
                 />
                 <Route
                   path="/hr/attendance/list"

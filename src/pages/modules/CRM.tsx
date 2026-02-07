@@ -1,41 +1,64 @@
-import { motion } from 'framer-motion';
-import { Button } from '../../components/ui/button';
-import { RefreshCw, Plus, User, Users, TrendingUp, Headphones, CheckCircle, Workflow, Filter, Download } from 'lucide-react';
-import LeadOverview from '../../components/crm/LeadOverview';
-import ContactOverview from '../../components/crm/ContactOverview';
-import SalesOverview from '../../components/crm/SalesOverview';
-import MarketingOverview from '../../components/crm/MarketingOverview';
-import SupportOverview from '../../components/crm/SupportOverview';
-import ActivityOverview from '../../components/crm/ActivityOverview';
-import AnalyticsOverview from '../../components/crm/AnalyticsOverview';
-import WorkflowDiagram from '../../components/crm/WorkflowDiagram';
-import { useModule } from '../../ModuleContext';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { motion } from "framer-motion";
+import { Button } from "../../components/ui/button";
+import {
+  RefreshCw,
+  Plus,
+  User,
+  Users,
+  TrendingUp,
+  Headphones,
+  CheckCircle,
+  Workflow,
+  Filter,
+  Download,
+  BarChart4,
+} from "lucide-react";
+import LeadOverview from "../../components/crm/LeadOverview";
+import ContactOverview from "../../components/crm/ContactOverview";
+import SalesOverview from "../../components/crm/SalesOverview";
+import MarketingOverview from "../../components/crm/MarketingOverview";
+import SupportOverview from "../../components/crm/SupportOverview";
+import ActivityOverview from "../../components/crm/ActivityOverview";
+import AnalyticsOverview from "../../components/crm/AnalyticsOverview";
+import LeadAnalytics from "../../components/crm/leadManagement/components_old/LeadAnalytics";
+import WorkflowDiagram from "../../components/crm/WorkflowDiagram";
+import { useModule } from "../../ModuleContext";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { 
+  visible: {
+    opacity: 1,
+    transition: {
       staggerChildren: 0.1,
-      when: "beforeChildren"
-    } 
-  }
+      when: "beforeChildren",
+    },
+  },
 };
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
-    y: 0, 
+    y: 0,
     opacity: 1,
-    transition: { 
-      type: 'spring', 
-      stiffness: 100, 
+    transition: {
+      type: "spring",
+      stiffness: 100,
       damping: 15,
-      duration: 0.5
-    }
-  }
+      duration: 0.5,
+    },
+  },
 };
 
 const statCardVariants = {
@@ -46,13 +69,13 @@ const statCardVariants = {
     transition: {
       type: "spring",
       stiffness: 150,
-      damping: 10
-    }
+      damping: 10,
+    },
   },
   hover: {
     scale: 1.03,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 };
 
 type StatCardProps = {
@@ -63,8 +86,14 @@ type StatCardProps = {
   color: string;
 };
 
-const StatCard = ({ title, value, change, icon: Icon, color }: StatCardProps) => (
-  <motion.div 
+const StatCard = ({
+  title,
+  value,
+  change,
+  icon: Icon,
+  color,
+}: StatCardProps) => (
+  <motion.div
     variants={statCardVariants}
     initial="hidden"
     animate="visible"
@@ -79,14 +108,16 @@ const StatCard = ({ title, value, change, icon: Icon, color }: StatCardProps) =>
       <div className="flex items-center">
         <p className="text-2xl font-bold mt-1 text-orange-900">{value}</p>
         {change !== undefined && (
-          <motion.span 
+          <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-              change > 0 ? 'bg-orange-100 text-orange-800' : 'bg-amber-800 text-amber-100'
+              change > 0
+                ? "bg-orange-100 text-orange-800"
+                : "bg-amber-800 text-amber-100"
             }`}
           >
-            {change > 0 ? '↑' : '↓'} {Math.abs(change)}%
+            {change > 0 ? "↑" : "↓"} {Math.abs(change)}%
           </motion.span>
         )}
       </div>
@@ -97,9 +128,27 @@ const StatCard = ({ title, value, change, icon: Icon, color }: StatCardProps) =>
 // Simple Workflow Visualization Component
 const SimpleWorkflowVisualization = () => {
   const steps = [
-    { id: 1, title: 'Initial Review', person: 'John Manager', role: 'Manager', order: 1 },
-    { id: 2, title: 'Department Approval', person: 'Sarah Wilson', role: 'Manager', order: 2 },
-    { id: 3, title: 'HR Final Approval', person: 'Michael Chen', role: 'HR', order: 3 },
+    {
+      id: 1,
+      title: "Initial Review",
+      person: "John Manager",
+      role: "Manager",
+      order: 1,
+    },
+    {
+      id: 2,
+      title: "Department Approval",
+      person: "Sarah Wilson",
+      role: "Manager",
+      order: 2,
+    },
+    {
+      id: 3,
+      title: "HR Final Approval",
+      person: "Michael Chen",
+      role: "HR",
+      order: 3,
+    },
   ];
 
   return (
@@ -111,7 +160,9 @@ const SimpleWorkflowVisualization = () => {
             <CheckCircle className="w-8 h-8 text-white" />
           </div>
           <h3 className="text-lg font-bold text-gray-900">Approval Workflow</h3>
-          <p className="text-sm text-gray-600">Effective: 2024-01-01 to 2024-12-31</p>
+          <p className="text-sm text-gray-600">
+            Effective: 2024-01-01 to 2024-12-31
+          </p>
         </div>
       </div>
 
@@ -119,33 +170,52 @@ const SimpleWorkflowVisualization = () => {
       <div className="relative flex flex-col md:flex-row items-center justify-between">
         {/* Connection Lines */}
         <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-200 via-orange-300 to-orange-200 transform -translate-y-1/2"></div>
-        
+
         {steps.map((step, index) => (
-          <div key={step.id} className="relative flex flex-col items-center mb-8 md:mb-0 w-full md:w-auto">
+          <div
+            key={step.id}
+            className="relative flex flex-col items-center mb-8 md:mb-0 w-full md:w-auto"
+          >
             {/* Step Circle */}
-            <div className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-              step.role === 'HR' ? 'bg-red-100 border-2 border-red-300' : 
-              step.role === 'Manager' ? 'bg-blue-100 border-2 border-blue-300' : 
-              'bg-orange-100 border-2 border-orange-300'
-            }`}>
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                step.role === 'HR' ? 'bg-red-500' : 
-                step.role === 'Manager' ? 'bg-blue-500' : 
-                'bg-orange-500'
-              }`}>
-                <span className="text-white font-bold text-lg">{step.order}</span>
+            <div
+              className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+                step.role === "HR"
+                  ? "bg-red-100 border-2 border-red-300"
+                  : step.role === "Manager"
+                    ? "bg-blue-100 border-2 border-blue-300"
+                    : "bg-orange-100 border-2 border-orange-300"
+              }`}
+            >
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  step.role === "HR"
+                    ? "bg-red-500"
+                    : step.role === "Manager"
+                      ? "bg-blue-500"
+                      : "bg-orange-500"
+                }`}
+              >
+                <span className="text-white font-bold text-lg">
+                  {step.order}
+                </span>
               </div>
             </div>
 
             {/* Step Content */}
             <div className="bg-white rounded-lg shadow-md border p-4 w-64 text-center">
-              <h4 className="font-bold text-gray-900 text-sm mb-1">{step.title}</h4>
+              <h4 className="font-bold text-gray-900 text-sm mb-1">
+                {step.title}
+              </h4>
               <p className="text-gray-700 text-sm mb-2">{step.person}</p>
-              <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                step.role === 'HR' ? 'bg-red-100 text-red-800' : 
-                step.role === 'Manager' ? 'bg-blue-100 text-blue-800' : 
-                'bg-orange-100 text-orange-800'
-              }`}>
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                  step.role === "HR"
+                    ? "bg-red-100 text-red-800"
+                    : step.role === "Manager"
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-orange-100 text-orange-800"
+                }`}
+              >
                 {step.role}
               </span>
             </div>
@@ -191,152 +261,160 @@ export default function CRMDashboard() {
     "border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 hover:shadow-lg hover:ring-1 hover:ring-orange-400 transition-all",
     "border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 hover:shadow-lg hover:ring-1 hover:ring-orange-400 transition-all",
     "border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 hover:shadow-lg hover:ring-1 hover:ring-orange-400 transition-all",
-    "border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 hover:shadow-lg hover:ring-1 hover:ring-orange-400 transition-all"
+    "border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 hover:shadow-lg hover:ring-1 hover:ring-orange-400 transition-all",
   ];
 
   // Handle workflow interactions
   const handleStepClick = (step: any) => {
-    console.log('Workflow step clicked:', step);
+    console.log("Workflow step clicked:", step);
     // You can open a modal or navigate to step details
   };
 
   const handleAddStep = () => {
-    console.log('Add new step');
+    console.log("Add new step");
     // You can open a form to add new step
   };
 
   const handleEditStep = (step: any) => {
-    console.log('Edit step:', step);
+    console.log("Edit step:", step);
     // You can open an edit form
   };
 
   const handleDeleteStep = (stepId: string) => {
-    console.log('Delete step:', stepId);
+    console.log("Delete step:", stepId);
     // You can show confirmation modal
   };
 
   return (
-    <motion.div 
-      variants={containerVariants} 
-      initial="hidden" 
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
       animate="visible"
       className="p-6 min-h-screen bg-gray-50"
     >
       {/* Header Section */}
-      <motion.section 
+      <motion.section
         variants={itemVariants}
         className="mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end"
       >
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {activeModule === 'CRM' ? (
-              <motion.span 
+            {activeModule === "CRM" ? (
+              <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="inline-block"
               >
                 <span className="bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
                   CRM
-                </span> Dashboard
+                </span>{" "}
+                Dashboard
               </motion.span>
-            ) : 'CRM Dashboard'}
+            ) : (
+              "CRM Dashboard"
+            )}
           </h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="mt-2 text-sm text-gray-600"
           >
-            Manage leads, contacts, sales, marketing, support, and customer interactions
+            Manage leads, contacts, sales, marketing, support, and customer
+            interactions
           </motion.p>
         </div>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="flex space-x-3 mt-4 sm:mt-0"
         >
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="gap-2 border-orange-300 text-orange-700 hover:bg-orange-100 hover:text-orange-800 transition-colors"
           >
             <RefreshCw size={16} className="hover:animate-spin" />
             <span>Refresh</span>
           </Button>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             className="flex items-center bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-orange-200 transition-all"
           >
-            <Plus size={16} className="mr-2" /> 
+            <Plus size={16} className="mr-2" />
             <span>New Entry</span>
           </Button>
         </motion.div>
       </motion.section>
 
       {/* Stats Cards */}
-      <motion.div 
+      <motion.div
         variants={itemVariants}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-8"
       >
-        <StatCard 
-          title="Total Leads" 
-          value="1,248" 
-          change={12.5} 
-          icon={User} 
+        <StatCard
+          title="Total Leads"
+          value="1,248"
+          change={12.5}
+          icon={User}
           color={cardColors[0]}
         />
-        <StatCard 
-          title="Active Contacts" 
-          value="3,742" 
-          change={4.2} 
-          icon={Users} 
+        <StatCard
+          title="Active Contacts"
+          value="3,742"
+          change={4.2}
+          icon={Users}
           color={cardColors[1]}
         />
-        <StatCard 
-          title="Sales Pipeline" 
-          value="$284K" 
-          change={8.7} 
-          icon={TrendingUp} 
+        <StatCard
+          title="Sales Pipeline"
+          value="$284K"
+          change={8.7}
+          icon={TrendingUp}
           color={cardColors[2]}
         />
-        <StatCard 
-          title="Open Tickets" 
-          value="127" 
-          change={-3.8} 
-          icon={Headphones} 
+        <StatCard
+          title="Open Tickets"
+          value="127"
+          change={-3.8}
+          icon={Headphones}
           color={cardColors[3]}
         />
-        <StatCard 
-          title="Pending Approvals" 
-          value="12" 
-          change={5.3} 
-          icon={CheckCircle} 
+        <StatCard
+          title="Pending Approvals"
+          value="12"
+          change={5.3}
+          icon={CheckCircle}
           color={cardColors[4]}
         />
       </motion.div>
 
       {/* Workflow Tabs Section */}
-      <motion.div 
-        variants={itemVariants}
-        className="mb-8"
-      >
+      <motion.div variants={itemVariants} className="mb-8">
         <Tabs defaultValue="workflow" className="w-full">
           <div className="flex items-center justify-between mb-6">
             <TabsList className="bg-orange-50 p-1">
-              <TabsTrigger 
-                value="workflow" 
+              <TabsTrigger
+                value="workflow"
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white"
               >
                 <Workflow className="w-4 h-4 mr-2" />
                 Dynamic Workflow
               </TabsTrigger>
-              <TabsTrigger 
-                value="approval" 
+              <TabsTrigger
+                value="approval"
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Approval Workflow
+              </TabsTrigger>
+              <TabsTrigger
+                value="analytics"
+                className="data-[state=active]:bg-orange-500 data-[state=active]:text-white"
+              >
+                <BarChart4 className="w-4 h-4 mr-2" />
+                Lead Analytics
               </TabsTrigger>
             </TabsList>
             <div className="flex gap-2">
@@ -355,7 +433,7 @@ export default function CRMDashboard() {
             {/* Dynamic Workflow Diagram */}
             <Card className="border-orange-200 shadow-sm">
               <CardContent className="pt-6">
-                <WorkflowDiagram 
+                <WorkflowDiagram
                   editable={true}
                   onStepClick={handleStepClick}
                   onAddStep={handleAddStep}
@@ -372,7 +450,9 @@ export default function CRMDashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Active Workflows</p>
+                      <p className="text-sm font-medium text-gray-600">
+                        Active Workflows
+                      </p>
                       <p className="text-2xl font-bold text-orange-600">8</p>
                     </div>
                     <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
@@ -385,7 +465,9 @@ export default function CRMDashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Steps in Progress</p>
+                      <p className="text-sm font-medium text-gray-600">
+                        Steps in Progress
+                      </p>
                       <p className="text-2xl font-bold text-yellow-600">24</p>
                     </div>
                     <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -398,8 +480,12 @@ export default function CRMDashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Avg. Completion Time</p>
-                      <p className="text-2xl font-bold text-green-600">3.2 days</p>
+                      <p className="text-sm font-medium text-gray-600">
+                        Avg. Completion Time
+                      </p>
+                      <p className="text-2xl font-bold text-green-600">
+                        3.2 days
+                      </p>
                     </div>
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                       <CheckCircle className="w-6 h-6 text-green-600" />
@@ -416,9 +502,12 @@ export default function CRMDashboard() {
               <CardHeader className="border-b border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl text-orange-900">Approval Workflow Hierarchy</CardTitle>
+                    <CardTitle className="text-xl text-orange-900">
+                      Approval Workflow Hierarchy
+                    </CardTitle>
                     <p className="text-sm text-orange-700 mt-1">
-                      Visual representation of the approval process for customer contracts
+                      Visual representation of the approval process for customer
+                      contracts
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -437,11 +526,39 @@ export default function CRMDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="analytics">
+            {/* Lead Analytics */}
+            <Card className="border-orange-200 shadow-sm">
+              <CardHeader className="border-b border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl text-orange-900">
+                      Lead Analytics Dashboard
+                    </CardTitle>
+                    <p className="text-sm text-orange-700 mt-1">
+                      Comprehensive insights into lead performance and
+                      conversion metrics
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                      <BarChart4 className="w-3 h-3 mr-1" />
+                      Live Data
+                    </span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <LeadAnalytics isOpen={true} onClose={() => {}} />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </motion.div>
 
       {/* Main Dashboard Sections */}
-      <motion.div 
+      <motion.div
         variants={itemVariants}
         className="grid grid-cols-1 lg:grid-cols-3 gap-6"
       >
@@ -450,7 +567,7 @@ export default function CRMDashboard() {
         <SalesOverview />
       </motion.div>
 
-      <motion.div 
+      <motion.div
         variants={itemVariants}
         className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6"
       >
@@ -459,36 +576,74 @@ export default function CRMDashboard() {
         <ActivityOverview />
       </motion.div>
 
-      <motion.div 
-        variants={itemVariants}
-        className="mt-6"
-      >
+      <motion.div variants={itemVariants} className="mt-6">
         <AnalyticsOverview />
       </motion.div>
 
       {/* Recent Activities */}
-      <motion.div 
-        variants={itemVariants}
-        className="mt-8"
-      >
+      <motion.div variants={itemVariants} className="mt-8">
         <Card className="border-orange-200 shadow-sm">
           <CardHeader className="border-b border-orange-100">
-            <CardTitle className="text-orange-900">Recent Workflow Activities</CardTitle>
+            <CardTitle className="text-orange-900">
+              Recent Workflow Activities
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
             <div className="space-y-4">
               {[
-                { id: 1, action: 'Step completed', user: 'Sarah Wilson', workflow: 'Customer Onboarding', time: '10 minutes ago', color: 'green' },
-                { id: 2, action: 'New step added', user: 'Michael Chen', workflow: 'Contract Approval', time: '45 minutes ago', color: 'blue' },
-                { id: 3, action: 'Workflow updated', user: 'John Manager', workflow: 'Lead Qualification', time: '2 hours ago', color: 'orange' },
-                { id: 4, action: 'Approval requested', user: 'Lisa Wong', workflow: 'Budget Approval', time: '5 hours ago', color: 'purple' },
-                { id: 5, action: 'Step blocked', user: 'Robert Kim', workflow: 'Vendor Onboarding', time: '1 day ago', color: 'red' },
+                {
+                  id: 1,
+                  action: "Step completed",
+                  user: "Sarah Wilson",
+                  workflow: "Customer Onboarding",
+                  time: "10 minutes ago",
+                  color: "green",
+                },
+                {
+                  id: 2,
+                  action: "New step added",
+                  user: "Michael Chen",
+                  workflow: "Contract Approval",
+                  time: "45 minutes ago",
+                  color: "blue",
+                },
+                {
+                  id: 3,
+                  action: "Workflow updated",
+                  user: "John Manager",
+                  workflow: "Lead Qualification",
+                  time: "2 hours ago",
+                  color: "orange",
+                },
+                {
+                  id: 4,
+                  action: "Approval requested",
+                  user: "Lisa Wong",
+                  workflow: "Budget Approval",
+                  time: "5 hours ago",
+                  color: "purple",
+                },
+                {
+                  id: 5,
+                  action: "Step blocked",
+                  user: "Robert Kim",
+                  workflow: "Vendor Onboarding",
+                  time: "1 day ago",
+                  color: "red",
+                },
               ].map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div
+                  key={activity.id}
+                  className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
                   <div className="flex items-center gap-4">
-                    <div className={`w-3 h-3 rounded-full bg-${activity.color}-500`}></div>
+                    <div
+                      className={`w-3 h-3 rounded-full bg-${activity.color}-500`}
+                    ></div>
                     <div>
-                      <div className="font-medium text-gray-900">{activity.action}</div>
+                      <div className="font-medium text-gray-900">
+                        {activity.action}
+                      </div>
                       <div className="text-sm text-gray-600">
                         {activity.user} • {activity.workflow}
                       </div>

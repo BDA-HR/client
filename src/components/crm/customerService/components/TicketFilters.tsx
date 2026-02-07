@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Filter, X, Calendar, User, Tag } from 'lucide-react';
-import { Button } from '../../../ui/button';
+import { Search, X } from 'lucide-react';
 import { Input } from '../../../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
+import { Button } from '../../../ui/button';
 import { Badge } from '../../../ui/badge';
 import { Card, CardContent } from '../../../ui/card';
 
@@ -13,8 +11,7 @@ interface FilterState {
   priority: string;
   category: string;
   assignedTo: string;
-  channel: string;
-  slaStatus: string;
+  slaStatus?: string;
 }
 
 interface TicketFiltersProps {
@@ -32,15 +29,21 @@ export default function TicketFilters({
   totalCount, 
   filteredCount 
 }: TicketFiltersProps) {
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
   const updateFilter = (key: keyof FilterState, value: string) => {
     onFiltersChange({ ...filters, [key]: value });
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => 
-    value !== '' && value !== 'all'
-  );
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (filters.searchTerm) count++;
+    if (filters.status !== 'all') count++;
+    if (filters.priority !== 'all') count++;
+    if (filters.category !== 'all') count++;
+    if (filters.assignedTo !== 'all') count++;
+    return count;
+  };
+
+  const activeFiltersCount = getActiveFiltersCount();
 
   const agents = [
     'Tech Support Team',
@@ -51,251 +54,211 @@ export default function TicketFilters({
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
-      <Card>
-        <CardContent className="p-6">
-          {/* Search and Quick Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search tickets by title, description, or customer..."
-                value={filters.searchTerm}
-                onChange={(e) => updateFilter('searchTerm', e.target.value)}
-                className="pl-10"
-              />
+    <Card>
+      <CardContent>
+        <div className="space-y-4">
+          {/* Search and Quick Actions */}
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex-1 min-w-64">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search tickets by title, description, or customer..."
+                  value={filters.searchTerm}
+                  onChange={(e) => updateFilter('searchTerm', e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-
-            {/* Quick Status Filter */}
-            <Select value={filters.status} onValueChange={(value) => updateFilter('status', value)}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Open">Open</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Resolved">Resolved</SelectItem>
-                <SelectItem value="Closed">Closed</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Quick Priority Filter */}
-            <Select value={filters.priority} onValueChange={(value) => updateFilter('priority', value)}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="All Priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Priority</SelectItem>
-                <SelectItem value="Critical">Critical</SelectItem>
-                <SelectItem value="High">High</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="Low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Advanced Filters Toggle */}
-            <Button
-              variant="outline"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center space-x-2"
-            >
-              <Filter className="w-4 h-4" />
-              <span>Advanced</span>
-            </Button>
-
-            {/* Clear Filters */}
-            {hasActiveFilters && (
+            
+            {activeFiltersCount > 0 && (
               <Button
-                variant="ghost"
+                variant="outline"
+                size="sm"
                 onClick={onClearFilters}
-                className="flex items-center space-x-2 text-red-600 hover:text-red-700"
+                className="flex items-center space-x-2"
               >
                 <X className="w-4 h-4" />
-                <span>Clear</span>
+                <span>Clear Filters</span>
+                <Badge variant="secondary" className="ml-1">
+                  {activeFiltersCount}
+                </Badge>
               </Button>
             )}
           </div>
 
-          {/* Advanced Filters */}
-          {showAdvanced && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-200"
-            >
-              {/* Category Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Tag className="w-4 h-4 mr-1" />
-                  Category
-                </label>
-                <Select value={filters.category} onValueChange={(value) => updateFilter('category', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="Technical">Technical</SelectItem>
-                    <SelectItem value="Billing">Billing</SelectItem>
-                    <SelectItem value="General">General</SelectItem>
-                    <SelectItem value="Feature Request">Feature Request</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* Filter Controls */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            {/* Status Filter */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
+              <Select value={filters.status} onValueChange={(value) => updateFilter('status', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="Open">Open</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Resolved">Resolved</SelectItem>
+                  <SelectItem value="Closed">Closed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              {/* Assigned To Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <User className="w-4 h-4 mr-1" />
-                  Assigned To
-                </label>
-                <Select value={filters.assignedTo} onValueChange={(value) => updateFilter('assignedTo', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Agents" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Agents</SelectItem>
-                    {agents.map((agent) => (
-                      <SelectItem key={agent} value={agent}>
-                        {agent}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Priority Filter */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Priority</label>
+              <Select value={filters.priority} onValueChange={(value) => updateFilter('priority', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priority</SelectItem>
+                  <SelectItem value="Critical">Critical</SelectItem>
+                  <SelectItem value="High">High</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              {/* Channel Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Channel</label>
-                <Select value={filters.channel} onValueChange={(value) => updateFilter('channel', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Channels" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Channels</SelectItem>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="chat">Chat</SelectItem>
-                    <SelectItem value="phone">Phone</SelectItem>
-                    <SelectItem value="web">Web Form</SelectItem>
-                    <SelectItem value="social">Social Media</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Category Filter */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Category</label>
+              <Select value={filters.category} onValueChange={(value) => updateFilter('category', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="Technical">Technical</SelectItem>
+                  <SelectItem value="Billing">Billing</SelectItem>
+                  <SelectItem value="General">General</SelectItem>
+                  <SelectItem value="Feature Request">Feature Request</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              {/* SLA Status Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Calendar className="w-4 h-4 mr-1" />
-                  SLA Status
-                </label>
-                <Select value={filters.slaStatus} onValueChange={(value) => updateFilter('slaStatus', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All SLA Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All SLA Status</SelectItem>
-                    <SelectItem value="on-track">On Track</SelectItem>
-                    <SelectItem value="at-risk">At Risk</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Assigned To Filter */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Assigned To</label>
+              <Select value={filters.assignedTo} onValueChange={(value) => updateFilter('assignedTo', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Agents" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Agents</SelectItem>
+                  {agents.map((agent) => (
+                    <SelectItem key={agent} value={agent}>
+                      {agent}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* SLA Status Filter - for filtering by SLA status */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">SLA Status</label>
+              <Select value={filters.slaStatus || 'all'} onValueChange={(value) => updateFilter('slaStatus', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All SLA" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All SLA</SelectItem>
+                  <SelectItem value="on-track">On Track</SelectItem>
+                  <SelectItem value="at-risk">At Risk</SelectItem>
+                  <SelectItem value="overdue">Overdue</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Results Count */}
+            <div className="flex items-end">
+              <div className="text-sm text-gray-600">
+                <div className="font-medium">
+                  {filteredCount} of {totalCount} tickets
+                </div>
+                {activeFiltersCount > 0 && (
+                  <div className="text-xs text-gray-500">
+                    {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} applied
+                  </div>
+                )}
               </div>
-            </motion.div>
-          )}
+            </div>
+          </div>
 
           {/* Active Filters Display */}
-          {hasActiveFilters && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-200">
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2 border-t">
               <span className="text-sm font-medium text-gray-700">Active filters:</span>
+              
               {filters.searchTerm && (
                 <Badge variant="secondary" className="flex items-center space-x-1">
                   <span>Search: "{filters.searchTerm}"</span>
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
+                  <button
                     onClick={() => updateFilter('searchTerm', '')}
-                  />
+                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </Badge>
               )}
+              
               {filters.status !== 'all' && (
                 <Badge variant="secondary" className="flex items-center space-x-1">
                   <span>Status: {filters.status}</span>
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
+                  <button
                     onClick={() => updateFilter('status', 'all')}
-                  />
+                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </Badge>
               )}
+              
               {filters.priority !== 'all' && (
                 <Badge variant="secondary" className="flex items-center space-x-1">
                   <span>Priority: {filters.priority}</span>
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
+                  <button
                     onClick={() => updateFilter('priority', 'all')}
-                  />
+                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </Badge>
               )}
+              
               {filters.category !== 'all' && (
                 <Badge variant="secondary" className="flex items-center space-x-1">
                   <span>Category: {filters.category}</span>
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
+                  <button
                     onClick={() => updateFilter('category', 'all')}
-                  />
+                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </Badge>
               )}
+              
               {filters.assignedTo !== 'all' && (
                 <Badge variant="secondary" className="flex items-center space-x-1">
                   <span>Agent: {filters.assignedTo}</span>
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
+                  <button
                     onClick={() => updateFilter('assignedTo', 'all')}
-                  />
-                </Badge>
-              )}
-              {filters.channel !== 'all' && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>Channel: {filters.channel}</span>
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
-                    onClick={() => updateFilter('channel', 'all')}
-                  />
-                </Badge>
-              )}
-              {filters.slaStatus !== 'all' && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <span>SLA: {filters.slaStatus.replace('-', ' ')}</span>
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
-                    onClick={() => updateFilter('slaStatus', 'all')}
-                  />
+                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </Badge>
               )}
             </div>
           )}
-
-          {/* Results Summary */}
-          <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
-            <div className="text-sm text-gray-600">
-              Showing <span className="font-medium text-red-600">{filteredCount}</span> of{' '}
-              <span className="font-medium">{totalCount}</span> tickets
-            </div>
-            
-            {filteredCount !== totalCount && (
-              <div className="text-sm text-gray-500">
-                {totalCount - filteredCount} tickets filtered out
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

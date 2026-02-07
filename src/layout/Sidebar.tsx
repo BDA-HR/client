@@ -39,6 +39,8 @@ import {
   User,
   Trash2,
   Notebook,
+  Mail,
+  MessageSquare,
 } from "lucide-react";
 import { useModule } from "../ModuleContext";
 
@@ -345,13 +347,6 @@ const Sidebar: React.FC = () => {
                   {...theme}
                   isChild
                 />
-                <NavItem
-                  to="/hr/leave/allLeave"
-                  icon={<Users size={18} />}
-                  label="Requested Leave"
-                  {...theme}
-                  isChild
-                />
               </NavGroup>
 
               <NavGroup
@@ -479,36 +474,12 @@ const Sidebar: React.FC = () => {
 
           {activeModule === "CRM" && (
             <>
-              <NavGroup
+              <NavItem
+                to="/crm/leads"
                 icon={<Trophy size={18} />}
                 label="Lead Management"
-                isOpen={openGroup === "LeadManagement"}
-                onToggle={() => toggleGroup("LeadManagement")}
-                hoverBg={theme.hoverBg}
-              >
-                <NavItem
-                  to="/crm/leads"
-                  icon={<Trophy size={18} />}
-                  label="Leads"
-                  {...theme}
-                  isChild
-                  end={true}
-                />
-                <NavItem
-                  to="/crm/leads/analytics"
-                  icon={<BarChart4 size={18} />}
-                  label="Analytics"
-                  {...theme}
-                  isChild
-                />
-                <NavItem
-                  to="/crm/leads/nurturing"
-                  icon={<Calendar size={18} />}
-                  label="Nurturing"
-                  {...theme}
-                  isChild
-                />
-              </NavGroup>
+                {...theme}
+              />
               <NavItem
                 to="/crm/contacts"
                 icon={<Users size={18} />}
@@ -521,12 +492,35 @@ const Sidebar: React.FC = () => {
                 label="Sales Management"
                 {...theme}
               />
-              <NavItem
-                to="/crm/marketing"
+              <NavGroup
                 icon={<FileSpreadsheet size={18} />}
                 label="Marketing Automation"
-                {...theme}
-              />
+                isOpen={openGroup === "Marketing"}
+                onToggle={() => toggleGroup("Marketing")}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem
+                  to="/crm/campaigns"
+                  icon={<FileSpreadsheet size={18} />}
+                  label="Campaigns"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/campaigns/email"
+                  icon={<Mail size={18} />}
+                  label="Email Campaigns"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/campaigns/sms"
+                  icon={<MessageSquare size={18} />}
+                  label="SMS Campaigns"
+                  {...theme}
+                  isChild
+                />
+              </NavGroup>
               <NavItem
                 to="/crm/support"
                 icon={<Calendar size={18} />}

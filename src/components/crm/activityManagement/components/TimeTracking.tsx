@@ -186,65 +186,6 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* Time Tracking Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Time Today</p>
-                <p className="text-2xl font-bold text-blue-600">{formatDuration(totalTimeToday)}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Time This Week</p>
-                <p className="text-2xl font-bold text-green-600">{formatDuration(totalTimeWeek)}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Avg Per Activity</p>
-                <p className="text-2xl font-bold text-purple-600">{formatDuration(Math.round(averageTimePerActivity))}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Timers</p>
-                <p className="text-2xl font-bold text-orange-600">{activeTimer ? 1 : 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Timer className="w-6 h-6 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Active Timer */}
       {activeTimer && (
         <Card className="border-blue-200 bg-blue-50">

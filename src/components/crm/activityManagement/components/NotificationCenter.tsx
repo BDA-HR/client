@@ -242,68 +242,9 @@ export default function NotificationCenter({ activities }: NotificationCenterPro
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* Notification Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Notifications</p>
-                <p className="text-2xl font-bold text-gray-900">{notifications.length}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Bell className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Unread</p>
-                <p className="text-2xl font-bold text-orange-600">{unreadCount}</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Bell className="w-6 h-6 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Overdue Alerts</p>
-                <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
-              </div>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Upcoming</p>
-                <p className="text-2xl font-bold text-green-600">{upcomingCount}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Notification Controls */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="px-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <Select value={filter} onValueChange={(value: any) => setFilter(value)}>

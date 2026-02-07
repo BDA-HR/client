@@ -1,242 +1,262 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, Calendar, User, Edit, AlertTriangle } from 'lucide-react';
+import { DollarSign, Calendar, User, MoreHorizontal, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
-import { Badge } from '../../../ui/badge';
 import { Button } from '../../../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
-import type { Opportunity } from '../../../../types/crm';
+import { Badge } from '../../../ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/dropdown-menu';
 
-interface SalesPipelineProps {
-  opportunities: Opportunity[];
-  onStageChange: (opportunityId: string, newStage: Opportunity['stage']) => void;
-  onEdit: (opportunity: Opportunity) => void;
+interface Opportunity {
+  id: string;
+  name: string;
+  accountName: string;
+  contactName: string;
+  amount: number;
+  probability: number;
+  expectedCloseDate: string;
+  stage: string;
+  assignedTo: string;
 }
 
-const stages: Opportunity['stage'][] = [
-  'Qualification',
-  'Needs Analysis', 
-  'Proposal',
-  'Negotiation',
-  'Closed Won',
-  'Closed Lost'
+const mockOpportunities: Opportunity[] = [
+  {
+    id: '1',
+    name: 'Enterprise Software License',
+    accountName: 'Innovation Labs',
+    contactName: 'Alice Johnson',
+    amount: 125000,
+    probability: 75,
+    expectedCloseDate: '2024-02-15',
+    stage: 'Proposal',
+    assignedTo: 'Sarah Johnson'
+  },
+  {
+    id: '2',
+    name: 'Professional Services Package',
+    accountName: 'Innovation Labs',
+    contactName: 'Bob Smith',
+    amount: 45000,
+    probability: 85,
+    expectedCloseDate: '2024-01-30',
+    stage: 'Negotiation',
+    assignedTo: 'Sarah Johnson'
+  },
+  {
+    id: '3',
+    name: 'Cloud Migration Project',
+    accountName: 'TechCorp',
+    contactName: 'Carol Davis',
+    amount: 75000,
+    probability: 50,
+    expectedCloseDate: '2024-03-10',
+    stage: 'Qualification',
+    assignedTo: 'Mike Wilson'
+  },
+  {
+    id: '4',
+    name: 'Annual Support Contract',
+    accountName: 'DataSystems',
+    contactName: 'David Brown',
+    amount: 25000,
+    probability: 90,
+    expectedCloseDate: '2024-02-05',
+    stage: 'Negotiation',
+    assignedTo: 'Emily Davis'
+  }
 ];
 
-const stageColors = {
-  'Qualification': 'bg-blue-100 border-blue-300',
-  'Needs Analysis': 'bg-yellow-100 border-yellow-300',
-  'Proposal': 'bg-purple-100 border-purple-300',
-  'Negotiation': 'bg-orange-100 border-orange-300',
-  'Closed Won': 'bg-green-100 border-green-300',
-  'Closed Lost': 'bg-red-100 border-red-300'
-};
+const stages = [
+  { name: 'Qualification', color: 'bg-blue-100 border-blue-200', probability: 25 },
+  { name: 'Needs Analysis', color: 'bg-yellow-100 border-yellow-200', probability: 40 },
+  { name: 'Proposal', color: 'bg-orange-100 border-orange-200', probability: 60 },
+  { name: 'Negotiation', color: 'bg-purple-100 border-purple-200', probability: 80 },
+  { name: 'Closed Won', color: 'bg-green-100 border-green-200', probability: 100 },
+  { name: 'Closed Lost', color: 'bg-red-100 border-red-200', probability: 0 }
+];
 
-const probabilityColors = {
-  low: 'text-red-600',
-  medium: 'text-yellow-600',
-  high: 'text-green-600'
-};
+export default function SalesPipeline() {
+  const [opportunities, setOpportunities] = useState(mockOpportunities);
 
-export default function SalesPipeline({ opportunities, onStageChange, onEdit }: SalesPipelineProps) {
-  const [draggedOpportunity, setDraggedOpportunity] = useState<string | null>(null);
-
-  const getOpportunitiesByStage = (stage: Opportunity['stage']) => {
-    return opportunities.filter(opp => opp.stage === stage);
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
-  const getStageValue = (stage: Opportunity['stage']) => {
-    return getOpportunitiesByStage(stage).reduce((sum, opp) => sum + opp.amount, 0);
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
-  const getProbabilityLevel = (probability: number) => {
-    if (probability < 30) return 'low';
-    if (probability < 70) return 'medium';
-    return 'high';
+  const getOpportunitiesByStage = (stageName: string) => {
+    return opportunities.filter(opp => opp.stage === stageName);
   };
 
-  const isOverdue = (expectedCloseDate: string) => {
-    return new Date(expectedCloseDate) < new Date();
+  const getStageTotal = (stageName: string) => {
+    return getOpportunitiesByStage(stageName).reduce((sum, opp) => sum + opp.amount, 0);
   };
 
-  const handleDragStart = (e: React.DragEvent, opportunityId: string) => {
-    setDraggedOpportunity(opportunityId);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = (e: React.DragEvent, targetStage: Opportunity['stage']) => {
-    e.preventDefault();
-    if (draggedOpportunity) {
-      onStageChange(draggedOpportunity, targetStage);
-      setDraggedOpportunity(null);
-    }
+  const moveOpportunity = (opportunityId: string, newStage: string) => {
+    setOpportunities(prev => 
+      prev.map(opp => 
+        opp.id === opportunityId 
+          ? { ...opp, stage: newStage, probability: stages.find(s => s.name === newStage)?.probability || opp.probability }
+          : opp
+      )
+    );
   };
 
   return (
     <div className="space-y-6">
-      {/* Pipeline Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Pipeline Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {stages.map((stage) => {
-              const stageOpps = getOpportunitiesByStage(stage);
-              const stageValue = getStageValue(stage);
-              
-              return (
-                <div key={stage} className="text-center">
-                  <div className="text-lg font-bold text-gray-900">
-                    ${stageValue.toLocaleString()}
-                  </div>
-                  <div className="text-sm font-medium text-gray-700">{stage}</div>
-                  <div className="text-xs text-gray-500">
-                    {stageOpps.length} deal{stageOpps.length !== 1 ? 's' : ''}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Pipeline Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Sales Pipeline</h2>
+          <p className="text-gray-600">Drag opportunities between stages to update their status</p>
+        </div>
+        <Button className="bg-purple-600 hover:bg-purple-700">
+          <Plus className="w-4 h-4 mr-2" />
+          Add Opportunity
+        </Button>
+      </div>
 
-      {/* Pipeline Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* Pipeline Board */}
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 overflow-x-auto">
         {stages.map((stage) => {
-          const stageOpportunities = getOpportunitiesByStage(stage);
-          const stageValue = getStageValue(stage);
+          const stageOpportunities = getOpportunitiesByStage(stage.name);
+          const stageTotal = getStageTotal(stage.name);
           
           return (
-            <motion.div
-              key={stage}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-3"
-            >
-              <Card className={`${stageColors[stage]} border-2`}>
+            <div key={stage.name} className="min-w-80 lg:min-w-0">
+              <Card className={`${stage.color} min-h-96`}>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium">
-                    {stage}
-                  </CardTitle>
-                  <div className="text-xs text-gray-600">
-                    {stageOpportunities.length} deals • ${stageValue.toLocaleString()}
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-medium text-gray-700">
+                      {stage.name}
+                    </CardTitle>
+                    <Badge variant="outline" className="text-xs">
+                      {stageOpportunities.length}
+                    </Badge>
+                  </div>
+                  <div className="text-lg font-bold text-gray-900">
+                    {formatCurrency(stageTotal)}
                   </div>
                 </CardHeader>
-              </Card>
-
-              <div
-                className="space-y-3 min-h-96"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, stage)}
-              >
-                {stageOpportunities.map((opportunity) => (
-                  <motion.div
-                    key={opportunity.id}
-                    layout
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, opportunity.id)}
-                    className="cursor-move"
-                  >
-                    <Card className="hover:shadow-md transition-shadow bg-white">
-                      <CardContent className="p-4">
-                        <div className="space-y-3">
-                          {/* Header */}
-                          <div className="flex justify-between items-start">
-                            <h4 className="font-medium text-gray-900 text-sm leading-tight">
-                              {opportunity.name}
-                            </h4>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => onEdit(opportunity)}
-                              className="h-6 w-6 p-0"
-                            >
-                              <Edit className="w-3 h-3" />
+                <CardContent className="space-y-3">
+                  {stageOpportunities.map((opportunity, index) => (
+                    <motion.div
+                      key={opportunity.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-white rounded-lg p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-medium text-gray-900 text-sm leading-tight">
+                          {opportunity.name}
+                        </h4>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                              <MoreHorizontal className="w-4 h-4" />
                             </Button>
-                          </div>
-
-                          {/* Amount and Probability */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-1">
-                              <DollarSign className="w-4 h-4 text-green-600" />
-                              <span className="font-semibold text-gray-900">
-                                ${opportunity.amount.toLocaleString()}
-                              </span>
-                            </div>
-                            <Badge 
-                              variant="outline" 
-                              className={`text-xs ${probabilityColors[getProbabilityLevel(opportunity.probability)]}`}
-                            >
-                              {opportunity.probability}%
-                            </Badge>
-                          </div>
-
-                          {/* Owner and Close Date */}
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-1">
-                              <User className="w-3 h-3 text-gray-400" />
-                              <span className="text-xs text-gray-600">{opportunity.assignedTo}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Calendar className="w-3 h-3 text-gray-400" />
-                              <span className={`text-xs ${
-                                isOverdue(opportunity.expectedCloseDate) 
-                                  ? 'text-red-600 font-medium' 
-                                  : 'text-gray-600'
-                              }`}>
-                                {new Date(opportunity.expectedCloseDate).toLocaleDateString()}
-                              </span>
-                              {isOverdue(opportunity.expectedCloseDate) && (
-                                <AlertTriangle className="w-3 h-3 text-red-500" />
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Next Step */}
-                          {opportunity.nextStep && (
-                            <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
-                              <strong>Next:</strong> {opportunity.nextStep}
-                            </div>
-                          )}
-
-                          {/* Stage Change Dropdown */}
-                          <Select
-                            value={opportunity.stage}
-                            onValueChange={(value) => onStageChange(opportunity.id, value as Opportunity['stage'])}
-                          >
-                            <SelectTrigger className="h-7 text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {stages.map((stageOption) => (
-                                <SelectItem key={stageOption} value={stageOption} className="text-xs">
-                                  {stageOption}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            {stages.map(s => s.name !== stage.name && (
+                              <DropdownMenuItem 
+                                key={s.name}
+                                onClick={() => moveOpportunity(opportunity.id, s.name)}
+                              >
+                                Move to {s.name}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="text-sm text-gray-600">
+                          {opportunity.accountName}
                         </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-
-                {stageOpportunities.length === 0 && (
-                  <div className="text-center py-8 text-gray-400">
-                    <div className="text-sm">No opportunities</div>
-                    <div className="text-xs">Drag deals here</div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-1">
+                            <DollarSign className="w-3 h-3 text-green-600" />
+                            <span className="text-sm font-medium text-green-600">
+                              {formatCurrency(opportunity.amount)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {opportunity.probability}%
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>{formatDate(opportunity.expectedCloseDate)}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <User className="w-3 h-3" />
+                            <span className="truncate max-w-16">{opportunity.assignedTo.split(' ')[0]}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {stageOpportunities.length === 0 && (
+                    <div className="text-center py-8 text-gray-400">
+                      <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No opportunities</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           );
         })}
       </div>
+
+      {/* Pipeline Summary */}
+      <Card className="border-purple-200">
+        <CardHeader>
+          <CardTitle>Pipeline Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{opportunities.length}</div>
+              <div className="text-sm text-gray-600">Total Opportunities</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">
+                {formatCurrency(opportunities.reduce((sum, opp) => sum + opp.amount, 0))}
+              </div>
+              <div className="text-sm text-gray-600">Total Pipeline Value</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">
+                {formatCurrency(opportunities.reduce((sum, opp) => sum + (opp.amount * opp.probability / 100), 0))}
+              </div>
+              <div className="text-sm text-gray-600">Weighted Pipeline</div>
+            </div>
+            <div className="text-center p-4 bg-orange-50 rounded-lg">
+              <div className="text-2xl font-bold text-orange-600">
+                {Math.round(opportunities.reduce((sum, opp) => sum + opp.probability, 0) / opportunities.length)}%
+              </div>
+              <div className="text-sm text-gray-600">Average Probability</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

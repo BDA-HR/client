@@ -9,7 +9,7 @@ export interface Lead {
   company: string;
   jobTitle: string;
   source: 'Website' | 'Email' | 'Phone' | 'Social Media' | 'Referral' | 'Event';
-  status: 'New' | 'Contacted' | 'Qualified' | 'Proposal Sent' | 'Closed Won' | 'Closed Lost';
+  status: 'New' | 'Contacted' | 'Qualified' | 'Proposal Sent' | 'Converted' | 'Closed Lost';
   score: number;
   assignedTo: string;
   createdAt: string;
@@ -18,7 +18,22 @@ export interface Lead {
   budget: number;
   timeline: string;
   industry: string;
+  // Conversion tracking
+  isConverted: boolean;
+  convertedAt?: string;
+  convertedToContactId?: string;
+  convertedToAccountId?: string;
+  convertedToOpportunityId?: string;
+  conversionType?: 'Contact' | 'Contact+Account' | 'Contact+Account+Opportunity';
 }
+ 
+;
+  convertedAt?: string;
+  convertedTotring;
+  convertedToAccount string;
+  convertedToOpport
+  conversionType
+}';pportunityct+Account+OntaCo | '+Account' | 'Contactt'?: 'Contacing;?: strnityIduId?:tactId?: sConted: boolean  isConverrackingrsion t// Conve 
 
 export interface Contact {
   id: string;
@@ -44,6 +59,44 @@ export interface Contact {
   lastContactDate: string;
   notes: string;
   isActive: boolean;
+  stage: 'Lead' | 'Prospect' | 'Customer' | 'Partner';
+  owner: string;
+  teamVisibility: 'private' | 'team' | 'public';
+  consentStatus: 'pending' | 'granted' | 'denied';
+  customFields: Record<string, any>;
+  relationshipScore: number;
+  lastInteractionType: string;
+  segmentIds: string[];
+  // Conversion tracking
+  convertedFromLeadId?: string;
+  accountId?: string; // Link to account when created
+}
+
+export interface Account {
+  id: string;
+  name: string;
+  industry: string;
+  website: string;
+  phone: string;
+  email: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  tags: string[];
+  owner: string;
+  parentAccountId?: string;
+  accountType: 'Prospect' | 'Customer' | 'Partner' | 'Vendor';
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  notes: string;
+  customFields: Record<string, any>;
+  // Relationships
+  primaryContactId?: string;
+  contactIds: string[];
+  opportunityIds: string[];
 }
 
 export interface Opportunity {
@@ -101,6 +154,43 @@ export interface SupportTicket {
   slaDeadline: string;
   tags: string[];
   attachments: string[];
+  customerSatisfaction?: number;
+  escalationLevel: number;
+  responseTime?: number;
+  resolutionTime?: number;
+  channel: 'email' | 'chat' | 'phone' | 'web' | 'social';
+  internalNotes: Array<{
+    id: string;
+    content: string;
+    createdBy: string;
+    createdAt: string;
+    isInternal: boolean;
+  }>;
+  publicReplies: Array<{
+    id: string;
+    content: string;
+    createdBy: string;
+    createdAt: string;
+    isFromCustomer: boolean;
+    attachments: string[];
+  }>;
+  relatedTickets: string[];
+  knowledgeBaseArticles: string[];
+  slaPolicy: {
+    id: string;
+    name: string;
+    responseTime: number;
+    resolutionTime: number;
+    priority: 'Low' | 'Medium' | 'High' | 'Critical';
+    businessHoursOnly: boolean;
+  };
+  customerInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+    tier: 'Enterprise' | 'Premium' | 'Standard';
+  };
 }
 
 // Activity interface - explicitly exported

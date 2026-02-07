@@ -121,8 +121,8 @@ export default function LeadNotes({ leadId }: LeadNotesProps) {
         ) : (
           notes.map((note) => (
             <Card key={note.id}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
+              <CardContent>
+                <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-gray-400" />
                     <span className="text-sm font-medium">{note.author}</span>

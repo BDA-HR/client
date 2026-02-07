@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit, Phone, Mail, Building, User, Calendar, DollarSign, Target, CheckSquare, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Edit, Phone, Mail, Building, User, Calendar, DollarSign, Target, CheckSquare, MessageSquare, RefreshCw } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
@@ -89,6 +89,194 @@ export default function LeadDetailPage() {
     }
   };
 
+  const handleConversion = (conversionData: any) => {
+    if (!leadData) return;
+    
+    console.log('Converting lead with data:', conversionData);
+    
+    let createdContactId: string | undefined;
+    let createdAccountId: string | undefined;
+    let createdOpportunityId: string | undefined;
+    
+    try {
+      // 1. Create Contact if requested
+      if (conversionData.createContact && conversionData.contactData) {
+        createdContactId = Date.now().toString();
+        const newContact = {
+          id: createdContactId,
+          firstName: conversionData.contactData.firstName || leadData.firstName,
+          lastName: conversionData.contactData.lastName || leadData.lastName,
+          email: conversionData.contactData.email || leadData.email,
+          phone: conversionData.contactData.phone || leadData.phone,
+          company: conversionData.contactData.company || leadData.company,
+          jobTitle: conversionData.contactData.jobTitle || leadData.jobTitle,
+          address: conversionData.contactData.address || '',
+          city: conversionData.contactData.city || '',
+          state: conversionData.contactData.state || '',
+          zipCode: conversionData.contactData.zipCode || '',
+          country: conversionData.contactData.country || 'USA',
+          tags: conversionData.contactData.tags || [],
+          socialMedia: conversionData.contactData.socialMedia || {},
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          lastContactDate: new Date().toISOString(),
+          notes: conversionData.contactData.notes || leadData.notes || '',
+          isActive: true,
+          stage: conversionData.contactData.stage || 'Prospect',
+          owner: conversionData.contactData.owner || leadData.assignedTo,
+          teamVisibility: conversionData.contactData.teamVisibility || 'team',
+          consentStatus: conversionData.contactData.consentStatus || 'pending',
+          customFields: conversionData.contactData.customFields || {},
+          relationshipScore: conversionData.contactData.relationshipScore || Math.min(leadData.score, 100),
+          lastInteractionType: 'conversion',
+          segmentIds: conversionData.contactData.segmentIds || [],
+          convertedFromLeadId: leadData.id,
+          accountId: undefined // Will be set if account is created
+        };
+        
+        // Save to localStorage
+        const storedContacts = localStorage.getItem('contacts');
+        const contacts = storedContacts ? JSON.parse(storedContacts) : [];
+        contacts.push(newContact);
+        localStorage.setItem('contacts', JSON.stringify(contacts));
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('contactsUpdated'));
+        
+        console.log('Created contact:', newContact);
+        console.log('Total contacts in storage:', contacts.length);
+      }
+      
+      // 2. Create Account if requested
+      if (conversionData.createAccount && conversionData.accountData) {
+        createdAccountId = (Date.now() + 1).toString();
+        const newAccount = {
+          ...conversionData.accountData,
+          id: createdAccountId,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          primaryContactId: createdContactId,
+          contactIds: createdContactId ? [createdContactId] : [],
+          opportunityIds: []
+        };
+        
+        // Save to localStorage
+        const storedAccounts = localStorage.getItem('accounts');
+        const accounts = storedAccounts ? JSON.parse(storedAccounts) : [];
+        accounts.push(newAccount);
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+        
+        // Update contact with account ID if contact was created
+        if (createdContactId) {
+          const storedContacts = localStorage.getItem('contacts');
+          if (storedContacts) {
+            const contacts = JSON.parse(storedContacts);
+            const updatedContacts = contacts.map((c: any) => 
+              c.id === createdContactId ? { ...c, accountId: createdAccountId } : c
+            );
+            localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+          }
+        }
+        
+        console.log('Created account:', newAccount);
+      }
+      
+      // 3. Create Opportunity if requested
+      if (conversionData.createOpportunity && conversionData.opportunityData) {
+        if (!createdAccountId || !createdContactId) {
+          showToast.error('Account and Contact are required to create an Opportunity');
+          return;
+        }
+        
+        createdOpportunityId = (Date.now() + 2).toString();
+        const newOpportunity = {
+          ...conversionData.opportunityData,
+          id: createdOpportunityId,
+          accountId: createdAccountId,
+          contactId: createdContactId,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          products: [],
+          competitors: [],
+          nextStep: 'Initial qualification call'
+        };
+        
+        // Save to localStorage
+        const storedOpportunities = localStorage.getItem('opportunities');
+        const opportunities = storedOpportunities ? JSON.parse(storedOpportunities) : [];
+        opportunities.push(newOpportunity);
+        localStorage.setItem('opportunities', JSON.stringify(opportunities));
+        
+        // Update account with opportunity ID
+        const storedAccounts = localStorage.getItem('accounts');
+        if (storedAccounts) {
+          const accounts = JSON.parse(storedAccounts);
+          const updatedAccounts = accounts.map((a: any) => 
+            a.id === createdAccountId 
+              ? { ...a, opportunityIds: [...a.opportunityIds, createdOpportunityId] }
+              : a
+          );
+          localStorage.setItem('accounts', JSON.stringify(updatedAccounts));
+        }
+        
+        console.log('Created opportunity:', newOpportunity);
+      }
+      
+      // 4. Update lead status
+      const updatedLead = {
+        ...leadData,
+        status: 'Converted' as const,
+        isConverted: true,
+        convertedAt: new Date().toISOString(),
+        convertedToContactId: createdContactId,
+        convertedToAccountId: createdAccountId,
+        convertedToOpportunityId: createdOpportunityId,
+        conversionType: [
+          conversionData.createContact && 'Contact',
+          conversionData.createAccount && 'Account', 
+          conversionData.createOpportunity && 'Opportunity'
+        ].filter(Boolean).join('+') as any
+      };
+      
+      // Update lead in localStorage
+      const storedLeads = localStorage.getItem('leads');
+      if (storedLeads) {
+        const leads = JSON.parse(storedLeads);
+        const updatedLeads = leads.map((l: Lead) => 
+          l.id === leadData.id ? updatedLead : l
+        );
+        localStorage.setItem('leads', JSON.stringify(updatedLeads));
+      }
+      
+      setLeadData(updatedLead);
+      
+      // Show success message with next steps
+      let message = 'Lead converted successfully!';
+      if (conversionData.createContact) {
+        message += ' Contact created.';
+      }
+      if (conversionData.createAccount) {
+        message += ' Account created.';
+      }
+      if (conversionData.createOpportunity) {
+        message += ' Opportunity created.';
+      }
+      
+      showToast.success(message);
+      
+      // Navigate to the appropriate page
+      if (conversionData.createContact) {
+        setTimeout(() => {
+          navigate('/crm/contacts');
+        }, 2000);
+      }
+      
+    } catch (error) {
+      console.error('Error during conversion:', error);
+      showToast.error('Failed to convert lead. Please try again.');
+    }
+  };
+
   if (!lead) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -146,114 +334,22 @@ export default function LeadDetailPage() {
           <Button
             className="bg-orange-600 hover:bg-orange-700"
             onClick={() => navigate(`/crm/leads/${lead.id}/convert`)}
+            disabled={lead.isConverted}
           >
-            <CheckSquare className="w-4 h-4 mr-2" />
-            Convert Lead
+            {lead.isConverted ? (
+              <>
+                <CheckSquare className="w-4 h-4 mr-2" />
+                Converted
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Convert Lead
+              </>
+            )}
           </Button>
         </div>
       </div>
-
-      {/* Lead Summary Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center space-x-2">
-              <User className="w-5 h-5 text-orange-600" />
-              <span>Lead Summary</span>
-            </CardTitle>
-            <div className="flex space-x-2">
-              <Badge className={statusColors[lead.status]}>
-                {lead.status}
-              </Badge>
-              <Badge className={sourceColors[lead.source]}>
-                {lead.source}
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 mb-2">Contact Information</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{lead.email}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Phone className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{lead.phone}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Building className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{lead.company}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 mb-2">Lead Details</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Target className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Score: {lead.score}/100</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Assigned to: {lead.assignedTo}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Building className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Industry: {lead.industry}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 mb-2">Opportunity</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Budget: ${lead.budget?.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Timeline: {lead.timeline}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 mb-2">Dates</h4>
-                <div className="space-y-2">
-                  <div className="text-sm">
-                    <span className="text-gray-500">Created:</span><br />
-                    {new Date(lead.createdAt).toLocaleDateString()}
-                  </div>
-                  <div className="text-sm">
-                    <span className="text-gray-500">Updated:</span><br />
-                    {new Date(lead.updatedAt).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {lead.notes && (
-            <div className="mt-6 pt-6 border-t">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">Initial Notes</h4>
-              <p className="text-sm text-gray-700">{lead.notes}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -323,19 +419,36 @@ export default function LeadDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => window.location.href = `tel:${lead.phone}`}
+                  >
                     <Phone className="w-4 h-4 mr-2" />
                     Call {lead.firstName}
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => window.location.href = `mailto:${lead.email}`}
+                  >
                     <Mail className="w-4 h-4 mr-2" />
                     Send Email
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => setIsCommunicationDialogOpen(true)}
+                  >
                     <Calendar className="w-4 h-4 mr-2" />
                     Schedule Meeting
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate(`/crm/leads/${lead.id}/convert`)}
+                    disabled={lead.isConverted}
+                  >
                     <CheckSquare className="w-4 h-4 mr-2" />
                     Convert to Opportunity
                   </Button>

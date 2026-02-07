@@ -4,12 +4,12 @@ import { Plus, Zap } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { showToast } from '../../layout/layout';
 import { mockCampaigns } from '../../data/crmMockData';
-import CampaignStats from '../../components/crm/marketingAutomation/components/CampaignStats';
 import CampaignList from '../../components/crm/marketingAutomation/components/CampaignList';
 import CampaignFilters from '../../components/crm/marketingAutomation/components/CampaignFilters';
 import CampaignForm from '../../components/crm/marketingAutomation/components/CampaignForm';
 import AutomationRules from '../../components/crm/marketingAutomation/components/AutomationRules';
 import LeadScoring from '../../components/crm/marketingAutomation/components/LeadScoring';
+import LeadNurturing from '../../components/crm/leadManagement/components_old/LeadNurturing';
 import type { Campaign } from '../../types/crm';
 
 interface FilterState {
@@ -32,7 +32,7 @@ export default function MarketingAutomation() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'campaigns' | 'automation' | 'scoring'>('campaigns');
+  const [viewMode, setViewMode] = useState<'campaigns' | 'automation' | 'scoring' | 'nurturing'>('campaigns');
 
   // Filter campaigns based on current filters
   const filteredCampaigns = campaigns.filter(campaign => {
@@ -184,6 +184,16 @@ export default function MarketingAutomation() {
             >
               Lead Scoring
             </button>
+            <button
+              onClick={() => setViewMode('nurturing')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                viewMode === 'nurturing' 
+                  ? 'bg-white text-purple-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Nurturing
+            </button>
           </div>
           <Button 
             onClick={() => setIsAddDialogOpen(true)}
@@ -194,9 +204,6 @@ export default function MarketingAutomation() {
           </Button>
         </div>
       </div>
-
-      {/* Stats */}
-      <CampaignStats campaigns={campaigns} />
 
       {/* Content based on view mode */}
       {viewMode === 'campaigns' && (
@@ -228,6 +235,10 @@ export default function MarketingAutomation() {
 
       {viewMode === 'scoring' && (
         <LeadScoring />
+      )}
+
+      {viewMode === 'nurturing' && (
+        <LeadNurturing />
       )}
 
       {/* Add Campaign Form */}

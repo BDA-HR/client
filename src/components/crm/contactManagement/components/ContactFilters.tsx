@@ -78,7 +78,7 @@ export default function ContactFilters({
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardContent>
         <div className="space-y-4">
           {/* Search and Quick Actions */}
           <div className="flex flex-wrap gap-4 items-center">
@@ -210,7 +210,7 @@ export default function ContactFilters({
           </div>
 
           {/* Tag Filters */}
-          <div>
+       {/*   <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Tags</label>
             <div className="flex flex-wrap gap-2">
               {availableTags.map((tag) => (
@@ -227,7 +227,7 @@ export default function ContactFilters({
                 </button>
               ))}
             </div>
-          </div>
+          </div>*/}
 
           {/* Active Filters Display */}
           {activeFiltersCount > 0 && (

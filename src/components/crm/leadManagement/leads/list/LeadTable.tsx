@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, Edit, MoreHorizontal, Phone, Mail, User, Building, CheckSquare, Trash2, UserCheck, UserPlus } from 'lucide-react';
+import { Eye, Edit, MoreHorizontal, Phone, Mail, User, Building, Trash2, UserPlus, RefreshCw } from 'lucide-react';
 import { Button } from '../../../../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../ui/table';
 import { Badge } from '../../../../ui/badge';
@@ -8,9 +8,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../../ui/dialog';
 import { Label } from '../../../../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../ui/select';
+import { Pagination } from '../../../../ui/pagination';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../../../../layout/layout';
 import DeleteLeadModal from '../delete/DeleteLeadModal';
+import ChangeLeadStatusModal from '../ChangeLeadStatusModal';
 import type { Lead } from '../../../../../types/crm';
 
 interface LeadTableProps {
@@ -34,6 +36,20 @@ export default function LeadTable({
   const [selectedRep, setSelectedRep] = useState('');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedLeadForDelete, setSelectedLeadForDelete] = useState<Lead | null>(null);
+  const [isChangeStatusModalOpen, setIsChangeStatusModalOpen] = useState(false);
+  const [changingStatusLead, setChangingStatusLead] = useState<Lead | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const itemsPerPage = 10;
+
+  // Pagination calculations
+  const totalItems = leads.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedLeads = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return leads.slice(startIndex, endIndex);
+  }, [leads, currentPage]);
   
   // Sales reps list
   const salesReps = [
@@ -76,6 +92,20 @@ export default function LeadTable({
       if (!confirmed) return;
     }
     onStatusChange(leadId, newStatus);
+  };
+
+  const handleChangeStatus = (lead: Lead) => {
+    setChangingStatusLead(lead);
+    setIsChangeStatusModalOpen(true);
+  };
+
+  const handleStatusChange = (newStatus: Lead['status']) => {
+    if (changingStatusLead) {
+      onStatusChange(changingStatusLead.id, newStatus);
+      setIsChangeStatusModalOpen(false);
+      setChangingStatusLead(null);
+      showToast.success(`Lead status updated to ${newStatus}`);
+    }
   };
 
   const handleAssignRep = (lead: Lead) => {
@@ -144,7 +174,7 @@ export default function LeadTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {leads.map((lead) => (
+          {paginatedLeads.map((lead) => (
             <TableRow key={lead.id}>
               <TableCell>
                 <div className="flex items-center space-x-2">
@@ -206,24 +236,13 @@ export default function LeadTable({
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleChangeStatus(lead)}>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Change Status
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleAssignRep(lead)}>
                       <UserPlus className="w-4 h-4 mr-2" />
                       Reassign
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={() => handleStatusChangeWithConfirmation(lead.id, 'Contacted')}
-                      disabled={lead.status === 'Contacted'}
-                    >
-                      <UserCheck className="w-4 h-4 mr-2" />
-                      Mark as Contacted
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleStatusChangeWithConfirmation(lead.id, 'Qualified')}
-                      disabled={lead.status === 'Qualified'}
-                    >
-                      <CheckSquare className="w-4 h-4 mr-2" />
-                      Mark as Qualified
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -240,6 +259,16 @@ export default function LeadTable({
           ))}
         </TableBody>
       </Table>
+      
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
+        itemLabel="leads"
+      />
 
       {/* Assign Rep Dialog */}
       <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
@@ -287,6 +316,17 @@ export default function LeadTable({
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
+      />
+
+      {/* Change Status Modal */}
+      <ChangeLeadStatusModal
+        isOpen={isChangeStatusModalOpen}
+        onClose={() => {
+          setIsChangeStatusModalOpen(false);
+          setChangingStatusLead(null);
+        }}
+        onSubmit={handleStatusChange}
+        lead={changingStatusLead}
       />
     </motion.div>
   );

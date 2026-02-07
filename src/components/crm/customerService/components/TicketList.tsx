@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, Edit, MoreHorizontal, Clock, User, AlertTriangle, CheckCircle, Star } from 'lucide-react';
+import { Eye, Edit, MoreHorizontal, Clock, User, Trash2 } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../ui/table';
 import { Badge } from '../../../ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/dropdown-menu';
-import { useNavigate } from 'react-router-dom';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../../ui/dropdown-menu';
+import { Pagination } from '../../../ui/pagination';
+import TicketDetailModal from './TicketDetailModal';
+import DeleteTicketModal from './DeleteTicketModal';
 import type { SupportTicket } from '../../../../types/crm';
 
 const statusColors = {
@@ -36,10 +37,47 @@ interface TicketListProps {
   tickets: SupportTicket[];
   onStatusChange: (ticketId: string, newStatus: SupportTicket['status']) => void;
   onEdit: (ticket: SupportTicket) => void;
+  onDelete: (ticketId: string) => void;
 }
 
-export default function TicketList({ tickets, onStatusChange, onEdit }: TicketListProps) {
-  const navigate = useNavigate();
+export default function TicketList({ tickets, onStatusChange, onEdit, onDelete }: TicketListProps) {
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState<SupportTicket | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const itemsPerPage = 10;
+
+  // Pagination calculations
+  const totalItems = tickets.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedTickets = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return tickets.slice(startIndex, endIndex);
+  }, [tickets, currentPage]);
+
+  const handleViewDetails = (ticket: SupportTicket) => {
+    setSelectedTicket(ticket);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleDeleteClick = (ticket: SupportTicket) => {
+    setTicketToDelete(ticket);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = (ticket: SupportTicket) => {
+    onDelete(ticket.id);
+    setIsDeleteModalOpen(false);
+    setTicketToDelete(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setTicketToDelete(null);
+  };
 
   if (tickets.length === 0) {
     return (
@@ -48,94 +86,41 @@ export default function TicketList({ tickets, onStatusChange, onEdit }: TicketLi
         animate={{ opacity: 1 }}
         className="text-center py-12"
       >
-        <CheckCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-900 mb-2">No tickets found</h3>
         <p className="text-gray-500">All caught up! No support tickets match your current filters.</p>
       </motion.div>
     );
   }
 
-  const getSLAStatus = (ticket: SupportTicket) => {
-    const now = new Date();
-    const deadline = new Date(ticket.slaDeadline);
-    const timeLeft = deadline.getTime() - now.getTime();
-    const twoHours = 2 * 60 * 60 * 1000;
-
-    if (['Resolved', 'Closed'].includes(ticket.status)) {
-      return { status: 'completed', color: 'text-green-600', icon: CheckCircle };
-    } else if (timeLeft < 0) {
-      return { status: 'overdue', color: 'text-red-600', icon: AlertTriangle };
-    } else if (timeLeft < twoHours) {
-      return { status: 'at-risk', color: 'text-orange-600', icon: Clock };
-    } else {
-      return { status: 'on-track', color: 'text-green-600', icon: CheckCircle };
-    }
-  };
-
-  const formatTimeLeft = (deadline: string) => {
-    const now = new Date();
-    const deadlineDate = new Date(deadline);
-    const timeLeft = deadlineDate.getTime() - now.getTime();
-    
-    if (timeLeft < 0) {
-      const overdue = Math.abs(timeLeft);
-      const hours = Math.floor(overdue / (1000 * 60 * 60));
-      const minutes = Math.floor((overdue % (1000 * 60 * 60)) / (1000 * 60));
-      return `${hours}h ${minutes}m overdue`;
-    } else {
-      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      return `${hours}h ${minutes}m left`;
-    }
-  };
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
-      {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead>Ticket</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Channel</TableHead>
-              <TableHead>Assigned To</TableHead>
-              <TableHead>SLA Status</TableHead>
-              <TableHead>CSAT</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tickets.map((ticket) => {
-              const slaStatus = getSLAStatus(ticket);
-              const SLAIcon = slaStatus.icon;
-              
-              return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-4"
+      >
+        {/* Table */}
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                <TableHead>Ticket ID / Title</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Assigned To</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedTickets.map((ticket) => (
                 <TableRow key={ticket.id} className="hover:bg-gray-50">
                   <TableCell>
                     <div className="space-y-1">
                       <div className="font-medium text-gray-900">#{ticket.id}</div>
-                      <div className="text-sm text-gray-900 font-medium line-clamp-1">
+                      <div className="text-sm text-gray-900 font-medium">
                         {ticket.title}
-                      </div>
-                      <div className="text-xs text-gray-500 line-clamp-2">
-                        {ticket.description}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline" className="text-xs">
-                          {ticket.category}
-                        </Badge>
-                        {ticket.tags.slice(0, 2).map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
                       </div>
                     </div>
                   </TableCell>
@@ -145,18 +130,8 @@ export default function TicketList({ tickets, onStatusChange, onEdit }: TicketLi
                         {ticket.customerInfo.name}
                       </div>
                       <div className="text-sm text-gray-600">
-                        {ticket.customerInfo.email}
+                        {ticket.customerInfo.company}
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs ${
-                          ticket.customerInfo.tier === 'Enterprise' ? 'border-purple-300 text-purple-700' :
-                          ticket.customerInfo.tier === 'Premium' ? 'border-blue-300 text-blue-700' :
-                          'border-gray-300 text-gray-700'
-                        }`}
-                      >
-                        {ticket.customerInfo.tier}
-                      </Badge>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -165,27 +140,8 @@ export default function TicketList({ tickets, onStatusChange, onEdit }: TicketLi
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Select
-                      value={ticket.status}
-                      onValueChange={(value) => onStatusChange(ticket.id, value as SupportTicket['status'])}
-                    >
-                      <SelectTrigger className="w-32">
-                        <Badge className={statusColors[ticket.status]}>
-                          {ticket.status}
-                        </Badge>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Open">Open</SelectItem>
-                        <SelectItem value="In Progress">In Progress</SelectItem>
-                        <SelectItem value="Pending">Pending</SelectItem>
-                        <SelectItem value="Resolved">Resolved</SelectItem>
-                        <SelectItem value="Closed">Closed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={channelColors[ticket.channel]}>
-                      {ticket.channel}
+                    <Badge className={statusColors[ticket.status]}>
+                      {ticket.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -195,31 +151,6 @@ export default function TicketList({ tickets, onStatusChange, onEdit }: TicketLi
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="space-y-1">
-                      <div className={`flex items-center space-x-1 ${slaStatus.color}`}>
-                        <SLAIcon className="w-4 h-4" />
-                        <span className="text-sm font-medium capitalize">
-                          {slaStatus.status.replace('-', ' ')}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {formatTimeLeft(ticket.slaDeadline)}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {ticket.customerSatisfaction ? (
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                        <span className="text-sm font-medium">
-                          {ticket.customerSatisfaction.toFixed(1)}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">No rating</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm">
@@ -227,7 +158,7 @@ export default function TicketList({ tickets, onStatusChange, onEdit }: TicketLi
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => navigate(`/crm/support/${ticket.id}`)}>
+                        <DropdownMenuItem onClick={() => handleViewDetails(ticket)}>
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
@@ -235,19 +166,55 @@ export default function TicketList({ tickets, onStatusChange, onEdit }: TicketLi
                           <Edit className="w-4 h-4 mr-2" />
                           Edit Ticket
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(`/crm/support/${ticket.id}/history`)}>
+                        <DropdownMenuItem onClick={() => handleViewDetails(ticket)}>
                           <Clock className="w-4 h-4 mr-2" />
                           View History
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteClick(ticket)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
-    </motion.div>
+              ))}
+            </TableBody>
+          </Table>
+          
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            itemLabel="tickets"
+          />
+        </div>
+      </motion.div>
+
+      {/* Detail Modal */}
+      <TicketDetailModal
+        ticket={selectedTicket}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedTicket(null);
+        }}
+      />
+
+      {/* Delete Modal */}
+      <DeleteTicketModal
+        ticket={ticketToDelete}
+        isOpen={isDeleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+      />
+    </>
   );
 }

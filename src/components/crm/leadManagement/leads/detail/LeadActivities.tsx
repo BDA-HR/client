@@ -107,7 +107,7 @@ export default function LeadActivities({ leadId }: LeadActivitiesProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Activities</h3>
         <Button onClick={() => setIsAddDialogOpen(true)} className="bg-orange-600 hover:bg-orange-700">
@@ -119,7 +119,7 @@ export default function LeadActivities({ leadId }: LeadActivitiesProps) {
       <div className="space-y-4">
         {activities.map((activity) => (
           <Card key={activity.id}>
-            <CardContent className="p-4">
+            <CardContent>
               <div className="flex items-start space-x-4">
                 <div className={`p-2 rounded-full ${getActivityColor(activity.type)}`}>
                   {getActivityIcon(activity.type)}
