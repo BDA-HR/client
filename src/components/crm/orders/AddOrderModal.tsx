@@ -165,7 +165,7 @@ export default function AddOrderModal({
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <ShoppingCart className="w-5 h-5 text-green-600" />
+            <ShoppingCart className="w-5 h-5 text-orange-600" />
             <span>Create New Order</span>
           </DialogTitle>
         </DialogHeader>
@@ -300,7 +300,7 @@ export default function AddOrderModal({
           </Button>
           <Button 
             onClick={handleSubmit}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-orange-600 hover:bg-orange-700"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

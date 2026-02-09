@@ -101,8 +101,8 @@ export default function ActivityCalendarView({ activities, onEdit }: ActivityCal
     if (isOverdue) return 'bg-red-100 text-red-800 border-red-200';
     
     switch (activity.status) {
-      case 'Completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'In Progress': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Completed': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'In Progress': return 'bg-orange-100 text-orange-800 border-orange-200';
       case 'Cancelled': return 'bg-gray-100 text-gray-800 border-gray-200';
       default: return 'bg-orange-100 text-orange-800 border-orange-200';
     }
@@ -272,14 +272,14 @@ export default function ActivityCalendarView({ activities, onEdit }: ActivityCal
                       >
                         <div className="flex items-center space-x-4">
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            activity.status === 'Completed' ? 'bg-green-100' :
-                            activity.status === 'In Progress' ? 'bg-blue-100' :
+                            activity.status === 'Completed' ? 'bg-orange-100' :
+                            activity.status === 'In Progress' ? 'bg-orange-100' :
                             activity.status === 'Cancelled' ? 'bg-gray-100' :
                             'bg-orange-100'
                           }`}>
                             <ActivityIcon className={`w-5 h-5 ${
-                              activity.status === 'Completed' ? 'text-green-600' :
-                              activity.status === 'In Progress' ? 'text-blue-600' :
+                              activity.status === 'Completed' ? 'text-orange-600' :
+                              activity.status === 'In Progress' ? 'text-orange-600' :
                               activity.status === 'Cancelled' ? 'text-gray-600' :
                               'text-orange-600'
                             }`} />

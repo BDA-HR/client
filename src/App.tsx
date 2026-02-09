@@ -79,6 +79,7 @@ import LeadDetailPage from "./pages/crm/LeadDetailPage";
 import LeadConversion from "./pages/crm/LeadConversion";
 import ContactManagement from "./pages/crm/ContactManagement";
 import AddContactPage from "./pages/crm/AddContactPage";
+import EditContactPage from "./pages/crm/EditContactPage";
 import ContactDetailPage from "./pages/crm/ContactDetailPage";
 import OpportunityDetailPage from "./pages/crm/OpportunityDetailPage";
 import SalesManagement from "./pages/crm/SalesManagement";
@@ -169,6 +170,10 @@ function App() {
                 />
                 <Route path="/crm/contacts" element={<ContactManagement />} />
                 <Route path="/crm/contacts/add" element={<AddContactPage />} />
+                <Route
+                  path="/crm/contacts/:id/edit"
+                  element={<EditContactPage />}
+                />
                 <Route
                   path="/crm/contacts/:id"
                   element={<ContactDetailPage />}

@@ -99,27 +99,13 @@ export default function ChangeLeadStatusModal({
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          {/* Lead Info */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="text-sm font-medium text-gray-900">
-              {lead.firstName} {lead.lastName}
-            </div>
-            <div className="text-sm text-gray-600">
-              {lead.company}
-            </div>
-            <div className="text-sm text-gray-600">
-              Current Status: <span className={`font-medium ${getStatusColor(lead.status)}`}>
-                {lead.status}
-              </span>
-            </div>
-          </div>
 
           {/* Status Selection */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="status">New Status *</Label>
               <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as Lead['status'])}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1 w-full">
                   <SelectValue placeholder="Select new status" />
                 </SelectTrigger>
                 <SelectContent>

@@ -50,10 +50,10 @@ export default function ActivityMetrics({ activities }: ActivityMetricsProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-green-600">{completedActivities}</p>
+              <p className="text-2xl font-bold text-orange-600">{completedActivities}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-orange-600" />
             </div>
           </div>
         </CardContent>

@@ -217,7 +217,7 @@ export default function ActivityForm({ activity, isOpen, onClose, onSubmit, mode
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <ActivityIcon className="w-5 h-5 text-blue-600" />
+            <ActivityIcon className="w-5 h-5 text-orange-600" />
             <span>{mode === 'add' ? 'Create New Activity' : 'Edit Activity'}</span>
             {mode === 'edit' && activity && (
               <Badge variant="outline">#{activity.id}</Badge>
@@ -449,7 +449,7 @@ export default function ActivityForm({ activity, isOpen, onClose, onSubmit, mode
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
               {mode === 'add' ? 'Create Activity' : 'Update Activity'}
             </Button>
           </div>

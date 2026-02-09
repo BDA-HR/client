@@ -144,129 +144,106 @@ export default function ContactForm({
   const FormContent = () => (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Tabs defaultValue="basic" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="basic" className="flex items-center space-x-2">
             <User className="w-4 h-4" />
-            <span>Basic Info</span>
-          </TabsTrigger>
-          <TabsTrigger value="company" className="flex items-center space-x-2">
-            <Building className="w-4 h-4" />
-            <span>Company & Address</span>
-          </TabsTrigger>
-          <TabsTrigger value="crm" className="flex items-center space-x-2">
-            <Tag className="w-4 h-4" />
-            <span>CRM & Tags</span>
+            <span>Contact & Company Info</span>
           </TabsTrigger>
           <TabsTrigger value="additional" className="flex items-center space-x-2">
             <FileText className="w-4 h-4" />
-            <span>Additional</span>
+            <span>Additional Details</span>
           </TabsTrigger>
         </TabsList>
 
         <div className="mt-4 min-h-[400px]">
-          {/* Basic Information Tab */}
+          {/* Contact & Company Info Tab */}
           <TabsContent value="basic" className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="firstName">First Name *</Label>
-                <Input
-                  id="firstName"
-                  value={formData.firstName}
-                  onChange={(e) => handleChange('firstName', e.target.value)}
-                  className={`mt-1 ${errors.firstName ? 'border-red-500' : ''}`}
-                />
-                {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last Name *</Label>
-                <Input
-                  id="lastName"
-                  value={formData.lastName}
-                  onChange={(e) => handleChange('lastName', e.target.value)}
-                  className={`mt-1 ${errors.lastName ? 'border-red-500' : ''}`}
-                />
-                {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                  className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
-                />
-                {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="stage">Stage</Label>
-                <Select value={formData.stage} onValueChange={(value) => handleChange('stage', value)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Lead">Lead</SelectItem>
-                    <SelectItem value="Prospect">Prospect</SelectItem>
-                    <SelectItem value="Customer">Customer</SelectItem>
-                    <SelectItem value="Partner">Partner</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="owner">Owner</Label>
-                <Select value={formData.owner} onValueChange={(value) => handleChange('owner', value)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select owner" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {owners.map((owner) => (
-                      <SelectItem key={owner} value={owner}>{owner}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="consentStatus">Consent Status</Label>
-              <Select value={formData.consentStatus} onValueChange={(value) => handleChange('consentStatus', value)}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="granted">Granted</SelectItem>
-                  <SelectItem value="denied">Denied</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </TabsContent>
-
-          {/* Company & Address Tab */}
-          <TabsContent value="company" className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
-                <Building className="w-4 h-4 mr-2" />
-                Company Information
-              </h4>
+            {/* Contact Information */}
+            <div className="border-b pb-6 mb-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="company">Company *</Label>
+                  <Label htmlFor="firstName" className="text-sm text-gray-500">First Name <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="firstName"
+                    value={formData.firstName}
+                    onChange={(e) => handleChange('firstName', e.target.value)}
+                    className={`mt-1 ${errors.firstName ? 'border-red-500' : ''}`}
+                  />
+                  {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="lastName" className="text-sm text-gray-500">Last Name <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={(e) => handleChange('lastName', e.target.value)}
+                    className={`mt-1 ${errors.lastName ? 'border-red-500' : ''}`}
+                  />
+                  {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 mt-4">
+                <div>
+                  <Label htmlFor="email" className="text-sm text-gray-500">Email <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
+                  />
+                  {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="phone" className="text-sm text-gray-500">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 mt-4">
+                <div>
+                  <Label htmlFor="stage" className="text-sm text-gray-500">Stage</Label>
+                  <Select value={formData.stage} onValueChange={(value) => handleChange('stage', value)}>
+                    <SelectTrigger className="mt-1 w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Lead">Lead</SelectItem>
+                      <SelectItem value="Prospect">Prospect</SelectItem>
+                      <SelectItem value="Customer">Customer</SelectItem>
+                      <SelectItem value="Partner">Partner</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="owner" className="text-sm text-gray-500">Owner</Label>
+                  <Select value={formData.owner} onValueChange={(value) => handleChange('owner', value)}>
+                    <SelectTrigger className="mt-1 w-full">
+                      <SelectValue placeholder="Select owner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {owners.map((owner) => (
+                        <SelectItem key={owner} value={owner}>{owner}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Company Information */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Company Information</h3>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="company" className="text-sm text-gray-500">Company <span className="text-red-500">*</span></Label>
                   <Input
                     id="company"
                     value={formData.company}
@@ -276,7 +253,7 @@ export default function ContactForm({
                   {errors.company && <p className="text-sm text-red-500 mt-1">{errors.company}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="jobTitle">Job Title</Label>
+                  <Label htmlFor="jobTitle" className="text-sm text-gray-500">Job Title</Label>
                   <Input
                     id="jobTitle"
                     value={formData.jobTitle}
@@ -285,67 +262,61 @@ export default function ContactForm({
                   />
                 </div>
               </div>
-            </div>
 
-            <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
-                <MapPin className="w-4 h-4 mr-2" />
-                Address Information
-              </h4>
-              <div className="space-y-4">
+              <div className="mt-4">
+                <Label htmlFor="address" className="text-sm text-gray-500">Address</Label>
+                <Input
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-4 gap-4 mt-4">
                 <div>
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="city" className="text-sm text-gray-500">City</Label>
                   <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => handleChange('address', e.target.value)}
+                    id="city"
+                    value={formData.city}
+                    onChange={(e) => handleChange('city', e.target.value)}
                     className="mt-1"
                   />
                 </div>
-                <div className="grid grid-cols-4 gap-4">
-                  <div>
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      value={formData.city}
-                      onChange={(e) => handleChange('city', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="state">State</Label>
-                    <Input
-                      id="state"
-                      value={formData.state}
-                      onChange={(e) => handleChange('state', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="zipCode">Zip Code</Label>
-                    <Input
-                      id="zipCode"
-                      value={formData.zipCode}
-                      onChange={(e) => handleChange('zipCode', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country">Country</Label>
-                    <Input
-                      id="country"
-                      value={formData.country}
-                      onChange={(e) => handleChange('country', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="state" className="text-sm text-gray-500">State</Label>
+                  <Input
+                    id="state"
+                    value={formData.state}
+                    onChange={(e) => handleChange('state', e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="zipCode" className="text-sm text-gray-500">Zip Code</Label>
+                  <Input
+                    id="zipCode"
+                    value={formData.zipCode}
+                    onChange={(e) => handleChange('zipCode', e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="country" className="text-sm text-gray-500">Country</Label>
+                  <Input
+                    id="country"
+                    value={formData.country}
+                    onChange={(e) => handleChange('country', e.target.value)}
+                    className="mt-1"
+                  />
                 </div>
               </div>
             </div>
           </TabsContent>
 
-          {/* CRM & Tags Tab */}
-          <TabsContent value="crm" className="space-y-6">
+          {/* Additional Details Tab */}
+          <TabsContent value="additional" className="space-y-6">
+            {/* Tags */}
             <div>
               <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
                 <Tag className="w-4 h-4 mr-2" />
@@ -382,6 +353,7 @@ export default function ContactForm({
               </div>
             </div>
 
+            {/* Social Media */}
             <div>
               <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
                 <Share2 className="w-4 h-4 mr-2" />
@@ -389,7 +361,7 @@ export default function ContactForm({
               </h4>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="linkedin">LinkedIn</Label>
+                  <Label htmlFor="linkedin" className="text-sm text-gray-500">LinkedIn</Label>
                   <Input
                     id="linkedin"
                     value={formData.socialMedia?.linkedin || ''}
@@ -399,7 +371,7 @@ export default function ContactForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="twitter">Twitter</Label>
+                  <Label htmlFor="twitter" className="text-sm text-gray-500">Twitter</Label>
                   <Input
                     id="twitter"
                     value={formData.socialMedia?.twitter || ''}
@@ -409,7 +381,7 @@ export default function ContactForm({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="facebook">Facebook</Label>
+                  <Label htmlFor="facebook" className="text-sm text-gray-500">Facebook</Label>
                   <Input
                     id="facebook"
                     value={formData.socialMedia?.facebook || ''}
@@ -420,22 +392,36 @@ export default function ContactForm({
                 </div>
               </div>
             </div>
-          </TabsContent>
 
-          {/* Additional Tab */}
-          <TabsContent value="additional" className="space-y-6">
+            {/* Consent Status */}
             <div>
-              <Label htmlFor="notes">Notes</Label>
+              <Label htmlFor="consentStatus" className="text-sm text-gray-500">Consent Status</Label>
+              <Select value={formData.consentStatus} onValueChange={(value) => handleChange('consentStatus', value)}>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="granted">Granted</SelectItem>
+                  <SelectItem value="denied">Denied</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <Label htmlFor="notes" className="text-sm text-gray-500">Notes</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => handleChange('notes', e.target.value)}
-                rows={8}
+                rows={6}
                 placeholder="Additional notes about this contact..."
                 className="mt-1"
               />
             </div>
             
+            {/* Active Status */}
             <div className="flex items-center space-x-2">
               <Switch
                 id="isActive"
@@ -454,7 +440,7 @@ export default function ContactForm({
         </Button>
         <Button 
           type="submit" 
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-orange-600 hover:bg-orange-700"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Saving...' : (mode === 'add' ? 'Add Contact' : 'Save Changes')}
@@ -481,129 +467,106 @@ export default function ContactForm({
         <div className="flex-1 overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="basic" className="flex items-center space-x-2">
                   <User className="w-4 h-4" />
-                  <span>Basic Info</span>
-                </TabsTrigger>
-                <TabsTrigger value="company" className="flex items-center space-x-2">
-                  <Building className="w-4 h-4" />
-                  <span>Company & Address</span>
-                </TabsTrigger>
-                <TabsTrigger value="crm" className="flex items-center space-x-2">
-                  <Tag className="w-4 h-4" />
-                  <span>CRM & Tags</span>
+                  <span>Contact & Company Info</span>
                 </TabsTrigger>
                 <TabsTrigger value="additional" className="flex items-center space-x-2">
                   <FileText className="w-4 h-4" />
-                  <span>Additional</span>
+                  <span>Additional Details</span>
                 </TabsTrigger>
               </TabsList>
 
               <div className="mt-4">
-                {/* Basic Information Tab */}
+                {/* Contact & Company Info Tab */}
                 <TabsContent value="basic" className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="firstName">First Name *</Label>
-                      <Input
-                        id="firstName"
-                        value={formData.firstName}
-                        onChange={(e) => handleChange('firstName', e.target.value)}
-                        className={`mt-1 ${errors.firstName ? 'border-red-500' : ''}`}
-                      />
-                      {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name *</Label>
-                      <Input
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={(e) => handleChange('lastName', e.target.value)}
-                        className={`mt-1 ${errors.lastName ? 'border-red-500' : ''}`}
-                      />
-                      {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleChange('email', e.target.value)}
-                        className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
-                      />
-                      {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => handleChange('phone', e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="stage">Stage</Label>
-                      <Select value={formData.stage} onValueChange={(value) => handleChange('stage', value)}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Lead">Lead</SelectItem>
-                          <SelectItem value="Prospect">Prospect</SelectItem>
-                          <SelectItem value="Customer">Customer</SelectItem>
-                          <SelectItem value="Partner">Partner</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="owner">Owner</Label>
-                      <Select value={formData.owner} onValueChange={(value) => handleChange('owner', value)}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select owner" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {owners.map((owner) => (
-                            <SelectItem key={owner} value={owner}>{owner}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="consentStatus">Consent Status</Label>
-                    <Select value={formData.consentStatus} onValueChange={(value) => handleChange('consentStatus', value)}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="granted">Granted</SelectItem>
-                        <SelectItem value="denied">Denied</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TabsContent>
-
-                {/* Company & Address Tab */}
-                <TabsContent value="company" className="space-y-6">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
-                      <Building className="w-4 h-4 mr-2" />
-                      Company Information
-                    </h4>
+                  {/* Contact Information */}
+                  <div className="border-b pb-6 mb-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
                     <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="company">Company *</Label>
+                        <Label htmlFor="firstName" className="text-sm text-gray-500">First Name <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="firstName"
+                          value={formData.firstName}
+                          onChange={(e) => handleChange('firstName', e.target.value)}
+                          className={`mt-1 ${errors.firstName ? 'border-red-500' : ''}`}
+                        />
+                        {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName" className="text-sm text-gray-500">Last Name <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="lastName"
+                          value={formData.lastName}
+                          onChange={(e) => handleChange('lastName', e.target.value)}
+                          className={`mt-1 ${errors.lastName ? 'border-red-500' : ''}`}
+                        />
+                        {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6 mt-4">
+                      <div>
+                        <Label htmlFor="email" className="text-sm text-gray-500">Email <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleChange('email', e.target.value)}
+                          className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
+                        />
+                        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                      </div>
+                      <div>
+                        <Label htmlFor="phone" className="text-sm text-gray-500">Phone</Label>
+                        <Input
+                          id="phone"
+                          value={formData.phone}
+                          onChange={(e) => handleChange('phone', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6 mt-4">
+                      <div>
+                        <Label htmlFor="stage" className="text-sm text-gray-500">Stage</Label>
+                        <Select value={formData.stage} onValueChange={(value) => handleChange('stage', value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Lead">Lead</SelectItem>
+                            <SelectItem value="Prospect">Prospect</SelectItem>
+                            <SelectItem value="Customer">Customer</SelectItem>
+                            <SelectItem value="Partner">Partner</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="owner" className="text-sm text-gray-500">Owner</Label>
+                        <Select value={formData.owner} onValueChange={(value) => handleChange('owner', value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Select owner" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {owners.map((owner) => (
+                              <SelectItem key={owner} value={owner}>{owner}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Company Information */}
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Company Information</h3>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <Label htmlFor="company" className="text-sm text-gray-500">Company <span className="text-red-500">*</span></Label>
                         <Input
                           id="company"
                           value={formData.company}
@@ -613,7 +576,7 @@ export default function ContactForm({
                         {errors.company && <p className="text-sm text-red-500 mt-1">{errors.company}</p>}
                       </div>
                       <div>
-                        <Label htmlFor="jobTitle">Job Title</Label>
+                        <Label htmlFor="jobTitle" className="text-sm text-gray-500">Job Title</Label>
                         <Input
                           id="jobTitle"
                           value={formData.jobTitle}
@@ -622,67 +585,61 @@ export default function ContactForm({
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      Address Information
-                    </h4>
-                    <div className="space-y-4">
+                    <div className="mt-4">
+                      <Label htmlFor="address" className="text-sm text-gray-500">Address</Label>
+                      <Input
+                        id="address"
+                        value={formData.address}
+                        onChange={(e) => handleChange('address', e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-4 mt-4">
                       <div>
-                        <Label htmlFor="address">Address</Label>
+                        <Label htmlFor="city" className="text-sm text-gray-500">City</Label>
                         <Input
-                          id="address"
-                          value={formData.address}
-                          onChange={(e) => handleChange('address', e.target.value)}
+                          id="city"
+                          value={formData.city}
+                          onChange={(e) => handleChange('city', e.target.value)}
                           className="mt-1"
                         />
                       </div>
-                      <div className="grid grid-cols-4 gap-4">
-                        <div>
-                          <Label htmlFor="city">City</Label>
-                          <Input
-                            id="city"
-                            value={formData.city}
-                            onChange={(e) => handleChange('city', e.target.value)}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="state">State</Label>
-                          <Input
-                            id="state"
-                            value={formData.state}
-                            onChange={(e) => handleChange('state', e.target.value)}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="zipCode">Zip Code</Label>
-                          <Input
-                            id="zipCode"
-                            value={formData.zipCode}
-                            onChange={(e) => handleChange('zipCode', e.target.value)}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="country">Country</Label>
-                          <Input
-                            id="country"
-                            value={formData.country}
-                            onChange={(e) => handleChange('country', e.target.value)}
-                            className="mt-1"
-                          />
-                        </div>
+                      <div>
+                        <Label htmlFor="state" className="text-sm text-gray-500">State</Label>
+                        <Input
+                          id="state"
+                          value={formData.state}
+                          onChange={(e) => handleChange('state', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="zipCode" className="text-sm text-gray-500">Zip Code</Label>
+                        <Input
+                          id="zipCode"
+                          value={formData.zipCode}
+                          onChange={(e) => handleChange('zipCode', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="country" className="text-sm text-gray-500">Country</Label>
+                        <Input
+                          id="country"
+                          value={formData.country}
+                          onChange={(e) => handleChange('country', e.target.value)}
+                          className="mt-1"
+                        />
                       </div>
                     </div>
                   </div>
                 </TabsContent>
 
-                {/* CRM & Tags Tab */}
-                <TabsContent value="crm" className="space-y-6">
+                {/* Additional Details Tab */}
+                <TabsContent value="additional" className="space-y-6">
+                  {/* Tags */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
                       <Tag className="w-4 h-4 mr-2" />
@@ -719,6 +676,7 @@ export default function ContactForm({
                     </div>
                   </div>
 
+                  {/* Social Media */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
                       <Share2 className="w-4 h-4 mr-2" />
@@ -726,7 +684,7 @@ export default function ContactForm({
                     </h4>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label htmlFor="linkedin">LinkedIn</Label>
+                        <Label htmlFor="linkedin" className="text-sm text-gray-500">LinkedIn</Label>
                         <Input
                           id="linkedin"
                           value={formData.socialMedia?.linkedin || ''}
@@ -736,7 +694,7 @@ export default function ContactForm({
                         />
                       </div>
                       <div>
-                        <Label htmlFor="twitter">Twitter</Label>
+                        <Label htmlFor="twitter" className="text-sm text-gray-500">Twitter</Label>
                         <Input
                           id="twitter"
                           value={formData.socialMedia?.twitter || ''}
@@ -746,7 +704,7 @@ export default function ContactForm({
                         />
                       </div>
                       <div>
-                        <Label htmlFor="facebook">Facebook</Label>
+                        <Label htmlFor="facebook" className="text-sm text-gray-500">Facebook</Label>
                         <Input
                           id="facebook"
                           value={formData.socialMedia?.facebook || ''}
@@ -757,22 +715,36 @@ export default function ContactForm({
                       </div>
                     </div>
                   </div>
-                </TabsContent>
 
-                {/* Additional Tab */}
-                <TabsContent value="additional" className="space-y-6">
+                  {/* Consent Status */}
                   <div>
-                    <Label htmlFor="notes">Notes</Label>
+                    <Label htmlFor="consentStatus" className="text-sm text-gray-500">Consent Status</Label>
+                    <Select value={formData.consentStatus} onValueChange={(value) => handleChange('consentStatus', value)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="granted">Granted</SelectItem>
+                        <SelectItem value="denied">Denied</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Notes */}
+                  <div>
+                    <Label htmlFor="notes" className="text-sm text-gray-500">Notes</Label>
                     <Textarea
                       id="notes"
                       value={formData.notes}
                       onChange={(e) => handleChange('notes', e.target.value)}
-                      rows={8}
+                      rows={6}
                       placeholder="Additional notes about this contact..."
                       className="mt-1"
                     />
                   </div>
                   
+                  {/* Active Status */}
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="isActive"
@@ -794,7 +766,7 @@ export default function ContactForm({
           </Button>
           <Button 
             onClick={handleSubmit}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-orange-600 hover:bg-orange-700"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : (mode === 'add' ? 'Add Contact' : 'Save Changes')}

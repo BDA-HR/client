@@ -141,10 +141,10 @@ const QuotationsPage = () => {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      'Approved': 'bg-green-100 text-green-800 border border-green-200',
+      'Approved': 'bg-orange-100 text-orange-800 border border-orange-200',
       'Pending Approval': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
       'Draft': 'bg-gray-100 text-gray-800 border border-gray-200',
-      'Sent': 'bg-blue-100 text-blue-800 border border-blue-200',
+      'Sent': 'bg-orange-100 text-orange-800 border border-orange-200',
       'Accepted': 'bg-purple-100 text-purple-800 border border-purple-200',
       'Rejected': 'bg-red-100 text-red-800 border border-red-200',
     };
@@ -215,14 +215,14 @@ const QuotationsPage = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="flex items-center gap-2"
           >
-            <FileText className="w-6 h-6 text-blue-600" />
+            <FileText className="w-6 h-6 text-orange-600" />
             <h1 className="text-2xl font-bold text-black">
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="inline-block"
               >
-                <span className="bg-linear-to-r from-blue-600 to-blue-600 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-orange-600 to-orange-600 bg-clip-text text-transparent">
                   Quotations 
                 </span>{" "}Management
               </motion.span>
@@ -246,7 +246,7 @@ const QuotationsPage = () => {
               </div>
               <input
                 placeholder="Search Quotations"
-                className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -265,7 +265,7 @@ const QuotationsPage = () => {
           </div>
           <Button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex cursor-pointer items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap w-full sm:w-auto"
+            className="flex cursor-pointer items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white whitespace-nowrap w-full sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Add Quotation
@@ -329,8 +329,8 @@ const QuotationsPage = () => {
                   >
                     <td className="px-4 py-3 align-middle">
                       <div className="flex items-center">
-                        <div className="shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <FileText className="w-5 h-5 text-blue-600" />
+                        <div className="shrink-0 h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-orange-600" />
                         </div>
                         <div className="ml-3">
                           <div className="text-sm font-medium text-gray-900">
@@ -473,7 +473,7 @@ const QuotationsPage = () => {
                       onClick={() => setCurrentPage(page)}
                       className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                         currentPage === page
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                          ? 'z-10 bg-orange-50 border-orange-500 text-orange-600'
                           : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                       }`}
                     >

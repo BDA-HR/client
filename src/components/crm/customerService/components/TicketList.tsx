@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, Edit, MoreHorizontal, Clock, User, Trash2 } from 'lucide-react';
+import { Eye, Edit, MoreHorizontal, Clock, User, Trash2, RefreshCw } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../ui/table';
 import { Badge } from '../../../ui/badge';
@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Pagination } from '../../../ui/pagination';
 import TicketDetailModal from './TicketDetailModal';
 import DeleteTicketModal from './DeleteTicketModal';
+import ChangeTicketStatusModal from './ChangeTicketStatusModal';
 import type { SupportTicket } from '../../../../types/crm';
 
 const statusColors = {
@@ -45,6 +46,8 @@ export default function TicketList({ tickets, onStatusChange, onEdit, onDelete }
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState<SupportTicket | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [ticketToChangeStatus, setTicketToChangeStatus] = useState<SupportTicket | null>(null);
+  const [isChangeStatusModalOpen, setIsChangeStatusModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   
   const itemsPerPage = 10;
@@ -66,6 +69,17 @@ export default function TicketList({ tickets, onStatusChange, onEdit, onDelete }
   const handleDeleteClick = (ticket: SupportTicket) => {
     setTicketToDelete(ticket);
     setIsDeleteModalOpen(true);
+  };
+
+  const handleChangeStatusClick = (ticket: SupportTicket) => {
+    setTicketToChangeStatus(ticket);
+    setIsChangeStatusModalOpen(true);
+  };
+
+  const handleStatusChangeConfirm = (ticketId: string, newStatus: SupportTicket['status'], note?: string) => {
+    onStatusChange(ticketId, newStatus);
+    setIsChangeStatusModalOpen(false);
+    setTicketToChangeStatus(null);
   };
 
   const handleDeleteConfirm = (ticket: SupportTicket) => {
@@ -166,6 +180,10 @@ export default function TicketList({ tickets, onStatusChange, onEdit, onDelete }
                           <Edit className="w-4 h-4 mr-2" />
                           Edit Ticket
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleChangeStatusClick(ticket)}>
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Change Status
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleViewDetails(ticket)}>
                           <Clock className="w-4 h-4 mr-2" />
                           View History
@@ -214,6 +232,17 @@ export default function TicketList({ tickets, onStatusChange, onEdit, onDelete }
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
+      />
+
+      {/* Change Status Modal */}
+      <ChangeTicketStatusModal
+        ticket={ticketToChangeStatus}
+        isOpen={isChangeStatusModalOpen}
+        onClose={() => {
+          setIsChangeStatusModalOpen(false);
+          setTicketToChangeStatus(null);
+        }}
+        onConfirm={handleStatusChangeConfirm}
       />
     </>
   );

@@ -64,11 +64,11 @@ export default function ContactOpportunities({ contactId, hasAccount = false }: 
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case 'Qualification': return 'bg-blue-100 text-blue-800';
+      case 'Qualification': return 'bg-orange-100 text-orange-800';
       case 'Needs Analysis': return 'bg-yellow-100 text-yellow-800';
       case 'Proposal': return 'bg-orange-100 text-orange-800';
       case 'Negotiation': return 'bg-purple-100 text-purple-800';
-      case 'Closed Won': return 'bg-green-100 text-green-800';
+      case 'Closed Won': return 'bg-orange-100 text-orange-800';
       case 'Closed Lost': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -128,7 +128,7 @@ export default function ContactOpportunities({ contactId, hasAccount = false }: 
         {hasAccount ? (
           <Button 
             onClick={() => setIsAddDialogOpen(true)}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-orange-600 hover:bg-orange-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Opportunity
@@ -150,7 +150,7 @@ export default function ContactOpportunities({ contactId, hasAccount = false }: 
 
       {/* Opportunities Table */}
       {opportunities.length === 0 ? (
-        <Card className="border-green-200">
+        <Card className="border-orange-200">
           <CardContent>
             <div className="text-center py-6">
               <DollarSign className="w-10 h-10 text-gray-300 mx-auto mb-3" />
@@ -164,7 +164,7 @@ export default function ContactOpportunities({ contactId, hasAccount = false }: 
               {hasAccount ? (
                 <Button 
                   onClick={() => setIsAddDialogOpen(true)}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-orange-600 hover:bg-orange-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add First Opportunity
@@ -183,7 +183,7 @@ export default function ContactOpportunities({ contactId, hasAccount = false }: 
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-green-200">
+        <Card className="border-orange-200">
           <CardContent>
             <Table>
               <TableHeader>

@@ -188,9 +188,9 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
     >
       {/* Active Timer */}
       {activeTimer && (
-        <Card className="border-blue-200 bg-blue-50">
+        <Card className="border-orange-200 bg-orange-50">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-blue-900">
+            <CardTitle className="flex items-center space-x-2 text-orange-900">
               <Timer className="w-5 h-5" />
               <span>Active Timer</span>
             </CardTitle>
@@ -203,19 +203,19 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
               return (
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-blue-900">{activeEntry.activityTitle}</h4>
-                    <p className="text-sm text-blue-700">Started at {new Date(activeEntry.startTime).toLocaleTimeString()}</p>
+                    <h4 className="font-medium text-orange-900">{activeEntry.activityTitle}</h4>
+                    <p className="text-sm text-orange-700">Started at {new Date(activeEntry.startTime).toLocaleTimeString()}</p>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-blue-900">
+                      <div className="text-2xl font-bold text-orange-900">
                         {formatDuration(getCurrentDuration(activeEntry))}
                       </div>
-                      <div className="text-sm text-blue-700">Running</div>
+                      <div className="text-sm text-orange-700">Running</div>
                     </div>
                     <Button
                       onClick={() => stopTimer(activeTimer)}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-orange-600 hover:bg-orange-700"
                     >
                       <Square className="w-4 h-4 mr-2" />
                       Stop
@@ -232,7 +232,7 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Play className="w-5 h-5 text-blue-600" />
+            <Play className="w-5 h-5 text-orange-600" />
             <span>Quick Start Timer</span>
           </CardTitle>
         </CardHeader>
@@ -251,7 +251,7 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
                   size="sm"
                   onClick={() => startTimer(activity.id, activity.title)}
                   disabled={!!activeTimer}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-orange-600 hover:bg-orange-700"
                 >
                   <Play className="w-4 h-4" />
                 </Button>
@@ -266,7 +266,7 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-orange-600" />
               <span>Time Entries</span>
             </CardTitle>
             <div className="flex space-x-3">
@@ -359,7 +359,7 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
                               hour12: true
                             })
                           ) : (
-                            <span className="text-blue-600">Running...</span>
+                            <span className="text-orange-600">Running...</span>
                           )}
                         </div>
                       </TableCell>
@@ -371,7 +371,7 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
                       <TableCell>
                         {entry.isRunning ? (
                           <div className="flex items-center space-x-2">
-                            <Badge className="bg-blue-100 text-blue-800">
+                            <Badge className="bg-orange-100 text-orange-800">
                               <Timer className="w-3 h-3 mr-1" />
                               Running
                             </Badge>
@@ -384,7 +384,7 @@ export default function TimeTracking({ activities }: TimeTrackingProps) {
                             </Button>
                           </div>
                         ) : (
-                          <Badge className="bg-green-100 text-green-800">
+                          <Badge className="bg-orange-100 text-orange-800">
                             Completed
                           </Badge>
                         )}

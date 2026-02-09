@@ -163,7 +163,7 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
         </div>
         <Button
           onClick={() => setIsAddDialogOpen(true)}
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-orange-600 hover:bg-orange-700"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Note
@@ -173,7 +173,7 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
       {/* Notes List */}
       <div className="space-y-3">
         {notes.length === 0 ? (
-          <Card className="border-green-200">
+          <Card className="border-orange-200">
             <CardContent>
               <div className="text-center py-6">
                 <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-3" />
@@ -185,7 +185,7 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
                 </p>
                 <Button
                   onClick={() => setIsAddDialogOpen(true)}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-orange-600 hover:bg-orange-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add First Note
@@ -202,7 +202,7 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
               transition={{ delay: index * 0.1 }}
             >
               <Card
-                className={`border-green-200 hover:shadow-md transition-shadow ${
+                className={`border-orange-200 hover:shadow-md transition-shadow ${
                   note.isPrivate ? "bg-yellow-50 border-yellow-200" : ""
                 }`}
               >
@@ -318,7 +318,7 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
               </Button>
               <Button
                 onClick={handleAddNote}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-orange-600 hover:bg-orange-700"
               >
                 Add Note
               </Button>
@@ -372,7 +372,7 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
               </Button>
               <Button
                 onClick={handleEditNote}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-orange-600 hover:bg-orange-700"
               >
                 Update Note
               </Button>

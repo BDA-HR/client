@@ -91,7 +91,7 @@ export default function ActivityManagement() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 cursor-pointer border-blue-300 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
+            className="gap-2 cursor-pointer border-orange-300 text-orange-700 hover:bg-orange-100 hover:text-orange-800"
             onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')}
           >
             {viewMode === 'list' ? (
@@ -113,7 +113,7 @@ export default function ActivityManagement() {
               onClick={() => setSecondaryView(secondaryView === 'time' ? null : 'time')}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                 secondaryView === 'time' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-orange-600 shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -124,7 +124,7 @@ export default function ActivityManagement() {
               onClick={() => setSecondaryView(secondaryView === 'notifications' ? null : 'notifications')}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                 secondaryView === 'notifications' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
+                  ? 'bg-white text-orange-600 shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -135,7 +135,7 @@ export default function ActivityManagement() {
 
           <Button 
             onClick={() => setIsAddDialogOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-orange-600 hover:bg-orange-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Activity

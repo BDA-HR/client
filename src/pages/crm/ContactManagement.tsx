@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../layout/layout';
 import { mockContacts } from '../../data/crmMockData';
 import ContactList from '../../components/crm/contactManagement/components/ContactList';
-import ContactForm from '../../components/crm/contactManagement/components/ContactForm';
 import ContactFilters from '../../components/crm/contactManagement/components/ContactFilters';
 import type { Contact } from '../../types/crm';
 
@@ -32,9 +31,6 @@ export default function ContactManagement() {
     owner: 'all',
     dateRange: 'all'
   });
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
 
   // Load contacts from localStorage on component mount
@@ -154,23 +150,6 @@ export default function ContactManagement() {
     showToast.success('Contact added successfully');
   };
 
-  const handleEditContact = (contactData: Partial<Contact>) => {
-    if (selectedContact) {
-      const updatedContacts = contacts.map(contact => 
-        contact.id === selectedContact.id 
-          ? { ...contact, ...contactData, updatedAt: new Date().toISOString() }
-          : contact
-      );
-      setContacts(updatedContacts);
-      
-      // Save to localStorage
-      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-      
-      setSelectedContact(null);
-      showToast.success('Contact updated successfully');
-    }
-  };
-
   const handleDeleteContact = (contactId: string) => {
     // Soft delete - mark as inactive instead of removing
     const updatedContacts = contacts.map(contact => 
@@ -262,7 +241,7 @@ export default function ContactManagement() {
         </div>
         <Button 
           onClick={() => navigate('/crm/contacts/add')}
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-orange-600 hover:bg-orange-700"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Contact
@@ -281,35 +260,11 @@ export default function ContactManagement() {
       {/* Contacts List */}
       <ContactList
         contacts={filteredContacts}
-        onEdit={(contact) => {
-          setSelectedContact(contact);
-          setIsEditDialogOpen(true);
-        }}
         onDelete={handleDeleteContact}
         onBulkAction={handleBulkAction}
         selectedContacts={selectedContacts}
         onSelectContact={handleSelectContact}
         onSelectAll={handleSelectAll}
-      />
-
-      {/* Add Contact Form */}
-      <ContactForm
-        isOpen={isAddDialogOpen}
-        onClose={() => setIsAddDialogOpen(false)}
-        onSubmit={handleAddContact}
-        mode="add"
-      />
-
-      {/* Edit Contact Form */}
-      <ContactForm
-        contact={selectedContact}
-        isOpen={isEditDialogOpen}
-        onClose={() => {
-          setIsEditDialogOpen(false);
-          setSelectedContact(null);
-        }}
-        onSubmit={handleEditContact}
-        mode="edit"
       />
     </motion.div>
   );

@@ -131,8 +131,8 @@ export default function AddSMSCampaignModal({
     if (!formData.campaignId) {
       newErrors.campaignId = 'Campaign is required';
     }
-    if (!formData.templateId) {
-      newErrors.templateId = 'SMS template is required';
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
     }
     if (formData.message.length > maxCharacters) {
       newErrors.message = `Message exceeds ${maxCharacters} characters`;
@@ -235,10 +235,10 @@ export default function AddSMSCampaignModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <MessageSquare className="w-5 h-5 text-green-600" />
+            <MessageSquare className="w-5 h-5 text-orange-600" />
             <span>{editingCampaign ? 'Edit SMS Campaign' : 'Create New SMS Campaign'}</span>
           </DialogTitle>
         </DialogHeader>
@@ -252,6 +252,7 @@ export default function AddSMSCampaignModal({
           >
             {/* Left Column */}
             <div className="space-y-4">
+              {/* Campaign Selection */}
               <div>
                 <Label htmlFor="campaignId">Campaign *</Label>
                 <Select value={formData.campaignId} onValueChange={(value) => handleChange('campaignId', value)}>
@@ -276,11 +277,30 @@ export default function AddSMSCampaignModal({
                 )}
               </div>
 
+              {/* Message Field - Always visible */}
               <div>
-                <Label htmlFor="templateId">SMS Template *</Label>
+                <Label htmlFor="message">Message *</Label>
+                <Textarea
+                  id="message"
+                  value={formData.message}
+                  onChange={(e) => handleChange('message', e.target.value)}
+                  placeholder="Type your SMS message here..."
+                  rows={10}
+                  maxLength={160}
+                  className={`mt-1 ${errors.message ? 'border-red-500' : ''}`}
+                />
+                <p className={`text-sm mt-1 ${characterCount > maxCharacters ? 'text-red-500' : 'text-gray-500'}`}>
+                  {characterCount}/{maxCharacters} characters
+                </p>
+                {errors.message && <p className="text-sm text-red-500 mt-1">{errors.message}</p>}
+              </div>
+
+              {/* Template Selection - Optional */}
+              <div>
+                <Label htmlFor="templateId">SMS Template (Optional)</Label>
                 <Select value={formData.templateId} onValueChange={(value) => handleChange('templateId', value)}>
-                  <SelectTrigger className={`mt-1 ${errors.templateId ? 'border-red-500' : ''}`}>
-                    <SelectValue placeholder="Select SMS template" />
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select SMS template to auto-fill" />
                   </SelectTrigger>
                   <SelectContent>
                     {smsTemplates.map(template => (
@@ -288,19 +308,114 @@ export default function AddSMSCampaignModal({
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.templateId && <p className="text-sm text-red-500 mt-1">{errors.templateId}</p>}
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-4">
+              {/* Target Audience */}
+              <div>
+                <Label htmlFor="targetType">Target Type *</Label>
+                <Select 
+                  value={formData.targetType} 
+                  onValueChange={(value) => {
+                    handleChange('targetType', value);
+                    handleChange('selectedRecipients', []);
+                    handleChange('sendToAll', false);
+                  }}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {targetTypeOptions.map(type => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {formData.templateId && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <Label className="text-sm font-medium">Message Preview:</Label>
-                  <p className="text-sm text-gray-700 mt-2">{formData.message}</p>
-                  <p className={`text-sm mt-2 ${characterCount > maxCharacters ? 'text-red-500' : 'text-gray-500'}`}>
-                    {characterCount}/{maxCharacters} characters
+              <div>
+                <Label htmlFor="recipients">Select Recipients *</Label>
+                <Select
+                  value={formData.sendToAll ? 'all' : ''}
+                  onValueChange={(value) => {
+                    if (value === 'all') {
+                      handleChange('sendToAll', true);
+                      handleChange('selectedRecipients', []);
+                    } else {
+                      handleChange('sendToAll', false);
+                      handleRecipientToggle(value);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder={
+                      formData.sendToAll 
+                        ? `All ${formData.targetType}` 
+                        : formData.selectedRecipients.length > 0
+                        ? `${formData.selectedRecipients.length} selected`
+                        : 'Select recipients'
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={formData.sendToAll}
+                          onCheckedChange={(checked) => {
+                            handleChange('sendToAll', checked);
+                            if (checked) {
+                              handleChange('selectedRecipients', []);
+                            }
+                          }}
+                          className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                        />
+                        <span className="font-medium">Select All {formData.targetType}</span>
+                      </div>
+                    </SelectItem>
+                    {getRecipientList().length === 0 ? (
+                      <SelectItem value="none" disabled>
+                        No {formData.targetType.toLowerCase()} available
+                      </SelectItem>
+                    ) : (
+                      getRecipientList().map((recipient: any) => (
+                        <SelectItem key={recipient.id} value={recipient.id}>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={formData.selectedRecipients.includes(recipient.id)}
+                              onCheckedChange={() => {
+                                handleChange('sendToAll', false);
+                                handleRecipientToggle(recipient.id);
+                              }}
+                              className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                            />
+                            <div className="flex-1">
+                              <div className="font-medium text-sm">
+                                {recipient.firstName} {recipient.lastName}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {recipient.phone || recipient.email}
+                                {recipient.company && ` • ${recipient.company}`}
+                              </div>
+                            </div>
+                          </div>
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {errors.selectedRecipients && (
+                  <p className="text-sm text-red-500 mt-1">{errors.selectedRecipients}</p>
+                )}
+                {(formData.sendToAll || formData.selectedRecipients.length > 0) && (
+                  <p className="text-sm text-orange-600 mt-1 font-medium">
+                    ✓ {formData.sendToAll ? `All ${formData.targetType}` : `${formData.selectedRecipients.length} recipient(s)`} selected
                   </p>
-                </div>
-              )}
+                )}
+              </div>
 
+              {/* Status and Schedule */}
               <div>
                 <Label htmlFor="status">Status</Label>
                 <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
@@ -327,78 +442,6 @@ export default function AddSMSCampaignModal({
                 {errors.scheduledDate && <p className="text-sm text-red-500 mt-1">{errors.scheduledDate}</p>}
               </div>
             </div>
-
-            {/* Right Column - Target Audience */}
-            <div className="space-y-4">
-              <div className="border rounded-lg p-4">
-                <h3 className="font-medium mb-3">Target Audience</h3>
-                <div className="flex items-center space-x-2 mb-3">
-                  <Checkbox
-                    id="sendToAll"
-                    checked={formData.sendToAll}
-                    onCheckedChange={(checked) => handleChange('sendToAll', checked)}
-                  />
-                  <Label htmlFor="sendToAll" className="cursor-pointer">
-                    Send to All {formData.targetType}
-                  </Label>
-                </div>
-
-                {!formData.sendToAll && (
-                  <div className="space-y-3">
-                    <div>
-                      <Label htmlFor="targetType">Target Type</Label>
-                      <Select 
-                        value={formData.targetType} 
-                        onValueChange={(value) => {
-                          handleChange('targetType', value);
-                          handleChange('selectedRecipients', []);
-                        }}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {targetTypeOptions.map(type => (
-                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label>Select Recipients *</Label>
-                      <div className="mt-2 border rounded-lg p-3 max-h-64 overflow-y-auto space-y-2">
-                        {getRecipientList().length === 0 ? (
-                          <p className="text-sm text-gray-500">No {formData.targetType.toLowerCase()} available</p>
-                        ) : (
-                          getRecipientList().map((recipient: any) => (
-                            <div key={recipient.id} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`recipient-${recipient.id}`}
-                                checked={formData.selectedRecipients.includes(recipient.id)}
-                                onCheckedChange={() => handleRecipientToggle(recipient.id)}
-                              />
-                              <Label htmlFor={`recipient-${recipient.id}`} className="cursor-pointer flex-1 text-sm">
-                                {recipient.firstName} {recipient.lastName} - {recipient.phone || recipient.email}
-                                {recipient.company && ` (${recipient.company})`}
-                              </Label>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                      {errors.selectedRecipients && (
-                        <p className="text-sm text-red-500 mt-1">{errors.selectedRecipients}</p>
-                      )}
-                      {!formData.sendToAll && formData.selectedRecipients.length > 0 && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          {formData.selectedRecipients.length} recipient(s) selected
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
           </motion.form>
         </div>
 
@@ -409,7 +452,7 @@ export default function AddSMSCampaignModal({
           </Button>
           <Button
             onClick={handleSubmit}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-orange-600 hover:bg-orange-700"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

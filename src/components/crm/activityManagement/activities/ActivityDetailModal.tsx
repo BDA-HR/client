@@ -8,8 +8,8 @@ import type { Activity } from '../../../../types/crm';
 
 const statusColors = {
   'Pending': 'bg-yellow-100 text-yellow-800',
-  'In Progress': 'bg-blue-100 text-blue-800',
-  'Completed': 'bg-green-100 text-green-800',
+  'In Progress': 'bg-orange-100 text-orange-800',
+  'Completed': 'bg-orange-100 text-orange-800',
   'Cancelled': 'bg-red-100 text-red-800'
 };
 
@@ -117,7 +117,7 @@ export default function ActivityDetailModal({ activity, isOpen, onClose }: Activ
                     <div>
                       <Label className="text-xs text-gray-500">Completed</Label>
                       <div className="flex items-center space-x-2 mt-1">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-orange-500" />
                         <span className="text-sm">{new Date(activity.completedDate).toLocaleString()}</span>
                       </div>
                     </div>
@@ -129,10 +129,10 @@ export default function ActivityDetailModal({ activity, isOpen, onClose }: Activ
               {activity.reminder && (
                 <div>
                   <Label className="text-xs text-gray-500 mb-2 block">Reminder</Label>
-                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
                     <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-blue-600" />
-                      <span className="text-sm text-blue-900">
+                      <Clock className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm text-orange-900">
                         {activity.reminderTime 
                           ? new Date(activity.reminderTime).toLocaleString()
                           : 'Reminder set'}
@@ -173,7 +173,7 @@ export default function ActivityDetailModal({ activity, isOpen, onClose }: Activ
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">Status Timeline</h4>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2 text-sm">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                     <span className="text-gray-600">Created:</span>
                     <span className="text-gray-900">{new Date(activity.createdAt).toLocaleDateString()}</span>
                   </div>
@@ -184,7 +184,7 @@ export default function ActivityDetailModal({ activity, isOpen, onClose }: Activ
                   </div>
                   {activity.completedDate && (
                     <div className="flex items-center space-x-2 text-sm">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                       <span className="text-gray-600">Completed:</span>
                       <span className="text-gray-900">{new Date(activity.completedDate).toLocaleDateString()}</span>
                     </div>

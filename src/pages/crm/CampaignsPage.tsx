@@ -105,7 +105,7 @@ export default function CampaignsPage() {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-purple-600 hover:bg-purple-700"
+          className="bg-orange-600 hover:bg-orange-700"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Campaign
@@ -125,7 +125,7 @@ export default function CampaignsPage() {
             <p className="text-gray-500 mb-4">Get started by creating your first campaign.</p>
             <Button 
               onClick={() => setIsModalOpen(true)}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-orange-600 hover:bg-orange-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Campaign
@@ -216,7 +216,7 @@ export default function CampaignsPage() {
                         onClick={() => setCurrentPage(page)}
                         className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                           currentPage === page
-                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            ? 'z-10 bg-orange-50 border-orange-500 text-orange-600'
                             : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                         }`}
                       >
@@ -248,7 +248,7 @@ export default function CampaignsPage() {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="campaignName">Campaign Name *</Label>
               <Input
                 id="campaignName"
@@ -266,7 +266,7 @@ export default function CampaignsPage() {
               <Button type="button" variant="outline" onClick={handleCloseModal}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
+              <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
                 {editingCampaign ? 'Update' : 'Create'} Campaign
               </Button>
             </div>

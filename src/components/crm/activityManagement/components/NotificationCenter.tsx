@@ -228,7 +228,7 @@ export default function NotificationCenter({ activities }: NotificationCenterPro
   const getNotificationColor = (type: Notification['type'], priority: Notification['priority']) => {
     if (type === 'overdue') return 'border-l-red-500 bg-red-50';
     if (priority === 'high') return 'border-l-orange-500 bg-orange-50';
-    if (priority === 'medium') return 'border-l-blue-500 bg-blue-50';
+    if (priority === 'medium') return 'border-l-orange-500 bg-orange-50';
     return 'border-l-gray-500 bg-gray-50';
   };
 
@@ -287,7 +287,7 @@ export default function NotificationCenter({ activities }: NotificationCenterPro
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Settings className="w-5 h-5 text-blue-600" />
+              <Settings className="w-5 h-5 text-orange-600" />
               <span>Notification Settings</span>
             </CardTitle>
           </CardHeader>
@@ -380,7 +380,7 @@ export default function NotificationCenter({ activities }: NotificationCenterPro
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Bell className="w-5 h-5 text-blue-600" />
+            <Bell className="w-5 h-5 text-orange-600" />
             <span>Notifications</span>
             {unreadCount > 0 && (
               <Badge className="bg-red-100 text-red-800">{unreadCount} unread</Badge>
@@ -413,13 +413,13 @@ export default function NotificationCenter({ activities }: NotificationCenterPro
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                             notification.type === 'overdue' ? 'bg-red-100' :
                             notification.priority === 'high' ? 'bg-orange-100' :
-                            notification.priority === 'medium' ? 'bg-blue-100' :
+                            notification.priority === 'medium' ? 'bg-orange-100' :
                             'bg-gray-100'
                           }`}>
                             <NotificationIcon className={`w-4 h-4 ${
                               notification.type === 'overdue' ? 'text-red-600' :
                               notification.priority === 'high' ? 'text-orange-600' :
-                              notification.priority === 'medium' ? 'text-blue-600' :
+                              notification.priority === 'medium' ? 'text-orange-600' :
                               'text-gray-600'
                             }`} />
                           </div>
@@ -428,7 +428,7 @@ export default function NotificationCenter({ activities }: NotificationCenterPro
                             <div className="flex items-center space-x-2">
                               <h4 className="font-medium text-gray-900">{notification.title}</h4>
                               {!notification.isRead && (
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
                               )}
                               <Badge variant="outline" className="text-xs capitalize">
                                 {notification.type}

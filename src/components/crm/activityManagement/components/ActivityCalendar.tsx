@@ -108,8 +108,8 @@ export default function ActivityCalendar({ activities, onStatusChange, onEdit, o
     if (isOverdue) return 'bg-red-100 text-red-800 border-red-200';
     
     switch (activity.status) {
-      case 'Completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'In Progress': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Completed': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'In Progress': return 'bg-orange-100 text-orange-800 border-orange-200';
       case 'Cancelled': return 'bg-gray-100 text-gray-800 border-gray-200';
       default: return 'bg-orange-100 text-orange-800 border-orange-200';
     }
@@ -202,14 +202,14 @@ export default function ActivityCalendar({ activities, onStatusChange, onEdit, o
                           : 'bg-gray-50 border-gray-100'
                       } ${
                         day.isToday 
-                          ? 'ring-2 ring-blue-500 ring-opacity-50' 
+                          ? 'ring-2 ring-orange-500 ring-opacity-50' 
                           : ''
                       }`}
                     >
                       <div className={`text-sm font-medium mb-2 ${
                         day.isCurrentMonth 
                           ? day.isToday 
-                            ? 'text-blue-600' 
+                            ? 'text-orange-600' 
                             : 'text-gray-900'
                           : 'text-gray-400'
                       }`}>
@@ -280,7 +280,7 @@ export default function ActivityCalendar({ activities, onStatusChange, onEdit, o
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Calendar className="w-5 h-5 text-blue-600" />
+            <Calendar className="w-5 h-5 text-orange-600" />
             <span>Today's Activities</span>
           </CardTitle>
         </CardHeader>

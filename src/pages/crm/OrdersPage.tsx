@@ -119,10 +119,10 @@ const OrdersPage = () => {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      'Confirmed': 'bg-blue-100 text-blue-800 border border-blue-200',
+      'Confirmed': 'bg-orange-100 text-orange-800 border border-orange-200',
       'In Production': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-      'Shipped': 'bg-green-100 text-green-800 border border-green-200',
-      'Delivered': 'bg-green-100 text-green-800 border border-green-200',
+      'Shipped': 'bg-orange-100 text-orange-800 border border-orange-200',
+      'Delivered': 'bg-orange-100 text-orange-800 border border-orange-200',
       'Cancelled': 'bg-red-100 text-red-800 border border-red-200',
     };
     return colors[status] || 'bg-gray-100 text-gray-800 border border-gray-200';
@@ -132,7 +132,7 @@ const OrdersPage = () => {
     const colors: Record<string, string> = {
       'High': 'bg-red-100 text-red-800',
       'Medium': 'bg-yellow-100 text-yellow-800',
-      'Low': 'bg-green-100 text-green-800',
+      'Low': 'bg-orange-100 text-orange-800',
     };
     return colors[priority] || 'bg-gray-100 text-gray-800';
   };
@@ -202,14 +202,14 @@ const OrdersPage = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="flex items-center gap-2"
           >
-            <ShoppingCart className="w-6 h-6 text-green-600" />
+            <ShoppingCart className="w-6 h-6 text-orange-600" />
             <h1 className="text-2xl font-bold text-black">
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="inline-block"
               >
-                <span className="bg-linear-to-r from-green-600 to-green-600 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-orange-600 to-orange-600 bg-clip-text text-transparent">
                   Orders 
                 </span>{" "}Management
               </motion.span>
@@ -233,7 +233,7 @@ const OrdersPage = () => {
               </div>
               <input
                 placeholder="Search Orders"
-                className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -252,7 +252,7 @@ const OrdersPage = () => {
           </div>
           <Button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex cursor-pointer items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap w-full sm:w-auto"
+            className="flex cursor-pointer items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white whitespace-nowrap w-full sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Add Order
@@ -319,8 +319,8 @@ const OrdersPage = () => {
                   >
                     <td className="px-4 py-3 align-middle">
                       <div className="flex items-center">
-                        <div className="shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                          <ShoppingCart className="w-5 h-5 text-green-600" />
+                        <div className="shrink-0 h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                          <ShoppingCart className="w-5 h-5 text-orange-600" />
                         </div>
                         <div className="ml-3">
                           <div className="text-sm font-medium text-gray-900">
@@ -372,7 +372,7 @@ const OrdersPage = () => {
                       <div className="flex items-center justify-center">
                         <div className="w-16 bg-gray-200 rounded-full h-2">
                           <div
-                            className="bg-green-600 h-2 rounded-full"
+                            className="bg-orange-600 h-2 rounded-full"
                             style={{ width: `${order.progress}%` }}
                           ></div>
                         </div>
@@ -475,7 +475,7 @@ const OrdersPage = () => {
                       onClick={() => setCurrentPage(page)}
                       className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                         currentPage === page
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                          ? 'z-10 bg-orange-50 border-orange-500 text-orange-600'
                           : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                       }`}
                     >

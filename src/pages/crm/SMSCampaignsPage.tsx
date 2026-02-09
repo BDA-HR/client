@@ -77,8 +77,8 @@ export default function SMSCampaignsPage() {
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       'Draft': 'bg-gray-100 text-gray-800',
-      'Scheduled': 'bg-blue-100 text-blue-800',
-      'Sent': 'bg-green-100 text-green-800',
+      'Scheduled': 'bg-orange-100 text-orange-800',
+      'Sent': 'bg-orange-100 text-orange-800',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
@@ -109,7 +109,7 @@ export default function SMSCampaignsPage() {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-orange-600 hover:bg-orange-700"
         >
           <Plus className="w-4 h-4 mr-2" />
           New SMS Campaign
@@ -129,7 +129,7 @@ export default function SMSCampaignsPage() {
             <p className="text-gray-500 mb-4">Get started by creating your first SMS campaign.</p>
             <Button 
               onClick={() => setIsModalOpen(true)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-orange-600 hover:bg-orange-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create SMS Campaign

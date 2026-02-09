@@ -11,6 +11,7 @@ import ContactActivities from '../../components/crm/contactManagement/components
 import ContactOpportunities from '../../components/crm/contactManagement/components/ContactOpportunities';
 import ContactNotes from '../../components/crm/contactManagement/components/ContactNotes';
 import ContactForm from '../../components/crm/contactManagement/components/ContactForm';
+import ContactEmailModal from '../../components/crm/contactManagement/components/ContactEmailModal';
 import AccountForm from '../../components/crm/accountManagement/components/AccountForm';
 import type { Contact, Account } from '../../types/crm';
 
@@ -19,6 +20,7 @@ export default function ContactDetailPage() {
   const navigate = useNavigate();
   const [contact, setContact] = useState<Contact | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -89,6 +91,12 @@ export default function ContactDetailPage() {
       
       showToast.success('Contact updated successfully');
     }
+  };
+
+  const handleEmailSent = (emailData: { subject: string; message: string }) => {
+    // In a real app, this would send the email via API
+    console.log('Email sent:', emailData);
+    showToast.success('Email sent successfully');
   };
 
   const handleCreateAccount = () => {
@@ -162,7 +170,7 @@ export default function ContactDetailPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading contact...</p>
         </div>
       </div>
@@ -183,7 +191,7 @@ export default function ContactDetailPage() {
             variant="ghost"
             size="sm"
             onClick={() => navigate('/crm/contacts')}
-            className="hover:bg-green-50"
+            className="hover:bg-orange-50"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Contacts
@@ -208,7 +216,7 @@ export default function ContactDetailPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`mailto:${contact.email}`, '_self')}
+            onClick={() => setIsEmailModalOpen(true)}
           >
             <Mail className="w-4 h-4 mr-2" />
             Email
@@ -217,20 +225,13 @@ export default function ContactDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+              className="bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200"
               onClick={() => handleCreateAccount()}
             >
               <Building className="w-4 h-4 mr-2" />
               Create Account
             </Button>
           )}
-          <Button
-            onClick={() => setIsEditDialogOpen(true)}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Edit Contact
-          </Button>
         </div>
       </div>
 
@@ -369,23 +370,23 @@ export default function ContactDetailPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex ">
-        <TabsList className="bg-green-50 gap-5 border border-gray-200">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
+        <TabsList className="bg-orange-50 gap-5 border border-gray-200">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
             Overview
           </TabsTrigger>
-          <TabsTrigger value="activities" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
+          <TabsTrigger value="activities" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
             Activities
           </TabsTrigger>
-          <TabsTrigger value="opportunities" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
+          <TabsTrigger value="opportunities" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
             Opportunities
           </TabsTrigger>
-          <TabsTrigger value="notes" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
+          <TabsTrigger value="notes" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
             Notes
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <ContactOverview contact={contact} />
+          <ContactOverview contact={contact} onEdit={() => setIsEditDialogOpen(true)} />
         </TabsContent>
 
         <TabsContent value="activities" className="space-y-6">
@@ -400,6 +401,14 @@ export default function ContactDetailPage() {
           <ContactNotes contactId={contact.id} />
         </TabsContent>
       </Tabs>
+
+      {/* Email Modal */}
+      <ContactEmailModal
+        contact={contact}
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        onEmailSent={handleEmailSent}
+      />
 
       {/* Edit Contact Form */}
       <ContactForm

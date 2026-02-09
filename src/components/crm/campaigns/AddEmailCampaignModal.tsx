@@ -136,8 +136,11 @@ export default function AddEmailCampaignModal({
     if (!formData.campaignId) {
       newErrors.campaignId = 'Campaign is required';
     }
-    if (!formData.templateId) {
-      newErrors.templateId = 'Email template is required';
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    }
+    if (!formData.body.trim()) {
+      newErrors.body = 'Message is required';
     }
     if (!formData.sendToAll && formData.selectedRecipients.length === 0) {
       newErrors.selectedRecipients = 'Please select at least one recipient';
@@ -235,10 +238,10 @@ export default function AddEmailCampaignModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <Mail className="w-5 h-5 text-blue-600" />
+            <Mail className="w-5 h-5 text-orange-600" />
             <span>{editingCampaign ? 'Edit Email Campaign' : 'Create New Email Campaign'}</span>
           </DialogTitle>
         </DialogHeader>
@@ -252,6 +255,7 @@ export default function AddEmailCampaignModal({
           >
             {/* Left Column */}
             <div className="space-y-4">
+              {/* Campaign Selection */}
               <div>
                 <Label htmlFor="campaignId">Campaign *</Label>
                 <Select value={formData.campaignId} onValueChange={(value) => handleChange('campaignId', value)}>
@@ -276,11 +280,49 @@ export default function AddEmailCampaignModal({
                 )}
               </div>
 
+              {/* Email Content Fields - Always visible */}
               <div>
-                <Label htmlFor="templateId">Email Template *</Label>
+                <Label htmlFor="subject">Subject *</Label>
+                <Input
+                  id="subject"
+                  value={formData.subject}
+                  onChange={(e) => handleChange('subject', e.target.value)}
+                  placeholder="Email subject"
+                  className={`mt-1 ${errors.subject ? 'border-red-500' : ''}`}
+                />
+                {errors.subject && <p className="text-sm text-red-500 mt-1">{errors.subject}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="previewText">Preview Text</Label>
+                <Input
+                  id="previewText"
+                  value={formData.previewText}
+                  onChange={(e) => handleChange('previewText', e.target.value)}
+                  placeholder="Preview text shown in inbox"
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="body">Message *</Label>
+                <Textarea
+                  id="body"
+                  value={formData.body}
+                  onChange={(e) => handleChange('body', e.target.value)}
+                  placeholder="Type your email message here..."
+                  rows={8}
+                  className={`mt-1 ${errors.body ? 'border-red-500' : ''}`}
+                />
+                {errors.body && <p className="text-sm text-red-500 mt-1">{errors.body}</p>}
+              </div>
+
+              {/* Template Selection - Optional */}
+              <div>
+                <Label htmlFor="templateId">Email Template (Optional)</Label>
                 <Select value={formData.templateId} onValueChange={(value) => handleChange('templateId', value)}>
-                  <SelectTrigger className={`mt-1 ${errors.templateId ? 'border-red-500' : ''}`}>
-                    <SelectValue placeholder="Select email template" />
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select email template to auto-fill" />
                   </SelectTrigger>
                   <SelectContent>
                     {emailTemplates.map(template => (
@@ -288,26 +330,114 @@ export default function AddEmailCampaignModal({
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.templateId && <p className="text-sm text-red-500 mt-1">{errors.templateId}</p>}
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-4">
+              {/* Target Audience */}
+              <div>
+                <Label htmlFor="targetType">Target Type *</Label>
+                <Select 
+                  value={formData.targetType} 
+                  onValueChange={(value) => {
+                    handleChange('targetType', value);
+                    handleChange('selectedRecipients', []);
+                    handleChange('sendToAll', false);
+                  }}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {targetTypeOptions.map(type => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {formData.templateId && (
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                  <div>
-                    <Label className="text-sm font-medium">Subject Preview:</Label>
-                    <p className="text-sm text-gray-700">{formData.subject}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Preview Text:</Label>
-                    <p className="text-sm text-gray-700">{formData.previewText}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Body Preview:</Label>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap max-h-32 overflow-y-auto">{formData.body}</p>
-                  </div>
-                </div>
-              )}
+              <div>
+                <Label htmlFor="recipients">Select Recipients *</Label>
+                <Select
+                  value={formData.sendToAll ? 'all' : ''}
+                  onValueChange={(value) => {
+                    if (value === 'all') {
+                      handleChange('sendToAll', true);
+                      handleChange('selectedRecipients', []);
+                    } else {
+                      handleChange('sendToAll', false);
+                      handleRecipientToggle(value);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder={
+                      formData.sendToAll 
+                        ? `All ${formData.targetType}` 
+                        : formData.selectedRecipients.length > 0
+                        ? `${formData.selectedRecipients.length} selected`
+                        : 'Select recipients'
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={formData.sendToAll}
+                          onCheckedChange={(checked) => {
+                            handleChange('sendToAll', checked);
+                            if (checked) {
+                              handleChange('selectedRecipients', []);
+                            }
+                          }}
+                          className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                        />
+                        <span className="font-medium">Select All {formData.targetType}</span>
+                      </div>
+                    </SelectItem>
+                    {getRecipientList().length === 0 ? (
+                      <SelectItem value="none" disabled>
+                        No {formData.targetType.toLowerCase()} available
+                      </SelectItem>
+                    ) : (
+                      getRecipientList().map((recipient: any) => (
+                        <SelectItem key={recipient.id} value={recipient.id}>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={formData.selectedRecipients.includes(recipient.id)}
+                              onCheckedChange={() => {
+                                handleChange('sendToAll', false);
+                                handleRecipientToggle(recipient.id);
+                              }}
+                              className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                            />
+                            <div className="flex-1">
+                              <div className="font-medium text-sm">
+                                {recipient.firstName} {recipient.lastName}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {recipient.email}
+                                {recipient.company && ` • ${recipient.company}`}
+                              </div>
+                            </div>
+                          </div>
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {errors.selectedRecipients && (
+                  <p className="text-sm text-red-500 mt-1">{errors.selectedRecipients}</p>
+                )}
+                {(formData.sendToAll || formData.selectedRecipients.length > 0) && (
+                  <p className="text-sm text-orange-600 mt-1 font-medium">
+                    ✓ {formData.sendToAll ? `All ${formData.targetType}` : `${formData.selectedRecipients.length} recipient(s)`} selected
+                  </p>
+                )}
+              </div>
 
+              {/* Status and Schedule */}
               <div>
                 <Label htmlFor="status">Status</Label>
                 <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
@@ -334,78 +464,6 @@ export default function AddEmailCampaignModal({
                 {errors.scheduledDate && <p className="text-sm text-red-500 mt-1">{errors.scheduledDate}</p>}
               </div>
             </div>
-
-            {/* Right Column - Target Audience */}
-            <div className="space-y-4">
-              <div className="border rounded-lg p-4">
-                <h3 className="font-medium mb-3">Target Audience</h3>
-                <div className="flex items-center space-x-2 mb-3">
-                  <Checkbox
-                    id="sendToAll"
-                    checked={formData.sendToAll}
-                    onCheckedChange={(checked) => handleChange('sendToAll', checked)}
-                  />
-                  <Label htmlFor="sendToAll" className="cursor-pointer">
-                    Send to All {formData.targetType}
-                  </Label>
-                </div>
-
-                {!formData.sendToAll && (
-                  <div className="space-y-3">
-                    <div>
-                      <Label htmlFor="targetType">Target Type</Label>
-                      <Select 
-                        value={formData.targetType} 
-                        onValueChange={(value) => {
-                          handleChange('targetType', value);
-                          handleChange('selectedRecipients', []);
-                        }}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {targetTypeOptions.map(type => (
-                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label>Select Recipients *</Label>
-                      <div className="mt-2 border rounded-lg p-3 max-h-64 overflow-y-auto space-y-2">
-                        {getRecipientList().length === 0 ? (
-                          <p className="text-sm text-gray-500">No {formData.targetType.toLowerCase()} available</p>
-                        ) : (
-                          getRecipientList().map((recipient: any) => (
-                            <div key={recipient.id} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`recipient-${recipient.id}`}
-                                checked={formData.selectedRecipients.includes(recipient.id)}
-                                onCheckedChange={() => handleRecipientToggle(recipient.id)}
-                              />
-                              <Label htmlFor={`recipient-${recipient.id}`} className="cursor-pointer flex-1 text-sm">
-                                {recipient.firstName} {recipient.lastName} - {recipient.email}
-                                {recipient.company && ` (${recipient.company})`}
-                              </Label>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                      {errors.selectedRecipients && (
-                        <p className="text-sm text-red-500 mt-1">{errors.selectedRecipients}</p>
-                      )}
-                      {!formData.sendToAll && formData.selectedRecipients.length > 0 && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          {formData.selectedRecipients.length} recipient(s) selected
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
           </motion.form>
         </div>
 
@@ -416,7 +474,7 @@ export default function AddEmailCampaignModal({
           </Button>
           <Button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-orange-600 hover:bg-orange-700"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

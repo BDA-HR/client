@@ -272,19 +272,15 @@ export default function LeadTable({
 
       {/* Assign Rep Dialog */}
       <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Reassign Lead</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>Lead: {selectedLeadForAssign?.firstName} {selectedLeadForAssign?.lastName}</Label>
-              <p className="text-sm text-gray-600">{selectedLeadForAssign?.company}</p>
-            </div>
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="salesRep">Select Sales Rep</Label>
               <Select value={selectedRep} onValueChange={setSelectedRep}>
-                <SelectTrigger>
+                <SelectTrigger className='w-full'>
                   <SelectValue placeholder="Choose a sales rep" />
                 </SelectTrigger>
                 <SelectContent>

@@ -174,15 +174,15 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
     switch (priority) {
       case 'High': return 'bg-red-100 text-red-800';
       case 'Medium': return 'bg-yellow-100 text-yellow-800';
-      case 'Low': return 'bg-green-100 text-green-800';
+      case 'Low': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusColor = (status: Activity['status']) => {
     switch (status) {
-      case 'Completed': return 'bg-green-100 text-green-800';
-      case 'In Progress': return 'bg-blue-100 text-blue-800';
+      case 'Completed': return 'bg-orange-100 text-orange-800';
+      case 'In Progress': return 'bg-orange-100 text-orange-800';
       case 'Cancelled': return 'bg-gray-100 text-gray-800';
       default: return 'bg-orange-100 text-orange-800';
     }
@@ -309,7 +309,7 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center space-x-2">
-              <CheckSquare className="w-5 h-5 text-blue-600" />
+              <CheckSquare className="w-5 h-5 text-orange-600" />
               <span>Tasks & Activities</span>
             </CardTitle>
             <div className="flex items-center space-x-2">

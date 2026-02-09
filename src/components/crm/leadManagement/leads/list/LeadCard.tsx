@@ -18,11 +18,11 @@ export default function LeadCard({ lead, onEdit, onDelete }: LeadCardProps) {
 
   const getStatusColor = (status: string) => {
     const statusColors: Record<string, string> = {
-      'New': 'bg-blue-100 text-blue-800',
+      'New': 'bg-orange-100 text-orange-800',
       'Contacted': 'bg-yellow-100 text-yellow-800',
-      'Qualified': 'bg-green-100 text-green-800',
+      'Qualified': 'bg-orange-100 text-orange-800',
       'Proposal Sent': 'bg-purple-100 text-purple-800',
-      'Closed Won': 'bg-emerald-100 text-emerald-800',
+      'Closed Won': 'bg-orange-100 text-orange-800',
       'Closed Lost': 'bg-red-100 text-red-800'
     };
     return statusColors[status] || 'bg-gray-100 text-gray-800';
@@ -31,9 +31,9 @@ export default function LeadCard({ lead, onEdit, onDelete }: LeadCardProps) {
   const getSourceColor = (source: string) => {
     const sourceColors: Record<string, string> = {
       'Website': 'bg-orange-100 text-orange-800',
-      'Email Campaign': 'bg-blue-100 text-blue-800',
+      'Email Campaign': 'bg-orange-100 text-orange-800',
       'Social Media': 'bg-purple-100 text-purple-800',
-      'Phone': 'bg-green-100 text-green-800',
+      'Phone': 'bg-orange-100 text-orange-800',
       'Referral': 'bg-pink-100 text-pink-800',
       'Event': 'bg-indigo-100 text-indigo-800'
     };

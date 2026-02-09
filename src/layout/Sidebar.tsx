@@ -505,6 +505,7 @@ const Sidebar: React.FC = () => {
                   label="Campaigns"
                   {...theme}
                   isChild
+                  end
                 />
                 <NavItem
                   to="/crm/campaigns/email"

@@ -5,22 +5,20 @@ import { Button } from '../../../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../ui/table';
 import { Badge } from '../../../ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
-import { Checkbox } from '../../../ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/dropdown-menu';
 import { Pagination } from '../../../ui/pagination';
 import { useNavigate } from 'react-router-dom';
 import type { Contact } from '../../../../types/crm';
 
 const stageColors = {
-  'Lead': 'bg-blue-100 text-blue-800',
+  'Lead': 'bg-orange-100 text-orange-800',
   'Prospect': 'bg-yellow-100 text-yellow-800',
-  'Customer': 'bg-green-100 text-green-800',
+  'Customer': 'bg-orange-100 text-orange-800',
   'Partner': 'bg-purple-100 text-purple-800'
 };
 
 interface ContactListProps {
   contacts: Contact[];
-  onEdit: (contact: Contact) => void;
   onDelete: (contactId: string) => void;
   onBulkAction: (action: string, contactIds: string[]) => void;
   selectedContacts: string[];
@@ -30,7 +28,6 @@ interface ContactListProps {
 
 export default function ContactList({
   contacts,
-  onEdit,
   onDelete,
   onBulkAction,
   selectedContacts,
@@ -84,9 +81,9 @@ export default function ContactList({
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="flex items-center gap-4 p-4 bg-green-50 rounded-lg border border-green-200"
+          className="flex items-center gap-4 p-4 bg-orange-50 rounded-lg border border-orange-200"
         >
-          <span className="text-sm font-medium text-green-800">
+          <span className="text-sm font-medium text-orange-800">
             {selectedContacts.length} contact{selectedContacts.length > 1 ? 's' : ''} selected
           </span>
           <Select value={bulkAction} onValueChange={setBulkAction}>
@@ -103,7 +100,7 @@ export default function ContactList({
           <Button 
             onClick={handleBulkActionExecute}
             disabled={!bulkAction}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-orange-600 hover:bg-orange-700"
           >
             Apply
           </Button>
@@ -141,8 +138,8 @@ export default function ContactList({
                 </TableCell> */}
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-orange-600" />
                     </div>
                     <div>
                       <div className="font-medium text-gray-900">
@@ -214,7 +211,7 @@ export default function ContactList({
                         <Eye className="w-4 h-4 mr-2" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onEdit(contact)}>
+                      <DropdownMenuItem onClick={() => navigate(`/crm/contacts/${contact.id}/edit`)}>
                         <Edit className="w-4 h-4 mr-2" />
                         Edit Contact
                       </DropdownMenuItem>

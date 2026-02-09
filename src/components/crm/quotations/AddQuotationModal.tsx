@@ -158,7 +158,7 @@ export default function AddQuotationModal({
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <FileText className="w-5 h-5 text-blue-600" />
+            <FileText className="w-5 h-5 text-orange-600" />
             <span>{editingQuotation ? 'Edit Quotation' : 'Create New Quotation'}</span>
           </DialogTitle>
         </DialogHeader>
@@ -249,7 +249,7 @@ export default function AddQuotationModal({
           </Button>
           <Button 
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-orange-600 hover:bg-orange-700"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

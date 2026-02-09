@@ -26,8 +26,8 @@ const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
     'Draft': 'text-gray-600',
     'Pending Approval': 'text-yellow-600',
-    'Approved': 'text-green-600',
-    'Sent': 'text-blue-600',
+    'Approved': 'text-orange-600',
+    'Sent': 'text-orange-600',
     'Accepted': 'text-purple-600',
     'Rejected': 'text-red-600',
   };
@@ -80,7 +80,7 @@ export default function ChangeStatusModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <RefreshCw className="w-5 h-5 text-blue-600" />
+            <RefreshCw className="w-5 h-5 text-orange-600" />
             <span>Change Quotation Status</span>
           </DialogTitle>
         </DialogHeader>
@@ -132,8 +132,8 @@ export default function ChangeStatusModal({
 
             {/* Status Change Info */}
             {selectedStatus && selectedStatus !== quotation.status && (
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <div className="text-sm text-blue-800">
+              <div className="bg-orange-50 p-3 rounded-lg">
+                <div className="text-sm text-orange-800">
                   <strong>Status will change from:</strong>
                 </div>
                 <div className="text-sm">
@@ -156,7 +156,7 @@ export default function ChangeStatusModal({
               </Button>
               <Button 
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-orange-600 hover:bg-orange-700"
                 disabled={isSubmitting || !selectedStatus || selectedStatus === quotation?.status}
               >
                 {isSubmitting ? (
