@@ -69,12 +69,15 @@ export default function ActivityForm({ isOpen, onClose, onSubmit, contactId }: A
           <DialogTitle>Add New Activity</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-2">
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="type">Activity Type *</Label>
-              <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
-                <SelectTrigger>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => handleChange("type", value)}
+              >
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select activity type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -87,10 +90,13 @@ export default function ActivityForm({ isOpen, onClose, onSubmit, contactId }: A
               </Select>
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-                <SelectTrigger>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => handleChange("status", value)}
+              >
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -102,29 +108,29 @@ export default function ActivityForm({ isOpen, onClose, onSubmit, contactId }: A
             </div>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="subject">Subject *</Label>
             <Input
               id="subject"
               value={formData.subject}
-              onChange={(e) => handleChange('subject', e.target.value)}
+              onChange={(e) => handleChange("subject", e.target.value)}
               placeholder="Enter activity subject"
             />
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="description">Description *</Label>
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => handleChange('description', e.target.value)}
+              onChange={(e) => handleChange("description", e.target.value)}
               placeholder="Describe the activity details..."
               rows={4}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label>Date & Time</Label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -140,40 +146,40 @@ export default function ActivityForm({ isOpen, onClose, onSubmit, contactId }: A
                   <Calendar
                     mode="single"
                     selected={formData.date}
-                    onSelect={(date) => date && handleChange('date', date)}
+                    onSelect={(date) => date && handleChange("date", date)}
                     initialFocus
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="duration">Duration (minutes)</Label>
               <Input
                 id="duration"
                 type="number"
                 value={formData.duration}
-                onChange={(e) => handleChange('duration', e.target.value)}
+                onChange={(e) => handleChange("duration", e.target.value)}
                 placeholder="e.g., 30"
                 min="1"
               />
             </div>
           </div>
 
-          {formData.status === 'completed' && (
-            <div>
+          {formData.status === "completed" && (
+            <div className="space-y-2">
               <Label htmlFor="outcome">Outcome</Label>
               <Textarea
                 id="outcome"
                 value={formData.outcome}
-                onChange={(e) => handleChange('outcome', e.target.value)}
+                onChange={(e) => handleChange("outcome", e.target.value)}
                 placeholder="What was the outcome of this activity?"
                 rows={3}
               />
             </div>
           )}
 
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex justify-center space-x-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>

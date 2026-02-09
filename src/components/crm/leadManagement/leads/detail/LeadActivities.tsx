@@ -110,7 +110,10 @@ export default function LeadActivities({ leadId }: LeadActivitiesProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Activities</h3>
-        <Button onClick={() => setIsAddDialogOpen(true)} className="bg-orange-600 hover:bg-orange-700">
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="bg-orange-600 hover:bg-orange-700"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Activity
         </Button>
@@ -121,7 +124,9 @@ export default function LeadActivities({ leadId }: LeadActivitiesProps) {
           <Card key={activity.id}>
             <CardContent>
               <div className="flex items-start space-x-4">
-                <div className={`p-2 rounded-full ${getActivityColor(activity.type)}`}>
+                <div
+                  className={`p-2 rounded-full ${getActivityColor(activity.type)}`}
+                >
                   {getActivityIcon(activity.type)}
                 </div>
                 <div className="flex-1">
@@ -158,12 +163,19 @@ export default function LeadActivities({ leadId }: LeadActivitiesProps) {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="activityType">Activity Type</Label>
-              <Select 
-                value={newActivity.type} 
-                onValueChange={(value) => setNewActivity(prev => ({ ...prev, type: value as Activity['type'] }))}
+              <Label htmlFor="activityType" className="pb-1">
+                Activity Type
+              </Label>
+              <Select
+                value={newActivity.type}
+                onValueChange={(value) =>
+                  setNewActivity((prev) => ({
+                    ...prev,
+                    type: value as Activity["type"],
+                  }))
+                }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -176,30 +188,48 @@ export default function LeadActivities({ leadId }: LeadActivitiesProps) {
               </Select>
             </div>
             <div>
-              <Label htmlFor="activityTitle">Title</Label>
+              <Label htmlFor="activityTitle" className="pb-1">
+                Title
+              </Label>
               <input
                 id="activityTitle"
                 className="w-full px-3 py-2 border rounded-md"
                 value={newActivity.title}
-                onChange={(e) => setNewActivity(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setNewActivity((prev) => ({ ...prev, title: e.target.value }))
+                }
                 placeholder="Activity title"
               />
             </div>
             <div>
-              <Label htmlFor="activityDescription">Description</Label>
+              <Label htmlFor="activityDescription" className="pb-1">
+                Description
+              </Label>
               <Textarea
                 id="activityDescription"
                 value={newActivity.description}
-                onChange={(e) => setNewActivity(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setNewActivity((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 placeholder="Activity description"
                 rows={3}
+                className="w-full px-3 py-2 border rounded-md"
               />
             </div>
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleAddActivity} className="bg-orange-600 hover:bg-orange-700">
+              <Button
+                onClick={handleAddActivity}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
                 Add Activity
               </Button>
             </div>

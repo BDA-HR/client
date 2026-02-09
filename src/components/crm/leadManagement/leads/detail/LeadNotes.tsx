@@ -174,8 +174,8 @@ export default function LeadNotes({ leadId }: LeadNotesProps) {
             <DialogTitle>{editingNote ? 'Edit Note' : 'Add Note'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="noteContent">Note Content</Label>
+            <div  className="space-y-2">
+              <Label htmlFor="noteContent" >Note Content</Label>
               <Textarea
                 id="noteContent"
                 value={newNoteContent}

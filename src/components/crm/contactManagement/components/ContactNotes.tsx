@@ -157,9 +157,11 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Notes</h3>
-          <p className="text-sm text-gray-600">Keep track of important information and observations</p>
+          <p className="text-sm text-gray-600">
+            Keep track of important information and observations
+          </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setIsAddDialogOpen(true)}
           className="bg-green-600 hover:bg-green-700"
         >
@@ -175,9 +177,13 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
             <CardContent>
               <div className="text-center py-6">
                 <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                <h3 className="text-base font-medium text-gray-900 mb-2">No notes yet</h3>
-                <p className="text-sm text-gray-500 mb-4">Start adding notes to keep track of important information.</p>
-                <Button 
+                <h3 className="text-base font-medium text-gray-900 mb-2">
+                  No notes yet
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  Start adding notes to keep track of important information.
+                </p>
+                <Button
                   onClick={() => setIsAddDialogOpen(true)}
                   className="bg-green-600 hover:bg-green-700"
                 >
@@ -195,16 +201,23 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className={`border-green-200 hover:shadow-md transition-shadow ${
-                note.isPrivate ? 'bg-yellow-50 border-yellow-200' : ''
-              }`}>
-                <CardContent >
+              <Card
+                className={`border-green-200 hover:shadow-md transition-shadow ${
+                  note.isPrivate ? "bg-yellow-50 border-yellow-200" : ""
+                }`}
+              >
+                <CardContent>
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <User className="w-3 h-3 text-gray-400" />
-                      <span className="text-xs font-medium text-gray-700">{note.createdBy}</span>
+                      <span className="text-xs font-medium text-gray-700">
+                        {note.createdBy}
+                      </span>
                       {note.isPrivate && (
-                        <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800">
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-yellow-100 text-yellow-800"
+                        >
                           Private
                         </Badge>
                       )}
@@ -229,12 +242,18 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-700 mb-3 whitespace-pre-wrap">{note.content}</p>
+                  <p className="text-sm text-gray-700 mb-3 whitespace-pre-wrap">
+                    {note.content}
+                  </p>
 
                   <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-1">
                       {note.tags.map((tag, tagIndex) => (
-                        <Badge key={tagIndex} variant="outline" className="text-xs">
+                        <Badge
+                          key={tagIndex}
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {tag}
                         </Badge>
                       ))}
@@ -262,12 +281,14 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="content">Note Content *</Label>
               <Textarea
                 id="content"
                 value={newNote.content}
-                onChange={(e) => setNewNote(prev => ({ ...prev, content: e.target.value }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({ ...prev, content: e.target.value }))
+                }
                 placeholder="Enter your note here..."
                 rows={6}
               />
@@ -278,7 +299,12 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
                 type="checkbox"
                 id="isPrivate"
                 checked={newNote.isPrivate}
-                onChange={(e) => setNewNote(prev => ({ ...prev, isPrivate: e.target.checked }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({
+                    ...prev,
+                    isPrivate: e.target.checked,
+                  }))
+                }
                 className="rounded border-gray-300"
               />
               <Label htmlFor="isPrivate" className="text-sm">
@@ -290,7 +316,10 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
               <Button type="button" variant="outline" onClick={closeDialogs}>
                 Cancel
               </Button>
-              <Button onClick={handleAddNote} className="bg-green-600 hover:bg-green-700">
+              <Button
+                onClick={handleAddNote}
+                className="bg-green-600 hover:bg-green-700"
+              >
                 Add Note
               </Button>
             </div>
@@ -306,12 +335,14 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="editContent">Note Content *</Label>
               <Textarea
                 id="editContent"
                 value={newNote.content}
-                onChange={(e) => setNewNote(prev => ({ ...prev, content: e.target.value }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({ ...prev, content: e.target.value }))
+                }
                 placeholder="Enter your note here..."
                 rows={6}
               />
@@ -322,7 +353,12 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
                 type="checkbox"
                 id="editIsPrivate"
                 checked={newNote.isPrivate}
-                onChange={(e) => setNewNote(prev => ({ ...prev, isPrivate: e.target.checked }))}
+                onChange={(e) =>
+                  setNewNote((prev) => ({
+                    ...prev,
+                    isPrivate: e.target.checked,
+                  }))
+                }
                 className="rounded border-gray-300"
               />
               <Label htmlFor="editIsPrivate" className="text-sm">
@@ -334,7 +370,10 @@ export default function ContactNotes({ contactId }: ContactNotesProps) {
               <Button type="button" variant="outline" onClick={closeDialogs}>
                 Cancel
               </Button>
-              <Button onClick={handleEditNote} className="bg-green-600 hover:bg-green-700">
+              <Button
+                onClick={handleEditNote}
+                className="bg-green-600 hover:bg-green-700"
+              >
                 Update Note
               </Button>
             </div>

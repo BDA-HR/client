@@ -40,9 +40,11 @@ export default function OpportunityForm({
   contactId, 
   mode 
 }: OpportunityFormProps) {
+  type StageType = 'Qualification' | 'Needs Analysis' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
+
   const [formData, setFormData] = useState({
     name: '',
-    stage: 'Qualification' as const,
+    stage: 'Qualification' as StageType,
     amount: '',
     probability: '50',
     expectedCloseDate: new Date(),
@@ -144,37 +146,37 @@ export default function OpportunityForm({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'add' ? 'Add New Opportunity' : 'Edit Opportunity'}
+            {mode === "add" ? "Add New Opportunity" : "Edit Opportunity"}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-2">
             <Label htmlFor="name">Opportunity Name *</Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
+              onChange={(e) => handleChange("name", e.target.value)}
               placeholder="Enter opportunity name"
             />
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="description">Description *</Label>
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => handleChange('description', e.target.value)}
+              onChange={(e) => handleChange("description", e.target.value)}
               placeholder="Describe the opportunity..."
               rows={3}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="stage">Stage</Label>
               <Select value={formData.stage} onValueChange={handleStageChange}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -188,10 +190,13 @@ export default function OpportunityForm({
               </Select>
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="source">Source</Label>
-              <Select value={formData.source} onValueChange={(value) => handleChange('source', value)}>
-                <SelectTrigger>
+              <Select
+                value={formData.source}
+                onValueChange={(value) => handleChange("source", value)}
+              >
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select source" />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,26 +214,26 @@ export default function OpportunityForm({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="amount">Amount ($) *</Label>
               <Input
                 id="amount"
                 type="number"
                 value={formData.amount}
-                onChange={(e) => handleChange('amount', e.target.value)}
+                onChange={(e) => handleChange("amount", e.target.value)}
                 placeholder="0.00"
                 min="0"
                 step="0.01"
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="probability">Probability (%) *</Label>
               <Input
                 id="probability"
                 type="number"
                 value={formData.probability}
-                onChange={(e) => handleChange('probability', e.target.value)}
+                onChange={(e) => handleChange("probability", e.target.value)}
                 placeholder="50"
                 min="0"
                 max="100"
@@ -236,7 +241,7 @@ export default function OpportunityForm({
             </div>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label>Expected Close Date</Label>
             <Popover>
               <PopoverTrigger asChild>
@@ -252,7 +257,9 @@ export default function OpportunityForm({
                 <Calendar
                   mode="single"
                   selected={formData.expectedCloseDate}
-                  onSelect={(date) => date && handleChange('expectedCloseDate', date)}
+                  onSelect={(date) =>
+                    date && handleChange("expectedCloseDate", date)
+                  }
                   initialFocus
                 />
               </PopoverContent>
@@ -264,7 +271,7 @@ export default function OpportunityForm({
               Cancel
             </Button>
             <Button type="submit" className="bg-green-600 hover:bg-green-700">
-              {mode === 'add' ? 'Add Opportunity' : 'Update Opportunity'}
+              {mode === "add" ? "Add Opportunity" : "Update Opportunity"}
             </Button>
           </div>
         </form>

@@ -303,7 +303,7 @@ export default function LeadDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/crm/leads')}
+            onClick={() => navigate("/crm/leads")}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Leads
@@ -313,7 +313,9 @@ export default function LeadDetailPage() {
             <h1 className="text-2xl font-bold text-gray-900">
               {lead.firstName} {lead.lastName}
             </h1>
-            <p className="text-gray-600">{lead.jobTitle} at {lead.company}</p>
+            <p className="text-gray-600">
+              {lead.jobTitle} at {lead.company}
+            </p>
           </div>
         </div>
         <div className="flex space-x-2">
@@ -374,8 +376,8 @@ export default function LeadDetailPage() {
                       <span>{lead.score}/100</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-orange-600 h-2 rounded-full" 
+                      <div
+                        className="bg-orange-600 h-2 rounded-full"
                         style={{ width: `${lead.score}%` }}
                       ></div>
                     </div>
@@ -386,21 +388,21 @@ export default function LeadDetailPage() {
                       Based on the current status "{lead.status}", consider:
                     </p>
                     <ul className="text-sm text-gray-600 mt-2 space-y-1">
-                      {lead.status === 'New' && (
+                      {lead.status === "New" && (
                         <>
                           <li>• Schedule initial contact call</li>
                           <li>• Research company background</li>
                           <li>• Prepare qualification questions</li>
                         </>
                       )}
-                      {lead.status === 'Contacted' && (
+                      {lead.status === "Contacted" && (
                         <>
                           <li>• Follow up on initial conversation</li>
                           <li>• Qualify budget and timeline</li>
                           <li>• Schedule product demo</li>
                         </>
                       )}
-                      {lead.status === 'Qualified' && (
+                      {lead.status === "Qualified" && (
                         <>
                           <li>• Prepare customized proposal</li>
                           <li>• Schedule stakeholder meeting</li>
@@ -419,32 +421,33 @@ export default function LeadDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full justify-start"
-                    onClick={() => window.location.href = `tel:${lead.phone}`}
+                    onClick={() => (window.location.href = `tel:${lead.phone}`)}
                   >
                     <Phone className="w-4 h-4 mr-2" />
                     Call {lead.firstName}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full justify-start"
-                    onClick={() => window.location.href = `mailto:${lead.email}`}
+                    // onClick={() => window.location.href = `mailto:${lead.email}`}
+                    onClick={() => setIsCommunicationDialogOpen(true)}
                   >
                     <Mail className="w-4 h-4 mr-2" />
                     Send Email
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full justify-start"
                     onClick={() => setIsCommunicationDialogOpen(true)}
                   >
                     <Calendar className="w-4 h-4 mr-2" />
                     Schedule Meeting
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full justify-start"
                     onClick={() => navigate(`/crm/leads/${lead.id}/convert`)}
                     disabled={lead.isConverted}

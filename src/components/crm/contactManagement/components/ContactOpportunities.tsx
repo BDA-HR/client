@@ -116,8 +116,8 @@ export default function ContactOpportunities({ contactId, hasAccount = false }: 
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header and Stats */}
+    <div className="space-y-4">
+
      
       {/* Header and Add Button */}
       <div className="flex items-center justify-between">

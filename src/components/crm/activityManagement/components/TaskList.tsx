@@ -212,7 +212,7 @@ export default function TaskList({ activities, onStatusChange, onEdit, onDelete 
       >
       {/* Filters */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="px-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">

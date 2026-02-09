@@ -51,7 +51,7 @@ export default function ActivityFilters({
   return (
     <Card>
       <CardContent>
-        <div className="space-y-4">
+        <div>
           {/* Search and Quick Actions */}
           <div className="flex flex-wrap gap-4 items-center">
             <div className="flex-1 min-w-64">
