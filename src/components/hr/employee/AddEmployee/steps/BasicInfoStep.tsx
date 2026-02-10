@@ -14,6 +14,7 @@ import { nameListService } from '../../../../../services/List/HrmmNameListServic
 import type { ListItem } from '../../../../../types/List/list';
 import type { NameListDto } from '../../../../../types/hr/NameListDto';
 import type { NameListItem } from '../../../../../types/NameList/nameList';
+import { jgStepService } from '../../../../../services/core/settings/ModHrm/JgStepService';
 
 interface BasicInfoStepProps {
   data: Partial<Step1Dto & { branchId: UUID, jobGradeStepId: UUID }>;
@@ -54,6 +55,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [loadingPositions, setLoadingPositions] = useState(false);
   const [loadingJobGrades, setLoadingJobGrades] = useState(false);
+  const [loadingJobGradeSteps, setLoadingJobGradeSteps] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Scroll to top function
@@ -213,6 +215,36 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
     fetchJobGrades();
   }, []);
+console.log('selected job grade', formik.values.jobGradeId);
+  // Fetch job grades using nameListService when component mounts
+useEffect(() => {
+  if (!formik.values.jobGradeId) return;
+
+  const fetchJobGradeSteps = async () => {
+    try {
+      setLoadingJobGradeSteps(true);
+
+      const jobGradeStepsData = await jgStepService.getJgStepsByJobGrade(
+        formik.values.jobGradeId,
+      );
+
+      setJobGradeSteps(jobGradeStepsData);
+
+      if (jobGradeStepsData.length > 0) {
+        formik.setFieldValue("jobGradeStepId", jobGradeStepsData[0].id);
+      }
+    } catch (error) {
+      console.error("Error fetching job grade steps:", error);
+      setSubmitError("Failed to load job grade steps");
+      setJobGradeSteps([]);
+    } finally {
+      setLoadingJobGradeSteps(false);
+    }
+  };
+
+  fetchJobGradeSteps();
+}, [formik.values.jobGradeId]);
+
 
   // Convert branches to ListItem format
   const branchListItems: ListItem[] = branches.map(branch => ({
@@ -789,7 +821,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               )}
             </div>
 
-            {/* Job Grade - Using List Component */}
+            {/* Job Grade step - Using List Component */}
             <div className="space-y-2">
               <List
                 items={jobGradeStepsListItems}
@@ -797,16 +829,16 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 onSelect={handleJobGradeStepSelect}
                 label="Select Job Grade Step"
                 placeholder="Select a job grade step"
-                disabled={loadingJobGrades || loading}
+                disabled={loadingJobGradeSteps || loading}
               />
-              {loadingJobGrades && (
+              {loadingJobGradeSteps && (
                 <p className="text-sm text-gray-500">
                   Loading job grade steps...
                 </p>
               )}
               {getErrorMessage("jobGradeStepId") && (
                 <div className="text-red-500 text-xs mt-1">
-                  {getErrorMessage("jobGradeId")}
+                  {getErrorMessage("jobGradeStepId")}
                 </div>
               )}
             </div>
