@@ -206,7 +206,7 @@ export const FiscalYearModal: React.FC<FiscalYearModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
               >
-                Cancel
+                No, Keep It.
               </button>
               <button
                 onClick={() => {
@@ -215,7 +215,7 @@ export const FiscalYearModal: React.FC<FiscalYearModalProps> = ({
                 }}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white"
               >
-                Delete
+                Yes, Delete!
               </button>
             </div>
           </div>
