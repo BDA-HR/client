@@ -69,7 +69,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                   Deleting...
                 </>
               ) : (
-                "Delete Account"
+                "Yes, Delete!"
               )}
             </Button>
             <Button
@@ -78,7 +78,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
               variant="outline"
               className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium disabled:opacity-50"
             >
-              Cancel
+              No, Keep It.
             </Button>
           </div>
         </div>

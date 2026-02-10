@@ -86,7 +86,7 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
               className="cursor-pointer px-6"
               disabled={isLoading}
             >
-              {isLoading ? 'Deleting...' : 'Delete'}
+              {isLoading ? 'Deleting...' : 'Yes, Delete!'}
             </Button>
             <Button
               onClick={handleClose}
@@ -94,7 +94,7 @@ const DeleteBranchModal: React.FC<DeleteBranchModalProps> = ({
               className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
               disabled={isLoading}
             >
-              Cancel
+              No, Keep It.
             </Button>
           </div>
         </div>

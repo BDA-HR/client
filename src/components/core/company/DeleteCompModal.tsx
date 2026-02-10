@@ -88,11 +88,11 @@ const DeleteCompModal: React.FC<DeleteCompModalProps> = ({
             className="cursor-pointer px-6"
             disabled={isLoading}
           >
-            {isLoading ? 'Deleting...' : 'Delete'}
+            {isLoading ? 'Deleting...' : 'Yes, Delete!'}
           </Button>
           <DialogClose asChild>
             <Button variant="outline" className="cursor-pointer px-6" disabled={isLoading}>
-              Cancel
+              No, Keep It.
             </Button>
           </DialogClose>
           </div>
