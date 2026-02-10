@@ -16,8 +16,8 @@ import type { NameListDto } from '../../../../../types/hr/NameListDto';
 import type { NameListItem } from '../../../../../types/NameList/nameList';
 
 interface BasicInfoStepProps {
-  data: Partial<Step1Dto & { branchId: UUID }>;
-  onNext: (data: Step1Dto & { branchId: UUID }) => void;
+  data: Partial<Step1Dto & { branchId: UUID, jobGradeStepId: UUID }>;
+  onNext: (data: Step1Dto & { branchId: UUID, jobGradeStepId: UUID }) => void;
   onBack: () => void;
   loading?: boolean;
 }
@@ -49,6 +49,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const [departments, setDepartments] = useState<NameListItem[]>([]);
   const [positions, setPositions] = useState<NameListDto[]>([]);
   const [jobGrades, setJobGrades] = useState<NameListItem[]>([]);
+  const [jobGradeSteps, setJobGradeSteps] = useState<NameListItem[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(false);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [loadingPositions, setLoadingPositions] = useState(false);
@@ -73,7 +74,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     return data.employmentDate || new Date().toISOString().split('T')[0];
   };
 
-  const formik = useFormik<Step1Dto & { branchId: UUID }>({
+  const formik = useFormik<Step1Dto & { branchId: UUID, jobGradeStepId: UUID }>({
     initialValues: {
       firstName: data.firstName || '',
       firstNameAm: data.firstNameAm || '',
@@ -86,6 +87,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       employmentDate: getDefaultEmploymentDate(),
       branchId: data.branchId || '' as UUID,
       jobGradeId: data.jobGradeId || '' as UUID,
+      jobGradeStepId: data.jobGradeStepId || '' as UUID,
       positionId: data.positionId || '' as UUID,
       departmentId: data.departmentId || '' as UUID,
       employmentType: data.employmentType || '' as EmpType,
@@ -236,6 +238,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     name: grade.name
   }));
 
+   const jobGradeStepsListItems: ListItem[] = jobGradeSteps.map(steps => ({
+    id: steps.id,
+    name: steps.name
+  }));
+
   // Handle branch selection
   const handleBranchSelect = (item: ListItem) => {
     formik.setFieldValue('branchId', item.id);
@@ -264,6 +271,14 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const handleJobGradeSelect = (item: ListItem) => {
     formik.setFieldValue('jobGradeId', item.id);
     if (submitError && formik.errors.jobGradeId) {
+      setSubmitError(null);
+    }
+  };
+
+   // Handle job grade step select
+  const handleJobGradeStepSelect = (item: ListItem) => {
+    formik.setFieldValue('jobGradeStepId', item.id);
+    if (submitError && formik.errors.jobGradeStepId) {
       setSubmitError(null);
     }
   };
@@ -331,8 +346,16 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         >
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -344,7 +367,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 onClick={() => setSubmitError(null)}
                 className="text-red-800 hover:text-red-900"
               >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
                   <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                 </svg>
               </button>
@@ -367,7 +394,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
           {/* First Name (English) */}
           <div className="space-y-2">
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="firstName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               First Name (English) *
             </label>
             <Input
@@ -377,19 +407,27 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.firstName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstName') ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                getErrorMessage("firstName")
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="John"
               disabled={loading}
             />
-            {getErrorMessage('firstName') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('firstName')}</div>
+            {getErrorMessage("firstName") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("firstName")}
+              </div>
             )}
           </div>
 
           {/* ስም */}
           <div className="space-y-2">
-            <label htmlFor="firstNameAm" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="firstNameAm"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               ስም *
             </label>
             <Input
@@ -397,21 +435,29 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               name="firstNameAm"
               type="text"
               value={formik.values.firstNameAm}
-              onChange={(e) => handleAmharicInputChange(e, 'firstNameAm')}
+              onChange={(e) => handleAmharicInputChange(e, "firstNameAm")}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('firstNameAm') ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                getErrorMessage("firstNameAm")
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="አየለ"
               disabled={loading}
             />
-            {getErrorMessage('firstNameAm') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('firstNameAm')}</div>
+            {getErrorMessage("firstNameAm") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("firstNameAm")}
+              </div>
             )}
           </div>
 
           {/* Middle Name (English) */}
           <div className="space-y-2">
-            <label htmlFor="middleName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="middleName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Middle Name (English) *
             </label>
             <Input
@@ -421,19 +467,27 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.middleName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleName') ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                getErrorMessage("middleName")
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="Michael"
               disabled={loading}
             />
-            {getErrorMessage('middleName') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('middleName')}</div>
+            {getErrorMessage("middleName") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("middleName")}
+              </div>
             )}
           </div>
 
           {/* የአባት ስም */}
           <div className="space-y-2">
-            <label htmlFor="middleNameAm" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="middleNameAm"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               የአባት ስም *
             </label>
             <Input
@@ -441,21 +495,29 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               name="middleNameAm"
               type="text"
               value={formik.values.middleNameAm}
-              onChange={(e) => handleAmharicInputChange(e, 'middleNameAm')}
+              onChange={(e) => handleAmharicInputChange(e, "middleNameAm")}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('middleNameAm') ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                getErrorMessage("middleNameAm")
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="በቀለ"
               disabled={loading}
             />
-            {getErrorMessage('middleNameAm') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('middleNameAm')}</div>
+            {getErrorMessage("middleNameAm") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("middleNameAm")}
+              </div>
             )}
           </div>
 
           {/* Last Name (English) */}
           <div className="space-y-2">
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Last Name (English) *
             </label>
             <Input
@@ -465,19 +527,27 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.lastName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastName') ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                getErrorMessage("lastName")
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="Doe"
               disabled={loading}
             />
-            {getErrorMessage('lastName') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('lastName')}</div>
+            {getErrorMessage("lastName") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("lastName")}
+              </div>
             )}
           </div>
 
           {/* የአያት ስም */}
           <div className="space-y-2">
-            <label htmlFor="lastNameAm" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="lastNameAm"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               የአያት ስም *
             </label>
             <Input
@@ -485,30 +555,45 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               name="lastNameAm"
               type="text"
               value={formik.values.lastNameAm}
-              onChange={(e) => handleAmharicInputChange(e, 'lastNameAm')}
+              onChange={(e) => handleAmharicInputChange(e, "lastNameAm")}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('lastNameAm') ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                getErrorMessage("lastNameAm")
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="ዮሐንስ"
               disabled={loading}
             />
-            {getErrorMessage('lastNameAm') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('lastNameAm')}</div>
+            {getErrorMessage("lastNameAm") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("lastNameAm")}
+              </div>
             )}
           </div>
 
           {/* Gender */}
           <div className="space-y-2">
-            <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="gender"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Gender *
             </label>
             <Select
               value={formik.values.gender}
-              onValueChange={(value: Gender) => formik.setFieldValue('gender', value)}
+              onValueChange={(value: Gender) =>
+                formik.setFieldValue("gender", value)
+              }
               disabled={loading}
             >
-              <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('gender') ? "border-red-500" : "border-gray-300"
-                }`}>
+              <SelectTrigger
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage("gender")
+                    ? "border-red-500"
+                    : "border-gray-300"
+                }`}
+              >
                 <SelectValue placeholder="Select Gender" />
               </SelectTrigger>
               <SelectContent>
@@ -519,14 +604,19 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 ))}
               </SelectContent>
             </Select>
-            {getErrorMessage('gender') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('gender')}</div>
+            {getErrorMessage("gender") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("gender")}
+              </div>
             )}
           </div>
 
           {/* Nationality */}
           <div className="space-y-2">
-            <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="nationality"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Nationality *
             </label>
             <Input
@@ -536,13 +626,18 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={formik.values.nationality}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('nationality') ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                getErrorMessage("nationality")
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="Ethiopian"
               disabled={loading}
             />
-            {getErrorMessage('nationality') && (
-              <div className="text-red-500 text-xs mt-1">{getErrorMessage('nationality')}</div>
+            {getErrorMessage("nationality") && (
+              <div className="text-red-500 text-xs mt-1">
+                {getErrorMessage("nationality")}
+              </div>
             )}
           </div>
         </div>
@@ -551,10 +646,12 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
-            <h3 className="text-xl font-semibold text-gray-800">Employment Details</h3>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Employment Details
+            </h3>
           </div>
 
-          {/* Row 1: Branch, Department, Job Grade, Position */}
+          {/* Row 1: Branch, Department, Employement Date, Position */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
             {/* Branch - Using List Component */}
             <div className="space-y-2">
@@ -569,8 +666,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               {loadingBranches && (
                 <p className="text-sm text-gray-500">Loading branches...</p>
               )}
-              {getErrorMessage('branchId') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('branchId')}</div>
+              {getErrorMessage("branchId") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("branchId")}
+                </div>
               )}
             </div>
 
@@ -581,14 +680,22 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 selectedValue={formik.values.departmentId}
                 onSelect={handleDepartmentSelect}
                 label="Select Department"
-                placeholder={departments.length === 0 ? "No departments available" : "Select a department"}
-                disabled={loadingDepartments || loading || departments.length === 0}
+                placeholder={
+                  departments.length === 0
+                    ? "No departments available"
+                    : "Select a department"
+                }
+                disabled={
+                  loadingDepartments || loading || departments.length === 0
+                }
               />
               {loadingDepartments && (
                 <p className="text-sm text-gray-500">Loading departments...</p>
               )}
-              {getErrorMessage('departmentId') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('departmentId')}</div>
+              {getErrorMessage("departmentId") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("departmentId")}
+                </div>
               )}
             </div>
 
@@ -606,19 +713,62 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                       ? "No positions available"
                       : "Select a position"
                 }
-                disabled={loadingPositions || loading || !formik.values.departmentId || positions.length === 0}
+                disabled={
+                  loadingPositions ||
+                  loading ||
+                  !formik.values.departmentId ||
+                  positions.length === 0
+                }
               />
               {loadingPositions && (
                 <p className="text-sm text-gray-500">Loading positions...</p>
               )}
-              {formik.values.departmentId && positions.length === 0 && !loadingPositions && (
-                <p className="text-sm text-gray-500">No positions available for this department</p>
-              )}
-              {getErrorMessage('positionId') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('positionId')}</div>
+              {formik.values.departmentId &&
+                positions.length === 0 &&
+                !loadingPositions && (
+                  <p className="text-sm text-gray-500">
+                    No positions available for this department
+                  </p>
+                )}
+              {getErrorMessage("positionId") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("positionId")}
+                </div>
               )}
             </div>
 
+            {/* Employment Date */}
+            <div className="space-y-2">
+              <label
+                htmlFor="employmentDate"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Employment Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="employmentDate"
+                name="employmentDate"
+                type="date"
+                value={formik.values.employmentDate}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                  getErrorMessage("employmentDate")
+                    ? "border-red-500"
+                    : "border-gray-300"
+                }`}
+                disabled={loading}
+              />
+              {getErrorMessage("employmentDate") && (
+                <p className="text-red-500 text-sm mt-1">
+                  {getErrorMessage("employmentDate")}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Row 2: Job Grade, Employment Type, Employment Nature */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Job Grade - Using List Component */}
             <div className="space-y-2">
               <List
@@ -632,47 +782,57 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               {loadingJobGrades && (
                 <p className="text-sm text-gray-500">Loading job grades...</p>
               )}
-              {getErrorMessage('jobGradeId') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('jobGradeId')}</div>
+              {getErrorMessage("jobGradeId") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("jobGradeId")}
+                </div>
               )}
             </div>
-          </div>
 
-          {/* Row 2: Employment Date, Employment Type, Employment Nature */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            {/* Employment Date */}
+            {/* Job Grade - Using List Component */}
             <div className="space-y-2">
-              <label htmlFor="employmentDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Employment Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="employmentDate"
-                name="employmentDate"
-                type="date"
-                value={formik.values.employmentDate}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentDate') ? "border-red-500" : "border-gray-300"
-                  }`}
-                disabled={loading}
+              <List
+                items={jobGradeStepsListItems}
+                selectedValue={formik.values.jobGradeStepId}
+                onSelect={handleJobGradeStepSelect}
+                label="Select Job Grade Step"
+                placeholder="Select a job grade step"
+                disabled={loadingJobGrades || loading}
               />
-              {getErrorMessage('employmentDate') && (
-                <p className="text-red-500 text-sm mt-1">{getErrorMessage('employmentDate')}</p>
+              {loadingJobGrades && (
+                <p className="text-sm text-gray-500">
+                  Loading job grade steps...
+                </p>
+              )}
+              {getErrorMessage("jobGradeStepId") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("jobGradeId")}
+                </div>
               )}
             </div>
 
             {/* Employment Type */}
             <div className="space-y-2">
-              <label htmlFor="employmentType" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="employmentType"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Employment Type *
               </label>
               <Select
                 value={formik.values.employmentType}
-                onValueChange={(value: EmpType) => formik.setFieldValue('employmentType', value)}
+                onValueChange={(value: EmpType) =>
+                  formik.setFieldValue("employmentType", value)
+                }
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentType') ? "border-red-500" : "border-gray-300"
-                  }`}>
+                <SelectTrigger
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                    getErrorMessage("employmentType")
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                >
                   <SelectValue placeholder="Select Employment Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -683,23 +843,35 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                   ))}
                 </SelectContent>
               </Select>
-              {getErrorMessage('employmentType') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('employmentType')}</div>
+              {getErrorMessage("employmentType") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("employmentType")}
+                </div>
               )}
             </div>
 
             {/* Employment Nature */}
             <div className="space-y-2">
-              <label htmlFor="employmentNature" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="employmentNature"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Employment Nature *
               </label>
               <Select
                 value={formik.values.employmentNature}
-                onValueChange={(value: EmpNature) => formik.setFieldValue('employmentNature', value)}
+                onValueChange={(value: EmpNature) =>
+                  formik.setFieldValue("employmentNature", value)
+                }
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('employmentNature') ? "border-red-500" : "border-gray-300"
-                  }`}>
+                <SelectTrigger
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                    getErrorMessage("employmentNature")
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                >
                   <SelectValue placeholder="Select Employment Nature" />
                 </SelectTrigger>
                 <SelectContent>
@@ -710,23 +882,35 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                   ))}
                 </SelectContent>
               </Select>
-              {getErrorMessage('employmentNature') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('employmentNature')}</div>
+              {getErrorMessage("employmentNature") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("employmentNature")}
+                </div>
               )}
             </div>
 
             {/* Work Arrangement */}
             <div className="space-y-2">
-              <label htmlFor="employmentNature" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="employmentNature"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Work Arrangement *
               </label>
               <Select
                 value={formik.values.workArrangement}
-                onValueChange={(value: WorkArrangement) => formik.setFieldValue('workArrangement', value)}
+                onValueChange={(value: WorkArrangement) =>
+                  formik.setFieldValue("workArrangement", value)
+                }
                 disabled={loading}
               >
-                <SelectTrigger className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${getErrorMessage('workArrangement') ? "border-red-500" : "border-gray-300"
-                  }`}>
+                <SelectTrigger
+                  className={`w-full px-3 py-2 border focus:outline-none focus:border-green-500 focus:outline-2 rounded-md transition-colors duration-200 ${
+                    getErrorMessage("workArrangement")
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                >
                   <SelectValue placeholder="Select Work Arrangement" />
                 </SelectTrigger>
                 <SelectContent>
@@ -737,8 +921,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                   ))}
                 </SelectContent>
               </Select>
-              {getErrorMessage('workArrangement') && (
-                <div className="text-red-500 text-xs mt-1">{getErrorMessage('workArrangement')}</div>
+              {getErrorMessage("workArrangement") && (
+                <div className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("workArrangement")}
+                </div>
               )}
             </div>
           </div>
@@ -748,11 +934,15 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full"></div>
-            <h3 className="text-xl font-semibold text-gray-800">Profile Picture</h3>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Profile Picture
+            </h3>
           </div>
 
           <div className="flex flex-col items-center">
-            <div className="w-80 h-80"> {/* Increased size */}
+            <div className="w-80 h-80">
+              {" "}
+              {/* Increased size */}
               <ProfilePictureUpload
                 profilePicture={formik.values.File}
                 onProfilePictureSelect={handleProfilePictureSelect}
@@ -776,7 +966,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                 Saving...
               </>
             ) : (
-              'Save & Continue'
+              "Save & Continue"
             )}
           </button>
         </div>

@@ -80,7 +80,7 @@ export const AddEmployeeStepForm: React.FC<AddEmployeeStepFormProps> = ({
   };
 
   // Handle Step 1 submission with service call
-  const handleStep1Submit = async (step1Data: Step1Dto & { branchId: UUID }) => {
+  const handleStep1Submit = async (step1Data: Step1Dto & { branchId: UUID, jobGradeStepId: UUID }) => {
     setLoading(true);
     setError(null);
 

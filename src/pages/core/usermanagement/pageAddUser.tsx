@@ -14,7 +14,7 @@ function PageAddUser() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [basicInfoData, setBasicInfoData] = useState<
-    Partial<Step1Dto & { branchId: UUID }>
+    Partial<Step1Dto & { branchId: UUID, jobGradeStepId: UUID }>
   >({});
   const [employeeId, setEmployeeId] = useState<UUID | null>(null);
   const [step2Data, setStep2Data] = useState<BasicInfoDto | null>(null);
