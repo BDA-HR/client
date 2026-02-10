@@ -57,14 +57,14 @@ const DeletePolicyRuleConditionModal: React.FC<DeletePolicyRuleConditionModalPro
               onClick={handleConfirm}
               className="w-full sm:w-auto cursor-pointer px-4 sm:px-6 py-2"
             >
-              Delete
+              Yes, Delete!
             </Button>
             <Button
               onClick={onClose}
               variant="outline"
               className="w-full sm:w-auto px-4 sm:px-6 py-2 cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
             >
-              Cancel
+              No, Keep It.
             </Button>
           </div>
         </div>

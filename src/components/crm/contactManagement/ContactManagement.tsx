@@ -4,7 +4,6 @@ import { Plus, Search, User, Building, Mail, Phone, MapPin, Tag, Edit, Trash2 } 
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table';
 import { Badge } from '../../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog';
 import { Label } from '../../ui/label';

@@ -6,7 +6,7 @@ import {
   DialogClose
 } from '../../../../components/ui/dialog';
 import { Button } from '../../../../components/ui/button';
-import { AlertTriangle, Key } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import type { PerApiListDto, UUID } from '../../../../types/core/Settings/api-permission';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -90,11 +90,11 @@ const DeleteApiPermissionModal: React.FC<DeleteApiPermissionModalProps> = ({
               className="cursor-pointer px-6"
               disabled={isLoading}
             >
-              {isLoading ? 'Deleting...' : 'Delete'}
+              {isLoading ? 'Deleting...' : 'Yes, Delete!'}
             </Button>
             <DialogClose asChild>
               <Button variant="outline" className="cursor-pointer px-6" disabled={isLoading}>
-                Cancel
+                No, Keep It.
               </Button>
             </DialogClose>
           </div>
