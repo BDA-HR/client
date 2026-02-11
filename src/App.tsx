@@ -70,41 +70,51 @@ import PageReports from "./pages/finance/PageReports";
 import PageAssets from "./pages/finance/PageAssets";
 import PageTransactions from "./pages/finance/PageTransactions";
 import PagePayroll from "./pages/finance/PagePayroll";
-import LeadManagement from "./pages/crm/LeadManagement";
-import AddLeadPage from "./pages/crm/AddLeadPage";
-import EditLeadPage from "./pages/crm/EditLeadPage";
-import LeadRoutingPage from "./pages/crm/LeadRoutingPage";
-import ImportLeadPage from "./pages/crm/ImportLeadPage";
-import LeadDetailPage from "./pages/crm/LeadDetailPage";
-import LeadConversion from "./pages/crm/LeadConversion";
-import ContactManagement from "./pages/crm/ContactManagement";
-import AddContactPage from "./pages/crm/AddContactPage";
-import EditContactPage from "./pages/crm/EditContactPage";
-import ContactDetailPage from "./pages/crm/ContactDetailPage";
-import OpportunityDetailPage from "./pages/crm/OpportunityDetailPage";
-import SalesManagement from "./pages/crm/SalesManagement";
-import QuotationsPage from "./pages/crm/QuotationsPage";
-import OrdersPage from "./pages/crm/OrdersPage";
-import OrderDetailPage from "./pages/crm/OrderDetailPage";
-import MarketingAutomation from "./pages/crm/MarketingAutomation";
-import CampaignsPage from "./pages/crm/CampaignsPage";
-import EmailCampaignsPage from "./pages/crm/EmailCampaignsPage";
-import SMSCampaignsPage from "./pages/crm/SMSCampaignsPage";
-import CustomerSupport from "./pages/crm/CustomerService";
-import ActivityManagement from "./pages/crm/ActivityManagement";
-import AnalyticsReporting from "./pages/crm/AnalyticsReporting";
-import CRMSettings from "./components/settings/coreSettings/crmSettings/CRMSettings";
+import LeadGenerationPage from "./pages/crm/leadManagement/LeadGenerationPage";
+import AssignedLeadsPage from "./pages/crm/leadManagement/AssignedLeadsPage";
+import LeadGroupingPage from "./pages/crm/leadManagement/LeadGroupingPage";
+import AddLeadPage from "./pages/crm/leadManagement/AddLeadPage";
+import EditLeadPage from "./pages/crm/leadManagement/EditLeadPage";
+import LeadRoutingPage from "./pages/crm/leadManagement/LeadRoutingPage";
+import ImportLeadPage from "./pages/crm/leadManagement/ImportLeadPage";
+import LeadDetailPage from "./pages/crm/leadManagement/LeadDetailPage";
+import LeadConversion from "./pages/crm/leadManagement/LeadConversion";
+import ContactsPage from "./pages/crm/contactManagement/ContactsPage";
+import ContactGroupingPage from "./pages/crm/contactManagement/ContactGroupingPage";
+import AssignedContactsPage from "./pages/crm/contactManagement/AssignedContactsPage";
+import AssignedContactDetailPage from "./pages/crm/contactManagement/AssignedContactDetailPage";
+import AddContactPage from "./pages/crm/contactManagement/AddContactPage";
+import EditContactPage from "./pages/crm/contactManagement/EditContactPage";
+import ContactDetailPage from "./pages/crm/contactManagement/ContactDetailPage";
+import OpportunityDetailPage from "./pages/crm/salesManagement/OpportunityDetailPage";
+import SalesManagement from "./pages/crm/salesManagement/SalesManagement";
+import OpportunitiesPage from "./pages/crm/salesManagement/OpportunitiesPage";
+import QuotationsPage from "./pages/crm/salesManagement/QuotationsPage";
+import OrdersPage from "./pages/crm/salesManagement/OrdersPage";
+import OrderDetailPage from "./pages/crm/salesManagement/OrderDetailPage";
+import MarketingAutomation from "./pages/crm/marketingAutomation/MarketingAutomation";
+import CampaignsPage from "./pages/crm/marketingAutomation/CampaignsPage";
+import EmailCampaignsPage from "./pages/crm/marketingAutomation/EmailCampaignsPage";
+import SMSCampaignsPage from "./pages/crm/marketingAutomation/SMSCampaignsPage";
+import CustomerSupport from "./pages/crm/customerService/CustomerService";
+import TicketsPage from "./pages/crm/customerService/TicketsPage";
+import KnowledgeBasePage from "./pages/crm/customerService/KnowledgeBasePage";
+import ActivityManagement from "./pages/crm/activityManagement/ActivityManagement";
+import TasksPage from "./pages/crm/activityManagement/TasksPage";
+import CalendarPage from "./pages/crm/activityManagement/CalendarPage";
+import TimeTrackingPage from "./pages/crm/activityManagement/TimeTrackingPage";
+import NotificationsPage from "./pages/crm/activityManagement/NotificationsPage";
+import AnalyticsReporting from "./pages/crm/analytics/AnalyticsReporting";
 import PageCrmSettings from "./pages/settings/crmSettings/PageCrmSettings";
 import PageLeadSources from "./pages/settings/crmSettings/pageLeadSources";
 import PageLeadStatuses from "./pages/settings/crmSettings/pageLeadStatuses";
-import PageLeadQualificationStatuses from "./pages/settings/crmSettings/pageLeadQualificationStatuses";
-import PageLeadCategories from "./pages/settings/crmSettings/pageLeadCategories";
 import PageIndustries from "./pages/settings/crmSettings/pageIndustries";
-import PageContactMethods from "./pages/settings/crmSettings/pageContactMethods";
-import PageActivityTypes from "./pages/settings/crmSettings/pageActivityTypes";
-import PageAssignmentModes from "./pages/settings/crmSettings/pageAssignmentModes";
-import PageConversionTargets from "./pages/settings/crmSettings/pageConversionTargets";
 import PageRoutingRules from "./pages/settings/crmSettings/pageRoutingRules";
+import PageLeadScoring from "./pages/settings/crmSettings/pageLeadScoring";
+import PageQuotationTemplates from "./pages/settings/crmSettings/pageQuotationTemplates";
+import PageEmailTemplates from "./pages/settings/crmSettings/pageEmailTemplates";
+import PageSMSTemplates from "./pages/settings/crmSettings/pageSMSTemplates";
+import PageTicketStatus from "./pages/settings/crmSettings/pageTicketStatus";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -155,20 +165,49 @@ function App() {
                 <Route path="/file" element={<FileDashboard />} />
                 {/* End MENU ROUTES */}
                 {/* START CRM ROUTES */}
-                <Route path="/crm/leads" element={<LeadManagement />} />
+                <Route
+                  path="/crm/leads/generation"
+                  element={<LeadGenerationPage />}
+                />
+                <Route
+                  path="/crm/leads/generation/import"
+                  element={<ImportLeadPage />}
+                />
+                <Route
+                  path="/crm/leads/assigned"
+                  element={<AssignedLeadsPage />}
+                />
+                <Route
+                  path="/crm/leads/assigned/:id"
+                  element={<LeadDetailPage />}
+                />
+                <Route
+                  path="/crm/leads/grouping"
+                  element={<LeadGroupingPage />}
+                />
                 <Route path="/crm/leads/add" element={<AddLeadPage />} />
                 <Route path="/crm/leads/:id/edit" element={<EditLeadPage />} />
-                <Route path="/crm/leads/import" element={<ImportLeadPage />} />
                 <Route
                   path="/crm/leads/routing"
                   element={<LeadRoutingPage />}
                 />
-                <Route path="/crm/leads/:id" element={<LeadDetailPage />} />
                 <Route
                   path="/crm/leads/:id/convert"
                   element={<LeadConversion />}
                 />
-                <Route path="/crm/contacts" element={<ContactManagement />} />
+                <Route path="/crm/contacts" element={<ContactsPage />} />
+                <Route
+                  path="/crm/contacts/grouping"
+                  element={<ContactGroupingPage />}
+                />
+                <Route
+                  path="/crm/contacts/assigned"
+                  element={<AssignedContactsPage />}
+                />
+                <Route
+                  path="/crm/contacts/assigned/:id"
+                  element={<AssignedContactDetailPage />}
+                />
                 <Route path="/crm/contacts/add" element={<AddContactPage />} />
                 <Route
                   path="/crm/contacts/:id/edit"
@@ -183,6 +222,10 @@ function App() {
                   element={<ContactDetailPage />}
                 />
                 <Route path="/crm/sales" element={<SalesManagement />} />
+                <Route
+                  path="/crm/sales/opportunities"
+                  element={<OpportunitiesPage />}
+                />
                 <Route path="/crm/quotations" element={<QuotationsPage />} />
                 <Route path="/crm/orders" element={<OrdersPage />} />
                 <Route path="/crm/orders/:id" element={<OrderDetailPage />} />
@@ -204,51 +247,65 @@ function App() {
                   element={<SMSCampaignsPage />}
                 />
                 <Route path="/crm/support" element={<CustomerSupport />} />
+                <Route path="/crm/support/tickets" element={<TicketsPage />} />
+                <Route
+                  path="/crm/support/knowledge-base"
+                  element={<KnowledgeBasePage />}
+                />
                 <Route
                   path="/crm/activities"
                   element={<ActivityManagement />}
                 />
+                <Route path="/crm/activities/tasks" element={<TasksPage />} />
+                <Route
+                  path="/crm/activities/calendar"
+                  element={<CalendarPage />}
+                />
+                <Route
+                  path="/crm/activities/time-tracking"
+                  element={<TimeTrackingPage />}
+                />
+                <Route
+                  path="/crm/activities/notifications"
+                  element={<NotificationsPage />}
+                />
                 <Route path="/crm/analytics" element={<AnalyticsReporting />} />
                 <Route path="/settings/crm" element={<PageCrmSettings />} />
                 <Route
+                  path="/settings/crm/routing-rules"
+                  element={<PageRoutingRules />}
+                />
+                <Route
+                  path="/settings/crm/lead-scoring"
+                  element={<PageLeadScoring />}
+                />
+                <Route
                   path="/settings/crm/lead-sources"
                   element={<PageLeadSources />}
+                />
+                <Route
+                  path="/settings/crm/quotation-templates"
+                  element={<PageQuotationTemplates />}
+                />
+                <Route
+                  path="/settings/crm/email-templates"
+                  element={<PageEmailTemplates />}
+                />
+                <Route
+                  path="/settings/crm/sms-templates"
+                  element={<PageSMSTemplates />}
                 />
                 <Route
                   path="/settings/crm/lead-statuses"
                   element={<PageLeadStatuses />}
                 />
                 <Route
-                  path="/settings/crm/lead-qualification-statuses"
-                  element={<PageLeadQualificationStatuses />}
-                />
-                <Route
-                  path="/settings/crm/lead-categories"
-                  element={<PageLeadCategories />}
-                />
-                <Route
                   path="/settings/crm/industries"
                   element={<PageIndustries />}
                 />
                 <Route
-                  path="/settings/crm/contact-methods"
-                  element={<PageContactMethods />}
-                />
-                <Route
-                  path="/settings/crm/activity-types"
-                  element={<PageActivityTypes />}
-                />
-                <Route
-                  path="/settings/crm/assignment-modes"
-                  element={<PageAssignmentModes />}
-                />
-                <Route
-                  path="/settings/crm/conversion-targets"
-                  element={<PageConversionTargets />}
-                />
-                <Route
-                  path="/settings/crm/routing-rules"
-                  element={<PageRoutingRules />}
+                  path="/settings/crm/ticket-status"
+                  element={<PageTicketStatus />}
                 />
                 {/* END CRM ROUTES */}
                 {/* START HR ROUTES */}
@@ -418,7 +475,6 @@ function App() {
                   path="/settings/core/menu-permissions"
                   element={<PageMenuSettings />}
                 />
-                <Route path="/settings/core/crm" element={<CRMSettings />} />
               </Route>
               {/* END CORE ROUTES */}
               {/*START CORE ROUTES */}

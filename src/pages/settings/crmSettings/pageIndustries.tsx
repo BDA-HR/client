@@ -12,11 +12,11 @@ const PageIndustries: React.FC = () => {
 
   return (
     <SimpleCRMSettingsTable
-      title="Industries"
-      description="Set up industry categories for lead and company classification"
+      title="Lead Industry"
+      description="Set up industry categories for lead classification"
       icon={Building}
-      iconColor="text-indigo-600"
-      buttonColor="bg-indigo-600 hover:bg-indigo-700"
+      iconColor="text-orange-600"
+      buttonColor="bg-orange-600 hover:bg-orange-700"
       data={settings.industries}
       onSave={handleSave}
       singularName="Industry"

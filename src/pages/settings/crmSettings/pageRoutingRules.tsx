@@ -277,72 +277,69 @@ const PageRoutingRules: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-50 space-y-6 min-h-screen p-6"
+      className="bg-gray-50 space-y-6 min-h-screen"
     >
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            className="flex items-center gap-2 px-3 py-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-medium">Back</span>
-          </Button>
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 100, damping: 15 }}
+        className="mb-4 flex items-center gap-3"
+      >
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Back</span>
+        </Button>
 
-          <Shield className="w-8 h-8 text-cyan-600" />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Routing Rules</h1>
-            <p className="text-gray-600">Configure automatic lead routing and assignment rules</p>
-          </div>
-        </div>
-        <div className="flex space-x-2">
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              // Test routing with sample lead data
-              const sampleLead = {
-                source: 'Website',
-                industry: 'Technology',
-                budget: 75000,
-                score: 85,
-                company: 'Tech Corp',
-                city: 'San Francisco'
-              };
-              const assignedRep = RoutingService.assignLeadToSalesRep(sampleLead);
-              if (assignedRep) {
-                showToast.success(`Sample lead would be assigned to: ${assignedRep}`);
-              } else {
-                showToast.custom('No routing rule matches the sample lead');
-              }
-            }}
-            className="text-cyan-600 border-cyan-600 hover:bg-cyan-50"
-          >
-            <TestTube className="w-4 h-4 mr-2" />
-            Test Rules
-          </Button>
-          <Button onClick={handleAdd} className="bg-cyan-600 hover:bg-cyan-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Routing Rule
-          </Button>
-        </div>
-      </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center gap-2"
+        >
+          <Shield className="w-6 h-6 text-orange-600" />
+          <h1 className="text-2xl font-bold text-black">
+            <span className="bg-gradient-to-r from-orange-600 to-orange-600 bg-clip-text text-transparent">
+              Lead Routing
+            </span>
+          </h1>
+        </motion.div>
+      </motion.div>
 
-      {/* Search */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="relative max-w-md">
+      {/* Search and Add */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white p-4 rounded-lg shadow-sm"
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search routing rules..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
-        </CardContent>
-      </Card>
+          <Button onClick={handleAdd} className="bg-orange-600 hover:bg-orange-700 cursor-pointer">
+            <Plus className="w-4 h-4 mr-2" />
+            Add New
+          </Button>
+        </div>
+      </motion.div>
 
       {/* Table */}
       <Card>
@@ -450,7 +447,7 @@ const PageRoutingRules: React.FC = () => {
                   : "Get started by creating your first routing rule."}
               </p>
               {!searchTerm && (
-                <Button onClick={handleAdd} className="bg-cyan-600 hover:bg-cyan-700">
+                <Button onClick={handleAdd} className="bg-orange-600 hover:bg-orange-700">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Routing Rule
                 </Button>
@@ -641,7 +638,7 @@ const PageRoutingRules: React.FC = () => {
             <div className="flex justify-center items-center gap-1.5 pt-4">
               <Button 
                 type="submit" 
-                className="bg-cyan-600 hover:bg-cyan-700 text-white cursor-pointer px-6"
+                className="bg-green-600 hover:bg-green-700 text-white cursor-pointer px-6"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (

@@ -8,8 +8,14 @@ export interface Lead {
   phone: string;
   company: string;
   jobTitle: string;
-  source: 'Website' | 'Email' | 'Phone' | 'Social Media' | 'Referral' | 'Event';
-  status: 'New' | 'Contacted' | 'Qualified' | 'Proposal Sent' | 'Converted' | 'Closed Lost';
+  source: "Website" | "Email" | "Phone" | "Social Media" | "Referral" | "Event";
+  status:
+    | "New"
+    | "Contacted"
+    | "Qualified"
+    | "Proposal Sent"
+    | "Converted"
+    | "Closed Lost";
   score: number;
   assignedTo: string;
   createdAt: string;
@@ -24,16 +30,11 @@ export interface Lead {
   convertedToContactId?: string;
   convertedToAccountId?: string;
   convertedToOpportunityId?: string;
-  conversionType?: 'Contact' | 'Contact+Account' | 'Contact+Account+Opportunity';
+  conversionType?:
+    | "Contact"
+    | "Contact+Account"
+    | "Contact+Account+Opportunity";
 }
- 
-;
-  convertedAt?: string;
-  convertedTotring;
-  convertedToAccount string;
-  convertedToOpport
-  conversionType
-}';pportunityct+Account+OntaCo | '+Account' | 'Contactt'?: 'Contacing;?: strnityIduId?:tactId?: sConted: boolean  isConverrackingrsion t// Conve 
 
 export interface Contact {
   id: string;
@@ -59,10 +60,10 @@ export interface Contact {
   lastContactDate: string;
   notes: string;
   isActive: boolean;
-  stage: 'Lead' | 'Prospect' | 'Customer' | 'Partner';
+  stage: "Lead" | "Prospect" | "Customer" | "Partner";
   owner: string;
-  teamVisibility: 'private' | 'team' | 'public';
-  consentStatus: 'pending' | 'granted' | 'denied';
+  teamVisibility: "private" | "team" | "public";
+  consentStatus: "pending" | "granted" | "denied";
   customFields: Record<string, any>;
   relationshipScore: number;
   lastInteractionType: string;
@@ -87,7 +88,7 @@ export interface Account {
   tags: string[];
   owner: string;
   parentAccountId?: string;
-  accountType: 'Prospect' | 'Customer' | 'Partner' | 'Vendor';
+  accountType: "Prospect" | "Customer" | "Partner" | "Vendor";
   createdAt: string;
   updatedAt: string;
   isActive: boolean;
@@ -104,7 +105,13 @@ export interface Opportunity {
   name: string;
   accountId: string;
   contactId: string;
-  stage: 'Qualification' | 'Needs Analysis' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
+  stage:
+    | "Qualification"
+    | "Needs Analysis"
+    | "Proposal"
+    | "Negotiation"
+    | "Closed Won"
+    | "Closed Lost";
   amount: number;
   probability: number;
   expectedCloseDate: string;
@@ -121,8 +128,8 @@ export interface Opportunity {
 export interface Campaign {
   id: string;
   name: string;
-  type: 'Email' | 'SMS' | 'Social Media' | 'Webinar' | 'Event';
-  status: 'Draft' | 'Active' | 'Paused' | 'Completed';
+  type: "Email" | "SMS" | "Social Media" | "Webinar" | "Event";
+  status: "Draft" | "Active" | "Paused" | "Completed";
   startDate: string;
   endDate: string;
   budget: number;
@@ -143,9 +150,9 @@ export interface SupportTicket {
   id: string;
   title: string;
   description: string;
-  status: 'Open' | 'In Progress' | 'Pending' | 'Resolved' | 'Closed';
-  priority: 'Low' | 'Medium' | 'High' | 'Critical';
-  category: 'Technical' | 'Billing' | 'General' | 'Feature Request';
+  status: "Open" | "In Progress" | "Pending" | "Resolved" | "Closed";
+  priority: "Low" | "Medium" | "High" | "Critical";
+  category: "Technical" | "Billing" | "General" | "Feature Request";
   customerId: string;
   assignedTo: string;
   createdAt: string;
@@ -158,7 +165,7 @@ export interface SupportTicket {
   escalationLevel: number;
   responseTime?: number;
   resolutionTime?: number;
-  channel: 'email' | 'chat' | 'phone' | 'web' | 'social';
+  channel: "email" | "chat" | "phone" | "web" | "social";
   internalNotes: Array<{
     id: string;
     content: string;
@@ -181,7 +188,7 @@ export interface SupportTicket {
     name: string;
     responseTime: number;
     resolutionTime: number;
-    priority: 'Low' | 'Medium' | 'High' | 'Critical';
+    priority: "Low" | "Medium" | "High" | "Critical";
     businessHoursOnly: boolean;
   };
   customerInfo: {
@@ -189,21 +196,21 @@ export interface SupportTicket {
     email: string;
     phone: string;
     company: string;
-    tier: 'Enterprise' | 'Premium' | 'Standard';
+    tier: "Enterprise" | "Premium" | "Standard";
   };
 }
 
 // Activity interface - explicitly exported
 export interface Activity {
   id: string;
-  type: 'Call' | 'Email' | 'Meeting' | 'Task' | 'Note';
+  type: "Call" | "Email" | "Meeting" | "Task" | "Note";
   title: string;
   description: string;
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Cancelled';
-  priority: 'Low' | 'Medium' | 'High';
+  status: "Pending" | "In Progress" | "Completed" | "Cancelled";
+  priority: "Low" | "Medium" | "High";
   assignedTo: string;
   relatedTo: {
-    type: 'Lead' | 'Contact' | 'Opportunity' | 'Account';
+    type: "Lead" | "Contact" | "Opportunity" | "Account";
     id: string;
     name: string;
   };
@@ -242,7 +249,6 @@ export interface CRMAnalytics {
 //   CRMAnalytics as CRMAnalyticsType
 // };
 
-
 // Supporting interfaces for enhanced Lead management
 export interface LeadOwnerHistory {
   id: string;
@@ -255,10 +261,17 @@ export interface LeadOwnerHistory {
 
 export interface ContentEngagement {
   id: string;
-  contentType: 'Blog' | 'Whitepaper' | 'Ebook' | 'Video' | 'Webinar' | 'Case Study' | 'Demo';
+  contentType:
+    | "Blog"
+    | "Whitepaper"
+    | "Ebook"
+    | "Video"
+    | "Webinar"
+    | "Case Study"
+    | "Demo";
   contentTitle: string;
   contentUrl: string;
-  engagementType: 'View' | 'Download' | 'Share' | 'Comment' | 'Like';
+  engagementType: "View" | "Download" | "Share" | "Comment" | "Like";
   engagementDate: string;
   duration?: number; // in minutes
   completionPercentage?: number;
@@ -284,23 +297,23 @@ export interface EmailHistory {
 
 export interface CallHistory {
   id: string;
-  type: 'Inbound' | 'Outbound';
+  type: "Inbound" | "Outbound";
   duration: number; // in minutes
-  outcome: 'Connected' | 'Voicemail' | 'No Answer' | 'Busy' | 'Failed';
+  outcome: "Connected" | "Voicemail" | "No Answer" | "Busy" | "Failed";
   notes: string;
   recordingUrl?: string;
   calledBy: string;
   calledAt: string;
   followUpRequired: boolean;
   followUpDate?: string;
-  sentiment: 'Positive' | 'Neutral' | 'Negative';
+  sentiment: "Positive" | "Neutral" | "Negative";
   nextSteps: string[];
 }
 
 export interface MeetingHistory {
   id: string;
   title: string;
-  type: 'Demo' | 'Discovery' | 'Proposal' | 'Follow-up' | 'Closing' | 'Other';
+  type: "Demo" | "Discovery" | "Proposal" | "Follow-up" | "Closing" | "Other";
   scheduledAt: string;
   duration: number; // in minutes
   attendees: string[];
@@ -308,7 +321,7 @@ export interface MeetingHistory {
   meetingUrl?: string;
   agenda: string;
   notes: string;
-  outcome: 'Completed' | 'Cancelled' | 'No Show' | 'Rescheduled';
+  outcome: "Completed" | "Cancelled" | "No Show" | "Rescheduled";
   recordingUrl?: string;
   presentationUrl?: string;
   followUpRequired: boolean;
@@ -322,17 +335,17 @@ export interface ActionItem {
   description: string;
   assignedTo: string;
   dueDate: string;
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Overdue';
-  priority: 'Low' | 'Medium' | 'High';
+  status: "Pending" | "In Progress" | "Completed" | "Overdue";
+  priority: "Low" | "Medium" | "High";
 }
 
 export interface TaskHistory {
   id: string;
   title: string;
   description: string;
-  type: 'Call' | 'Email' | 'Meeting' | 'Follow-up' | 'Research' | 'Other';
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Cancelled';
-  priority: 'Low' | 'Medium' | 'High';
+  type: "Call" | "Email" | "Meeting" | "Follow-up" | "Research" | "Other";
+  status: "Pending" | "In Progress" | "Completed" | "Cancelled";
+  priority: "Low" | "Medium" | "High";
   assignedTo: string;
   assignedBy: string;
   createdAt: string;
@@ -345,7 +358,7 @@ export interface TaskHistory {
 export interface NoteHistory {
   id: string;
   content: string;
-  type: 'General' | 'Call' | 'Meeting' | 'Email' | 'Research' | 'Internal';
+  type: "General" | "Call" | "Meeting" | "Email" | "Research" | "Internal";
   createdBy: string;
   createdAt: string;
   updatedAt?: string;
@@ -385,14 +398,24 @@ export interface ScoringFactor {
 
 export interface TouchpointHistory {
   id: string;
-  type: 'Email' | 'Call' | 'Meeting' | 'Website Visit' | 'Social Media' | 'Event' | 'Content Download' | 'Demo' | 'Trial' | 'Support';
+  type:
+    | "Email"
+    | "Call"
+    | "Meeting"
+    | "Website Visit"
+    | "Social Media"
+    | "Event"
+    | "Content Download"
+    | "Demo"
+    | "Trial"
+    | "Support";
   channel: string;
   description: string;
   timestamp: string;
   duration?: number;
   outcome?: string;
-  sentiment?: 'Positive' | 'Neutral' | 'Negative';
-  engagementLevel: 'High' | 'Medium' | 'Low';
+  sentiment?: "Positive" | "Neutral" | "Negative";
+  engagementLevel: "High" | "Medium" | "Low";
   notes?: string;
   automatedCapture: boolean;
 }
@@ -404,7 +427,7 @@ export interface CampaignHistory {
   campaignType: string;
   joinedAt: string;
   leftAt?: string;
-  status: 'Active' | 'Completed' | 'Paused' | 'Stopped';
+  status: "Active" | "Completed" | "Paused" | "Stopped";
   interactions: number;
   conversions: number;
   revenue?: number;
@@ -430,7 +453,13 @@ export interface WebActivity {
 
 export interface WebAction {
   id: string;
-  type: 'Click' | 'Form Submit' | 'Download' | 'Video Play' | 'Scroll' | 'Search';
+  type:
+    | "Click"
+    | "Form Submit"
+    | "Download"
+    | "Video Play"
+    | "Scroll"
+    | "Search";
   element: string;
   value?: string;
   timestamp: string;
@@ -439,15 +468,31 @@ export interface WebAction {
 export interface EmailActivity {
   id: string;
   emailId: string;
-  type: 'Sent' | 'Delivered' | 'Opened' | 'Clicked' | 'Replied' | 'Forwarded' | 'Bounced' | 'Unsubscribed' | 'Spam';
+  type:
+    | "Sent"
+    | "Delivered"
+    | "Opened"
+    | "Clicked"
+    | "Replied"
+    | "Forwarded"
+    | "Bounced"
+    | "Unsubscribed"
+    | "Spam";
   timestamp: string;
   details?: Record<string, any>;
 }
 
 export interface SocialActivity {
   id: string;
-  platform: 'LinkedIn' | 'Twitter' | 'Facebook' | 'Instagram' | 'YouTube';
-  type: 'Follow' | 'Like' | 'Share' | 'Comment' | 'Message' | 'Connection Request' | 'Profile View';
+  platform: "LinkedIn" | "Twitter" | "Facebook" | "Instagram" | "YouTube";
+  type:
+    | "Follow"
+    | "Like"
+    | "Share"
+    | "Comment"
+    | "Message"
+    | "Connection Request"
+    | "Profile View";
   content?: string;
   url?: string;
   timestamp: string;
@@ -456,7 +501,16 @@ export interface SocialActivity {
 
 export interface AuditTrail {
   id: string;
-  action: 'Created' | 'Updated' | 'Deleted' | 'Restored' | 'Merged' | 'Split' | 'Assigned' | 'Status Changed' | 'Score Changed';
+  action:
+    | "Created"
+    | "Updated"
+    | "Deleted"
+    | "Restored"
+    | "Merged"
+    | "Split"
+    | "Assigned"
+    | "Status Changed"
+    | "Score Changed";
   field?: string;
   oldValue?: any;
   newValue?: any;
@@ -481,8 +535,8 @@ export interface LeadPermissions {
 export interface LeadSharing {
   isPublic: boolean;
   sharedWith: string[];
-  shareLevel: 'View' | 'Edit' | 'Full';
-  teamVisibility: 'Private' | 'Team' | 'Department' | 'Company';
+  shareLevel: "View" | "Edit" | "Full";
+  teamVisibility: "Private" | "Team" | "Department" | "Company";
   externalSharing: boolean;
 }
 
@@ -494,7 +548,7 @@ export interface LeadNotifications {
   notifyOnScoreChange: boolean;
   notifyOnAssignment: boolean;
   notifyOnActivity: boolean;
-  notificationFrequency: 'Immediate' | 'Hourly' | 'Daily' | 'Weekly';
+  notificationFrequency: "Immediate" | "Hourly" | "Daily" | "Weekly";
   customNotifications: CustomNotification[];
 }
 
@@ -569,7 +623,7 @@ export interface LeadScoring {
 export interface ScoringRule {
   id: string;
   name: string;
-  category: 'Demographic' | 'Behavior' | 'Engagement' | 'Fit' | 'Intent';
+  category: "Demographic" | "Behavior" | "Engagement" | "Fit" | "Intent";
   criteria: ScoringCriteria[];
   points: number;
   isActive: boolean;
@@ -586,7 +640,12 @@ export interface ScoreBreakdown {
 
 export interface LeadRouting {
   routingRules: RoutingRule[];
-  assignmentMethod: 'Round Robin' | 'Load Balancing' | 'Territory' | 'Skill Based' | 'Manual';
+  assignmentMethod:
+    | "Round Robin"
+    | "Load Balancing"
+    | "Territory"
+    | "Skill Based"
+    | "Manual";
   autoAssignment: boolean;
   reassignmentRules: ReassignmentRule[];
   escalationRules: EscalationRule[];
@@ -632,7 +691,7 @@ export interface LeadEnrichment {
   autoEnrichment: boolean;
   enrichmentSources: string[];
   lastEnriched?: string;
-  enrichmentStatus: 'Pending' | 'Completed' | 'Failed' | 'Partial';
+  enrichmentStatus: "Pending" | "Completed" | "Failed" | "Partial";
   enrichedFields: string[];
   enrichmentScore: number;
   dataProviders: DataProvider[];
@@ -640,7 +699,7 @@ export interface LeadEnrichment {
 
 export interface DataProvider {
   name: string;
-  status: 'Active' | 'Inactive' | 'Error';
+  status: "Active" | "Inactive" | "Error";
   lastSync?: string;
   fieldsProvided: string[];
   confidence: number;
@@ -659,7 +718,7 @@ export interface LeadValidation {
 export interface ValidationResult {
   isValid: boolean;
   confidence: number;
-  status: 'Valid' | 'Invalid' | 'Risky' | 'Unknown';
+  status: "Valid" | "Invalid" | "Risky" | "Unknown";
   details?: string;
   validatedAt?: string;
 }
@@ -676,10 +735,10 @@ export interface LeadCompliance {
   gdprCompliant: boolean;
   ccpaCompliant: boolean;
   canSpamCompliant: boolean;
-  consentStatus: 'Granted' | 'Denied' | 'Pending' | 'Withdrawn';
+  consentStatus: "Granted" | "Denied" | "Pending" | "Withdrawn";
   consentDate?: string;
   consentSource?: string;
-  optInStatus: 'Single' | 'Double' | 'None';
+  optInStatus: "Single" | "Double" | "None";
   unsubscribeDate?: string;
   unsubscribeReason?: string;
   dataRetentionDate?: string;
@@ -693,7 +752,7 @@ export interface LeadAnalytics {
   conversionProbability: number;
   timeToConversion?: number; // in days
   valueScore: number;
-  engagementTrend: 'Increasing' | 'Stable' | 'Decreasing';
+  engagementTrend: "Increasing" | "Stable" | "Decreasing";
   responseRate: number;
   averageResponseTime: number; // in hours
   touchpointsToConversion?: number;
@@ -711,14 +770,14 @@ export interface ChannelEffectiveness {
   conversions: number;
   conversionRate: number;
   averageResponseTime: number;
-  effectiveness: 'High' | 'Medium' | 'Low';
+  effectiveness: "High" | "Medium" | "Low";
 }
 
 export interface BenchmarkComparison {
   industryAverage: number;
   companyAverage: number;
   teamAverage: number;
-  performanceRating: 'Above Average' | 'Average' | 'Below Average';
+  performanceRating: "Above Average" | "Average" | "Below Average";
 }
 
 // Lead Import/Export interfaces
@@ -726,7 +785,7 @@ export interface LeadImportMapping {
   csvField: string;
   crmField: string;
   required: boolean;
-  dataType: 'string' | 'number' | 'date' | 'boolean' | 'email' | 'phone';
+  dataType: "string" | "number" | "date" | "boolean" | "email" | "phone";
   validation?: string;
   defaultValue?: any;
   transformation?: string;
@@ -750,7 +809,7 @@ export interface ImportError {
   field: string;
   value: any;
   error: string;
-  severity: 'Error' | 'Warning';
+  severity: "Error" | "Warning";
 }
 
 export interface SkippedRecord {
@@ -765,7 +824,7 @@ export interface ImportSummary {
   fileName: string;
   importedBy: string;
   importedAt: string;
-  source: 'CSV' | 'Excel' | 'API' | 'Manual';
+  source: "CSV" | "Excel" | "API" | "Manual";
   mappingUsed: LeadImportMapping[];
   settings: ImportSettings;
 }
@@ -785,7 +844,7 @@ export interface ImportSettings {
 
 // Lead Export interfaces
 export interface LeadExportSettings {
-  format: 'CSV' | 'Excel' | 'PDF' | 'JSON';
+  format: "CSV" | "Excel" | "PDF" | "JSON";
   fields: string[];
   filters: ExportFilter[];
   includeActivities: boolean;
@@ -853,7 +912,18 @@ export interface CustomFieldDefinition {
   id: string;
   name: string;
   label: string;
-  type: 'text' | 'number' | 'date' | 'datetime' | 'boolean' | 'select' | 'multiselect' | 'textarea' | 'url' | 'email' | 'phone';
+  type:
+    | "text"
+    | "number"
+    | "date"
+    | "datetime"
+    | "boolean"
+    | "select"
+    | "multiselect"
+    | "textarea"
+    | "url"
+    | "email"
+    | "phone";
   required: boolean;
   defaultValue?: any;
   options?: DropdownOption[];
@@ -884,7 +954,7 @@ export interface FieldPermissions {
 export interface NotificationTemplate {
   id: string;
   name: string;
-  type: 'Email' | 'SMS' | 'Push' | 'In-App';
+  type: "Email" | "SMS" | "Push" | "In-App";
   subject?: string;
   body: string;
   variables: string[];
@@ -899,7 +969,7 @@ export interface IntegrationSetting {
   id: string;
   name: string;
   type: string;
-  status: 'Active' | 'Inactive' | 'Error';
+  status: "Active" | "Inactive" | "Error";
   configuration: Record<string, any>;
   lastSync?: string;
   syncFrequency: string;
@@ -916,7 +986,7 @@ export interface DataRetentionPolicy {
   name: string;
   description: string;
   retentionPeriod: number; // in days
-  action: 'Delete' | 'Archive' | 'Anonymize';
+  action: "Delete" | "Archive" | "Anonymize";
   conditions: RetentionCondition[];
   isActive: boolean;
   lastExecuted?: string;
@@ -946,7 +1016,7 @@ export interface ComplianceSettings {
   cookiePolicyUrl?: string;
   dataProcessingAgreementUrl?: string;
   complianceOfficer: string;
-  auditFrequency: 'Monthly' | 'Quarterly' | 'Annually';
+  auditFrequency: "Monthly" | "Quarterly" | "Annually";
   lastAudit?: string;
   nextAudit?: string;
   complianceScore: number;
@@ -957,10 +1027,10 @@ export interface ComplianceViolation {
   id: string;
   type: string;
   description: string;
-  severity: 'Low' | 'Medium' | 'High' | 'Critical';
+  severity: "Low" | "Medium" | "High" | "Critical";
   detectedAt: string;
   resolvedAt?: string;
-  status: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+  status: "Open" | "In Progress" | "Resolved" | "Closed";
   assignedTo: string;
   actions: string[];
 }
@@ -969,7 +1039,7 @@ export interface EnrichmentSettings {
   autoEnrichment: boolean;
   enrichmentProviders: string[];
   enrichmentFields: string[];
-  enrichmentFrequency: 'Real-time' | 'Hourly' | 'Daily' | 'Weekly';
+  enrichmentFrequency: "Real-time" | "Hourly" | "Daily" | "Weekly";
   costLimit: number;
   qualityThreshold: number;
   fallbackProviders: string[];
@@ -997,7 +1067,7 @@ export interface ReportingSettings {
   customReports: CustomReport[];
   dashboards: Dashboard[];
   scheduledReports: ScheduledReport[];
-  reportingFrequency: 'Real-time' | 'Hourly' | 'Daily' | 'Weekly' | 'Monthly';
+  reportingFrequency: "Real-time" | "Hourly" | "Daily" | "Weekly" | "Monthly";
   dataRetention: number; // in days
   exportFormats: string[];
   sharingPermissions: ReportSharingPermissions;
@@ -1007,7 +1077,7 @@ export interface CustomReport {
   id: string;
   name: string;
   description: string;
-  type: 'Table' | 'Chart' | 'Dashboard';
+  type: "Table" | "Chart" | "Dashboard";
   fields: string[];
   filters: ReportFilter[];
   groupBy: string[];
@@ -1042,7 +1112,7 @@ export interface Dashboard {
 
 export interface DashboardWidget {
   id: string;
-  type: 'Chart' | 'Table' | 'Metric' | 'List';
+  type: "Chart" | "Table" | "Metric" | "List";
   title: string;
   reportId: string;
   position: WidgetPosition;
@@ -1070,9 +1140,9 @@ export interface ScheduledReport {
   id: string;
   reportId: string;
   name: string;
-  frequency: 'Daily' | 'Weekly' | 'Monthly' | 'Quarterly';
+  frequency: "Daily" | "Weekly" | "Monthly" | "Quarterly";
   recipients: string[];
-  format: 'PDF' | 'Excel' | 'CSV';
+  format: "PDF" | "Excel" | "CSV";
   isActive: boolean;
   lastSent?: string;
   nextSend: string;
@@ -1342,14 +1412,14 @@ export interface Contact {
   notes: string;
   isActive: boolean;
   // Enhanced fields for relationship intelligence
-  stage: 'Lead' | 'Prospect' | 'Customer' | 'Partner';
+  stage: "Lead" | "Prospect" | "Customer" | "Partner";
   owner: string;
-  teamVisibility: 'private' | 'team' | 'public';
-  consentStatus: 'granted' | 'denied' | 'pending';
+  teamVisibility: "private" | "team" | "public";
+  consentStatus: "granted" | "denied" | "pending";
   customFields: Record<string, any>;
   duplicateOf?: string;
   relationshipScore: number;
-  lastInteractionType?: 'email' | 'call' | 'meeting' | 'other';
+  lastInteractionType?: "email" | "call" | "meeting" | "other";
   segmentIds: string[];
 }
 
@@ -1358,7 +1428,13 @@ export interface Opportunity {
   name: string;
   accountId: string;
   contactId: string;
-  stage: 'Qualification' | 'Needs Analysis' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
+  stage:
+    | "Qualification"
+    | "Needs Analysis"
+    | "Proposal"
+    | "Negotiation"
+    | "Closed Won"
+    | "Closed Lost";
   amount: number;
   probability: number;
   expectedCloseDate: string;
@@ -1377,10 +1453,10 @@ export interface Opportunity {
   lastActivityDate: string;
   winProbabilityAI: number;
   lostReason?: string;
-  approvalStatus: 'pending' | 'approved' | 'rejected';
+  approvalStatus: "pending" | "approved" | "rejected";
   discountApproved: boolean;
   commissionRate: number;
-  forecastCategory: 'commit' | 'best-case' | 'pipeline';
+  forecastCategory: "commit" | "best-case" | "pipeline";
   crossSellOpportunities: string[];
   upsellPotential: number;
 }
@@ -1388,8 +1464,8 @@ export interface Opportunity {
 export interface Campaign {
   id: string;
   name: string;
-  type: 'Email' | 'SMS' | 'Social Media' | 'Webinar' | 'Event';
-  status: 'Draft' | 'Active' | 'Paused' | 'Completed';
+  type: "Email" | "SMS" | "Social Media" | "Webinar" | "Event";
+  status: "Draft" | "Active" | "Paused" | "Completed";
   startDate: string;
   endDate: string;
   budget: number;
@@ -1418,7 +1494,12 @@ export interface Campaign {
 export interface AutomationRule {
   id: string;
   name: string;
-  trigger: 'email_opened' | 'link_clicked' | 'form_submitted' | 'page_visited' | 'time_delay';
+  trigger:
+    | "email_opened"
+    | "link_clicked"
+    | "form_submitted"
+    | "page_visited"
+    | "time_delay";
   conditions: RuleCondition[];
   actions: RuleAction[];
   isActive: boolean;
@@ -1426,12 +1507,12 @@ export interface AutomationRule {
 
 export interface RuleCondition {
   field: string;
-  operator: 'equals' | 'contains' | 'greater_than' | 'less_than';
+  operator: "equals" | "contains" | "greater_than" | "less_than";
   value: string;
 }
 
 export interface RuleAction {
-  type: 'send_email' | 'add_tag' | 'change_stage' | 'assign_to' | 'create_task';
+  type: "send_email" | "add_tag" | "change_stage" | "assign_to" | "create_task";
   parameters: Record<string, any>;
 }
 
@@ -1474,14 +1555,14 @@ export interface ABTestVariant {
 export interface ConversionGoal {
   id: string;
   name: string;
-  type: 'page_visit' | 'form_submit' | 'purchase' | 'download';
+  type: "page_visit" | "form_submit" | "purchase" | "download";
   value: number;
   url?: string;
 }
 
 export interface TriggerCondition {
   id: string;
-  type: 'contact_created' | 'email_opened' | 'form_submitted' | 'tag_added';
+  type: "contact_created" | "email_opened" | "form_submitted" | "tag_added";
   parameters: Record<string, any>;
 }
 
@@ -1489,9 +1570,9 @@ export interface SupportTicket {
   id: string;
   title: string;
   description: string;
-  status: 'Open' | 'In Progress' | 'Pending' | 'Resolved' | 'Closed';
-  priority: 'Low' | 'Medium' | 'High' | 'Critical';
-  category: 'Technical' | 'Billing' | 'General' | 'Feature Request';
+  status: "Open" | "In Progress" | "Pending" | "Resolved" | "Closed";
+  priority: "Low" | "Medium" | "High" | "Critical";
+  category: "Technical" | "Billing" | "General" | "Feature Request";
   customerId: string;
   assignedTo: string;
   createdAt: string;
@@ -1505,7 +1586,7 @@ export interface SupportTicket {
   escalationLevel: number;
   responseTime?: number;
   resolutionTime?: number;
-  channel: 'email' | 'chat' | 'phone' | 'web' | 'social';
+  channel: "email" | "chat" | "phone" | "web" | "social";
   internalNotes: TicketNote[];
   publicReplies: TicketReply[];
   relatedTickets: string[];
@@ -1516,7 +1597,7 @@ export interface SupportTicket {
     email: string;
     phone?: string;
     company?: string;
-    tier: 'Basic' | 'Premium' | 'Enterprise';
+    tier: "Basic" | "Premium" | "Enterprise";
   };
 }
 
@@ -1542,7 +1623,7 @@ export interface SLAPolicy {
   name: string;
   responseTime: number; // in minutes
   resolutionTime: number; // in minutes
-  priority: 'Low' | 'Medium' | 'High' | 'Critical';
+  priority: "Low" | "Medium" | "High" | "Critical";
   businessHoursOnly: boolean;
 }
 
@@ -1564,14 +1645,14 @@ export interface KnowledgeBaseArticle {
 // Activity interface - explicitly exported
 export interface Activity {
   id: string;
-  type: 'Call' | 'Email' | 'Meeting' | 'Task' | 'Note';
+  type: "Call" | "Email" | "Meeting" | "Task" | "Note";
   title: string;
   description: string;
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Cancelled';
-  priority: 'Low' | 'Medium' | 'High';
+  status: "Pending" | "In Progress" | "Completed" | "Cancelled";
+  priority: "Low" | "Medium" | "High";
   assignedTo: string;
   relatedTo: {
-    type: 'Lead' | 'Contact' | 'Opportunity' | 'Account';
+    type: "Lead" | "Contact" | "Opportunity" | "Account";
     id: string;
     name: string;
   };
@@ -1607,5 +1688,5 @@ export type {
   Campaign as CRMCampaign,
   SupportTicket as CRMSupportTicket,
   Activity as CRMActivity,
-  CRMAnalytics as CRMAnalyticsType
+  CRMAnalytics as CRMAnalyticsType,
 };

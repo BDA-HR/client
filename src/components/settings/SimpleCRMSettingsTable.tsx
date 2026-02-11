@@ -232,47 +232,69 @@ const SimpleCRMSettingsTable: React.FC<SimpleCRMSettingsTableProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-50 space-y-6 min-h-screen p-6"
+      className="bg-gray-50 space-y-6 min-h-screen"
     >
-      {/* Header with Back Button */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          {/* Back Button */}
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            className="flex items-center gap-2 px-3 py-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-medium">Back</span>
-          </Button>
-
-          <Icon className={`w-8 h-8 ${iconColor}`} />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-            <p className="text-gray-600">{description}</p>
-          </div>
-        </div>
-        <Button onClick={handleAdd} className={buttonColor}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add {singularName}
+      {/* Header - Only Back Button and Title */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 100, damping: 15 }}
+        className="mb-4 flex items-center gap-3"
+      >
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Back</span>
         </Button>
-      </div>
 
-      {/* Search */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="relative max-w-md">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center gap-2"
+        >
+          <Icon className={`w-6 h-6 ${iconColor}`} />
+          <h1 className="text-2xl font-bold text-black">
+            <span className={`bg-gradient-to-r from-orange-600 to-orange-600 bg-clip-text text-transparent`}>
+              {title}
+            </span>
+          </h1>
+        </motion.div>
+      </motion.div>
+
+      {/* Search and Add Button */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white p-4 rounded-lg shadow-sm"
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder={`Search ${title.toLowerCase()}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
-        </CardContent>
-      </Card>
+          <Button onClick={handleAdd} className={`${buttonColor} cursor-pointer`}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add New
+          </Button>
+        </div>
+      </motion.div>
 
       {/* Table */}
       <Card>

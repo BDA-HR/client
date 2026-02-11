@@ -20,7 +20,6 @@ import MarketingOverview from "../../components/crm/MarketingOverview";
 import SupportOverview from "../../components/crm/SupportOverview";
 import ActivityOverview from "../../components/crm/ActivityOverview";
 import AnalyticsOverview from "../../components/crm/AnalyticsOverview";
-import LeadAnalytics from "../../components/crm/leadManagement/components_old/LeadAnalytics";
 import WorkflowDiagram from "../../components/crm/WorkflowDiagram";
 import { useModule } from "../../ModuleContext";
 import {
@@ -550,7 +549,9 @@ export default function CRMDashboard() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                <LeadAnalytics isOpen={true} onClose={() => {}} />
+                <div className="text-center py-8 text-gray-500">
+                  Lead analytics dashboard coming soon
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

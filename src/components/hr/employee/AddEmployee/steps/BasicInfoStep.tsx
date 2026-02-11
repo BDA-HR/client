@@ -215,7 +215,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
     fetchJobGrades();
   }, []);
-console.log('selected job grade', formik.values.jobGradeId);
   // Fetch job grades using nameListService when component mounts
 useEffect(() => {
   if (!formik.values.jobGradeId) return;

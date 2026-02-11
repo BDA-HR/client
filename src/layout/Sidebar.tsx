@@ -73,25 +73,73 @@ const NavItem: React.FC<NavItemProps> = ({
   const isActive = () => {
     const currentPath = location.pathname;
 
+    // Helper function to match dynamic routes
+    const matchesPattern = (pattern: string, path: string): boolean => {
+      // Convert pattern like "/crm/leads/:id/edit" to regex
+      const regexPattern = pattern
+        .replace(/:[^/]+/g, "([^/]+)") // Replace :param with capture group
+        .replace(/\//g, "\\/"); // Escape slashes
+      const regex = new RegExp(`^${regexPattern}$`);
+
+      // For patterns like /crm/leads/:id, we need to ensure :id is numeric or UUID-like
+      // and not a known route segment
+      if (pattern === "/crm/leads/:id") {
+        const knownSegments = [
+          "generation",
+          "assigned",
+          "grouping",
+          "add",
+          "import",
+          "routing",
+        ];
+        const match = path.match(/^\/crm\/leads\/([^/]+)$/);
+        if (match) {
+          const segment = match[1];
+          // Don't match if it's a known route segment
+          if (knownSegments.includes(segment)) {
+            return false;
+          }
+        }
+      }
+
+      return regex.test(path);
+    };
+
     // For child items, be more specific about matching
     if (isChild && matchPaths && matchPaths.length > 0) {
-      return matchPaths.some(
-        (path) =>
-          currentPath === path ||
-          (currentPath.startsWith(path) && currentPath !== path),
-      );
+      const matchesAdditionalPaths = matchPaths.some((path) => {
+        // Check for dynamic route patterns
+        if (path.includes(":")) {
+          return matchesPattern(path, currentPath);
+        }
+        // Check for exact match only for child items
+        return currentPath === path;
+      });
+
+      if (matchesAdditionalPaths) return true;
     }
 
     // Check if current path matches the main 'to' path
     if (end) {
       if (currentPath === to) return true;
     } else {
-      if (currentPath.startsWith(to)) return true;
+      // For child items, use exact match to avoid conflicts
+      if (isChild) {
+        if (currentPath === to) return true;
+      } else {
+        if (currentPath.startsWith(to)) return true;
+      }
     }
 
     // Check if current path matches any of the additional matchPaths
     if (matchPaths && matchPaths.length > 0) {
-      return matchPaths.some((path) => currentPath.startsWith(path));
+      return matchPaths.some((path) => {
+        // Check for dynamic route patterns
+        if (path.includes(":")) {
+          return matchesPattern(path, currentPath);
+        }
+        return currentPath.startsWith(path);
+      });
     }
 
     return false;
@@ -474,24 +522,101 @@ const Sidebar: React.FC = () => {
 
           {activeModule === "CRM" && (
             <>
-              <NavItem
-                to="/crm/leads"
+              <NavGroup
                 icon={<Trophy size={18} />}
                 label="Lead Management"
-                {...theme}
-              />
-              <NavItem
-                to="/crm/contacts"
+                isOpen={openGroup === "LeadManagement"}
+                onToggle={() => toggleGroup("LeadManagement")}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem
+                  to="/crm/leads/generation"
+                  icon={<Trophy size={18} />}
+                  label="Lead Generation"
+                  {...theme}
+                  isChild
+                  matchPaths={[
+                    "/crm/leads/add",
+                    "/crm/leads/import",
+                    "/crm/leads/:id/edit",
+                  ]}
+                />
+                <NavItem
+                  to="/crm/leads/grouping"
+                  icon={<Trophy size={18} />}
+                  label="Lead Grouping"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/leads/assigned"
+                  icon={<Trophy size={18} />}
+                  label="Assigned Leads"
+                  {...theme}
+                  isChild
+                  matchPaths={["/crm/leads/:id"]}
+                />
+              </NavGroup>
+              <NavGroup
                 icon={<Users size={18} />}
                 label="Contact Management"
-                {...theme}
-              />
-              <NavItem
-                to="/crm/sales"
+                isOpen={openGroup === "Contacts"}
+                onToggle={() => toggleGroup("Contacts")}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem
+                  to="/crm/contacts"
+                  icon={<Users size={18} />}
+                  label="Contacts"
+                  {...theme}
+                  isChild
+                  matchPaths={["/crm/contacts/add", "/crm/contacts/:id/edit"]}
+                />
+                <NavItem
+                  to="/crm/contacts/grouping"
+                  icon={<Users size={18} />}
+                  label="Contact Grouping"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/contacts/assigned"
+                  icon={<Users size={18} />}
+                  label="Assigned Contacts"
+                  {...theme}
+                  isChild
+                  matchPaths={["/crm/contacts/assigned/:id"]}
+                />
+              </NavGroup>
+              <NavGroup
                 icon={<BarChart4 size={18} />}
                 label="Sales Management"
-                {...theme}
-              />
+                isOpen={openGroup === "Sales"}
+                onToggle={() => toggleGroup("Sales")}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem
+                  to="/crm/sales/opportunities"
+                  icon={<BarChart4 size={18} />}
+                  label="Opportunities"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/quotations"
+                  icon={<BarChart4 size={18} />}
+                  label="Quotations"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/orders"
+                  icon={<BarChart4 size={18} />}
+                  label="Orders"
+                  {...theme}
+                  isChild
+                />
+              </NavGroup>
               <NavGroup
                 icon={<FileSpreadsheet size={18} />}
                 label="Marketing Automation"
@@ -522,18 +647,64 @@ const Sidebar: React.FC = () => {
                   isChild
                 />
               </NavGroup>
-              <NavItem
-                to="/crm/support"
+              <NavGroup
                 icon={<Calendar size={18} />}
                 label="Customer Service"
-                {...theme}
-              />
-              <NavItem
-                to="/crm/activities"
+                isOpen={openGroup === "CustomerService"}
+                onToggle={() => toggleGroup("CustomerService")}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem
+                  to="/crm/support/tickets"
+                  icon={<Calendar size={18} />}
+                  label="Tickets"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/support/knowledge-base"
+                  icon={<Calendar size={18} />}
+                  label="Knowledge Base"
+                  {...theme}
+                  isChild
+                />
+              </NavGroup>
+              <NavGroup
                 icon={<ClipboardList size={18} />}
                 label="Activity Management"
-                {...theme}
-              />
+                isOpen={openGroup === "Activities"}
+                onToggle={() => toggleGroup("Activities")}
+                hoverBg={theme.hoverBg}
+              >
+                <NavItem
+                  to="/crm/activities/tasks"
+                  icon={<ClipboardList size={18} />}
+                  label="Tasks"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/activities/calendar"
+                  icon={<Calendar size={18} />}
+                  label="Calendar"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/activities/time-tracking"
+                  icon={<Clock size={18} />}
+                  label="Time Tracking"
+                  {...theme}
+                  isChild
+                />
+                <NavItem
+                  to="/crm/activities/notifications"
+                  icon={<Calendar size={18} />}
+                  label="Notifications"
+                  {...theme}
+                  isChild
+                />
+              </NavGroup>
               <NavItem
                 to="/crm/analytics"
                 icon={<BarChart4 size={18} />}

@@ -12,11 +12,11 @@ const PageLeadStatuses: React.FC = () => {
 
   return (
     <SimpleCRMSettingsTable
-      title="Lead Statuses"
+      title="Lead Status"
       description="Configure lead status options and workflow progression stages"
       icon={BarChart3}
-      iconColor="text-blue-600"
-      buttonColor="bg-blue-600 hover:bg-blue-700"
+      iconColor="text-orange-600"
+      buttonColor="bg-orange-600 hover:bg-orange-700"
       data={settings.leadStatuses}
       onSave={handleSave}
       showPriority={true}
