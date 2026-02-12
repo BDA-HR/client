@@ -116,6 +116,7 @@ import PageQuotationTemplates from "./pages/settings/crmSettings/pageQuotationTe
 import PageEmailTemplates from "./pages/settings/crmSettings/pageEmailTemplates";
 import PageSMSTemplates from "./pages/settings/crmSettings/pageSMSTemplates";
 import PageTicketStatus from "./pages/settings/crmSettings/pageTicketStatus";
+import VacanciesPage from "./pages/vacancy/VacanciesPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -489,6 +490,20 @@ function App() {
                 path="/modules"
                 element={
                   isAuthenticated ? <Modules /> : <Navigate to="/login" />
+                }
+              />
+
+              {/* Standalone Vacancies Routes */}
+              <Route
+                path="/vacancies"
+                element={
+                  isAuthenticated ? <VacanciesPage /> : <Navigate to="/login" />
+                }
+              />
+              <Route
+                path="/vacancies/:id"
+                element={
+                  isAuthenticated ? <VacanciesPage /> : <Navigate to="/login" />
                 }
               />
 

@@ -2,9 +2,10 @@ import ModulesSection from "../components/ModulesSection";
 import { AnimatedList } from "../components/magicui/animated-list";
 import { useNavigate } from "react-router";
 import { useState, useEffect, useCallback } from "react";
-import { Bell } from "lucide-react";
+import { Bell, Briefcase } from "lucide-react";
 import Calendar from "../components/Calender";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -124,8 +125,8 @@ function Modules() {
   const toggleTaskCompletion = useCallback((taskId: number) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
+        task.id === taskId ? { ...task, completed: !task.completed } : task,
+      ),
     );
   }, []);
 
@@ -173,6 +174,17 @@ function Modules() {
 
           {/* Fixed Header Controls */}
           <div className="flex items-center gap-4">
+            {/* Vacancies Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/vacancies")}
+              className="flex items-center gap-2 bg-white hover:bg-green-50 border-green-200 text-green-700 hover:text-green-800 shadow-sm"
+            >
+              <Briefcase className="w-4 h-4" />
+              <span className="font-medium">Vacancies</span>
+            </Button>
+
             {/* Notification Icon with Badge - Show for all users */}
             <div className="relative">
               <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
