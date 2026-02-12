@@ -45,6 +45,7 @@ import PageEducationalQual from "./pages/settings/hrSettings/pageEducationalQual
 import PagePosition from "./pages/settings/hrSettings/position/pagePosition";
 import PositionDetails from "./pages/settings/hrSettings/position/PositionDetails";
 import AddEmployeePage from "./pages/hr/employeepage/AddEmployeePage";
+import EditEmployeePage from "./pages/hr/employeepage/EditEmployeePage";
 import PageAnnualLeave from "./pages/settings/hrSettings/pageAnnualLeave";
 import LeavePolicyAccrualPage from "./pages/settings/hrSettings/leavepolicyaccrual/LeavePolicyAccrualPage";
 import { PageHolidayHist } from "./pages/core/pageHolidayHist";
@@ -316,6 +317,10 @@ function App() {
                 <Route
                   path="/hr/employees/record/Add"
                   element={<AddEmployeePage />}
+                />
+                <Route
+                  path="/hr/employees/edit/:employeeId"
+                  element={<EditEmployeePage />}
                 />
                 <Route
                   path="/hr/employees/:id"

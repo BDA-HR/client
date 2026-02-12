@@ -76,6 +76,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     window.location.href = `/hr/employees/${employee.id}`;
   };
 
+  const handleEdit = (employee: Employee) => {
+    sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
+    window.location.href = `/hr/employees/edit/${employee.id}`;
+    setPopoverOpen(null);
+  };
+
   const handleDelete = (employee: Employee) => {
     setSelectedEmployee(employee);
     setIsDeleteModalOpen(true);
@@ -322,9 +328,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                                 <Eye size={16} />
                                 View Details
                               </button>
-                              <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2">
+                              <button 
+                                onClick={() => handleEdit(employee)}
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded text-gray-700 flex items-center gap-2"
+                              >
                                 <PenBox size={16} />
-                                Edit
+                                Update
                               </button>
                               <button className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded flex items-center gap-2">
                                 <Trash2 size={16} />
