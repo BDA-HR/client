@@ -280,7 +280,7 @@ const Sidebar: React.FC = () => {
   const theme = themeMap[activeModule] || themeMap.default;
 
   return (
-    <div className="w-56 bg-white h-screen flex flex-col">
+    <div className="w-62 bg-white h-screen flex flex-col">
       <div className="mb-1/2 p-2 flex items-center gap-2 mx-auto">
         <button
           onClick={() => navigate("/modules")}
