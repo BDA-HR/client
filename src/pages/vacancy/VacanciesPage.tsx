@@ -21,7 +21,7 @@ export default function VacanciesPage() {
         {isDetailView ? <VacancyDetailSection /> : <VacanciesSection />}
       </main>
 
-      <VacancyFooter />
+      {/* <VacancyFooter /> */}
     </div>
   );
 }
