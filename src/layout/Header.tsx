@@ -8,9 +8,10 @@ import { useNavigate } from "react-router";
 
 interface HeaderProps {
   toggleSidebar: () => void;
+  isMobile: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
+const Header: React.FC<HeaderProps> = ({ toggleSidebar, isMobile }) => {
   const { activeModule } = useModule();
   const navigate = useNavigate();
 
@@ -30,16 +31,20 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const theme = themeMap[activeModule] || themeMap.default;
 
   return (
-    <header className={`${theme.bg} border-b ${theme.border} shadow-nav h-16 flex items-center justify-between px-4 lg:px-6`}>
+    <header
+      className={`${theme.bg} border-b ${theme.border} shadow-nav h-16 flex items-center justify-between px-4 lg:px-6`}
+    >
       <div className="flex items-center">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 rounded-md text-gray-500 hover:bg-gray-100 lg:hidden"
-        >
-          <Menu size={20} />
-        </button>
+        {isMobile && (
+          <button
+            onClick={toggleSidebar}
+            className="p-2 rounded-md text-gray-500 hover:bg-gray-100 lg:hidden"
+          >
+            <Menu size={20} />
+          </button>
+        )}
       </div>
-      
+
       <div className="flex items-center space-x-4">
         <div className="relative">
           <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 relative">
@@ -47,26 +52,37 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-error-500 ring-2 ring-white" />
           </button>
         </div>
-        
+
         <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100">
           <HelpCircle size={20} />
         </button>
-        
+
         <div className="flex items-center border-l border-gray-200 pl-4 ml-2">
           <div className="mr-3 text-right hidden sm:block">
             <p className={`text-sm font-medium ${theme.text}`}>John Smith</p>
-            <p className="text-xs text-gray-500">{activeModule || 'HR'} Manager</p>
+            <p className="text-xs text-gray-500">
+              {activeModule || "HR"} Manager
+            </p>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger className='rounded-full'><Avatar>            <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>CN</AvatarFallback> </Avatar></DropdownMenuTrigger>
+            <DropdownMenuTrigger className="rounded-full">
+              <Avatar>
+                {" "}
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>{" "}
+              </Avatar>
+            </DropdownMenuTrigger>
             <DropdownMenuContent>
-    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem  onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
-    <DropdownMenuItem onClick={() => navigate("/login")}>logout</DropdownMenuItem>
-  </DropdownMenuContent>
-            </DropdownMenu>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/profile")}>
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/login")}>
+                logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
