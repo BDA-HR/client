@@ -80,7 +80,6 @@ export default function ChangeStatusModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <RefreshCw className="w-5 h-5 text-orange-600" />
             <span>Change Quotation Status</span>
           </DialogTitle>
         </DialogHeader>
@@ -90,27 +89,13 @@ export default function ChangeStatusModal({
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          {/* Quotation Info */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="text-sm font-medium text-gray-900">
-              {quotation.quotationNumber}
-            </div>
-            <div className="text-sm text-gray-600">
-              {quotation.opportunityName}
-            </div>
-            <div className="text-sm text-gray-600">
-              Current Status: <span className={`font-medium ${getStatusColor(quotation.status)}`}>
-                {quotation.status}
-              </span>
-            </div>
-          </div>
 
           {/* Status Selection */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="status">New Status *</Label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1 w-full">
                   <SelectValue placeholder="Select new status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -130,26 +115,9 @@ export default function ChangeStatusModal({
               </Select>
             </div>
 
-            {/* Status Change Info */}
-            {selectedStatus && selectedStatus !== quotation.status && (
-              <div className="bg-orange-50 p-3 rounded-lg">
-                <div className="text-sm text-orange-800">
-                  <strong>Status will change from:</strong>
-                </div>
-                <div className="text-sm">
-                  <span className={getStatusColor(quotation.status)}>
-                    {quotation.status}
-                  </span>
-                  {' → '}
-                  <span className={getStatusColor(selectedStatus)}>
-                    {selectedStatus}
-                  </span>
-                </div>
-              </div>
-            )}
 
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-3 pt-4 border-t">
+            <div className="flex justify-center space-x-3 pt-4 ">
               <Button type="button" variant="outline" onClick={handleClose}>
                 <X className="w-4 h-4 mr-2" />
                 Cancel

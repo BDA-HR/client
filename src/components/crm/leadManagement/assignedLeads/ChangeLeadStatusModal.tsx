@@ -19,13 +19,13 @@ const statusOptions: Lead['status'][] = [
   'Contacted',
   'Qualified',
   'Proposal Sent',
-  'Closed Won',
+  'Converted',
   'Closed Lost'
 ];
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    'New': 'text-blue-600',
+    'New': 'text-green-600',
     'Contacted': 'text-yellow-600',
     'Qualified': 'text-green-600',
     'Proposal Sent': 'text-purple-600',
@@ -58,7 +58,7 @@ export default function ChangeLeadStatusModal({
     }
 
     // Show confirmation for final statuses
-    if (selectedStatus === 'Closed Won' || selectedStatus === 'Closed Lost') {
+    if (selectedStatus === 'Converted' || selectedStatus === 'Closed Lost') {
       const confirmed = window.confirm(
         `Are you sure you want to mark this lead as "${selectedStatus}"? This action will be logged in the audit trail.`
       );
@@ -89,7 +89,7 @@ export default function ChangeLeadStatusModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <RefreshCw className="w-5 h-5 text-blue-600" />
+            <RefreshCw className="w-5 h-5 text-green-600" />
             <span>Change Lead Status</span>
           </DialogTitle>
         </DialogHeader>
@@ -127,8 +127,8 @@ export default function ChangeLeadStatusModal({
 
             {/* Status Change Info */}
             {selectedStatus && selectedStatus !== lead.status && (
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <div className="text-sm text-blue-800">
+              <div className="bg-green-50 p-3 rounded-lg">
+                <div className="text-sm text-green-800">
                   <strong>Status will change from:</strong>
                 </div>
                 <div className="text-sm">
@@ -151,7 +151,7 @@ export default function ChangeLeadStatusModal({
               </Button>
               <Button 
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-green-600 hover:bg-green-700"
                 disabled={isSubmitting || !selectedStatus || selectedStatus === lead?.status}
               >
                 {isSubmitting ? (

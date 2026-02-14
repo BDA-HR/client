@@ -6,13 +6,16 @@ import { Badge } from '../../../components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import { showToast } from '../../../layout/layout';
 import AddSMSCampaignModal from '../../../components/crm/campaigns/AddSMSCampaignModal';
+import DeleteSmsCampaignModal from '../../../components/crm/marketingAutomation/DeleteSmsCampaignModal';
 import { Pagination } from '../../../components/ui/pagination';
 import type { SMSCampaign } from '../../../types/campaign';
 
 export default function SMSCampaignsPage() {
   const [smsCampaigns, setSMSCampaigns] = useState<SMSCampaign[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<SMSCampaign | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<SMSCampaign | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -61,11 +64,18 @@ export default function SMSCampaignsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this SMS campaign?')) {
-      const updated = smsCampaigns.filter(c => c.id !== id);
+  const handleDelete = (campaign: SMSCampaign) => {
+    setDeletingCampaign(campaign);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingCampaign) {
+      const updated = smsCampaigns.filter(c => c.id !== deletingCampaign.id);
       saveSMSCampaigns(updated);
       showToast.success('SMS campaign deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingCampaign(null);
     }
   };
 
@@ -178,7 +188,7 @@ export default function SMSCampaignsPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(campaign.id)}
+                        onClick={() => handleDelete(campaign)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -210,6 +220,17 @@ export default function SMSCampaignsPage() {
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
         editingCampaign={editingCampaign}
+      />
+
+      {/* Delete Modal */}
+      <DeleteSmsCampaignModal
+        campaignName={deletingCampaign?.campaignName || null}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingCampaign(null);
+        }}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

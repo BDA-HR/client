@@ -1,27 +1,22 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import type { Lead } from "../../../../types/crm";
-import { Button } from "../../../ui/button";
+import { Button } from "../../ui/button";
 
-interface DeleteLeadModalProps {
-  lead: Lead | null;
+interface DeleteTaskModalProps {
+  taskName: string | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (lead: Lead) => void;
+  onConfirm: () => void;
 }
 
-const DeleteLeadModal: React.FC<DeleteLeadModalProps> = ({
-  lead,
+const DeleteTaskModal: React.FC<DeleteTaskModalProps> = ({
+  taskName,
   isOpen,
   onClose,
   onConfirm,
 }) => {
-  if (!isOpen || !lead) return null;
-
-  const handleConfirm = () => {
-    onConfirm(lead);
-  };
+  if (!isOpen || !taskName) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
@@ -39,7 +34,7 @@ const DeleteLeadModal: React.FC<DeleteLeadModalProps> = ({
             </div>
 
             <p className="text-lg font-medium text-red-600 mt-4">
-              Are you sure you want to delete this lead?
+              Are you sure you want to delete this task?
             </p>
             <p className="text-sm text-red-600 mt-2">
               This action cannot be undone.
@@ -52,7 +47,7 @@ const DeleteLeadModal: React.FC<DeleteLeadModalProps> = ({
           <div className="mx-auto flex justify-center items-center gap-1.5">
             <Button
               variant="destructive"
-              onClick={handleConfirm}
+              onClick={onConfirm}
               className="cursor-pointer px-6"
             >
               Yes, Delete!
@@ -71,4 +66,4 @@ const DeleteLeadModal: React.FC<DeleteLeadModalProps> = ({
   );
 };
 
-export default DeleteLeadModal;
+export default DeleteTaskModal;

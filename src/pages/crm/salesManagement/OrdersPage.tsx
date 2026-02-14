@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import AddOrderModal from "../../../components/crm/orders/AddOrderModal";
+import DeleteOrderModal from "../../../components/crm/salesManagement/DeleteOrderModal";
 import { mockOpportunities, mockContacts } from "../../../data/crmMockData";
 
 // Mock orders data
@@ -65,6 +66,8 @@ const OrdersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState(mockOrders);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingOrder, setDeletingOrder] = useState<any>(null);
   const [prefilledOpportunity, setPrefilledOpportunity] = useState<any>(null);
 
   // No auto-modal opening - modals only open when user clicks "Add" buttons
@@ -100,7 +103,16 @@ const OrdersPage = () => {
   };
 
   const handleDelete = (order: any) => {
-    setOrders(orders.filter(o => o.id !== order.id));
+    setDeletingOrder(order);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingOrder) {
+      setOrders(orders.filter(o => o.id !== deletingOrder.id));
+      setIsDeleteModalOpen(false);
+      setDeletingOrder(null);
+    }
   };
 
   const handleShip = (order: any) => {
@@ -502,6 +514,17 @@ const OrdersPage = () => {
         onClose={() => setIsAddModalOpen(false)}
         onSubmit={handleAddOrder}
         prefilledOpportunity={prefilledOpportunity}
+      />
+
+      {/* Delete Order Modal */}
+      <DeleteOrderModal
+        orderName={deletingOrder?.orderNumber || null}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingOrder(null);
+        }}
+        onConfirm={handleConfirmDelete}
       />
     </motion.section>
   );

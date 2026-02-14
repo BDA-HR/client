@@ -6,13 +6,16 @@ import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+import DeleteCampaignModal from '../../../components/crm/marketingAutomation/DeleteCampaignModal';
 import { showToast } from '../../../layout/layout';
 import type { Campaign } from '../../../types/campaign';
 
 export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(null);
   const [campaignName, setCampaignName] = useState('');
   const [error, setError] = useState('');
 
@@ -71,11 +74,18 @@ export default function CampaignsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this campaign?')) {
-      const updated = campaigns.filter(c => c.id !== id);
+  const handleDelete = (campaign: Campaign) => {
+    setDeletingCampaign(campaign);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingCampaign) {
+      const updated = campaigns.filter(c => c.id !== deletingCampaign.id);
       saveCampaigns(updated);
       showToast.success('Campaign deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingCampaign(null);
     }
   };
 
@@ -162,7 +172,7 @@ export default function CampaignsPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(campaign.id)}
+                        onClick={() => handleDelete(campaign)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -273,6 +283,17 @@ export default function CampaignsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Campaign Modal */}
+      <DeleteCampaignModal
+        campaignName={deletingCampaign?.name || null}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingCampaign(null);
+        }}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import ContactGroupingHeader from './ContactGroupingHeader';
 import ContactGroupingTable from './ContactGroupingTable';
 import AddContactGroupModal from './AddContactGroupModal';
 import ContactGroupConditionModal from './ContactGroupConditionModal';
+import DeleteContactGroupModal from './DeleteContactGroupModal';
 
 export interface ContactGroup {
   id: string;
@@ -41,8 +42,10 @@ export default function ContactGroupingSection() {
   const [contactGroups, setContactGroups] = useState<ContactGroup[]>(mockContactGroups);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isConditionModalOpen, setIsConditionModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<ContactGroup | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<ContactGroup | null>(null);
+  const [deletingGroup, setDeletingGroup] = useState<ContactGroup | null>(null);
 
   const handleAddGroup = (groupData: Omit<ContactGroup, 'id' | 'contactCount' | 'createdAt' | 'updatedAt'>) => {
     const newGroup: ContactGroup = {
@@ -69,9 +72,19 @@ export default function ContactGroupingSection() {
   };
 
   const handleDeleteGroup = (groupId: string) => {
-    if (window.confirm('Are you sure you want to delete this contact group?')) {
-      setContactGroups(contactGroups.filter(group => group.id !== groupId));
+    const group = contactGroups.find(g => g.id === groupId);
+    if (group) {
+      setDeletingGroup(group);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDeleteGroup = () => {
+    if (deletingGroup) {
+      setContactGroups(contactGroups.filter(group => group.id !== deletingGroup.id));
       showToast.success('Contact group deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingGroup(null);
     }
   };
 
@@ -126,6 +139,16 @@ export default function ContactGroupingSection() {
           groupName={selectedGroup.name}
         />
       )}
+
+      <DeleteContactGroupModal
+        groupName={deletingGroup?.name || null}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingGroup(null);
+        }}
+        onConfirm={confirmDeleteGroup}
+      />
     </motion.div>
   );
 }

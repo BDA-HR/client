@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, Calendar, User, Building, Eye, Edit, Truck, Package, MoreHorizontal } from 'lucide-react';
+import { DollarSign, Calendar, User, Building, Eye, Edit, Truck, Package, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../ui/table';
 import { Badge } from '../../../../ui/badge';
 import { Button } from '../../../../ui/button';
 import { Progress } from '../../../../ui/progress';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../../../ui/dropdown-menu';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../ui/card';
 import { Pagination } from '../../../../ui/pagination';
+import DeleteOrderModal from '../../DeleteOrderModal';
 
 interface Order {
   id: string;
@@ -31,6 +32,7 @@ interface OrderTableProps {
   onView: (order: Order) => void;
   onEdit: (order: Order) => void;
   onUpdateStatus: (orderId: string, status: Order['status']) => void;
+  onDelete: (order: Order) => void;
 }
 
 const statusColors = {
@@ -55,9 +57,11 @@ export default function OrderTable({
   orders,
   onView,
   onEdit,
-  onUpdateStatus
+  onUpdateStatus,
+  onDelete
 }: OrderTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletingOrder, setDeletingOrder] = useState<Order | null>(null);
   const itemsPerPage = 10;
 
   const formatCurrency = (amount: number) => {
@@ -79,6 +83,17 @@ export default function OrderTable({
 
   const isOverdue = (dateString: string, status: string) => {
     return new Date(dateString) < new Date() && !['Delivered', 'Completed', 'Cancelled'].includes(status);
+  };
+
+  const handleDeleteClick = (order: Order) => {
+    setDeletingOrder(order);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingOrder) {
+      onDelete(deletingOrder);
+      setDeletingOrder(null);
+    }
   };
 
   // Pagination calculations
@@ -217,6 +232,14 @@ export default function OrderTable({
                             Mark as Delivered
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteClick(order)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -247,6 +270,14 @@ export default function OrderTable({
           </div>
         )}
       </CardContent>
+
+      {/* Delete Modal */}
+      <DeleteOrderModal
+        orderName={deletingOrder?.orderNumber || null}
+        isOpen={!!deletingOrder}
+        onClose={() => setDeletingOrder(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </Card>
   );
 }

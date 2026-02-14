@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit, Phone, Mail, Building } from 'lucide-react';
+import { ArrowLeft, Edit, Phone, Mail, Building, User, Calendar, Briefcase, FileText } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
+
 import { showToast } from '../../../layout/layout';
 import { mockContacts } from '../../../data/crmMockData';
 import ContactOverview from '../../../components/crm/contactManagement/contacts/ContactOverview';
@@ -369,38 +369,92 @@ export default function ContactDetailPage() {
       </Card> */}
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex ">
-        <TabsList className="bg-orange-50 gap-5 border border-gray-200">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+      <div className="bg-white rounded-2xl shadow-sm border border-orange-200 p-2">
+        <nav className="flex space-x-2">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'overview'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <User className={`h-5 w-5 ${activeTab === 'overview' ? 'text-orange-600' : 'text-gray-400'}`} />
             Overview
-          </TabsTrigger>
-          <TabsTrigger value="activities" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+            {activeTab === 'overview' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('activities')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'activities'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <Calendar className={`h-5 w-5 ${activeTab === 'activities' ? 'text-orange-600' : 'text-gray-400'}`} />
             Activities
-          </TabsTrigger>
-          <TabsTrigger value="opportunities" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+            {activeTab === 'activities' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('opportunities')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'opportunities'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <Briefcase className={`h-5 w-5 ${activeTab === 'opportunities' ? 'text-orange-600' : 'text-gray-400'}`} />
             Opportunities
-          </TabsTrigger>
-          <TabsTrigger value="notes" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+            {activeTab === 'opportunities' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('notes')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'notes'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <FileText className={`h-5 w-5 ${activeTab === 'notes' ? 'text-orange-600' : 'text-gray-400'}`} />
             Notes
-          </TabsTrigger>
-        </TabsList>
+            {activeTab === 'notes' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+        </nav>
+      </div>
 
-        <TabsContent value="overview" className="space-y-6">
-          <ContactOverview contact={contact} onEdit={() => setIsEditDialogOpen(true)} />
-        </TabsContent>
+      <div className="mt-4">
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            <ContactOverview contact={contact} onEdit={() => setIsEditDialogOpen(true)} />
+          </div>
+        )}
 
-        <TabsContent value="activities" className="space-y-6">
-          <ContactActivities contactId={contact.id} />
-        </TabsContent>
+        {activeTab === 'activities' && (
+          <div className="space-y-6">
+            <ContactActivities contactId={contact.id} />
+          </div>
+        )}
 
-        <TabsContent value="opportunities" className="space-y-6">
-          <ContactOpportunities contactId={contact.id} hasAccount={!!contact.accountId} />
-        </TabsContent>
+        {activeTab === 'opportunities' && (
+          <div className="space-y-6">
+            <ContactOpportunities contactId={contact.id} hasAccount={!!contact.accountId} />
+          </div>
+        )}
 
-        <TabsContent value="notes" className="space-y-6">
-          <ContactNotes contactId={contact.id} />
-        </TabsContent>
-      </Tabs>
+        {activeTab === 'notes' && (
+          <div className="space-y-6">
+            <ContactNotes contactId={contact.id} />
+          </div>
+        )}
+      </div>
 
       {/* Email Modal */}
       <ContactEmailModal

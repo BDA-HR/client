@@ -8,7 +8,7 @@ import SalesHeader from '../components/SalesHeader';
 import SalesFilters from '../components/SalesFilters';
 import SalesTable from '../components/SalesTable';
 import OpportunityForm from '../components/opportunities/OpportunityForm';
-import DeleteOpportunityModal from '../components/modals/DeleteOpportunityModal';
+import DeleteOpportunityModal from '../DeleteOpportunityModal';
 
 const OpportunitiesSection = () => {
   const [searchTerm, setSearchTerm] = useState("");

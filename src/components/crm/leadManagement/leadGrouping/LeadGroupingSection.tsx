@@ -5,6 +5,7 @@ import LeadGroupingHeader from './LeadGroupingHeader';
 import LeadGroupingTable from './LeadGroupingTable';
 import AddLeadGroupModal from './AddLeadGroupModal';
 import LeadGroupConditionModal from './LeadGroupConditionModal';
+import DeleteLeadGroupModal from './DeleteLeadGroupModal';
 
 export interface LeadGroup {
   id: string;
@@ -50,8 +51,10 @@ export default function LeadGroupingSection() {
   const [leadGroups, setLeadGroups] = useState<LeadGroup[]>(mockLeadGroups);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isConditionModalOpen, setIsConditionModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<LeadGroup | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<LeadGroup | null>(null);
+  const [deletingGroup, setDeletingGroup] = useState<LeadGroup | null>(null);
 
   const handleAddGroup = (groupData: Omit<LeadGroup, 'id' | 'leadCount' | 'createdAt' | 'updatedAt'>) => {
     const newGroup: LeadGroup = {
@@ -78,9 +81,19 @@ export default function LeadGroupingSection() {
   };
 
   const handleDeleteGroup = (groupId: string) => {
-    if (window.confirm('Are you sure you want to delete this lead group?')) {
-      setLeadGroups(leadGroups.filter(group => group.id !== groupId));
+    const group = leadGroups.find(g => g.id === groupId);
+    if (group) {
+      setDeletingGroup(group);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDeleteGroup = () => {
+    if (deletingGroup) {
+      setLeadGroups(leadGroups.filter(group => group.id !== deletingGroup.id));
       showToast.success('Lead group deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingGroup(null);
     }
   };
 
@@ -135,6 +148,16 @@ export default function LeadGroupingSection() {
           groupName={selectedGroup.name}
         />
       )}
+
+      <DeleteLeadGroupModal
+        groupName={deletingGroup?.name || null}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingGroup(null);
+        }}
+        onConfirm={confirmDeleteGroup}
+      />
     </motion.div>
   );
 }

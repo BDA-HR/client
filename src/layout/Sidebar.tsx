@@ -938,7 +938,7 @@ const Sidebar: React.FC = () => {
                   collapsed={collapsed}
                   matchPaths={[
                     "/crm/leads/add",
-                    "/crm/leads/import",
+                    "/crm/leads/generation/import",
                     "/crm/leads/:id/edit",
                   ]}
                 />
@@ -1169,7 +1169,7 @@ const Sidebar: React.FC = () => {
                   collapsed={false}
                   matchPaths={[
                     "/crm/leads/add",
-                    "/crm/leads/import",
+                    "/crm/leads/generation/import",
                     "/crm/leads/:id/edit",
                   ]}
                 />

@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Edit, Phone, Mail, Building, User, Calendar, DollarSign, Target, CheckSquare, MessageSquare, RefreshCw } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
 import { Badge } from '../../../components/ui/badge';
 import { Separator } from '../../../components/ui/separator';
 import { showToast } from '../../../layout/layout';
@@ -354,15 +353,70 @@ export default function LeadDetailPage() {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activities">Activities</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-        </TabsList>
+      <div className="bg-white rounded-2xl shadow-sm border border-orange-200 p-2">
+        <nav className="flex space-x-2 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'overview'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <User className={`h-5 w-5 ${activeTab === 'overview' ? 'text-orange-600' : 'text-gray-400'}`} />
+            Overview
+            {activeTab === 'overview' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('activities')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'activities'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <Calendar className={`h-5 w-5 ${activeTab === 'activities' ? 'text-orange-600' : 'text-gray-400'}`} />
+            Activities
+            {activeTab === 'activities' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('notes')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'notes'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <MessageSquare className={`h-5 w-5 ${activeTab === 'notes' ? 'text-orange-600' : 'text-gray-400'}`} />
+            Notes
+            {activeTab === 'notes' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              activeTab === 'history'
+                ? 'bg-orange-50 border border-orange-300 text-orange-700 shadow-sm'
+                : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'
+            }`}
+          >
+            <RefreshCw className={`h-5 w-5 ${activeTab === 'history' ? 'text-orange-600' : 'text-gray-400'}`} />
+            History
+            {activeTab === 'history' && (
+              <div className="w-2 h-2 rounded-full bg-orange-500 ml-1"></div>
+            )}
+          </button>
+        </nav>
+      </div>
 
-        <TabsContent value="overview" className="space-y-6">
+      {/* Tab Content */}
+      <div className="bg-white rounded-2xl shadow-sm border border-orange-200 p-6">
+        {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -459,20 +513,20 @@ export default function LeadDetailPage() {
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+        )}
 
-        <TabsContent value="activities">
+        {activeTab === 'activities' && (
           <LeadActivities leadId={lead.id} />
-        </TabsContent>
+        )}
 
-        <TabsContent value="notes">
+        {activeTab === 'notes' && (
           <LeadNotes leadId={lead.id} />
-        </TabsContent>
+        )}
 
-        <TabsContent value="history">
+        {activeTab === 'history' && (
           <LeadHistory leadId={lead.id} />
-        </TabsContent>
-      </Tabs>
+        )}
+      </div>
 
       {/* Lead Communication Dialog */}
       {lead && (

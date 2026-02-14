@@ -138,11 +138,11 @@ export default function AddLeadPage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/crm/leads')}
+              onClick={() => navigate('/crm/leads/generation')}
               className="cursor-pointer hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-medium text-gray-700">Back to Leads</span>
+              <span className="font-medium text-gray-700">Back</span>
             </Button>
             
             <div className=" flex-1">

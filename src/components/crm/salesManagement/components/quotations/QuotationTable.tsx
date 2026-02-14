@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, Calendar, User, Building, Eye, Edit, Download, Send, MoreHorizontal } from 'lucide-react';
+import { DollarSign, Calendar, User, Building, Eye, Edit, Download, Send, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../ui/table';
 import { Badge } from '../../../../ui/badge';
 import { Button } from '../../../../ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../../../ui/dropdown-menu';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../ui/card';
 import { Pagination } from '../../../../ui/pagination';
+import DeleteQuotationModal from '../../DeleteQuotationModal';
 
 interface Quotation {
   id: string;
@@ -29,6 +30,7 @@ interface QuotationTableProps {
   onEdit: (quotation: Quotation) => void;
   onSend: (quotation: Quotation) => void;
   onDownload: (quotation: Quotation) => void;
+  onDelete: (quotation: Quotation) => void;
 }
 
 const statusColors = {
@@ -46,9 +48,11 @@ export default function QuotationTable({
   onView,
   onEdit,
   onSend,
-  onDownload
+  onDownload,
+  onDelete
 }: QuotationTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletingQuotation, setDeletingQuotation] = useState<Quotation | null>(null);
   const itemsPerPage = 10;
 
   const formatCurrency = (amount: number) => {
@@ -70,6 +74,17 @@ export default function QuotationTable({
 
   const isExpired = (dateString: string) => {
     return new Date(dateString) < new Date();
+  };
+
+  const handleDeleteClick = (quotation: Quotation) => {
+    setDeletingQuotation(quotation);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingQuotation) {
+      onDelete(deletingQuotation);
+      setDeletingQuotation(null);
+    }
   };
 
   // Pagination calculations
@@ -199,6 +214,14 @@ export default function QuotationTable({
                             Send to Customer
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteClick(quotation)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -229,6 +252,14 @@ export default function QuotationTable({
           </div>
         )}
       </CardContent>
+
+      {/* Delete Modal */}
+      <DeleteQuotationModal
+        quotationName={deletingQuotation?.quotationNumber || null}
+        isOpen={!!deletingQuotation}
+        onClose={() => setDeletingQuotation(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </Card>
   );
 }

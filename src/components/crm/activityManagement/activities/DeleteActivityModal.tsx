@@ -24,14 +24,14 @@ const DeleteActivityModal: React.FC<DeleteActivityModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6 h-screen">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white rounded-xl shadow-xl max-w-4xl w-1/3 max-h-[90vh] overflow-y-auto"
       >
-        {/* Modal Body */}
+        {/* modal body */}
         <div className="p-6">
           <div className="py-4 text-center">
             <div className="flex items-center justify-center p-3 rounded-full gap-2 text-red-600 mx-auto">
@@ -44,21 +44,10 @@ const DeleteActivityModal: React.FC<DeleteActivityModalProps> = ({
             <p className="text-sm text-red-600 mt-2">
               This action cannot be undone.
             </p>
-
-            {/* Activity Info */}
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg text-left">
-              <div className="text-sm text-gray-700">
-                <div className="font-medium">{activity.title}</div>
-                <div className="mt-1 text-gray-500">Type: {activity.type}</div>
-                <div className="mt-1 text-gray-500">
-                  Scheduled: {new Date(activity.scheduledDate).toLocaleString()}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Modal Footer */}
+        {/* modal footer */}
         <div className="border-t px-6 py-2">
           <div className="mx-auto flex justify-center items-center gap-1.5">
             <Button
@@ -66,14 +55,14 @@ const DeleteActivityModal: React.FC<DeleteActivityModalProps> = ({
               onClick={handleConfirm}
               className="cursor-pointer px-6"
             >
-              Delete
+              Yes, Delete!
             </Button>
             <Button
               onClick={onClose}
               variant="outline"
               className="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors duration-200 font-medium"
             >
-              Cancel
+              No, Keep It.
             </Button>
           </div>
         </div>

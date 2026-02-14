@@ -5,6 +5,7 @@ import { Card, CardContent } from '../../../ui/card';
 import { Textarea } from '../../../ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/dialog';
 import { Label } from '../../../ui/label';
+import DeleteNoteModal from './DeleteNoteModal';
 
 interface Note {
   id: string;
@@ -40,7 +41,9 @@ export default function LeadNotes({ leadId }: LeadNotesProps) {
   ]);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
   const [newNoteContent, setNewNoteContent] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
 
@@ -83,8 +86,15 @@ export default function LeadNotes({ leadId }: LeadNotesProps) {
   };
 
   const handleDeleteNote = (noteId: string) => {
-    if (window.confirm('Are you sure you want to delete this note?')) {
-      setNotes(notes.filter(note => note.id !== noteId));
+    setDeletingNoteId(noteId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteNote = () => {
+    if (deletingNoteId) {
+      setNotes(notes.filter(note => note.id !== deletingNoteId));
+      setIsDeleteModalOpen(false);
+      setDeletingNoteId(null);
     }
   };
 
@@ -212,6 +222,15 @@ export default function LeadNotes({ leadId }: LeadNotesProps) {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteNoteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingNoteId(null);
+        }}
+        onConfirm={confirmDeleteNote}
+      />
     </div>
   );
 }

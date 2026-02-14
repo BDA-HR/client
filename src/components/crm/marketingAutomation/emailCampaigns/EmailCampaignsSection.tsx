@@ -6,13 +6,16 @@ import { Badge } from '../../../ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../ui/table';
 import { showToast } from '../../../../layout/layout';
 import AddEmailCampaignModal from '../../../crm/campaigns/AddEmailCampaignModal';
+import DeleteEmailCampaignModal from './DeleteEmailCampaignModal';
 import { Pagination } from '../../../ui/pagination';
 import type { EmailCampaign } from '../../../../types/campaign';
 
 export default function EmailCampaignsSection() {
   const [emailCampaigns, setEmailCampaigns] = useState<EmailCampaign[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<EmailCampaign | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<EmailCampaign | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -60,10 +63,20 @@ export default function EmailCampaignsSection() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this email campaign?')) {
-      const updated = emailCampaigns.filter(c => c.id !== id);
+    const campaign = emailCampaigns.find(c => c.id === id);
+    if (campaign) {
+      setDeletingCampaign(campaign);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (deletingCampaign) {
+      const updated = emailCampaigns.filter(c => c.id !== deletingCampaign.id);
       saveEmailCampaigns(updated);
       showToast.success('Email campaign deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingCampaign(null);
     }
   };
 
@@ -204,6 +217,16 @@ export default function EmailCampaignsSection() {
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
         editingCampaign={editingCampaign}
+      />
+
+      <DeleteEmailCampaignModal
+        campaignName={deletingCampaign?.campaignName || null}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingCampaign(null);
+        }}
+        onConfirm={confirmDelete}
       />
     </div>
   );

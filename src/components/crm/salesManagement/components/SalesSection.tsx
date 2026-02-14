@@ -5,7 +5,7 @@ import SalesHeader from "./SalesHeader";
 import SalesFilters from "./SalesFilters";
 import SalesTable from "./SalesTable";
 import OpportunityForm from "./opportunities/OpportunityForm";
-import DeleteOpportunityModal from "./modals/DeleteOpportunityModal";
+import DeleteOpportunityModal from "../DeleteOpportunityModal";
 
 interface SalesSectionProps {
   searchTerm: string;

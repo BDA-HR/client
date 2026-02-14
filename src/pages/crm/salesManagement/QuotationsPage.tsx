@@ -6,6 +6,7 @@ import { Button } from "../../../components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import AddQuotationModal from "../../../components/crm/quotations/AddQuotationModal";
 import ChangeStatusModal from "../../../components/crm/quotations/ChangeStatusModal";
+import DeleteQuotationModal from "../../../components/crm/salesManagement/DeleteQuotationModal";
 import { mockOpportunities, mockContacts } from "../../../data/crmMockData";
 
 // Mock quotations data
@@ -62,8 +63,10 @@ const QuotationsPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isChangeStatusModalOpen, setIsChangeStatusModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingQuotation, setEditingQuotation] = useState<any>(null);
   const [changingStatusQuotation, setChangingStatusQuotation] = useState<any>(null);
+  const [deletingQuotation, setDeletingQuotation] = useState<any>(null);
   const [prefilledOpportunity, setPrefilledOpportunity] = useState<any>(null);
 
   // No auto-modal opening - modals only open when user clicks "Add" buttons
@@ -109,8 +112,15 @@ const QuotationsPage = () => {
   };
 
   const handleDelete = (quotation: any) => {
-    if (window.confirm(`Are you sure you want to delete quotation ${quotation.quotationNumber}?`)) {
-      setQuotations(quotations.filter(q => q.id !== quotation.id));
+    setDeletingQuotation(quotation);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingQuotation) {
+      setQuotations(quotations.filter(q => q.id !== deletingQuotation.id));
+      setIsDeleteModalOpen(false);
+      setDeletingQuotation(null);
     }
   };
 
@@ -525,6 +535,17 @@ const QuotationsPage = () => {
         }}
         onSubmit={handleStatusUpdate}
         quotation={changingStatusQuotation}
+      />
+
+      {/* Delete Quotation Modal */}
+      <DeleteQuotationModal
+        quotationName={deletingQuotation?.quotationNumber || null}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingQuotation(null);
+        }}
+        onConfirm={handleConfirmDelete}
       />
     </motion.section>
   );

@@ -243,16 +243,21 @@ export default function ImportLeadContent({
         </CardHeader>
         <CardContent>
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               dragActive
                 ? "border-orange-500 bg-orange-50"
                 : "border-gray-300 hover:border-gray-400"
-            }`}
+            } ${!file ? 'cursor-pointer' : ''}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
-            onClick={() => !file && fileInputRef.current?.click()}
+            onClick={(e) => {
+              // Only trigger file input if clicking on the container itself, not on buttons
+              if (!file && e.target === e.currentTarget) {
+                fileInputRef.current?.click();
+              }
+            }}
           >
             {file ? (
               <div className="space-y-4">
@@ -297,7 +302,10 @@ export default function ImportLeadContent({
                 <Button
                   variant="outline"
                   className="cursor-pointer"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
                 >
                   Choose File
                 </Button>
