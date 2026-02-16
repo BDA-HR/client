@@ -1,0 +1,152 @@
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Mail } from "lucide-react";
+import { showToast } from "../../../../layout/layout";
+import EmailTemplatesHeader from "./EmailTemplatesHeader";
+import EmailTemplatesSearchFilter from "./EmailTemplatesSearchFilter";
+import EmailTemplatesTable from "./EmailTemplatesTable";
+import AddEmailTemplateModal from "./AddEmailTemplateModal";
+import EditEmailTemplateModal from "./EditEmailTemplateModal";
+import DeleteEmailTemplateModal from "./DeleteEmailTemplateModal";
+
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  is_active: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+const EmailTemplatesSection: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
+  const [deletingTemplate, setDeletingTemplate] = useState<EmailTemplate | null>(null);
+
+  const loadTemplates = (): EmailTemplate[] => {
+    const stored = localStorage.getItem('emailTemplates');
+    return stored ? JSON.parse(stored) : [];
+  };
+
+  const [templates, setTemplates] = useState<EmailTemplate[]>(loadTemplates());
+
+  const saveTemplates = (updatedTemplates: EmailTemplate[]) => {
+    localStorage.setItem('emailTemplates', JSON.stringify(updatedTemplates));
+    setTemplates(updatedTemplates);
+  };
+
+  const handleAddSubmit = (templateData: Omit<EmailTemplate, 'id' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy'>) => {
+    const newTemplate: EmailTemplate = {
+      ...templateData,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      createdBy: 'Current User'
+    };
+    saveTemplates([...templates, newTemplate]);
+    showToast.success("Template added successfully");
+    setIsAddModalOpen(false);
+  };
+
+  const handleEditSubmit = (templateData: Omit<EmailTemplate, 'id' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy'>) => {
+    if (editingTemplate) {
+      const updatedTemplates = templates.map(t =>
+        t.id === editingTemplate.id
+          ? { ...t, ...templateData, updatedAt: new Date().toISOString(), updatedBy: 'Current User' }
+          : t
+      );
+      saveTemplates(updatedTemplates);
+      showToast.success("Template updated successfully");
+      setEditingTemplate(null);
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deletingTemplate) {
+      const updatedTemplates = templates.filter(t => t.id !== deletingTemplate.id);
+      saveTemplates(updatedTemplates);
+      showToast.success("Template deleted successfully");
+      setDeletingTemplate(null);
+    }
+  };
+
+  const handleToggleActive = (template: EmailTemplate) => {
+    const updatedTemplates = templates.map(t =>
+      t.id === template.id ? { ...t, is_active: !t.is_active } : t
+    );
+    saveTemplates(updatedTemplates);
+    showToast.success(`Template ${!template.is_active ? 'activated' : 'deactivated'}`);
+  };
+
+  const filteredTemplates = templates.filter(t =>
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.subject.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-gray-50 space-y-6 min-h-screen"
+    >
+      <EmailTemplatesHeader />
+
+      <EmailTemplatesSearchFilter
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onAddClick={() => setIsAddModalOpen(true)}
+      />
+
+      <EmailTemplatesTable
+        templates={filteredTemplates}
+        onEdit={setEditingTemplate}
+        onDelete={setDeletingTemplate}
+        onToggleActive={handleToggleActive}
+      />
+
+      {filteredTemplates.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-12 bg-white rounded-lg border"
+        >
+          <Mail className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No Email Templates Found
+          </h3>
+          <p className="text-gray-500 mb-4">
+            {searchTerm
+              ? "No templates match your search."
+              : "Get started by creating your first email template."}
+          </p>
+        </motion.div>
+      )}
+
+      <AddEmailTemplateModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={handleAddSubmit}
+      />
+
+      <EditEmailTemplateModal
+        isOpen={!!editingTemplate}
+        onClose={() => setEditingTemplate(null)}
+        onSubmit={handleEditSubmit}
+        template={editingTemplate}
+      />
+
+      <DeleteEmailTemplateModal
+        isOpen={!!deletingTemplate}
+        onClose={() => setDeletingTemplate(null)}
+        onConfirm={handleDeleteConfirm}
+        templateName={deletingTemplate?.name || ''}
+      />
+    </motion.section>
+  );
+};
+
+export default EmailTemplatesSection;

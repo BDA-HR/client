@@ -1,28 +1,8 @@
 import React from "react";
-import { BarChart3 } from "lucide-react";
-import SimpleCRMSettingsTable from "../../../components/settings/SimpleCRMSettingsTable";
-import { useCRMSettings } from "../../../hooks/useCRMSettings";
+import LeadStatusesSection from "../../../components/settings/crmSettings/leadStatuses/LeadStatusesSection";
 
 const PageLeadStatuses: React.FC = () => {
-  const { settings, saveSettings } = useCRMSettings();
-
-  const handleSave = async (updatedLeadStatuses: any[]) => {
-    await saveSettings({ leadStatuses: updatedLeadStatuses });
-  };
-
-  return (
-    <SimpleCRMSettingsTable
-      title="Lead Status"
-      description="Configure lead status options and workflow progression stages"
-      icon={BarChart3}
-      iconColor="text-orange-600"
-      buttonColor="bg-orange-600 hover:bg-orange-700"
-      data={settings.leadStatuses}
-      onSave={handleSave}
-      showPriority={true}
-      singularName="Lead Status"
-    />
-  );
+  return <LeadStatusesSection />;
 };
 
 export default PageLeadStatuses;
