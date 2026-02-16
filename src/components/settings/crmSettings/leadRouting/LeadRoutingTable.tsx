@@ -30,10 +30,10 @@ const LeadRoutingTable: React.FC<LeadRoutingTableProps> = ({
             <TableRow>
               <TableHead>Priority</TableHead>
               <TableHead>Rule Name</TableHead>
-              <TableHead>Conditions</TableHead>
               <TableHead>Assign To</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created</TableHead>
+              <TableHead>Conditions</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -47,21 +47,13 @@ const LeadRoutingTable: React.FC<LeadRoutingTableProps> = ({
                   <div>
                     <p className="font-medium">{rule.name}</p>
                     {rule.description && (
-                      <p className="text-sm text-gray-500">{rule.description}</p>
+                      <p className="text-sm text-gray-500">
+                        {rule.description}
+                      </p>
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onManageConditions(rule)}
-                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                  >
-                    <Settings className="w-4 h-4 mr-1" />
-                    Manage ({rule.conditions.length})
-                  </Button>
-                </TableCell>
+
                 <TableCell>
                   <span className="font-medium">{rule.assignTo}</span>
                 </TableCell>
@@ -85,6 +77,17 @@ const LeadRoutingTable: React.FC<LeadRoutingTableProps> = ({
                 </TableCell>
                 <TableCell className="text-sm text-gray-500">
                   {new Date(rule.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onManageConditions(rule)}
+                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                  >
+                    <Settings className="w-4 h-4 mr-1" />
+                    Manage
+                  </Button>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -111,7 +114,7 @@ const LeadRoutingTable: React.FC<LeadRoutingTableProps> = ({
                           </>
                         )}
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => onDelete(rule)}
                         className="text-red-600"
                       >

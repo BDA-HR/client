@@ -107,16 +107,16 @@ const crmSettingsCards = [
     bgColor: "bg-orange-50",
     iconColor: "text-orange-600"
   },
-  {
-    id: 9,
-    title: "Ticket Status",
-    description: "Manage ticket status options for customer support workflow",
-    icon: Ticket,
-    href: "/settings/crm/ticket-status",
-    color: "from-orange-500 to-orange-600",
-    bgColor: "bg-orange-50",
-    iconColor: "text-orange-600"
-  }
+  // {
+  //   id: 9,
+  //   title: "Ticket Status",
+  //   description: "Manage ticket status options for customer support workflow",
+  //   icon: Ticket,
+  //   href: "/settings/crm/ticket-status",
+  //   color: "from-orange-500 to-orange-600",
+  //   bgColor: "bg-orange-50",
+  //   iconColor: "text-orange-600"
+  // }
 ]
 
 function PageCrmSettings() {

@@ -113,21 +113,15 @@ const OpportunitiesSection = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Opportunities</h1>
-          <p className="text-gray-600">Manage sales opportunities and track deals</p>
+        
         </div>
-        <Button 
-          onClick={handleOpenAddOpportunityModal}
-          className="bg-orange-600 hover:bg-orange-700"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Opportunity
-        </Button>
       </div>
 
       {/* Filters */}
       <SalesFilters
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
+        onAddClick={handleOpenAddOpportunityModal}
       />
 
       {/* Table */}
@@ -147,7 +141,9 @@ const OpportunitiesSection = () => {
       <OpportunityForm
         isOpen={isAddOpportunityModalOpen}
         onClose={handleCloseAddOpportunityModal}
-        onSubmit={formMode === 'add' ? handleAddOpportunity : handleOpportunityEdit}
+        onSubmit={
+          formMode === "add" ? handleAddOpportunity : handleOpportunityEdit
+        }
         opportunity={selectedOpportunity}
         mode={formMode}
       />
@@ -157,7 +153,7 @@ const OpportunitiesSection = () => {
         isOpen={!!deletingOpportunity}
         onClose={() => setDeletingOpportunity(null)}
         onConfirm={handleConfirmDelete}
-        opportunityName={deletingOpportunity?.name || ''}
+        opportunityName={deletingOpportunity?.name || ""}
       />
     </motion.section>
   );

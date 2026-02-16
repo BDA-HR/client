@@ -157,7 +157,7 @@ const AddRoutingRuleModal: React.FC<AddRoutingRuleModalProps> = ({
               Assign To <span className="text-red-500">*</span>
             </Label>
             <Select value={formData.assignTo} onValueChange={(value) => setFormData(prev => ({ ...prev, assignTo: value }))}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select sales rep" />
               </SelectTrigger>
               <SelectContent>
