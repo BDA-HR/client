@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  ChevronLeft,
-  ChevronRight,
-  User,
-  Loader2,
-  PenBox,
-  Lock,
+  ChevronLeft, ChevronRight, User, Loader2, PenBox, Lock,
 } from "lucide-react";
 import DeleteEmployeeModal from "../../hr/employee/DeleteEmployeeModal";
 
@@ -59,7 +54,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onEmployeeDelete,
   onAddAccount,
   onEditAccount,
-  showAddAccountButton = false,
+  showAddAccountButton = true,
   loading = false,
 }) => {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
@@ -288,7 +283,17 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       </div>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                      {employee.hasAccount ? (
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleAddAccountClick(employee)}
+                        className="p-2 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors"
+                        title="Add Account"
+                      >
+                        <Lock className="h-5 w-5" />
+                      </motion.button>
+
+                      {/* {employee.hasAccount ? (
                         // Direct Edit button for users with accounts
                         <motion.button
                           whileHover={{ scale: 1.1 }}
@@ -310,7 +315,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         >
                           <Lock className="h-5 w-5" />
                         </motion.button>
-                      )}
+                      )} */}
                     </td>
                   </motion.tr>
                 ))
@@ -371,11 +376,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     <button
                       key={page}
                       onClick={() => onPageChange(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === page
-                          ? "z-10 bg-blue-50 border-green-500 text-green-600"
-                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                      }`}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
+                        ? "z-10 bg-blue-50 border-green-500 text-green-600"
+                        : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                        }`}
                     >
                       {page}
                     </button>
