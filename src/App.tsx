@@ -117,6 +117,8 @@ import PageEmailTemplates from "./pages/settings/crmSettings/pageEmailTemplates"
 import PageSMSTemplates from "./pages/settings/crmSettings/pageSMSTemplates";
 import PageTicketStatus from "./pages/settings/crmSettings/pageTicketStatus";
 import VacanciesPage from "./pages/vacancy/VacanciesPage";
+import AddAccountPage from "./pages/core/usermanagement/pageAddAccount";
+import EditAccountPage from "./pages/core/usermanagement/pageEditAccount";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -463,6 +465,14 @@ function App() {
                 {/* <Route path='/core/hierarchy' element={<HierarchyOverview />} /> */}
                 <Route path="/core/users" element={<UserOverview />} />
                 <Route path="/core/Add-Employee" element={<PageAddUser />} />
+                <Route
+                  path="/core/user-management/add/:empId"
+                  element={<AddAccountPage />}
+                />
+                <Route
+                  path="/core/user-management/edit/:empId"
+                  element={<EditAccountPage />}
+                />
                 <Route
                   path="/core/department"
                   element={<DepartmentOverview />}

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { AddAccountStepForm } from "../../../components/core/usermgmt/AddAccountStepForm";
-import { EditAccountStepForm } from "../../../components/core/usermgmt/EditAccountStepForm";
 import type { EmpSearchRes, UUID } from "../../../types/core/EmpSearchRes";
 import EmployeeSearchFilters from "../../../components/hr/employee/EmployeeSearchFilters";
 import { motion } from "framer-motion";
 import { usermgmtService } from "../../../services/core/usermgtservice";
 import EmployeeTable from "../../../components/core/usermgmt/employeeTable";
 import type { EmployeeListDto } from "../../../types/hr/employee";
+import { useNavigate } from "react-router-dom";
 
 interface TableEmployee {
   id: string;
@@ -31,12 +30,6 @@ interface TableEmployee {
 
 const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAccountForm, setShowAccountForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<EmpSearchRes | null>(
-    null,
-  );
-  const [selectedAccountData, setSelectedAccountData] = useState<any>(null);
   const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
@@ -53,14 +46,12 @@ const UserManagement: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [tableLoading, setTableLoading] = useState(false);
-
-  // Filters state
   const [filters, setFilters] = useState({
     department: "",
     status: "",
     employmentType: "",
   });
-
+   const navigate = useNavigate();
   // Helper function to determine employee status based on actual data
   const determineEmployeeStatus = (
     employee: EmployeeListDto,
@@ -139,6 +130,8 @@ const UserManagement: React.FC = () => {
   const fetchAllEmployees = async (page: number = 1) => {
     setTableLoading(true);
     setError(null);
+ 
+
 
     try {
       // Fetch all employees from the API
@@ -231,9 +224,8 @@ const UserManagement: React.FC = () => {
       hasAccount: true,
     };
 
-    setSelectedEmployee(empSearchRes);
-    setShowAccountForm(true);
-    setShowEditForm(false);
+   navigate(`/core/user-management/add/${employeeData.id}`);
+
   };
 
   const handleEditAccount = async (employeeData: TableEmployee) => {
@@ -256,10 +248,7 @@ const UserManagement: React.FC = () => {
         employeeData.id as UUID,
       );
 
-      setSelectedEmployee(empSearchRes);
-      setSelectedAccountData(accountData);
-      setShowEditForm(true);
-      setShowAccountForm(false);
+      navigate(`/core/user-management/edit/${employeeData.id}`);
     } catch (error: any) {
       console.error("Failed to fetch account data:", error);
       setError(error.message || "Failed to load account data");
@@ -268,50 +257,7 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handleAccountAdded = (result: any) => {
-    console.log("Account created:", result);
-    setShowAccountForm(false);
-    setShowEditForm(false);
-    setSelectedEmployee(null);
-    setSelectedAccountData(null);
-    setError(null);
-    setHasSearched(false);
-    // Refresh the employee list after account creation
-    fetchAllEmployees(currentPage);
-  };
-
-  const handleAccountUpdated = (result: any) => {
-    console.log("Account updated:", result);
-    setShowAccountForm(false);
-    setShowEditForm(false);
-    setSelectedEmployee(null);
-    setSelectedAccountData(null);
-    setError(null);
-    setHasSearched(false);
-    // Refresh the employee list after account update
-    fetchAllEmployees(currentPage);
-  };
-
-  const handleAccountDeleted = (result: any) => {
-    console.log("Account deleted:", result);
-    setShowAccountForm(false);
-    setShowEditForm(false);
-    setSelectedEmployee(null);
-    setSelectedAccountData(null);
-    setError(null);
-    setHasSearched(false);
-    // Refresh the employee list after account deletion
-    fetchAllEmployees(currentPage);
-  };
-
-  const handleBackToAccounts = () => {
-    setShowAccountForm(false);
-    setShowEditForm(false);
-    setSelectedEmployee(null);
-    setSelectedAccountData(null);
-    setError(null);
-    setHasSearched(false);
-  };
+ 
 
   const handleEmployeeSearch = (searchValue: string) => {
     setSearchTerm(searchValue);
@@ -355,25 +301,6 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      {showAccountForm ? (
-        <div className="w-full bg-gray-50 overflow-auto">
-          <AddAccountStepForm
-            onBackToAccounts={handleBackToAccounts}
-            onAccountAdded={handleAccountAdded}
-            employee={selectedEmployee || undefined}
-          />
-        </div>
-      ) : showEditForm ? (
-        <div className="w-full bg-gray-50 overflow-auto">
-          <EditAccountStepForm
-            onBackToAccounts={handleBackToAccounts}
-            onAccountUpdated={handleAccountUpdated}
-            onAccountDeleted={handleAccountDeleted}
-            employee={selectedEmployee || undefined}
-            accountData={selectedAccountData}
-          />
-        </div>
-      ) : (
         <section className="w-full bg-gray-50 overflow-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -505,7 +432,6 @@ const UserManagement: React.FC = () => {
             </div>
           </motion.div>
         </section>
-      )}
     </>
   );
 };
