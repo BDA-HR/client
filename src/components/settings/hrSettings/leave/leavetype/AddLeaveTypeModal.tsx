@@ -28,6 +28,13 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const leaveCategoryOptions = Object.values(LeaveCategory);
+ const getLeaveCategoryKey = (value: LeaveCategory): string => {
+   const key =  Object.keys(LeaveCategory).find(
+       (k) => LeaveCategory[k as keyof typeof LeaveCategory] === value,
+     );
+     return key ?? "";
+ };
+
 
   const resetForm = () => {
     setName("");
@@ -37,7 +44,8 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
     setHolidaysAsLeave(false);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+     e.preventDefault(); 
     if (!name.trim()) {
       toast.error("Leave type name is required");
       return;
@@ -47,12 +55,12 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
     try {
       const payload: LeaveTypeAddDto = {
         name: name.trim(),
-        leaveCategory,
+        leaveCategory: getLeaveCategoryKey(leaveCategory),
         requiresApproval,
         allowHalfDay,
         holidaysAsLeave,
       };
-
+      console.log("lt data", payload);
       const response = await onAddLeaveType(payload);
       toast.success(response?.message || "Leave type created");
 

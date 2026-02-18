@@ -70,9 +70,9 @@ const LeaveTypeTable: React.FC<LeaveTypeTableProps> = ({
 
   const getCategoryColor = (category: string): string => {
     const colors: Record<string, string> = {
-      'Paid': 'bg-blue-100 text-blue-800 border border-blue-200',
-      'Unpaid': 'bg-red-100 text-red-800 border border-red-200',
-      'Special': 'bg-gray-100 text-gray-800 border border-gray-200',
+      '0': 'bg-blue-100 text-blue-800 border border-blue-200',
+      '1': 'bg-red-100 text-red-800 border border-red-200',
+      '2': 'bg-green-100 text-green-800 border border-green-200',
     };
     return colors[category] || 'bg-gray-100 text-gray-800 border border-gray-200';
   };
