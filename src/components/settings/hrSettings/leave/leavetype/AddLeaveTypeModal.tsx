@@ -4,10 +4,10 @@ import { X, BadgePlus } from "lucide-react";
 import { Button } from "../../../../ui/button";
 import { Label } from "../../../../ui/label";
 import { Input } from "../../../../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "../../../../ui/select";
 import type { LeaveTypeAddDto } from "../../../../../types/core/Settings/leavetype";
-import { LeaveCategory, type LeaveCategory as LeaveCategoryType, } from "../../../../../types/core/enum";
+import { LeaveCategory, } from "../../../../../types/core/enum";
 import toast from "react-hot-toast";
+import EnumSelect from "../../../../ui/enumSelect";
 
 interface AddLeaveTypeModalProps {
   isOpen: boolean;
@@ -21,24 +21,18 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
   onAddLeaveType,
 }) => {
   const [name, setName] = useState("");
-  const [leaveCategory, setLeaveCategory] = useState<LeaveCategoryType>(LeaveCategory["0"]); // Paid
+  const [leaveCategory, setLeaveCategory] = useState("0"); // Paid
   const [requiresApproval, setRequiresApproval] = useState(true);
   const [allowHalfDay, setAllowHalfDay] = useState(false);
   const [holidaysAsLeave, setHolidaysAsLeave] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const leaveCategoryOptions = Object.values(LeaveCategory);
- const getLeaveCategoryKey = (value: LeaveCategory): string => {
-   const key =  Object.keys(LeaveCategory).find(
-       (k) => LeaveCategory[k as keyof typeof LeaveCategory] === value,
-     );
-     return key ?? "";
- };
+
 
 
   const resetForm = () => {
     setName("");
-    setLeaveCategory(LeaveCategory["0"]);
+    setLeaveCategory("0");
     setRequiresApproval(true);
     setAllowHalfDay(false);
     setHolidaysAsLeave(false);
@@ -55,7 +49,7 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
     try {
       const payload: LeaveTypeAddDto = {
         name: name.trim(),
-        leaveCategory: getLeaveCategoryKey(leaveCategory),
+        leaveCategory,
         requiresApproval,
         allowHalfDay,
         holidaysAsLeave,
@@ -117,14 +111,16 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
           </button>
         </div>
 
-
         <form onSubmit={handleSubmit}>
           {/* Body */}
           <div className="px-6 py-4 space-y-4">
             {/* Name */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="minDurPerReq" className="text-sm text-gray-700 font-medium">
+                <Label
+                  htmlFor="minDurPerReq"
+                  className="text-sm text-gray-700 font-medium"
+                >
                   Leave Type Name <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
@@ -139,27 +135,19 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
 
               {/* Leave Category */}
               <div className="space-y-2">
-                <Label htmlFor="fiscalYear" className="block text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="fiscalYear"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Leave Category <span className="text-red-500">*</span>
                 </Label>
-                <Select
+                <EnumSelect
+                  enumObject={LeaveCategory}
                   value={leaveCategory}
-                  onValueChange={(v) =>
-                    setLeaveCategory(v as LeaveCategoryType)
-                  }
+                  onChange={setLeaveCategory}
+                  placeholder="Select Leave Category"
                   disabled={isLoading}
-                >
-                  <SelectTrigger className="w-full focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent">
-                    <SelectValue placeholder="Select Leave Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {leaveCategoryOptions.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
             </div>
 
@@ -186,7 +174,9 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
                   disabled={isLoading}
                   className="h-4 w-4 accent-emerald-600"
                 />
-                <span className="text-sm text-gray-700">Allow half-day leave</span>
+                <span className="text-sm text-gray-700">
+                  Allow half-day leave
+                </span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
@@ -197,7 +187,9 @@ const AddLeaveTypeModal: React.FC<AddLeaveTypeModalProps> = ({
                   disabled={isLoading}
                   className="h-4 w-4 accent-emerald-600"
                 />
-                <span className="text-sm text-gray-700">Count holidays as leave</span>
+                <span className="text-sm text-gray-700">
+                  Count holidays as leave
+                </span>
               </label>
             </div>
           </div>
